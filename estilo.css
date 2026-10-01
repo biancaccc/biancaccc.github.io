@@ -1,0 +1,97 @@
+p {
+
+  font-family: "Slabo 13px", serif;
+  font-weight: 400;
+  font-style: normal;
+  	font-size: 40px;
+	color: #99beff;
+
+
+
+}
+h1 {
+
+	font-family: "times new roman";
+	font-size: 60px;
+	color: #ffffff;
+	margin-top: 20px;
+	
+
+
+
+}
+h2 {
+
+  font-family: "Slabo 13px", serif;
+  font-weight: 400;
+  font-style: normal;
+	font-size: 40px;
+	color: #dbc9ff;
+
+
+
+	
+}
+
+a {
+  font-family: "Slabo 13px", serif;
+  font-weight: 400;
+  font-style: normal;
+	font-size: 40px;
+	color: #99beff;
+
+
+
+}
+
+p.especial {
+
+  font-family: "Slabo 13px", serif;
+  font-weight: 400;
+  font-style: normal;
+	font-size: 75px;
+	color: #ffffff;
+
+	margin-top: 100px;
+	
+}
+
+
+h3 {
+  font-family: "Slabo 13px", serif;
+  font-weight: 400;
+  font-style: normal;
+	font-size: 25px;
+	color: #ffffff;
+	margin-left: 400px;
+	margin-right: 400px;
+	text-align: left;
+	margin-bottom: 0;
+}
+
+h4 {
+	font-weight: bold;
+	font-family: "Slabo 13px", serif;
+  font-weight: 900;
+  font-style: normal;
+	font-size: 25px;
+	color: #ffffff;
+	margin-top: 60px;
+	margin-left: 400px;
+	margin-right: 400px;
+	text-align: left;
+}
+body {background-image:url(fundo.jpg);}
+
+img.classe1 { width: 700px;
+
+}
+
+img.classe1:hover { width: 1500px;
+ }
+
+.planetas {
+  display: flex;
+  gap: 34px;
+  justify-content: center; 
+}
