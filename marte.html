@@ -1,59 +1,141 @@
 <!DOCTYPE html>
-<html>
+<html lang="pt-BR">
 <head>
 	<meta charset="utf-8">
+	<!-- fundo escuro desde o primeiro instante; vindo de um salto, a página começa coberta pelo último quadro do salto (preso à tela, não à página), para nenhum quadro vazar antes das estrelas -->
+	<script>try{var h=document.documentElement;h.style.backgroundColor="#05030c";if(sessionStorage.getItem("salto")==="1"){var q=sessionStorage.getItem("saltoQuadro");h.className+=" em-salto";if(q){h.style.background="#05030c url("+q+") 0 0/100% 100% no-repeat fixed";h.style.imageRendering="pixelated"}}}catch(e){}</script>
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<title>Marte</title>
-	<link rel="stylesheet" type="text/css" href="estilo.css">
+	<title>Marte · Nosso sistema solar</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Silkscreen&family=Space+Grotesk:wght@400;500;700&family=Tiny5&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="estilo.css">
 </head>
-<center>
-<p = class="especial"> Marte </p>
-</center>
-<body bgcolor="#000000">
+<body data-passaporte="sistema" style="--cor: #e8906c; --largura: 400px">
 
-		<center>
-	<img src="planeta4.JPG" width="400px">
+	<header class="topo">
+		<a class="marca" href="sistema-solar.html">Nosso sistema solar</a>
+		<nav class="menu">
+		<a class="menu-galaxia" href="index.html#galaxia">&larr; Via Láctea</a>
+		<a href="mercurio.html">Mercúrio</a>
+		<a href="venus.html">Vênus</a>
+		<a href="terra.html">Terra</a>
+		<a href="marte.html" aria-current="page">Marte</a>
+		<a href="jupiter.html">Júpiter</a>
+		<a href="saturno.html">Saturno</a>
+		<a href="urano.html">Urano</a>
+		<a href="netuno.html">Netuno</a>
+		<a href="sol.html">Sol</a>
+		</nav>
+	</header>
 
+	<main>
+		<section class="destaque">
+			<div class="palco">
+				<img class="planeta" data-planeta="marte" src="pixel/marte.png" alt="Marte em pixel art">
+			</div>
+			<div class="destaque-texto">
+				<p class="posicao">4º planeta a partir do Sol</p>
+				<h1>Marte</h1>
+				<p class="lema">O planeta vermelho</p>
+				<dl class="ficha">
+					<div><dt>Tipo</dt><dd>Planeta rochoso</dd></div>
+					<div><dt>Distância do Sol</dt><dd>Cerca de 228 milhões de km</dd></div>
+					<div><dt>Um ano dura</dt><dd>687 dias</dd></div>
+					<div><dt>Luas</dt><dd>2, Fobos e Deimos</dd></div>
+				</dl>
+			</div>
+		</section>
 
+		<div class="leitura" id="leitura">
+		<aside class="sumario" aria-label="Nesta página">
+			<p>Nesta página</p>
+			<ol>
+				<li><a href="#secao-1">Marte: o planeta vermelho</a></li>
+				<li><a href="#secao-2">Um dia quase igual ao nosso</a></li>
+				<li><a href="#secao-3">Frio, seco e empoeirado</a></li>
+				<li><a href="#secao-4">Gigantes do Sistema Solar</a></li>
+				<li><a href="#secao-5">Duas luas em forma de batata</a></li>
+				<li><a href="#secao-6">Um passado com rios e lagos</a></li>
+				<li><a href="#secao-7">Robôs exploradores</a></li>
+				<li class="extra"><a href="#balanca">Sua balança espacial</a></li>
+			</ol>
+		</aside>
 
-<h4> Marte: o planeta vermelho</h4>
-<h3>Marte é o quarto planeta a partir do Sol e o mais estudado depois da Terra. Sua cor avermelhada vem da ferrugem: o solo e a poeira são cheios de óxido de ferro. Por lembrar a cor do sangue, ele recebeu o nome do deus romano da guerra. Da Terra, dá para vê-lo a olho nu como um ponto alaranjado no céu noturno.
-</h3>
+		<article class="conteudo">
+		<section class="bloco pixelado" id="secao-1">
+			<h2>Marte: o planeta vermelho</h2>
+			<p>Marte é o quarto planeta a partir do Sol e o mais estudado depois da Terra. Sua cor avermelhada vem da ferrugem: o solo e a poeira são cheios de óxido de ferro. Por lembrar a cor do sangue, ele recebeu o nome do deus romano da guerra. Da Terra, dá para vê-lo a olho nu como um ponto alaranjado no céu noturno.</p>
+		</section>
+		<section class="bloco pixelado" id="secao-2">
+			<h2>Um dia quase igual ao nosso</h2>
+			<p>O dia em Marte, chamado de "sol", dura 24 horas e 37 minutos, bem parecido com o da Terra. Já o ano é bem mais longo: Marte leva 687 dias terrestres para dar a volta no Sol, quase o dobro do nosso. Como seu eixo também é inclinado, Marte tem estações do ano, só que cada uma dura cerca de seis meses.</p>
+		</section>
+		<figure class="comparacao">
+			<img class="pixelado" src="tamanhomarte.png" alt="Comparação do tamanho de Marte">
+			<figcaption>Passe o mouse para ampliar</figcaption>
+		</figure>
+		<section class="bloco pixelado" id="secao-3">
+			<h2>Frio, seco e empoeirado</h2>
+			<p>A atmosfera de Marte é tão fina que a pressão lá é menos de 1% da pressão da Terra. Sem um "cobertor" para guardar o calor, a temperatura média fica em torno de −60 °C. De tempos em tempos, tempestades de poeira crescem tanto que cobrem o planeta inteiro por semanas. E, ao contrário daqui, o pôr do Sol em Marte é azulado.</p>
+		</section>
+		<section class="bloco pixelado" id="secao-4">
+			<h2>Gigantes do Sistema Solar</h2>
+			<p>Mesmo tendo metade do tamanho da Terra, Marte guarda recordes. O Monte Olimpo é o maior vulcão conhecido do Sistema Solar, com cerca de 22 km de altura, mais de duas vezes e meia a altura do Everest. E o Valles Marineris é um cânion com cerca de 4.000 km de comprimento, que atravessaria o Brasil de ponta a ponta.</p>
+		</section>
+		<section class="bloco pixelado" id="secao-5">
+			<h2>Duas luas em forma de batata</h2>
+			<p>Marte tem duas luas pequenas e irregulares, Fobos e Deimos, que provavelmente são asteroides capturados. Fobos está se aproximando de Marte aos poucos e, daqui a dezenas de milhões de anos, deve se despedaçar e talvez formar um anel ao redor do planeta.</p>
+		</section>
+		<section class="bloco pixelado" id="secao-6">
+			<h2>Um passado com rios e lagos</h2>
+			<p>Hoje Marte é um deserto gelado, mas nem sempre foi assim. Há leitos de rios secos, deltas e antigos lagos por toda a superfície, e seus polos guardam gelo de água. Bilhões de anos atrás, Marte provavelmente era mais quente e úmido, com condições que poderiam ter permitido vida microscópica.</p>
+		</section>
+		<section class="bloco pixelado" id="secao-7">
+			<h2>Robôs exploradores</h2>
+			<p>Marte é o único planeta além da Terra onde robôs passeiam pela superfície. Hoje, dois jipes da NASA trabalham lá: o Curiosity, que chegou em 2012, e o Perseverance, que chegou em 2021 trazendo o Ingenuity, o primeiro helicóptero a voar em outro planeta. Em 2026, os cientistas anunciaram que o Curiosity encontrou a maior variedade de moléculas orgânicas já vista em Marte, incluindo sete nunca detectadas antes no planeta. Essas moléculas não provam que houve vida, mas são os mesmos "tijolinhos" que deram origem à vida na Terra. Para ter certeza, será preciso trazer as amostras coletadas pelo Perseverance para análise em laboratórios aqui.</p>
+		</section>
 
-<h4>Um dia quase igual ao nosso</h4>
-<h3> O dia em Marte, chamado de "sol", dura 24 horas e 37 minutos, bem parecido com o da Terra. Já o ano é bem mais longo: Marte leva 687 dias terrestres para dar a volta no Sol, quase o dobro do nosso. Como seu eixo também é inclinado, Marte tem estações do ano, só que cada uma dura cerca de seis meses. </h3>
+		<p class="fecho">Frio, vermelho e cheio de pistas sobre o passado, Marte é o planeta que mais alimenta o sonho de encontrar vida fora da Terra e, quem sabe um dia, de receber os primeiros visitantes humanos.</p>
+		</article>
+		</div>
 
-<br>
-<br>
-<br>
+		<section id="balanca" data-planeta="marte"></section>
 
-		<img class="classe1" src="tamanhomarte.png">
+		<nav class="vizinhos">
+		<a class="anterior" href="terra.html"><img src="pixel/terra.png" alt=""><span><small>Anterior</small>Terra</span></a>
+		<a class="proximo" href="jupiter.html"><span><small>Próximo</small>Júpiter</span><img src="pixel/jupiter.png" alt=""></a>
+		</nav>
+	</main>
 
-<h4> Frio, seco e empoeirado </h4>
-<h3> A atmosfera de Marte é tão fina que a pressão lá é menos de 1% da pressão da Terra. Sem um "cobertor" para guardar o calor, a temperatura média fica em torno de −60 °C. De tempos em tempos, tempestades de poeira crescem tanto que cobrem o planeta inteiro por semanas. E, ao contrário daqui, o pôr do Sol em Marte é azulado. </h3> 
+	<footer class="rodape">
+		<nav class="rodape-planetas" aria-label="Todos os planetas">
+			<a href="mercurio.html"><img src="pixel/mercurio.png" alt="">Mercúrio</a>
+			<a href="venus.html"><img src="pixel/venus.png" alt="">Vênus</a>
+			<a href="terra.html"><img src="pixel/terra.png" alt="">Terra</a>
+			<a href="marte.html"><img src="pixel/marte.png" alt="">Marte</a>
+			<a href="jupiter.html"><img src="pixel/jupiter.png" alt="">Júpiter</a>
+			<a href="saturno.html"><img src="pixel/saturno.png" alt="">Saturno</a>
+			<a href="urano.html"><img src="pixel/urano.png" alt="">Urano</a>
+			<a href="netuno.html"><img src="pixel/netuno.png" alt="">Netuno</a>
+			<a href="sol.html"><img src="pixel/sol.png" alt="">Sol</a>
+		</nav>
+		<p><a href="sistema-solar.html">Nosso sistema solar</a> · <a href="index.html#galaxia">Via Láctea</a> · textos e pixel art feitos à mão</p>
+	</footer>
 
-
-
-<h4>Gigantes do Sistema Solar</h4>
-<h3>Mesmo tendo metade do tamanho da Terra, Marte guarda recordes. O Monte Olimpo é o maior vulcão conhecido do Sistema Solar, com cerca de 22 km de altura, mais de duas vezes e meia a altura do Everest. E o Valles Marineris é um cânion com cerca de 4.000 km de comprimento, que atravessaria o Brasil de ponta a ponta.</h3>
-
-<h4> Duas luas em forma de batata</h4>
-<h3>Marte tem duas luas pequenas e irregulares, Fobos e Deimos, que provavelmente são asteroides capturados. Fobos está se aproximando de Marte aos poucos e, daqui a dezenas de milhões de anos, deve se despedaçar e talvez formar um anel ao redor do planeta.</h3>
-
-<h4> Um passado com rios e lagos</h4>
-<h3>Hoje Marte é um deserto gelado, mas nem sempre foi assim. Há leitos de rios secos, deltas e antigos lagos por toda a superfície, e seus polos guardam gelo de água. Bilhões de anos atrás, Marte provavelmente era mais quente e úmido, com condições que poderiam ter permitido vida microscópica.</h3>
-
-<h4> Robôs exploradores</h4>
-<h3>Marte é o único planeta além da Terra onde robôs passeiam pela superfície. Hoje, dois jipes da NASA trabalham lá: o Curiosity, que chegou em 2012, e o Perseverance, que chegou em 2021 trazendo o Ingenuity, o primeiro helicóptero a voar em outro planeta. Em 2026, os cientistas anunciaram que o Curiosity encontrou a maior variedade de moléculas orgânicas já vista em Marte, incluindo sete nunca detectadas antes no planeta. Essas moléculas não provam que houve vida, mas são os mesmos "tijolinhos" que deram origem à vida na Terra. Para ter certeza, será preciso trazer as amostras coletadas pelo Perseverance para análise em laboratórios aqui. </h3>
-
-
-	<br>
-	<br>
-
-	Frio, vermelho e cheio de pistas sobre o passado, Marte é o planeta que mais alimenta o sonho de encontrar vida fora da Terra e, quem sabe um dia, de receber os primeiros visitantes humanos.
-
-
-	
-
+	<script src="nave.js"></script>
+	<script src="transicao.js"></script>
+	<script src="radio.js"></script>
+	<script src="cabine.js"></script>
+	<script src="chegada.js"></script>
+	<script src="passaporte.js"></script>
+	<script src="marca.js"></script>
+	<script src="fundo.js"></script>
+	<script src="pixel/sprites.js"></script>
+	<script src="balanco.js"></script>
+	<script src="balanca.js"></script>
+	<script src="visuais-dados.js"></script>
+	<script src="visuais.js"></script>
+	<script src="pagina.js"></script>
 </body>
 </html>

@@ -1,59 +1,146 @@
 <!DOCTYPE html>
-<html>
+<html lang="pt-BR">
 <head>
 	<meta charset="utf-8">
+	<!-- fundo escuro desde o primeiro instante; vindo de um salto, a página começa coberta pelo último quadro do salto (preso à tela, não à página), para nenhum quadro vazar antes das estrelas -->
+	<script>try{var h=document.documentElement;h.style.backgroundColor="#05030c";if(sessionStorage.getItem("salto")==="1"){var q=sessionStorage.getItem("saltoQuadro");h.className+=" em-salto";if(q){h.style.background="#05030c url("+q+") 0 0/100% 100% no-repeat fixed";h.style.imageRendering="pixelated"}}}catch(e){}</script>
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<title>Júpiter</title>
-	<link rel="stylesheet" type="text/css" href="estilo.css">
+	<title>Júpiter · Nosso sistema solar</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Silkscreen&family=Space+Grotesk:wght@400;500;700&family=Tiny5&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="estilo.css">
 </head>
-<center>
-<p = class="especial"> Júpiter </p>
-</center>
-<body bgcolor="#000000">
+<body data-passaporte="sistema" style="--cor: #e6c49a; --largura: 440px">
 
-		<center>
-	<img src="planeta5.JPG" width="400px">
+	<header class="topo">
+		<a class="marca" href="sistema-solar.html">Nosso sistema solar</a>
+		<nav class="menu">
+		<a class="menu-galaxia" href="index.html#galaxia">&larr; Via Láctea</a>
+		<a href="mercurio.html">Mercúrio</a>
+		<a href="venus.html">Vênus</a>
+		<a href="terra.html">Terra</a>
+		<a href="marte.html">Marte</a>
+		<a href="jupiter.html" aria-current="page">Júpiter</a>
+		<a href="saturno.html">Saturno</a>
+		<a href="urano.html">Urano</a>
+		<a href="netuno.html">Netuno</a>
+		<a href="sol.html">Sol</a>
+		</nav>
+	</header>
 
+	<main>
+		<section class="destaque">
+			<div class="palco">
+				<img class="planeta" data-planeta="jupiter" src="pixel/jupiter.png" alt="Júpiter em pixel art">
+			</div>
+			<div class="destaque-texto">
+				<p class="posicao">5º planeta a partir do Sol</p>
+				<h1>Júpiter</h1>
+				<p class="lema">O rei dos planetas</p>
+				<dl class="ficha">
+					<div><dt>Tipo</dt><dd>Gigante gasoso</dd></div>
+					<div><dt>Distância do Sol</dt><dd>Cerca de 778 milhões de km</dd></div>
+					<div><dt>Um ano dura</dt><dd>Quase 12 anos</dd></div>
+					<div><dt>Luas</dt><dd>Mais de 100</dd></div>
+				</dl>
+			</div>
+		</section>
 
-<h4> Júpiter: o rei dos planetas</h4>
-<h3>Júpiter é o quinto planeta a partir do Sol e, de longe, o maior do Sistema Solar. Ele é tão grande que caberiam mais de 1.300 Terras dentro dele, e sua massa é mais que o dobro da de todos os outros planetas somados. Por isso recebeu o nome do rei dos deuses romanos. Da Terra, aparece a olho nu como um ponto brilhante e estável no céu noturno.</h3>
+		<div class="leitura" id="leitura">
+		<aside class="sumario" aria-label="Nesta página">
+			<p>Nesta página</p>
+			<ol>
+				<li><a href="#secao-1">Júpiter: o rei dos planetas</a></li>
+				<li><a href="#secao-2">Um planeta sem chão</a></li>
+				<li><a href="#secao-3">O dia mais curto do Sistema Solar</a></li>
+				<li><a href="#secao-4">Uma tempestade maior que a Terra</a></li>
+				<li><a href="#secao-5">Um mini sistema solar</a></li>
+				<li><a href="#secao-6">Um escudo magnético gigante</a></li>
+				<li><a href="#secao-7">O aspirador cósmico</a></li>
+				<li><a href="#secao-8">Próximas visitas</a></li>
+				<li class="extra"><a href="#balanca">Sua balança espacial</a></li>
+			</ol>
+		</aside>
 
-<h4>Um planeta sem chão</h4>
-<h3> Júpiter é um gigante gasoso, formado principalmente por hidrogênio e hélio, os mesmos elementos que compõem o Sol. Ele não tem uma superfície firme: quanto mais fundo se desce, mais denso e quente o gás fica, até virar uma espécie de líquido. Uma nave que tentasse "pousar" seria esmagada antes de encontrar chão. </h3>
+		<article class="conteudo">
+		<section class="bloco pixelado" id="secao-1">
+			<h2>Júpiter: o rei dos planetas</h2>
+			<p>Júpiter é o quinto planeta a partir do Sol e, de longe, o maior do Sistema Solar. Ele é tão grande que caberiam mais de 1.300 Terras dentro dele, e sua massa é mais que o dobro da de todos os outros planetas somados. Por isso recebeu o nome do rei dos deuses romanos. Da Terra, aparece a olho nu como um ponto brilhante e estável no céu noturno.</p>
+		</section>
+		<section class="bloco pixelado" id="secao-2">
+			<h2>Um planeta sem chão</h2>
+			<p>Júpiter é um gigante gasoso, formado principalmente por hidrogênio e hélio, os mesmos elementos que compõem o Sol. Ele não tem uma superfície firme: quanto mais fundo se desce, mais denso e quente o gás fica, até virar uma espécie de líquido. Uma nave que tentasse "pousar" seria esmagada antes de encontrar chão.</p>
+		</section>
+		<section class="bloco pixelado" id="secao-3">
+			<h2>O dia mais curto do Sistema Solar</h2>
+			<p>Apesar do tamanho, Júpiter é o planeta que gira mais rápido: um dia lá dura menos de 10 horas. Já o ano é longo, com quase 12 anos terrestres para dar uma volta no Sol. Essa rotação acelerada deixa o planeta achatado nos polos e mais largo no meio, como uma bola de massinha girando. Em 2026, dados da sonda Juno mostraram que Júpiter é um pouco menor e mais achatado do que se pensava.</p>
+		</section>
+		<figure class="comparacao">
+			<img class="pixelado" src="tamanhojupiter.png" alt="Comparação do tamanho de Júpiter">
+			<figcaption>Passe o mouse para ampliar</figcaption>
+		</figure>
+		<section class="bloco pixelado" id="secao-4">
+			<h2>Uma tempestade maior que a Terra</h2>
+			<p>A Grande Mancha Vermelha é uma tempestade gigante, maior que a Terra inteira, com ventos que passam de 400 km/h. Ela é observada há quase 200 anos e continua girando, embora esteja encolhendo aos poucos. As listras coloridas do planeta também são faixas de nuvens e ventos que sopram em direções opostas.</p>
+		</section>
+		<section class="bloco pixelado" id="secao-5">
+			<h2>Um mini sistema solar</h2>
+			<p>Júpiter tem mais de 100 luas conhecidas. As quatro maiores foram descobertas por Galileu Galilei em 1610 e cada uma é um mundo à parte: Io é o lugar com mais vulcões ativos do Sistema Solar, Europa esconde um oceano de água salgada sob uma camada de gelo, Ganimedes é a maior lua de todas (maior até que Mercúrio) e Calisto é uma das superfícies mais cheias de crateras que conhecemos.</p>
+		</section>
+		<section class="bloco pixelado" id="secao-6">
+			<h2>Um escudo magnético gigante</h2>
+			<p>Júpiter tem o campo magnético mais forte entre os planetas, milhares de vezes mais intenso que o da Terra. Ele gera auroras enormes nos polos, mas também cinturões de radiação tão fortes que podem danificar os equipamentos das sondas que se aproximam.</p>
+		</section>
+		<section class="bloco pixelado" id="secao-7">
+			<h2>O aspirador cósmico</h2>
+			<p>Com sua gravidade enorme, Júpiter puxa e desvia muitos cometas e asteroides. Em 1994, o mundo viu ao vivo os pedaços do cometa Shoemaker-Levy 9 colidirem com o planeta, deixando marcas escuras maiores que a Terra. Por isso, alguns cientistas acreditam que ele ajuda a proteger os planetas internos, embora essa ideia ainda seja debatida.</p>
+		</section>
+		<section class="bloco pixelado" id="secao-8">
+			<h2>Próximas visitas</h2>
+			<p>Várias sondas já passaram por Júpiter, e a Juno o estuda desde 2016. Agora, duas novas missões estão a caminho: o JUICE, que vai explorar suas luas geladas, e a Europa Clipper, que vai examinar a lua com mais chances de abrigar vida, ambas com chegada prevista para o início da década de 2030.</p>
+		</section>
 
+		<p class="fecho">Gigante, veloz e rodeado de luas fascinantes, Júpiter é quase um sistema solar em miniatura e um dos lugares onde a busca por vida fora da Terra pode dar seus próximos passos.</p>
+		</article>
+		</div>
 
-<h4> O dia mais curto do Sistema Solar </h4>
-<h3> Apesar do tamanho, Júpiter é o planeta que gira mais rápido: um dia lá dura menos de 10 horas. Já o ano é longo, com quase 12 anos terrestres para dar uma volta no Sol. Essa rotação acelerada deixa o planeta achatado nos polos e mais largo no meio, como uma bola de massinha girando. Em 2026, dados da sonda Juno mostraram que Júpiter é um pouco menor e mais achatado do que se pensava. </h3> 
+		<section id="balanca" data-planeta="jupiter"></section>
 
-<br>
-<br>
-<br>
+		<nav class="vizinhos">
+		<a class="anterior" href="marte.html"><img src="pixel/marte.png" alt=""><span><small>Anterior</small>Marte</span></a>
+		<a class="proximo" href="saturno.html"><span><small>Próximo</small>Saturno</span><img src="pixel/saturno.png" alt=""></a>
+		</nav>
+	</main>
 
-<img class="classe1" src="tamanhojupiter.png">
+	<footer class="rodape">
+		<nav class="rodape-planetas" aria-label="Todos os planetas">
+			<a href="mercurio.html"><img src="pixel/mercurio.png" alt="">Mercúrio</a>
+			<a href="venus.html"><img src="pixel/venus.png" alt="">Vênus</a>
+			<a href="terra.html"><img src="pixel/terra.png" alt="">Terra</a>
+			<a href="marte.html"><img src="pixel/marte.png" alt="">Marte</a>
+			<a href="jupiter.html"><img src="pixel/jupiter.png" alt="">Júpiter</a>
+			<a href="saturno.html"><img src="pixel/saturno.png" alt="">Saturno</a>
+			<a href="urano.html"><img src="pixel/urano.png" alt="">Urano</a>
+			<a href="netuno.html"><img src="pixel/netuno.png" alt="">Netuno</a>
+			<a href="sol.html"><img src="pixel/sol.png" alt="">Sol</a>
+		</nav>
+		<p><a href="sistema-solar.html">Nosso sistema solar</a> · <a href="index.html#galaxia">Via Láctea</a> · textos e pixel art feitos à mão</p>
+	</footer>
 
-<h4>Uma tempestade maior que a Terra</h4>
-<h3>A Grande Mancha Vermelha é uma tempestade gigante, maior que a Terra inteira, com ventos que passam de 400 km/h. Ela é observada há quase 200 anos e continua girando, embora esteja encolhendo aos poucos. As listras coloridas do planeta também são faixas de nuvens e ventos que sopram em direções opostas.</h3>
-
-<h4> Um mini sistema solar</h4>
-<h3>Júpiter tem mais de 90 luas conhecidas. As quatro maiores foram descobertas por Galileu Galilei em 1610 e cada uma é um mundo à parte: Io é o lugar com mais vulcões ativos do Sistema Solar, Europa esconde um oceano de água salgada sob uma camada de gelo, Ganimedes é a maior lua de todas (maior até que Mercúrio) e Calisto é uma das superfícies mais cheias de crateras que conhecemos.</h3>
-
-<h4> Um escudo magnético gigante</h4>
-<h3>Júpiter tem o campo magnético mais forte entre os planetas, milhares de vezes mais intenso que o da Terra. Ele gera auroras enormes nos polos, mas também cinturões de radiação tão fortes que podem danificar os equipamentos das sondas que se aproximam.</h3>
-
-<h4> O aspirador cósmico</h4>
-<h3>Com sua gravidade enorme, Júpiter puxa e desvia muitos cometas e asteroides. Em 1994, o mundo viu ao vivo os pedaços do cometa Shoemaker-Levy 9 colidirem com o planeta, deixando marcas escuras maiores que a Terra. Por isso, alguns cientistas acreditam que ele ajuda a proteger os planetas internos, embora essa ideia ainda seja debatida.</h3>
-
-
-<h4> Próximas visitas</h4>
-<h3>Várias sondas já passaram por Júpiter, e a Juno o estuda desde 2016. Agora, duas novas missões estão a caminho, o JUICE, que vai explorar suas luas geladas, e a Europa Clipper, que vai examinar a lua com mais chances de abrigar vida, ambas com chegada prevista para o início da década de 2030.</h3>
-
-	<br>
-	<br>
-
-	Gigante, veloz e rodeado de luas fascinantes, Júpiter é quase um sistema solar em miniatura e um dos lugares onde a busca por vida fora da Terra pode dar seus próximos passos.
-
-
-
-
+	<script src="nave.js"></script>
+	<script src="transicao.js"></script>
+	<script src="radio.js"></script>
+	<script src="cabine.js"></script>
+	<script src="chegada.js"></script>
+	<script src="passaporte.js"></script>
+	<script src="marca.js"></script>
+	<script src="fundo.js"></script>
+	<script src="pixel/sprites.js"></script>
+	<script src="balanco.js"></script>
+	<script src="balanca.js"></script>
+	<script src="visuais-dados.js"></script>
+	<script src="visuais.js"></script>
+	<script src="pagina.js"></script>
 </body>
 </html>

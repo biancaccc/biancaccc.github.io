@@ -1,40 +1,100 @@
 <!DOCTYPE html>
-<html>
+<html lang="pt-BR">
 <head>
 	<meta charset="utf-8">
+	<!-- fundo escuro desde o primeiro instante; vindo de um salto, a página começa coberta pelo último quadro do salto (preso à tela, não à página), para nenhum quadro vazar antes das estrelas -->
+	<script>try{var h=document.documentElement;h.style.backgroundColor="#05030c";if(sessionStorage.getItem("salto")==="1"){var q=sessionStorage.getItem("saltoQuadro");h.className+=" em-salto";if(q){h.style.background="#05030c url("+q+") 0 0/100% 100% no-repeat fixed";h.style.imageRendering="pixelated"}}}catch(e){}</script>
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<title>Nosso sistema solar</title>
-	<link rel="stylesheet" type="text/css" href="estilo.css">
+	<title>Agência Andarilha · Turismo espacial em pixel art pela Via Láctea</title>
 	<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Slabo+13px&display=swap" rel="stylesheet">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Mrs+Saint+Delafield&family=Silkscreen&family=Space+Grotesk:wght@400;500;700&family=Tiny5&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="estilo.css">
 </head>
+<body class="viagem">
 
-<body bgcolor="#000000">
-<center>me e
+	<canvas id="cena" class="cena" aria-hidden="true"></canvas>
+	<div class="hud-moldura" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
 
-<h1>Nosso sistema solar</h1>
+	<!-- 1. A nave em cruzeiro -->
+	<section class="intro" id="intro">
+		<div class="hud-linha hud-topo">
+			<span><small>Nave</small> PX-01</span>
+			<span><small>Velocidade</small> <b id="velocidade">0,02 c</b></span>
+			<span><small>Destino</small> Via Láctea</span>
+		</div>
+		<div class="intro-centro">
+			<div class="selo-agencia" id="selo-agencia" role="img" aria-label="Selo da Agência Andarilha, turismo espacial desde 2077: um planeta com a órbita e a nave passando"></div>
+			<div class="intro-titulo">
+				<p class="hud-rotulo">Agência de turismo espacial</p>
+				<h1>Andarilha</h1>
+				<p class="intro-sub">Uma viagem em pixel art pela nossa galáxia</p>
+			</div>
+			<div class="intro-embarque">
+				<button type="button" class="intro-botao" id="iniciar" aria-keyshortcuts="Space"><span class="intro-botao-seta" aria-hidden="true"></span>Iniciar viagem<kbd aria-hidden="true">espaço</kbd></button>
+				<a class="rever-embarque" href="?embarque">Rever o embarque na agência</a>
+			</div>
+		</div>
+		<div class="hud-linha hud-base" aria-hidden="true">
+			<span><i class="hud-luz"></i>Sistemas ok</span>
+			<span>Portão 01 · embarque liberado</span>
+		</div>
+	</section>
 
+	<!-- 2. A galáxia com os destinos -->
+	<section class="galaxia" id="galaxia" hidden>
+		<header class="galaxia-topo">
+			<p class="hud-rotulo">Chegamos</p>
+			<h1>Via Láctea</h1>
+			<p>Escolha um destino turístico</p>
+		</header>
+		<div class="marcadores" id="marcadores"></div>
+		<aside class="cartao-destino" id="cartao" aria-live="polite">
+			<div class="cartao-cabeca">
+				<div class="cartao-mini" aria-hidden="true">
+					<!-- a arte de verdade fica escondida; o que aparece é um mosaico dela (o "sinal captado") -->
+					<canvas class="arte-destino cartao-fonte" data-arte="buraco-negro"></canvas>
+					<img class="cartao-fonte" src="pixel/sol.png" alt="" hidden>
+					<canvas class="cartao-mosaico"></canvas>
+				</div>
+				<div class="cartao-info"></div>
+			</div>
+			<div class="cartao-corpo"></div>
+		</aside>
+		<p class="nota-mapa">Mapa ilustrativo: as posições e distâncias não estão em escala.</p>
+		<button type="button" class="rever" id="rever">&#8634; Ver a decolagem de novo</button>
+		<a class="botao-linha" href="linha-do-tempo.html"><span class="bl-ampulheta" aria-hidden="true"><i></i></span><span class="bl-texto"><b>Linha do tempo</b><small>a história do céu</small></span></a>
+	</section>
 
-<h2>Conheça sobre cada um dos planetas</h2>
+	<div class="flash" id="flash" aria-hidden="true"></div>
 
-<img src="sistematodo.png" width="1400" id="foto">
+	<noscript>
+		<nav class="sem-script">
+			<p>Destinos:</p>
+			<a href="sagitario-a.html">Sagittarius A*</a>
+			<a href="fermi.html">Bolhas de Fermi</a>
+			<a href="orion.html">Nebulosa de Órion</a>
+			<a href="pleiades.html">Plêiades</a>
+			<a href="helice.html">Nebulosa da Hélice</a>
+			<a href="tabby.html">Estrela de Tabby</a>
+			<a href="omega-centauri.html">Omega Centauri</a>
+			<a href="betelgeuse.html">Betelgeuse</a>
+			<a href="eta-carinae.html">Eta Carinae</a>
+			<a href="sirius.html">Sirius</a>
+			<a href="caranguejo.html">Nebulosa do Caranguejo</a>
+			<a href="proxima-centauri.html">Proxima Centauri</a>
+			<a href="sistema-solar.html">Sistema Solar</a>
+		</nav>
+	</noscript>
 
-<nav class="planetas">
-  <a href="mercurio.html" onmouseover="foto.src='mercuriobrilhoo.png'" onmouseout="foto.src='sistematodo.png'">Mercúrio</a>
-  <a href="venus.html" onmouseover="foto.src='brilhovenus.png'" onmouseout="foto.src='sistematodo.png'">Vênus</a>
-  <a href="terra.html"onmouseover="foto.src='terrabrilho.png'" onmouseout="foto.src='sistematodo.png'" >Terra</a>
-  <a href="marte.html" onmouseover="foto.src='martebrilho.png'" onmouseout="foto.src='sistematodo.png'">Marte</a>
-  <a href="jupiter.html" onmouseover="foto.src='jupiterbrilho.png'" onmouseout="foto.src='sistematodo.png'" >Júpiter</a>
-  <a href="saturno.html" onmouseover="foto.src='saturnobrilho.png'" onmouseout="foto.src='sistematodo.png'" >Saturno</a>
-  <a href="urano.html" onmouseover="foto.src='uranobrilhoo.png'" onmouseout="foto.src='sistematodo.png'" >Urano</a>
-  <a href="netuno.html"onmouseover="foto.src='netunobrilho.png'" onmouseout="foto.src='sistematodo.png'" >Netuno</a>
-  <a href="sol.html">Sol</a>
-</nav>
-<br>
-<br>
-
-
+	<script src="nave.js"></script>
+	<script src="transicao.js"></script>
+	<script src="radio.js"></script>
+	<script src="passaporte.js"></script>
+	<script src="marca.js"></script>
+	<script src="destinos.js"></script>
+	<script src="viagem.js"></script>
+	<script src="cabine.js"></script>
+	<script src="embarque.js"></script>
 </body>
-
 </html>

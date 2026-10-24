@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+	<meta charset="utf-8">
+	<!-- fundo escuro desde o primeiro instante; vindo de um salto, a página começa coberta pelo último quadro do salto (preso à tela, não à página), para nenhum quadro vazar antes das estrelas -->
+	<script>try{var h=document.documentElement;h.style.backgroundColor="#05030c";if(sessionStorage.getItem("salto")==="1"){var q=sessionStorage.getItem("saltoQuadro");h.className+=" em-salto";if(q){h.style.background="#05030c url("+q+") 0 0/100% 100% no-repeat fixed";h.style.imageRendering="pixelated"}}}catch(e){}</script>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Linha do tempo do céu · Turismo espacial</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Silkscreen&family=Space+Grotesk:wght@400;500;700&family=Tiny5&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="estilo.css">
+</head>
+<body class="destino linha-geral" style="--cor: #7fe3ff">
+
+	<header class="topo">
+		<a class="marca" href="index.html#galaxia">Turismo espacial</a>
+		<nav class="menu">
+		<a class="menu-galaxia" href="index.html#galaxia">&larr; Via Láctea</a>
+		</nav>
+	</header>
+
+	<main>
+		<section class="destaque">
+			<div class="palco">
+				<div class="selo-agencia" id="selo-agencia" role="img" aria-label="Selo da Agência Andarilha"></div>
+			</div>
+			<div class="destaque-texto">
+				<p class="posicao">Arquivo histórico da Agência Andarilha</p>
+				<h1>Linha do tempo do céu</h1>
+				<p class="lema">Como fomos descobrindo cada um dos nossos destinos, do Egito antigo até o telescópio James Webb</p>
+				<dl class="ficha" id="ficha-linha"></dl>
+			</div>
+		</section>
+
+		<div class="leitura" id="leitura">
+		<aside class="sumario" aria-label="Nesta página">
+			<p>Nesta página</p>
+			<ol id="sumario-linha"></ol>
+		</aside>
+
+		<article class="conteudo" id="conteudo-linha">
+			<section class="bloco pixelado" id="filtros-linha">
+				<h2>Escolha o que ver</h2>
+				<p>Aqui estão juntas as linhas do tempo de todas as páginas, da mais antiga para a mais nova. Cada acontecimento tem uma etiqueta com o destino: clique nela para visitar a página dele.</p>
+				<div class="filtros-linha" role="group" aria-label="Filtrar a linha do tempo">
+					<button type="button" data-filtro="tudo" aria-pressed="true">Tudo</button>
+					<button type="button" data-filtro="solar" aria-pressed="false">Sistema Solar</button>
+					<button type="button" data-filtro="galaxia" aria-pressed="false">Via Láctea</button>
+				</div>
+				<!-- a régua do tempo: cada pontinho é um acontecimento, na cor do destino; clique para ir até ele -->
+				<nav class="regua" id="regua-linha" aria-label="Régua do tempo: cada pontinho é um acontecimento"></nav>
+			</section>
+			<p class="fecho">Milhares de anos olhando para cima, e cada descoberta abriu caminho para a próxima. A próxima linha dessa história pode ser escrita por você.</p>
+		</article>
+		</div>
+
+		<nav class="vizinhos volta" aria-label="Próxima viagem">
+		<a href="index.html#galaxia"><span><small>Escolher um destino</small>&larr; Voltar para a Via Láctea</span></a>
+		</nav>
+	</main>
+
+	<footer class="rodape">
+		<p><a href="index.html#galaxia">Turismo espacial</a></p>
+	</footer>
+
+	<script src="nave.js"></script>
+	<script src="transicao.js"></script>
+	<script src="radio.js"></script>
+	<script src="passaporte.js"></script>
+	<script src="marca.js"></script>
+	<script src="fundo.js"></script>
+	<script src="visuais-dados.js"></script>
+	<script>
+		// Junta as linhas do tempo de todas as páginas (visuais-dados.js; a de Urano está escrita na
+		// página dele, então vem copiada aqui), põe em ordem e separa por época.
+		(function () {
+			var V = window.VISUAIS_DADOS || {}, HOJE = new Date().getFullYear();
+			// nome, cor e grupo de cada página (solar = Sistema Solar, galaxia = destinos da Via Láctea)
+			var PAGINAS = {
+				sol: ['Sol', '#ffc04d', 'solar'], mercurio: ['Mercúrio', '#a9b8ff', 'solar'], venus: ['Vênus', '#f5a83c', 'solar'], terra: ['Terra', '#6f9bff', 'solar'],
+				marte: ['Marte', '#e8906c', 'solar'], jupiter: ['Júpiter', '#e6c49a', 'solar'], saturno: ['Saturno', '#e3cc8f', 'solar'], urano: ['Urano', '#a8ecf5', 'solar'],
+				netuno: ['Netuno', '#6b95ff', 'solar'], 'sagitario-a': ['Sagittarius A*', '#ffb347', 'galaxia'], fermi: ['Bolhas de Fermi', '#e070ff', 'galaxia'],
+				orion: ['Nebulosa de Órion', '#ff6fb5', 'galaxia'], pleiades: ['Plêiades', '#8fb8ff', 'galaxia'], helice: ['Nebulosa da Hélice', '#5fd6d0', 'galaxia'],
+				tabby: ['Estrela de Tabby', '#ff9d5c', 'galaxia'], 'omega-centauri': ['Omega Centauri', '#ffe08a', 'galaxia'], betelgeuse: ['Betelgeuse', '#ff6a3d', 'galaxia'],
+				'eta-carinae': ['Eta Carinae', '#c8a0ff', 'galaxia'], sirius: ['Sirius', '#5b8cff', 'galaxia'], caranguejo: ['Nebulosa do Caranguejo', '#9be36a', 'galaxia'],
+				'proxima-centauri': ['Proxima Centauri', '#f0505a', 'galaxia']
+			};
+			var URANO = [['1781', 'William Herschel descobre Urano com um telescópio.'], ['1787', 'Herschel encontra as duas primeiras luas: Titânia e Oberon.'],
+				['1851', 'William Lassell descobre Ariel e Umbriel.'], ['1948', 'Gerard Kuiper descobre Miranda, a lua do penhasco gigante.'],
+				['1977', 'Os anéis de Urano são descobertos.'], ['1986', 'A Voyager 2 passa por Urano: a única visita até hoje.'], ['2025', 'Uma nova lua é encontrada, e Urano passa a ter 29.']];
+			// transforma o rótulo ("1846", "Há uns 3.600 anos", "240 a.C.", "Fim do século 19"…) num ano, para pôr em ordem
+			function numero(s) { return parseFloat(s.replace(/\./g, '').replace(',', '.')); }
+			function mult(s) { return /bilh/.test(s) ? 1e9 : /milh/.test(s) ? 1e6 : /mil/.test(s) ? 1e3 : 1; }
+			function ano(r) {
+				var m;
+				if ((m = r.match(/^(\d+) a\.C\./))) return -numero(m[1]);
+				if ((m = r.match(/^Daqui a ([\d.,]+)/))) return HOJE + numero(m[1]) * mult(r);
+				if ((m = r.match(/^Há (?:uns )?([\d.,]+)/))) return HOJE - numero(m[1]) * mult(r);
+				if (/^Há milhares/.test(r)) return HOJE - 5000;
+				if ((m = r.match(/século (\d+)/))) return (+m[1] - 1) * 100 + 90;
+				if ((m = r.match(/^Antes de (\d{4})/))) return +m[1] - 1;
+				if ((m = r.match(/(\d{4})/))) return +m[1];
+				return 0;
+			}
+			var todos = [];
+			Object.keys(PAGINAS).forEach(function (id) {
+				var linha = id === 'urano' ? URANO : V[id] && V[id].linha;
+				(linha || []).forEach(function (m) { todos.push({ rotulo: m[0], texto: m[1], ano: ano(m[0]), id: id }); });
+			});
+			todos.sort(function (a, b) { return a.ano - b.ano; });
+			// cada época: id, título, quem entra nela, a ilustração animada (visuais.js) e um resuminho
+			var EPOCAS = [
+				['epoca-1', 'Antes dos telescópios', function (a) { return a < 1600; }, 'era-antiga', 'Pirâmides no Egito à noite, com o rio Nilo refletindo o céu e a estrela Sirius brilhando no horizonte.',
+					'Sem telescópio, só com os olhos: os povos antigos acompanhavam as estrelas para marcar o tempo, as colheitas e as cheias dos rios.'],
+				['epoca-2', 'Os primeiros telescópios (1600 a 1899)', function (a) { return a >= 1600 && a < 1900; }, 'era-telescopio', 'Uma luneta antiga, de latão, apontada para Júpiter, com as quatro luas grandes dando voltas em volta dele.',
+					'Em 1609, Galileu apontou uma luneta para o céu e tudo mudou: luas em volta de Júpiter, montanhas na Lua e estrelas que ninguém tinha visto antes.'],
+				['epoca-3', 'O século 20: foguetes, sondas e telescópios gigantes', function (a) { return a >= 1900 && a < 2000; }, 'era-foguete', 'Um foguete decolando da plataforma, com uma coluna de fogo e fumaça, subindo para o céu estrelado.',
+					'Com os foguetes, saímos da Terra: satélites, gente na Lua, sondas visitando os planetas e o telescópio Hubble lá em cima.'],
+				['epoca-4', 'O século 21: até hoje', function (a) { return a >= 2000 && a <= HOJE; }, 'era-webb', 'O telescópio James Webb flutuando no espaço: o espelho dourado de hexágonos em cima do escudo de proteção roxo, em camadas.',
+					'Robôs passeando em Marte, a primeira foto de um buraco negro e o James Webb, que enxerga a luz infravermelha das primeiras galáxias.'],
+				['epoca-5', 'E no futuro…', function (a) { return a > HOJE; }, 'era-futuro', 'O Sol, daqui a bilhões de anos, inchando até virar uma gigante vermelha e depois soltando as camadas de fora num anel de gás.',
+					'Daqui a bilhões de anos, o Sol vai inchar, soltar as camadas de fora como a Nebulosa da Hélice e virar uma anã branca.']
+			];
+			var conteudo = document.getElementById('conteudo-linha'), fecho = conteudo.querySelector('.fecho'), sumario = document.getElementById('sumario-linha');
+			var regua = document.getElementById('regua-linha');
+			EPOCAS.forEach(function (ep) {
+				var itens = todos.filter(function (t) { return ep[2](t.ano); });
+				if (!itens.length) return;
+				var s = document.createElement('section');
+				s.className = 'bloco pixelado';
+				s.id = ep[0];
+				s.innerHTML = '<h2>' + ep[1] + ' <small class="epoca-conta">' + itens.length + ' acontecimento' + (itens.length > 1 ? 's' : '') + '</small></h2>' +
+					'<figure class="animacao era-figura"><canvas data-animacao="' + ep[3] + '" width="200" height="70" role="img" aria-label="' + ep[4] + '"></canvas></figure>' +
+					'<p class="epoca-resumo">' + ep[5] + '</p>' +
+					'<ol class="linha-tempo">' + itens.map(function (t, i) {
+					var p = PAGINAS[t.id];
+					return '<li id="' + ep[0] + '-' + i + '" data-grupo="' + p[2] + '" style="--cor:' + p[1] + '"><b>' + t.rotulo + '</b><span>' + t.texto +
+						' <a class="linha-etiqueta" href="' + t.id + '.html">' + p[0].replace('*', '<span class="ast">*</span>') + '</a></span></li>';
+				}).join('') + '</ol>';
+				conteudo.insertBefore(s, fecho);
+				sumario.insertAdjacentHTML('beforeend', '<li><a href="#' + ep[0] + '">' + ep[1] + '</a></li>');
+				// na régua do topo: um trecho para cada época (largura conforme o número de
+				// acontecimentos), com um pontinho colorido para cada um, que leva até ele
+				regua.insertAdjacentHTML('beforeend', '<div class="regua-epoca" style="flex:' + itens.length + '"><a class="regua-nome" href="#' + ep[0] + '">' + ep[1].replace(/ \(.*|:.*/, '') + '</a><div class="regua-pontos">' +
+					itens.map(function (t, i) { var p = PAGINAS[t.id]; return '<a class="regua-ponto" data-grupo="' + p[2] + '" href="#' + ep[0] + '-' + i + '" style="--cor:' + p[1] + '" title="' + t.rotulo + ' · ' + p[0] + '"></a>'; }).join('') + '</div></div>');
+			});
+			document.getElementById('ficha-linha').innerHTML =
+				'<div><dt>Acontecimentos</dt><dd>' + todos.length + '</dd></div>' +
+				'<div><dt>Lugares</dt><dd>' + Object.keys(PAGINAS).length + '</dd></div>' +
+				'<div><dt>Mais antigo</dt><dd>' + todos[0].rotulo + '</dd></div>' +
+				'<div><dt>Mais novo</dt><dd>' + todos.filter(function (t) { return t.ano <= HOJE; }).pop().rotulo + '</dd></div>';
+			// os filtros: tudo, só o Sistema Solar ou só a Via Láctea
+			var botoes = document.querySelectorAll('[data-filtro]');
+			botoes.forEach(function (b) {
+				b.addEventListener('click', function () {
+					var f = b.getAttribute('data-filtro');
+					botoes.forEach(function (o) { o.setAttribute('aria-pressed', o === b ? 'true' : 'false'); });
+					document.querySelectorAll('.linha-geral .linha-tempo li, .regua-ponto').forEach(function (li) { li.classList.toggle('fora', f !== 'tudo' && li.getAttribute('data-grupo') !== f); });
+				});
+			});
+		})();
+	</script>
+	<script src="visuais.js"></script>
+	<script src="pagina.js"></script>
+</body>
+</html>

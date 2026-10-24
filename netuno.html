@@ -1,57 +1,141 @@
 <!DOCTYPE html>
-<html>
+<html lang="pt-BR">
 <head>
 	<meta charset="utf-8">
+	<!-- fundo escuro desde o primeiro instante; vindo de um salto, a página começa coberta pelo último quadro do salto (preso à tela, não à página), para nenhum quadro vazar antes das estrelas -->
+	<script>try{var h=document.documentElement;h.style.backgroundColor="#05030c";if(sessionStorage.getItem("salto")==="1"){var q=sessionStorage.getItem("saltoQuadro");h.className+=" em-salto";if(q){h.style.background="#05030c url("+q+") 0 0/100% 100% no-repeat fixed";h.style.imageRendering="pixelated"}}}catch(e){}</script>
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<title>Netuno</title>
-	<link rel="stylesheet" type="text/css" href="estilo.css">
+	<title>Netuno · Nosso sistema solar</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Silkscreen&family=Space+Grotesk:wght@400;500;700&family=Tiny5&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="estilo.css">
 </head>
-<center>
-<p = class="especial"> Netuno </p>
-</center>
-<body bgcolor="#000000">
+<body data-passaporte="sistema" style="--cor: #6b95ff; --largura: 400px">
 
-		<center>
-	<img src="planeta8.JPG" width="400px">
+	<header class="topo">
+		<a class="marca" href="sistema-solar.html">Nosso sistema solar</a>
+		<nav class="menu">
+		<a class="menu-galaxia" href="index.html#galaxia">&larr; Via Láctea</a>
+		<a href="mercurio.html">Mercúrio</a>
+		<a href="venus.html">Vênus</a>
+		<a href="terra.html">Terra</a>
+		<a href="marte.html">Marte</a>
+		<a href="jupiter.html">Júpiter</a>
+		<a href="saturno.html">Saturno</a>
+		<a href="urano.html">Urano</a>
+		<a href="netuno.html" aria-current="page">Netuno</a>
+		<a href="sol.html">Sol</a>
+		</nav>
+	</header>
 
-<h4>Netuno: o planeta encontrado pela matemática</h4>
-<h3>Netuno é o oitavo e mais distante planeta do Sistema Solar. Ele foi o primeiro planeta descoberto por cálculos antes de ser visto: os astrônomos perceberam que a órbita de Urano tinha pequenos desvios, como se algo invisível o puxasse. Em 1846, o matemático francês Urbain Le Verrier calculou onde esse "algo" deveria estar, e o astrônomo alemão Johann Galle apontou o telescópio para o lugar e encontrou Netuno. Por sua cor azulada, recebeu o nome do deus romano dos mares. Ele não pode ser visto a olho nu.</h3>
+	<main>
+		<section class="destaque">
+			<div class="palco">
+				<img class="planeta" data-planeta="netuno" src="pixel/netuno.png" alt="Netuno em pixel art">
+			</div>
+			<div class="destaque-texto">
+				<p class="posicao">8º planeta a partir do Sol</p>
+				<h1>Netuno</h1>
+				<p class="lema">O planeta encontrado pela matemática</p>
+				<dl class="ficha">
+					<div><dt>Tipo</dt><dd>Gigante de gelo</dd></div>
+					<div><dt>Distância do Sol</dt><dd>Cerca de 4,5 bilhões de km</dd></div>
+					<div><dt>Um ano dura</dt><dd>165 anos</dd></div>
+					<div><dt>Luas</dt><dd>16</dd></div>
+				</dl>
+			</div>
+		</section>
 
-<h4>Um azul que não era bem assim</h4>
-<h3>Durante décadas, Netuno apareceu nos livros com um azul intenso, bem mais forte que o de Urano. Mas, em 2024, cientistas reprocessaram as imagens antigas e mostraram que as fotos tinham sido realçadas para destacar detalhes. Na verdade, as cores dos dois planetas são bem parecidas: um azul-esverdeado suave, com Netuno só um pouquinho mais azul.</h3>
+		<div class="leitura" id="leitura">
+		<aside class="sumario" aria-label="Nesta página">
+			<p>Nesta página</p>
+			<ol>
+				<li><a href="#secao-1">Netuno: o planeta encontrado pela matemática</a></li>
+				<li><a href="#secao-2">Um azul que não era bem assim</a></li>
+				<li><a href="#secao-3">Um ano de 165 anos</a></li>
+				<li><a href="#secao-4">Frio, nublado e com estações de 40 anos</a></li>
+				<li><a href="#secao-5">Os ventos mais fortes do Sistema Solar</a></li>
+				<li><a href="#secao-6">Tritão, a lua que anda para trás</a></li>
+				<li><a href="#secao-7">Uma única visita</a></li>
+				<li class="extra"><a href="#balanca">Sua balança espacial</a></li>
+			</ol>
+		</aside>
 
+		<article class="conteudo">
+		<section class="bloco pixelado" id="secao-1">
+			<h2>Netuno: o planeta encontrado pela matemática</h2>
+			<p>Netuno é o oitavo e mais distante planeta do Sistema Solar. Ele foi o primeiro planeta descoberto por cálculos antes de ser visto: os astrônomos perceberam que a órbita de Urano tinha pequenos desvios, como se algo invisível o puxasse. Em 1846, o matemático francês Urbain Le Verrier calculou onde esse "algo" deveria estar, e o astrônomo alemão Johann Galle apontou o telescópio para o lugar e encontrou Netuno. Por sua cor azulada, recebeu o nome do deus romano dos mares. Ele não pode ser visto a olho nu.</p>
+		</section>
+		<section class="bloco pixelado" id="secao-2">
+			<h2>Um azul que não era bem assim</h2>
+			<p>Durante décadas, Netuno apareceu nos livros com um azul intenso, bem mais forte que o de Urano. Mas, em 2024, cientistas reprocessaram as imagens antigas e mostraram que as fotos tinham sido realçadas para destacar detalhes. Na verdade, as cores dos dois planetas são bem parecidas: um azul-esverdeado suave, com Netuno só um pouquinho mais azul.</p>
+		</section>
+		<section class="bloco pixelado" id="secao-3">
+			<h2>Um ano de 165 anos</h2>
+			<p>Netuno está tão longe que a luz do Sol leva cerca de 4 horas para chegar até ele. Um dia lá dura cerca de 16 horas, mas um ano leva 165 anos terrestres. Desde que foi descoberto, ele completou apenas uma volta ao redor do Sol, em 2011.</p>
+		</section>
+		<figure class="comparacao">
+			<img class="pixelado" src="tamanhonetuno.png" alt="Comparação do tamanho de Netuno">
+			<figcaption>Passe o mouse para ampliar</figcaption>
+		</figure>
+		<section class="bloco pixelado" id="secao-4">
+			<h2>Frio, nublado e com estações de 40 anos</h2>
+			<p>No topo das nuvens de Netuno, a temperatura fica em torno de −200 °C. Lá no alto, flutuam nuvens brancas feitas de gelo de metano, que aparecem e somem com o passar dos anos. Como o eixo de Netuno é inclinado, parecido com o da Terra, ele também tem estações do ano, mas cada uma dura cerca de 40 anos. E o clima de lá parece até sentir o humor do Sol: entre 2019 e 2023, as nuvens de Netuno quase desapareceram, e os cientistas perceberam que elas aumentam e diminuem seguindo o ciclo de atividade solar, mesmo a cerca de 4,5 bilhões de quilômetros de distância.</p>
+		</section>
+		<section class="bloco pixelado" id="secao-5">
+			<h2>Os ventos mais fortes do Sistema Solar</h2>
+			<p>Mesmo tão longe do calor do Sol, Netuno tem os ventos mais rápidos de todos os planetas, chegando a cerca de 2.000 km/h, mais que a velocidade do som na Terra. Parte da energia vem de dentro do próprio planeta, que libera mais que o dobro do calor que recebe do Sol. Em 1989, a sonda Voyager 2 fotografou uma tempestade gigante, a Grande Mancha Escura, do tamanho da Terra. Poucos anos depois, o telescópio Hubble mostrou que ela havia desaparecido.</p>
+		</section>
+		<section class="bloco pixelado" id="secao-6">
+			<h2>Tritão, a lua que anda para trás</h2>
+			<p>Netuno tem 16 luas conhecidas e anéis finos e escuros. A maior lua, Tritão, é um caso único: gira ao redor de Netuno no sentido contrário ao da rotação do planeta. Por isso, os cientistas acreditam que ela não nasceu ali, mas era um corpo gelado que foi capturado pela gravidade de Netuno. Tritão é um dos lugares mais frios já visitados, com cerca de −235 °C, e mesmo assim tem gêiseres que lançam nitrogênio a quilômetros de altura. Aos poucos, ela está se aproximando do planeta e, daqui a bilhões de anos, deve se despedaçar e formar um novo anel.</p>
+		</section>
+		<section class="bloco pixelado" id="secao-7">
+			<h2>Uma única visita</h2>
+			<p>Assim como Urano, Netuno foi visitado por uma só sonda: a Voyager 2, que passou por ele em 1989, doze anos depois de sair da Terra. Tudo o que sabemos de perto sobre o planeta vem dessa rápida passagem e das observações de telescópios como o Hubble e o James Webb.</p>
+		</section>
 
-<h4>Um ano de 165 anos</h4>
-<h3> Netuno está tão longe que a luz do Sol leva cerca de 4 horas para chegar até ele. Um dia lá dura cerca de 16 horas, mas um ano leva 165 anos terrestres. Desde que foi descoberto, ele completou apenas uma volta ao redor do Sol, em 2011.</h3> 
+		<p class="fecho">Distante, gelado e varrido por ventos furiosos, Netuno encerra a lista dos planetas do Sistema Solar e mostra que, às vezes, dá para encontrar um mundo inteiro só com lápis, papel e matemática.</p>
+		</article>
+		</div>
 
-<br>
-<br>
-<br>
+		<section id="balanca" data-planeta="netuno"></section>
 
-<img class="classe1" src="tamanhonetuno.png">
+		<nav class="vizinhos">
+		<a class="anterior" href="urano.html"><img src="pixel/urano.png" alt=""><span><small>Anterior</small>Urano</span></a>
+		<a class="proximo" href="sol.html"><span><small>Próximo</small>Sol</span><img src="pixel/sol.png" alt=""></a>
+		</nav>
+	</main>
 
+	<footer class="rodape">
+		<nav class="rodape-planetas" aria-label="Todos os planetas">
+			<a href="mercurio.html"><img src="pixel/mercurio.png" alt="">Mercúrio</a>
+			<a href="venus.html"><img src="pixel/venus.png" alt="">Vênus</a>
+			<a href="terra.html"><img src="pixel/terra.png" alt="">Terra</a>
+			<a href="marte.html"><img src="pixel/marte.png" alt="">Marte</a>
+			<a href="jupiter.html"><img src="pixel/jupiter.png" alt="">Júpiter</a>
+			<a href="saturno.html"><img src="pixel/saturno.png" alt="">Saturno</a>
+			<a href="urano.html"><img src="pixel/urano.png" alt="">Urano</a>
+			<a href="netuno.html"><img src="pixel/netuno.png" alt="">Netuno</a>
+			<a href="sol.html"><img src="pixel/sol.png" alt="">Sol</a>
+		</nav>
+		<p><a href="sistema-solar.html">Nosso sistema solar</a> · <a href="index.html#galaxia">Via Láctea</a> · textos e pixel art feitos à mão</p>
+	</footer>
 
-
-<h4>Frio, nublado e com estações de 40 anos</h4>
-<h3>No topo das nuvens de Netuno, a temperatura fica em torno de −200 °C. Lá no alto, flutuam nuvens brancas feitas de gelo de metano, que aparecem e somem com o passar dos anos. Como o eixo de Netuno é inclinado, parecido com o da Terra, ele também tem estações do ano, mas cada uma dura cerca de 40 anos. E o clima de lá parece até sentir o humor do Sol: entre 2019 e 2023, as nuvens de Netuno quase desapareceram, e os cientistas perceberam que elas aumentam e diminuem seguindo o ciclo de atividade solar, mesmo a cerca de 4,5 bilhões de quilômetros de distância.</h3>
-
-<h4>Os ventos mais fortes do Sistema Solar</h4>
-<h3>Mesmo tão longe do calor do Sol, Netuno tem os ventos mais rápidos de todos os planetas, chegando a cerca de 2.000 km/h, mais que a velocidade do som na Terra. Parte da energia vem de dentro do próprio planeta, que libera mais que o dobro do calor que recebe do Sol. Em 1989, a sonda Voyager 2 fotografou uma tempestade gigante, a Grande Mancha Escura, do tamanho da Terra. Poucos anos depois, o telescópio Hubble mostrou que ela havia desaparecido.</h3>
-
-
-
-<h4>Tritão, a lua que anda para trás</h4>
-<h3>Netuno tem 16 luas conhecidas e anéis finos e escuros. A maior lua, Tritão, é um caso único: gira ao redor de Netuno no sentido contrário ao da rotação do planeta. Por isso, os cientistas acreditam que ela não nasceu ali, mas era um corpo gelado que foi capturado pela gravidade de Netuno. Tritão é um dos lugares mais frios já visitados, com cerca de −235 °C, e mesmo assim tem gêiseres que lançam nitrogênio a quilômetros de altura. Aos poucos, ela está se aproximando do planeta e, daqui a bilhões de anos, deve se despedaçar e formar um novo anel.</h3>
-
-<h4>Uma única visita</h4>
-<h3>Assim como Urano, Netuno foi visitado por uma só sonda: a Voyager 2, que passou por ele em 1989, doze anos depois de sair da Terra. Tudo o que sabemos de perto sobre o planeta vem dessa rápida passagem e das observações de telescópios como o Hubble e o James Webb.</h3>
-
-	<br>
-	<br>
-
-Distante, gelado e varrido por ventos furiosos, Netuno encerra a lista dos planetas do Sistema Solar e mostra que, às vezes, dá para encontrar um mundo inteiro só com lápis, papel e matemática.
-
-
-
+	<script src="nave.js"></script>
+	<script src="transicao.js"></script>
+	<script src="radio.js"></script>
+	<script src="cabine.js"></script>
+	<script src="chegada.js"></script>
+	<script src="passaporte.js"></script>
+	<script src="marca.js"></script>
+	<script src="fundo.js"></script>
+	<script src="pixel/sprites.js"></script>
+	<script src="balanco.js"></script>
+	<script src="balanca.js"></script>
+	<script src="visuais-dados.js"></script>
+	<script src="visuais.js"></script>
+	<script src="pagina.js"></script>
 </body>
 </html>

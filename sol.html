@@ -1,61 +1,146 @@
 <!DOCTYPE html>
-<html>
+<html lang="pt-BR">
 <head>
 	<meta charset="utf-8">
+	<!-- fundo escuro desde o primeiro instante; vindo de um salto, a página começa coberta pelo último quadro do salto (preso à tela, não à página), para nenhum quadro vazar antes das estrelas -->
+	<script>try{var h=document.documentElement;h.style.backgroundColor="#05030c";if(sessionStorage.getItem("salto")==="1"){var q=sessionStorage.getItem("saltoQuadro");h.className+=" em-salto";if(q){h.style.background="#05030c url("+q+") 0 0/100% 100% no-repeat fixed";h.style.imageRendering="pixelated"}}}catch(e){}</script>
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<title>Sol</title>
-	<link rel="stylesheet" type="text/css" href="estilo.css">
+	<title>Sol · Nosso sistema solar</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Silkscreen&family=Space+Grotesk:wght@400;500;700&family=Tiny5&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="estilo.css">
 </head>
-<center>
-<p = class="especial"> Sol </p>
-</center>
-<body bgcolor="#000000">
+<body data-passaporte="sistema" class="estrela" style="--cor: #ffc04d; --escala: 1.3; --largura-celular: 84vw">
 
-		<center>
-	<img src="sol.JPG" width="600px">
+	<header class="topo">
+		<a class="marca" href="sistema-solar.html">Nosso sistema solar</a>
+		<nav class="menu">
+		<a class="menu-galaxia" href="index.html#galaxia">&larr; Via Láctea</a>
+		<a href="mercurio.html">Mercúrio</a>
+		<a href="venus.html">Vênus</a>
+		<a href="terra.html">Terra</a>
+		<a href="marte.html">Marte</a>
+		<a href="jupiter.html">Júpiter</a>
+		<a href="saturno.html">Saturno</a>
+		<a href="urano.html">Urano</a>
+		<a href="netuno.html">Netuno</a>
+		<a href="sol.html" aria-current="page">Sol</a>
+		</nav>
+	</header>
 
+	<main>
+		<section class="destaque">
+			<div class="palco">
+				<img class="planeta" data-planeta="sol" src="pixel/sol.png" alt="Sol em pixel art">
+			</div>
+			<div class="destaque-texto">
+				<p class="posicao">A estrela do Sistema Solar</p>
+				<h1>Sol</h1>
+				<p class="lema">A estrela que nos dá vida</p>
+				<dl class="ficha">
+					<div><dt>Tipo</dt><dd>Estrela anã amarela</dd></div>
+					<div><dt>Distância da Terra</dt><dd>Cerca de 150 milhões de km</dd></div>
+					<div><dt>Idade</dt><dd>Cerca de 4,6 bilhões de anos</dd></div>
+					<div><dt>Superfície</dt><dd>Cerca de 5.500 °C</dd></div>
+				</dl>
+			</div>
+		</section>
 
-<h4>Sol: a estrela que nos dá vida</h4>
-<h3>O Sol é o centro do Sistema Solar e a única estrela que temos por perto. Tudo ao seu redor, planetas, luas, asteroides e cometas, gira em torno dele, preso pela sua gravidade. Ele concentra cerca de 99,8% de toda a massa do Sistema Solar e é tão grande que caberiam mais de 1 milhão de Terras dentro dele. Mesmo assim, entre as estrelas do Universo, o Sol é considerado apenas médio.</h3>
+		<div class="leitura" id="leitura">
+		<aside class="sumario" aria-label="Nesta página">
+			<p>Nesta página</p>
+			<ol>
+				<li><a href="#secao-1">Sol: a estrela que nos dá vida</a></li>
+				<li><a href="#secao-2">Uma usina nuclear no céu</a></li>
+				<li><a href="#secao-3">Uma viagem longa e outra curta</a></li>
+				<li><a href="#secao-4">Um mistério quente</a></li>
+				<li><a href="#secao-5">Manchas, erupções e auroras</a></li>
+				<li><a href="#secao-6">Um elemento descoberto no Sol</a></li>
+				<li><a href="#secao-7">Tocando o Sol</a></li>
+				<li><a href="#secao-8">Meio caminho andado</a></li>
+				<li class="extra"><a href="#balanca">Sua balança espacial</a></li>
+			</ol>
+		</aside>
 
-<br>
-<br>
-<br>
+		<article class="conteudo">
+		<section class="bloco pixelado" id="secao-1">
+			<h2>Sol: a estrela que nos dá vida</h2>
+			<p>O Sol é o centro do Sistema Solar e a única estrela que temos por perto. Tudo ao seu redor, planetas, luas, asteroides e cometas, gira em torno dele, preso pela sua gravidade. Ele concentra cerca de 99,8% de toda a massa do Sistema Solar e é tão grande que caberiam mais de 1 milhão de Terras dentro dele. Mesmo assim, entre as estrelas do Universo, o Sol é considerado apenas médio.</p>
+		</section>
+		<figure class="comparacao">
+			<img class="pixelado" src="tamanhosol.png" alt="Comparação do tamanho do Sol">
+			<figcaption>Passe o mouse para ampliar</figcaption>
+		</figure>
+		<section class="bloco pixelado" id="secao-2">
+			<h2>Uma usina nuclear no céu</h2>
+			<p>O Sol brilha porque, no seu centro, átomos de hidrogênio se juntam para formar hélio, num processo chamado fusão nuclear. A cada segundo, essa fusão transforma cerca de 4 milhões de toneladas de matéria em energia, que sai do Sol em forma de luz e calor. No núcleo, a temperatura passa de 15 milhões de graus Celsius.</p>
+		</section>
+		<section class="bloco pixelado" id="secao-3">
+			<h2>Uma viagem longa e outra curta</h2>
+			<p>A energia criada no centro do Sol demora dezenas de milhares de anos para chegar até a superfície, porque vai sendo absorvida e reemitida pelo caminho, como uma bolinha presa num labirinto. Mas, quando finalmente escapa, a luz leva só cerca de 8 minutos para chegar à Terra. Ou seja, a luz que bate no seu rosto hoje começou sua jornada muito antes de existirem as primeiras cidades humanas.</p>
+		</section>
+		<section class="bloco pixelado" id="secao-4">
+			<h2>Um mistério quente</h2>
+			<p>A superfície do Sol tem cerca de 5.500 °C, mas a coroa, a camada mais externa da sua atmosfera, passa de 1 milhão de graus. É como se o ar ficasse mais quente à medida que nos afastamos de uma fogueira. Por que isso acontece ainda é um dos grandes mistérios da astronomia.</p>
+		</section>
+		<section class="bloco pixelado" id="secao-5">
+			<h2>Manchas, erupções e auroras</h2>
+			<p>O Sol não é sempre igual. Ele passa por ciclos de cerca de 11 anos, alternando fases calmas e fases agitadas, cheias de manchas escuras na superfície e explosões enormes. Nessas fases mais ativas, ele lança nuvens de partículas que, ao chegar à Terra, podem atrapalhar satélites, GPS e redes elétricas, mas também criam auroras mais intensas e visíveis em lugares onde normalmente não aparecem. O pico mais recente desse ciclo aconteceu entre 2024 e 2025.</p>
+		</section>
+		<section class="bloco pixelado" id="secao-6">
+			<h2>Um elemento descoberto no Sol</h2>
+			<p>Em 1868, ao analisar a luz do Sol durante um eclipse, cientistas encontraram sinais de um elemento que ainda não conheciam na Terra. Ele recebeu o nome de hélio, em homenagem a Hélio, o deus grego do Sol. Só anos depois o hélio foi encontrado aqui, e hoje é o gás que faz os balões de festa flutuarem.</p>
+		</section>
+		<section class="bloco pixelado" id="secao-7">
+			<h2>Tocando o Sol</h2>
+			<p>Em dezembro de 2024, a sonda Parker Solar Probe, da NASA, passou a cerca de 6 milhões de quilômetros da superfície do Sol, a maior aproximação de um objeto feito pelo ser humano. Nessa passagem, ela atingiu cerca de 690 mil km/h, tornando-se também o objeto mais rápido já construído, enquanto seu escudo térmico aguentava temperaturas perto de 1.000 °C.</p>
+		</section>
+		<section class="bloco pixelado" id="secao-8">
+			<h2>Meio caminho andado</h2>
+			<p>O Sol tem cerca de 4,6 bilhões de anos e está mais ou menos na metade da sua vida. Daqui a uns 5 bilhões de anos, quando o hidrogênio do núcleo acabar, ele vai inchar e virar uma gigante vermelha, engolindo Mercúrio, Vênus e talvez a Terra. Depois, vai encolher até virar uma anã branca, pequena e brilhante, que vai esfriar lentamente por bilhões de anos.</p>
+		</section>
 
-<img class="classe1" src="tamanhosol.png">
+		<p class="fecho">Gigante, quente e cheio de mistérios, o Sol é muito mais que uma luz no céu: é a estrela que torna possível cada dia e cada forma de vida na Terra.</p>
+		</article>
+		</div>
 
-<h4>Uma usina nuclear no céu</h4>
-<h3>O Sol brilha porque, no seu centro, átomos de hidrogênio se juntam para formar hélio, num processo chamado fusão nuclear. Cada segundo, essa fusão transforma cerca de 4 milhões de toneladas de matéria em energia, que sai do Sol em forma de luz e calor. No núcleo, a temperatura passa de 15 milhões de graus Celsius.</h3>
+		<section id="balanca" data-planeta="sol"></section>
 
+		<nav class="vizinhos">
+		<a class="anterior" href="netuno.html"><img src="pixel/netuno.png" alt=""><span><small>Anterior</small>Netuno</span></a>
+		<a class="proximo" href="index.html#galaxia"><span><small>Voltar para</small>Via Láctea</span></a>
+		</nav>
+	</main>
 
-<h4>Uma viagem longa e outra curta</h4>
-<h3> A energia criada no centro do Sol demora dezenas de milhares de anos para chegar até a superfície, porque vai sendo absorvida e reemitida pelo caminho, como uma bolinha presa num labirinto. Mas, quando finalmente escapa, a luz leva só cerca de 8 minutos para chegar à Terra. Ou seja, a luz que bate no seu rosto hoje começou sua jornada muito antes de existirem as primeiras cidades humanas.</h3> 
+	<footer class="rodape">
+		<nav class="rodape-planetas" aria-label="Todos os planetas">
+			<a href="mercurio.html"><img src="pixel/mercurio.png" alt="">Mercúrio</a>
+			<a href="venus.html"><img src="pixel/venus.png" alt="">Vênus</a>
+			<a href="terra.html"><img src="pixel/terra.png" alt="">Terra</a>
+			<a href="marte.html"><img src="pixel/marte.png" alt="">Marte</a>
+			<a href="jupiter.html"><img src="pixel/jupiter.png" alt="">Júpiter</a>
+			<a href="saturno.html"><img src="pixel/saturno.png" alt="">Saturno</a>
+			<a href="urano.html"><img src="pixel/urano.png" alt="">Urano</a>
+			<a href="netuno.html"><img src="pixel/netuno.png" alt="">Netuno</a>
+			<a href="sol.html"><img src="pixel/sol.png" alt="">Sol</a>
+		</nav>
+		<p><a href="sistema-solar.html">Nosso sistema solar</a> · <a href="index.html#galaxia">Via Láctea</a> · textos e pixel art feitos à mão</p>
+	</footer>
 
-
-
-<h4>Um mistério quente</h4>
-<h3>A superfície do Sol tem cerca de 5.500 °C, mas a coroa, a camada mais externa da sua atmosfera, passa de 1 milhão de graus. É como se o ar ficasse mais quente à medida que nos afastamos de uma fogueira. Por que isso acontece ainda é um dos grandes mistérios da astronomia.</h3>
-
-<h4>Manchas, erupções e auroras</h4>
-<h3>O Sol não é sempre igual. Ele passa por ciclos de cerca de 11 anos, alternando fases calmas e fases agitadas, cheias de manchas escuras na superfície e explosões enormes. Nessas fases mais ativas, ele lança nuvens de partículas que, ao chegar à Terra, podem atrapalhar satélites, GPS e redes elétricas, mas também criam auroras mais intensas e visíveis em lugares onde normalmente não aparecem. O pico mais recente desse ciclo aconteceu entre 2024 e 2025.</h3>
-
-
-<h4>Um elemento descoberto no Sol</h4>
-<h3>Em 1868, ao analisar a luz do Sol durante um eclipse, cientistas encontraram sinais de um elemento que ainda não conheciam na Terra. Ele recebeu o nome de hélio, em homenagem a Hélio, o deus grego do Sol. Só anos depois o hélio foi encontrado aqui, e hoje é o gás que faz os balões de festa flutuarem.</h3>
-
-<h4>Tocando o Sol</h4>
-<h3>Em dezembro de 2024, a sonda Parker Solar Probe, da NASA, passou a cerca de 6 milhões de quilômetros da superfície do Sol, a maior aproximação de um objeto feito pelo ser humano. Nessa passagem, ela atingiu cerca de 690 mil km/h, tornando-se também o objeto mais rápido já construído, enquanto seu escudo térmico aguentava temperaturas perto de 1.000 °C.</h3>
-
-<h4>Meio caminho andado</h4>
-<h3>EO Sol tem cerca de 4,6 bilhões de anos e está mais ou menos na metade da sua vida. Daqui a uns 5 bilhões de anos, quando o hidrogênio do núcleo acabar, ele vai inchar e virar uma gigante vermelha, engolindo Mercúrio, Vênus e talvez a Terra. Depois, vai encolher até virar uma anã branca, pequena e brilhante, que vai esfriar lentamente por bilhões de anos.</h3>
-
-	<br>
-	<br>
-
-Gigante, quente e cheio de mistérios, o Sol é muito mais que uma luz no céu: é a estrela que torna possível cada dia e cada forma de vida na Terra.
-
-
-
-
+	<script src="nave.js"></script>
+	<script src="transicao.js"></script>
+	<script src="radio.js"></script>
+	<script src="cabine.js"></script>
+	<script src="chegada.js"></script>
+	<script src="passaporte.js"></script>
+	<script src="marca.js"></script>
+	<script src="fundo.js"></script>
+	<script src="pixel/sprites.js"></script>
+	<script src="balanco.js"></script>
+	<script src="balanca.js"></script>
+	<script src="visuais-dados.js"></script>
+	<script src="visuais.js"></script>
+	<script src="pagina.js"></script>
 </body>
 </html>

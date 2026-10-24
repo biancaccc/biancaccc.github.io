@@ -1,59 +1,142 @@
 <!DOCTYPE html>
-<html>
+<html lang="pt-BR">
 <head>
 	<meta charset="utf-8">
+	<!-- fundo escuro desde o primeiro instante; vindo de um salto, a página começa coberta pelo último quadro do salto (preso à tela, não à página), para nenhum quadro vazar antes das estrelas -->
+	<script>try{var h=document.documentElement;h.style.backgroundColor="#05030c";if(sessionStorage.getItem("salto")==="1"){var q=sessionStorage.getItem("saltoQuadro");h.className+=" em-salto";if(q){h.style.background="#05030c url("+q+") 0 0/100% 100% no-repeat fixed";h.style.imageRendering="pixelated"}}}catch(e){}</script>
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<title>Mercúrio</title>
-	<link rel="stylesheet" type="text/css" href="estilo.css">
+	<title>Mercúrio · Nosso sistema solar</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Silkscreen&family=Space+Grotesk:wght@400;500;700&family=Tiny5&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="estilo.css">
 </head>
-<center>
-<p = class="especial"> Mercúrio </p>
+<body data-passaporte="sistema" style="--cor: #a9b8ff; --largura: 360px">
 
-<body bgcolor="#000000">
+	<header class="topo">
+		<a class="marca" href="sistema-solar.html">Nosso sistema solar</a>
+		<nav class="menu">
+		<a class="menu-galaxia" href="index.html#galaxia">&larr; Via Láctea</a>
+		<a href="mercurio.html" aria-current="page">Mercúrio</a>
+		<a href="venus.html">Vênus</a>
+		<a href="terra.html">Terra</a>
+		<a href="marte.html">Marte</a>
+		<a href="jupiter.html">Júpiter</a>
+		<a href="saturno.html">Saturno</a>
+		<a href="urano.html">Urano</a>
+		<a href="netuno.html">Netuno</a>
+		<a href="sol.html">Sol</a>
+		</nav>
+	</header>
 
-		<center>
-	<img src="planeta1.JPG" width="400px">
-	
+	<main>
+		<section class="destaque">
+			<div class="palco">
+				<img class="planeta" data-planeta="mercurio" src="pixel/mercurio.png" alt="Mercúrio em pixel art">
+			</div>
+			<div class="destaque-texto">
+				<p class="posicao">1º planeta a partir do Sol</p>
+				<h1>Mercúrio</h1>
+				<p class="lema">O pequeno mensageiro do Sol</p>
+				<dl class="ficha">
+					<div><dt>Tipo</dt><dd>Planeta rochoso</dd></div>
+					<div><dt>Distância do Sol</dt><dd>Cerca de 58 milhões de km</dd></div>
+					<div><dt>Um ano dura</dt><dd>88 dias</dd></div>
+					<div><dt>Luas</dt><dd>Nenhuma</dd></div>
+				</dl>
+			</div>
+		</section>
+
+		<div class="leitura" id="leitura">
+		<aside class="sumario" aria-label="Nesta página">
+			<p>Nesta página</p>
+			<ol>
+				<li><a href="#secao-1">Mercúrio: o pequeno mensageiro do Sol</a></li>
+				<li><a href="#secao-2">Um dia que dura dois anos</a></li>
+				<li><a href="#secao-3">Calor extremo e frio extremo</a></li>
+				<li><a href="#secao-4">Lá existe água!</a></li>
+				<li><a href="#secao-5">Um mistério ainda sem solução</a></li>
+				<li><a href="#secao-6">Mercúrio e a teoria da relatividade</a></li>
+				<li><a href="#secao-7">Poucas visitas</a></li>
+				<li class="extra"><a href="#balanca">Sua balança espacial</a></li>
+			</ol>
+		</aside>
+
+		<article class="conteudo">
+		<section class="bloco pixelado" id="secao-1">
+			<h2>Mercúrio: o pequeno mensageiro do Sol</h2>
+			<p>Mercúrio é o planeta mais próximo do Sol e o mais veloz do Sistema Solar, por isso leva o nome do mensageiro dos deuses romanos. Da Terra, dá para vê-lo a olho nu, baixinho no horizonte, logo depois do pôr do Sol ou pouco antes do amanhecer.</p>
+		</section>
+		<section class="bloco pixelado" id="secao-2">
+			<h2>Um dia que dura dois anos</h2>
+			<p>Mercúrio completa uma volta ao redor do Sol em só 88 dias: esse é o ano dele. Mas ele gira em torno de si mesmo tão devagar que, entre um nascer do Sol e o seguinte, passam 176 dias terrestres. Ou seja, lá um único dia dura dois anos.</p>
+		</section>
+		<figure class="comparacao">
+			<img class="pixelado" src="tamanhomercurio.png" alt="Comparação do tamanho de Mercúrio">
+			<figcaption>Passe o mouse para ampliar</figcaption>
+		</figure>
+		<section class="bloco pixelado" id="secao-3">
+			<h2>Calor extremo e frio extremo</h2>
+			<p>Como quase não tem atmosfera para guardar o calor, a temperatura passa de 400 °C durante o dia e cai para cerca de −180 °C à noite.</p>
+		</section>
+		<section class="bloco pixelado" id="secao-4">
+			<h2>Lá existe água!</h2>
+			<p>Mesmo tão perto do Sol, Mercúrio tem água congelada. Ela fica no fundo de crateras nos polos, onde a luz nunca chega, e foi confirmada em 2012 pela sonda MESSENGER, da NASA.</p>
+		</section>
+		<section class="bloco pixelado" id="secao-5">
+			<h2>Um mistério ainda sem solução</h2>
+			<p>Outro aspecto curioso é sua estrutura: apesar de ser o menor planeta, cerca de 75% de seu interior é formado por um enorme núcleo metálico, com quase 4.000 km de diâmetro. Uma hipótese é que Mercúrio tenha sido maior no passado e tenha perdido parte de sua camada rochosa após colisões com outros corpos celestes. Pequeno, extremo e cheio de mistérios, Mercúrio continua sendo um dos planetas mais intrigantes do Sistema Solar.</p>
+		</section>
+		<section class="bloco pixelado" id="secao-6">
+			<h2>Mercúrio e a teoria da relatividade</h2>
+			<p>A órbita de Mercúrio se desloca aos poucos de um jeito que as leis de Newton não conseguiam explicar. Em 1915, a Teoria da Relatividade de Einstein resolveu o mistério: a massa do Sol curva o espaço ao seu redor.</p>
+		</section>
+		<section class="bloco pixelado" id="secao-7">
+			<h2>Poucas visitas</h2>
+			<p>Chegar lá é difícil, porque a sonda acelera demais ao cair em direção ao Sol. Só três missões o visitaram: Mariner 10, MESSENGER e BepiColombo, que deve entrar em órbita no fim de 2026 e pode ajudar a desvendar o mistério do núcleo.</p>
+			<p>Pequeno, rápido, escaldante e gelado ao mesmo tempo, Mercúrio prova que até o planeta mais discreto guarda grandes surpresas.</p>
+		</section>
 
 
-<h4> Mercúrio: o pequeno mensageiro do Sol </h4>
-<h3>Mercúrio é o planeta mais próximo do Sol e o mais veloz do Sistema Solar, por isso leva o nome do mensageiro dos deuses romanos. Da Terra, dá para vê-lo a olho nu, baixinho no horizonte, logo depois do pôr do Sol ou pouco antes do amanhecer.</h3>
+		</article>
+		</div>
 
-<h4> Um dia que dura dois anos </h4>
-<h3> Mercúrio completa uma volta ao redor do Sol em só 88 dias: esse é o ano dele. Mas ele gira em torno de si mesmo tão devagar que, entre um nascer do Sol e o seguinte, passam 176 dias terrestres. Ou seja, lá um único dia dura dois anos. </h3>
-<br>
-<br>
-<br>
-<img class="classe1" src="tamanhomercurio.png">
+		<section id="balanca" data-planeta="mercurio"></section>
 
+		<nav class="vizinhos">
+		<a class="anterior" href="sistema-solar.html"><span><small>Voltar para</small>Sistema Solar</span></a>
+		<a class="proximo" href="venus.html"><span><small>Próximo</small>Vênus</span><img src="pixel/venus.png" alt=""></a>
+		</nav>
+	</main>
 
-<h4> Calor extremo e frio extremo </h4>
-<h3> Como quase não tem atmosfera para guardar o calor, a temperatura passa de 400 °C durante o dia e cai para cerca de −180 °C à noite. </h3>
+	<footer class="rodape">
+		<nav class="rodape-planetas" aria-label="Todos os planetas">
+			<a href="mercurio.html"><img src="pixel/mercurio.png" alt="">Mercúrio</a>
+			<a href="venus.html"><img src="pixel/venus.png" alt="">Vênus</a>
+			<a href="terra.html"><img src="pixel/terra.png" alt="">Terra</a>
+			<a href="marte.html"><img src="pixel/marte.png" alt="">Marte</a>
+			<a href="jupiter.html"><img src="pixel/jupiter.png" alt="">Júpiter</a>
+			<a href="saturno.html"><img src="pixel/saturno.png" alt="">Saturno</a>
+			<a href="urano.html"><img src="pixel/urano.png" alt="">Urano</a>
+			<a href="netuno.html"><img src="pixel/netuno.png" alt="">Netuno</a>
+			<a href="sol.html"><img src="pixel/sol.png" alt="">Sol</a>
+		</nav>
+		<p><a href="sistema-solar.html">Nosso sistema solar</a> · <a href="index.html#galaxia">Via Láctea</a> · textos e pixel art feitos à mão</p>
+	</footer>
 
-<h4> Lá existe água! </h4>
-<h3> Mesmo tão perto do Sol, Mercúrio tem água congelada. Ela fica no fundo de crateras nos polos, onde a luz nunca chega, e foi confirmada em 2012 pela sonda MESSENGER, da NASA. </h3> 
-
-
-<h4> Um mistério ainda sem solução </h4>
-
-<h3>Outro aspecto curioso é sua estrutura: apesar de ser o menor planeta, cerca de 75% de seu interior é formado por um enorme núcleo metálico, com quase 4.000 km de diâmetro. Uma hipótese é que Mercúrio tenha sido maior no passado e tenha perdido parte de sua camada rochosa após colisões com outros corpos celestes.Pequeno, extremo e cheio de mistérios, Mercúrio continua sendo um dos planetas mais intrigantes do Sistema Solar.</h3>
-
-<h4> Mercúrio e a teoria da relatividade </h4>
-
-<h3>A órbita de Mercúrio se desloca aos poucos de um jeito que as leis de Newton não conseguiam explicar. Em 1915, a Teoria da Relatividade de Einstein resolveu o mistério: a massa do Sol curva o espaço ao seu redor.</h3>
-
-<h4> Poucas visitas </h4>
-
-<h3> Chegar lá é difícil, porque a sonda acelera demais ao cair em direção ao Sol. Só três missões o visitaram: Mariner 10, MESSENGER e BepiColombo, que deve entrar em órbita no fim de 2026 e pode ajudar a desvendar o mistério do núcleo.
-	<br>
-	<br>
-Pequeno, rápido, escaldante e gelado ao mesmo tempo, Mercúrio prova que até o planeta mais discreto guarda grandes surpresas. </h3> 
-
-<br> 
-<br> 
-
-	<img class="classe1" src="tamanhomercurio.png">
-	<br> 
-</center>
+	<script src="nave.js"></script>
+	<script src="transicao.js"></script>
+	<script src="radio.js"></script>
+	<script src="cabine.js"></script>
+	<script src="chegada.js"></script>
+	<script src="passaporte.js"></script>
+	<script src="marca.js"></script>
+	<script src="fundo.js"></script>
+	<script src="pixel/sprites.js"></script>
+	<script src="balanco.js"></script>
+	<script src="balanca.js"></script>
+	<script src="visuais-dados.js"></script>
+	<script src="visuais.js"></script>
+	<script src="pagina.js"></script>
 </body>
 </html>

@@ -1,58 +1,146 @@
 <!DOCTYPE html>
-<html>
+<html lang="pt-BR">
 <head>
 	<meta charset="utf-8">
+	<!-- fundo escuro desde o primeiro instante; vindo de um salto, a página começa coberta pelo último quadro do salto (preso à tela, não à página), para nenhum quadro vazar antes das estrelas -->
+	<script>try{var h=document.documentElement;h.style.backgroundColor="#05030c";if(sessionStorage.getItem("salto")==="1"){var q=sessionStorage.getItem("saltoQuadro");h.className+=" em-salto";if(q){h.style.background="#05030c url("+q+") 0 0/100% 100% no-repeat fixed";h.style.imageRendering="pixelated"}}}catch(e){}</script>
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<title>Terra</title>
-	<link rel="stylesheet" type="text/css" href="estilo.css">
+	<title>Terra · Nosso sistema solar</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Silkscreen&family=Space+Grotesk:wght@400;500;700&family=Tiny5&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="estilo.css">
 </head>
-<center>
-<p = class="especial"> Terra </p>
-</center>
-<body bgcolor="#000000">
+<body data-passaporte="sistema" style="--cor: #6f9bff; --largura: 400px">
 
-		<center>
-	<img src="planeta3.JPG" width="400px">
+	<header class="topo">
+		<a class="marca" href="sistema-solar.html">Nosso sistema solar</a>
+		<nav class="menu">
+		<a class="menu-galaxia" href="index.html#galaxia">&larr; Via Láctea</a>
+		<a href="mercurio.html">Mercúrio</a>
+		<a href="venus.html">Vênus</a>
+		<a href="terra.html" aria-current="page">Terra</a>
+		<a href="marte.html">Marte</a>
+		<a href="jupiter.html">Júpiter</a>
+		<a href="saturno.html">Saturno</a>
+		<a href="urano.html">Urano</a>
+		<a href="netuno.html">Netuno</a>
+		<a href="sol.html">Sol</a>
+		</nav>
+	</header>
 
+	<main>
+		<section class="destaque">
+			<div class="palco">
+				<img class="planeta" data-planeta="terra" src="pixel/terra.png" alt="Terra em pixel art">
+			</div>
+			<div class="destaque-texto">
+				<p class="posicao">3º planeta a partir do Sol</p>
+				<h1>Terra</h1>
+				<p class="lema">O planeta azul</p>
+				<dl class="ficha">
+					<div><dt>Tipo</dt><dd>Planeta rochoso</dd></div>
+					<div><dt>Distância do Sol</dt><dd>Cerca de 150 milhões de km</dd></div>
+					<div><dt>Um ano dura</dt><dd>365 dias</dd></div>
+					<div><dt>Luas</dt><dd>1, a Lua</dd></div>
+				</dl>
+			</div>
+		</section>
 
-<h4> Terra: o planeta azul</h4>
-<h3>A Terra é o terceiro planeta a partir do Sol e o único lugar do Universo onde sabemos que existe vida. É também o único planeta do Sistema Solar que não leva nome de um deus: "Terra" vem do latim e significa simplesmente "chão" ou "solo". Vista do espaço, porém, ela é mais azul do que marrom, porque cerca de 71% da sua superfície é coberta por água.</h3>
+		<div class="leitura" id="leitura">
+		<aside class="sumario" aria-label="Nesta página">
+			<p>Nesta página</p>
+			<ol>
+				<li><a href="#secao-1">Terra: o planeta azul</a></li>
+				<li><a href="#secao-2">Na distância certa</a></li>
+				<li><a href="#secao-3">Um dia de 24 horas e um ano de 365 dias</a></li>
+				<li><a href="#secao-4">Por que existem estações do ano</a></li>
+				<li><a href="#secao-5">Um escudo invisível</a></li>
+				<li><a href="#secao-6">Um chão que se move</a></li>
+				<li><a href="#secao-7">A Lua, a grande companheira</a></li>
+				<li><a href="#secao-8">Um pálido ponto azul</a></li>
+				<li class="extra"><a href="#balanca">Sua balança espacial</a></li>
+			</ol>
+		</aside>
 
-<h4> Na distância certa</h4>
-<h3> A Terra fica a cerca de 150 milhões de km do Sol, dentro da chamada zona habitável: nem tão perto que a água ferva, como em Vênus, nem tão longe que ela congele de vez. É por isso que ela é o único planeta com oceanos de água líquida na superfície. </h3>
+		<article class="conteudo">
+		<section class="bloco pixelado" id="secao-1">
+			<h2>Terra: o planeta azul</h2>
+			<p>A Terra é o terceiro planeta a partir do Sol e o único lugar do Universo onde sabemos que existe vida. É também o único planeta do Sistema Solar que não leva nome de um deus: "Terra" vem do latim e significa simplesmente "chão" ou "solo". Vista do espaço, porém, ela é mais azul do que marrom, porque cerca de 71% da sua superfície é coberta por água.</p>
+		</section>
+		<section class="bloco pixelado" id="secao-2">
+			<h2>Na distância certa</h2>
+			<p>A Terra fica a cerca de 150 milhões de km do Sol, dentro da chamada zona habitável: nem tão perto que a água ferva, como em Vênus, nem tão longe que ela congele de vez. É por isso que ela é o único planeta com oceanos de água líquida na superfície.</p>
+		</section>
+		<section class="bloco pixelado" id="secao-3">
+			<h2>Um dia de 24 horas e um ano de 365 dias</h2>
+			<p>A Terra gira em torno de si mesma em cerca de 24 horas e dá a volta no Sol em 365 dias e 6 horas. Essas 6 horas que sobram se acumulam, e a cada quatro anos viram um dia extra: o 29 de fevereiro dos anos bissextos. Enquanto isso, viajamos ao redor do Sol a cerca de 107 mil km/h sem sentir nada.</p>
+		</section>
+		<figure class="comparacao">
+			<img class="pixelado" src="tamanhoterra.png" alt="Comparação do tamanho da Terra">
+			<figcaption>Passe o mouse para ampliar</figcaption>
+		</figure>
+		<section class="bloco pixelado" id="secao-4">
+			<h2>Por que existem estações do ano</h2>
+			<p>O eixo da Terra é inclinado em cerca de 23 graus. Por isso, durante o ano, ora o hemisfério norte, ora o hemisfério sul recebe a luz do Sol mais diretamente. Quando é verão no Brasil, é inverno na Europa.</p>
+		</section>
+		<section class="bloco pixelado" id="secao-5">
+			<h2>Um escudo invisível</h2>
+			<p>No centro da Terra existe um núcleo de ferro, parte dele derretido e em movimento, que gera um campo magnético ao redor do planeta. Ele funciona como um escudo contra as partículas lançadas pelo Sol, e quando algumas delas escapam perto dos polos, criam as auroras, aquelas luzes coloridas no céu. Esse núcleo também faz da Terra o planeta mais denso do Sistema Solar.</p>
+		</section>
+		<section class="bloco pixelado" id="secao-6">
+			<h2>Um chão que se move</h2>
+			<p>A superfície da Terra é dividida em placas gigantes que se movem alguns centímetros por ano, mais ou menos a velocidade em que as unhas crescem. É esse movimento que forma montanhas, causa terremotos e, há milhões de anos, separou a América do Sul da África, que antes se encaixavam como peças de quebra-cabeça. A Terra é o único planeta conhecido onde isso acontece.</p>
+		</section>
+		<section class="bloco pixelado" id="secao-7">
+			<h2>A Lua, a grande companheira</h2>
+			<p>A hipótese mais aceita é que a Lua nasceu há cerca de 4,5 bilhões de anos, quando um corpo do tamanho de Marte colidiu com a Terra jovem e lançou pedaços ao espaço. Hoje ela provoca as marés e ajuda a manter a inclinação da Terra estável, o que deixa o clima mais equilibrado. Ela também freia a rotação do planeta aos poucos: na época dos dinossauros, o dia era um pouco mais curto do que hoje.</p>
+		</section>
+		<section class="bloco pixelado" id="secao-8">
+			<h2>Um pálido ponto azul</h2>
+			<p>Em 1990, a sonda Voyager 1, a cerca de 6 bilhões de km de distância, virou sua câmera para trás e fotografou a Terra. Na imagem, ela aparece como um pontinho quase invisível num raio de luz. A foto ficou famosa como "Pálido Ponto Azul" e mostra como nosso planeta é pequeno diante da imensidão do espaço.</p>
+		</section>
 
-<h4> Um dia de 24 horas e um ano de 365 dias </h4>
-<h3> A Terra gira em torno de si mesma em cerca de 24 horas e dá a volta no Sol em 365 dias e 6 horas. Essas 6 horas que sobram se acumulam, e a cada quatro anos viram um dia extra: o 29 de fevereiro dos anos bissextos. Enquanto isso, viajamos ao redor do Sol a cerca de 107 mil km/h sem sentir nada. </h3> 
+		<p class="fecho">Pequena no Universo, mas única até onde sabemos, a Terra é o único lar que conhecemos e o planeta de que mais precisamos cuidar.</p>
+		</article>
+		</div>
 
-<br>
-<br>
-<br>
+		<section id="balanca" data-planeta="terra"></section>
 
-		<img class="classe1" src="tamanhoterra.png">
+		<nav class="vizinhos">
+		<a class="anterior" href="venus.html"><img src="pixel/venus.png" alt=""><span><small>Anterior</small>Vênus</span></a>
+		<a class="proximo" href="marte.html"><span><small>Próximo</small>Marte</span><img src="pixel/marte.png" alt=""></a>
+		</nav>
+	</main>
 
+	<footer class="rodape">
+		<nav class="rodape-planetas" aria-label="Todos os planetas">
+			<a href="mercurio.html"><img src="pixel/mercurio.png" alt="">Mercúrio</a>
+			<a href="venus.html"><img src="pixel/venus.png" alt="">Vênus</a>
+			<a href="terra.html"><img src="pixel/terra.png" alt="">Terra</a>
+			<a href="marte.html"><img src="pixel/marte.png" alt="">Marte</a>
+			<a href="jupiter.html"><img src="pixel/jupiter.png" alt="">Júpiter</a>
+			<a href="saturno.html"><img src="pixel/saturno.png" alt="">Saturno</a>
+			<a href="urano.html"><img src="pixel/urano.png" alt="">Urano</a>
+			<a href="netuno.html"><img src="pixel/netuno.png" alt="">Netuno</a>
+			<a href="sol.html"><img src="pixel/sol.png" alt="">Sol</a>
+		</nav>
+		<p><a href="sistema-solar.html">Nosso sistema solar</a> · <a href="index.html#galaxia">Via Láctea</a> · textos e pixel art feitos à mão</p>
+	</footer>
 
-<h4>Por que existem estações do ano</h4>
-<h3>O eixo da Terra é inclinado em cerca de 23 graus. Por isso, durante o ano, ora o hemisfério norte, ora o hemisfério sul recebe a luz do Sol mais diretamente. Quando é verão no Brasil, é inverno na Europa.</h3>
-
-<h4> Um escudo invisível </h4>
-<h3>No centro da Terra existe um núcleo de ferro, parte dele derretido e em movimento, que gera um campo magnético ao redor do planeta. Ele funciona como um escudo contra as partículas lançadas pelo Sol, e quando algumas delas escapam perto dos polos, criam as auroras, aquelas luzes coloridas no céu. Esse núcleo também faz da Terra o planeta mais denso do Sistema Solar.</h3>
-
-<h4> Um chão que se move</h4>
-<h3>A superfície da Terra é dividida em placas gigantes que se movem alguns centímetros por ano, mais ou menos a velocidade em que as unhas crescem. É esse movimento que forma montanhas, causa terremotos e, há milhões de anos, separou a América do Sul da África, que antes se encaixavam como peças de quebra-cabeça. A Terra é o único planeta conhecido onde isso acontece.</h3>
-
-<h4> A Lua, a grande companheira</h4>
-<h3>AA hipótese mais aceita é que a Lua nasceu há cerca de 4,5 bilhões de anos, quando um corpo do tamanho de Marte colidiu com a Terra jovem e lançou pedaços ao espaço. Hoje ela provoca as marés e ajuda a manter a inclinação da Terra estável, o que deixa o clima mais equilibrado. Ela também freia a rotação do planeta aos poucos: na época dos dinossauros, o dia era um pouco mais curto do que hoje. </h3>
-
-<h4> Um pálido ponto azul</h4>
-<h3>Em 1990, a sonda Voyager 1, a cerca de 6 bilhões de km de distância, virou sua câmera para trás e fotografou a Terra. Na imagem, ela aparece como um pontinho quase invisível num raio de luz. A foto ficou famosa como "Pálido Ponto Azul" e mostra como nosso planeta é pequeno diante da imensidão do espaço. </h3>
-
-
-	<br>
-	<br>
-
-Pequena no Universo, mas única até onde sabemos, a Terra é o único lar que conhecemos e o planeta que mais precisamos cuidar.
-
-
-
+	<script src="nave.js"></script>
+	<script src="transicao.js"></script>
+	<script src="radio.js"></script>
+	<script src="cabine.js"></script>
+	<script src="chegada.js"></script>
+	<script src="passaporte.js"></script>
+	<script src="marca.js"></script>
+	<script src="fundo.js"></script>
+	<script src="pixel/sprites.js"></script>
+	<script src="balanco.js"></script>
+	<script src="balanca.js"></script>
+	<script src="visuais-dados.js"></script>
+	<script src="visuais.js"></script>
+	<script src="pagina.js"></script>
 </body>
 </html>

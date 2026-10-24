@@ -1,55 +1,245 @@
 <!DOCTYPE html>
-<html>
+<html lang="pt-BR">
 <head>
 	<meta charset="utf-8">
+	<!-- fundo escuro desde o primeiro instante; vindo de um salto, a página começa coberta pelo último quadro do salto (preso à tela, não à página), para nenhum quadro vazar antes das estrelas -->
+	<script>try{var h=document.documentElement;h.style.backgroundColor="#05030c";if(sessionStorage.getItem("salto")==="1"){var q=sessionStorage.getItem("saltoQuadro");h.className+=" em-salto";if(q){h.style.background="#05030c url("+q+") 0 0/100% 100% no-repeat fixed";h.style.imageRendering="pixelated"}}}catch(e){}</script>
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<title>Urano</title>
-	<link rel="stylesheet" type="text/css" href="estilo.css">
+	<title>Urano · Nosso sistema solar</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Silkscreen&family=Space+Grotesk:wght@400;500;700&family=Tiny5&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="estilo.css">
 </head>
-<center>
-<p = class="especial"> Urano </p>
-</center>
-<body bgcolor="#000000">
+<body data-passaporte="sistema" style="--cor: #a8ecf5; --largura: 400px">
 
-		<center>
-	<img src="planeta7.JPG" width="400px">
+	<header class="topo">
+		<a class="marca" href="sistema-solar.html">Nosso sistema solar</a>
+		<nav class="menu">
+		<a class="menu-galaxia" href="index.html#galaxia">&larr; Via Láctea</a>
+		<a href="mercurio.html">Mercúrio</a>
+		<a href="venus.html">Vênus</a>
+		<a href="terra.html">Terra</a>
+		<a href="marte.html">Marte</a>
+		<a href="jupiter.html">Júpiter</a>
+		<a href="saturno.html">Saturno</a>
+		<a href="urano.html" aria-current="page">Urano</a>
+		<a href="netuno.html">Netuno</a>
+		<a href="sol.html">Sol</a>
+		</nav>
+	</header>
 
-<h4> Urano: o planeta deitado</h4>
-<h3>Urano é o sétimo planeta a partir do Sol e foi o primeiro a ser descoberto com um telescópio, pelo astrônomo William Herschel, em 1781. Até então, ninguém sabia que existia um planeta além de Saturno. Seu nome vem do deus grego do céu, pai de Saturno, e ele é o único planeta com nome de um deus grego em vez de romano. Em céus muito escuros, dá até para vê-lo a olho nu, como um pontinho bem fraco.</h3>
+	<main>
+		<section class="destaque">
+			<div class="palco">
+				<img class="planeta" data-planeta="urano" src="pixel/urano.png" alt="Urano em pixel art">
+			</div>
+			<div class="destaque-texto">
+				<p class="posicao">7º planeta a partir do Sol</p>
+				<h1>Urano</h1>
+				<p class="lema">O planeta deitado</p>
+				<dl class="ficha">
+					<div><dt>Tipo</dt><dd>Gigante de gelo</dd></div>
+					<div><dt>Distância do Sol</dt><dd>Cerca de 2,9 bilhões de km</dd></div>
+					<div><dt>Um ano dura</dt><dd>84 anos</dd></div>
+					<div><dt>Luas</dt><dd>29</dd></div>
+				</dl>
+			</div>
+		</section>
 
-<h4>Um gigante de gelo</h4>
-<h3> Urano não é feito só de gás, como Júpiter e Saturno. Ele é um gigante de gelo: por baixo de uma atmosfera de hidrogênio e hélio, tem uma grande camada de água, amônia e metano, pressionados de um jeito que não existe na Terra. O metano da atmosfera absorve a luz vermelha do Sol e reflete o azul, dando a Urano sua cor verde-azulada.</h3>
+		<div class="leitura" id="leitura">
+		<aside class="sumario" aria-label="Nesta página">
+			<p>Nesta página</p>
+			<ol>
+				<li><a href="#secao-1">Urano: o planeta deitado</a></li>
+				<li><a href="#secao-2">Um gigante de gelo</a></li>
+				<li><a href="#secao-3">Um planeta que rola</a></li>
+				<li><a href="#secao-4">Verões e invernos de 42 anos</a></li>
+				<li><a href="#secao-5">O planeta mais frio</a></li>
+				<li><a href="#secao-6">Luas com nomes de teatro</a></li>
+				<li><a href="#secao-7">Uma única visita</a></li>
+				<li><a href="#linha-do-tempo">Linha do tempo</a></li>
+				<li><a href="#calculadoras">Calculadoras espaciais</a></li>
+				<li><a href="#sons">Ouça de verdade</a></li>
+				<li><a href="#quiz">Quiz de Urano</a></li>
+				<li class="extra"><a href="#balanca">Sua balança espacial</a></li>
+			</ol>
+		</aside>
 
+		<article class="conteudo">
+		<section class="bloco pixelado" id="secao-1">
+			<h2>Urano: o planeta deitado</h2>
+			<div class="bloco-corpo">
+				<p>Urano é o sétimo planeta a partir do Sol e foi o primeiro a ser descoberto com um telescópio, pelo astrônomo William Herschel, em 1781. Até então, ninguém sabia que existia um planeta além de Saturno. Seu nome vem do deus grego do céu, pai de Saturno, e ele é o único planeta com nome de um deus grego em vez de romano. Em céus muito escuros, dá até para vê-lo a olho nu, como um pontinho bem fraco.</p>
+				<aside class="visor-dado"><b>1781</b><span>o ano em que Herschel o encontrou</span></aside>
+			</div>
+		</section>
+		<section class="bloco pixelado" id="secao-2">
+			<h2>Um gigante de gelo</h2>
+			<div class="bloco-corpo">
+				<p>Urano não é feito só de gás, como Júpiter e Saturno. Ele é um gigante de gelo: por baixo de uma atmosfera de hidrogênio e hélio, tem uma grande camada de água, amônia e metano, pressionados de um jeito que não existe na Terra. O metano da atmosfera absorve a luz vermelha do Sol e reflete o azul, dando a Urano sua cor verde-azulada.</p>
+				<aside class="visor-dado"><b>63</b><span>Terras caberiam dentro dele</span></aside>
+			</div>
+			<p class="comparacao-dia"><span class="icone-secao" data-icone="balao" aria-hidden="true"></span><span><b>Isso é como…</b> encher Urano de planetas: dá para colocar cerca de 63 Terras lá dentro, e ainda sobra espaço.</span></p>
+		</section>
+		<section class="bloco pixelado" id="secao-3">
+			<h2>Um planeta que rola</h2>
+			<div class="bloco-corpo">
+				<p>A característica mais estranha de Urano é que ele gira deitado, com o eixo inclinado em quase 98 graus. Em vez de rodar como um pião, ele rola ao redor do Sol como uma bola. A hipótese mais aceita é que, há bilhões de anos, uma colisão gigante o derrubou de lado.</p>
+				<aside class="visor-dado"><b>98°</b><span>de inclinação do eixo (a Terra tem 23°)</span></aside>
+			</div>
+			<figure class="animacao">
+				<canvas data-animacao="urano-rola" width="200" height="110" role="img" aria-label="Animação: Urano dá a volta no Sol deitado, com o eixo sempre apontando para o mesmo lado. Ora o polo norte, ora o polo sul fica virado para o Sol."></canvas>
+				<div class="animacao-hud" aria-hidden="true"><span data-hud="ano">ano 0 de 84</span><span data-hud="estacao">verão no polo norte</span></div>
+				<figcaption>O eixo aponta sempre para o mesmo lado: durante a volta, cada polo passa metade do tempo virado para o Sol. O pontinho vermelho é o polo norte, e as nuvens brancas mostram Urano rolando em volta do eixo deitado, no sentido da setinha amarela.</figcaption>
+			</figure>
+		</section>
+		<section class="bloco pixelado" id="secao-4">
+			<h2>Verões e invernos de 42 anos</h2>
+			<div class="bloco-corpo">
+				<p>Urano leva 84 anos terrestres para dar uma volta no Sol. Como está deitado, cada polo passa cerca de 42 anos seguidos com o Sol no céu e depois 42 anos em total escuridão. Uma pessoa que nascesse no começo do inverno em um dos polos poderia passar metade da vida sem ver o Sol.</p>
+				<aside class="visor-dado"><b>42 anos</b><span>de dia (ou de noite) em cada polo</span></aside>
+			</div>
+		</section>
+		<!-- comparação de tamanho com o Sol, montada pelo visuais.js (tamanho real, lupa, Terra e trânsito) -->
+		<figure class="comparacao-viva" data-astro="Urano" data-img="pixel/urano.png" data-km="51118" role="img" aria-label="Comparação de tamanho: Urano em tamanho real ao lado do Sol. O diâmetro do Sol é cerca de 27 vezes maior que o de Urano."></figure>
+		<section class="bloco pixelado" id="secao-5">
+			<h2>O planeta mais frio</h2>
+			<div class="bloco-corpo">
+				<p>Mesmo não sendo o mais distante do Sol, Urano tem a atmosfera mais fria do Sistema Solar, chegando a cerca de −224 °C. Os cientistas ainda tentam entender por que ele libera tão pouco calor de dentro, ao contrário dos outros gigantes. Há também a hipótese de que, lá no fundo, a pressão seja tão grande que o carbono do metano vire diamante e "chova" em direção ao centro do planeta.</p>
+				<aside class="visor-dado frio"><b>−224 °C</b><span>a atmosfera mais fria do Sistema Solar</span></aside>
+			</div>
+			<p class="comparacao-dia"><span class="icone-secao" data-icone="balao" aria-hidden="true"></span><span><b>Isso é como…</b> o lugar mais frio já medido na Terra, na Antártida, chegou a −89 °C. Urano é bem mais gelado que isso.</span></p>
+			<figure class="animacao">
+				<canvas data-animacao="urano-diamantes" width="200" height="84" role="img" aria-label="Animação: Urano cortado ao meio, mostrando a atmosfera, a camada de gelos e o núcleo, com diamantes caindo devagar em direção ao centro."></canvas>
+				<figcaption><span class="legenda-cor" style="--c:#bfeff5"></span>atmosfera <span class="legenda-cor" style="--c:#3f8fb8"></span>gelos (água, amônia e metano) <span class="legenda-cor" style="--c:#8a6a52"></span>núcleo <span class="legenda-cor" style="--c:#ffffff"></span>diamantes caindo</figcaption>
+			</figure>
+		</section>
+		<section class="bloco pixelado" id="secao-6">
+			<h2>Luas com nomes de teatro</h2>
+			<div class="bloco-corpo">
+				<p>Urano tem anéis escuros e finos e, desde a descoberta de uma nova lua em 2025, 29 luas conhecidas. Enquanto os outros planetas têm luas com nomes da mitologia, as de Urano homenageiam personagens de William Shakespeare e Alexander Pope, como Titânia, Oberon, Ariel e Miranda. Miranda tem um dos maiores penhascos conhecidos do Sistema Solar, com cerca de 20 km de altura.</p>
+				<aside class="visor-dado"><b>29</b><span>luas conhecidas</span></aside>
+			</div>
+			<p class="comparacao-dia"><span class="icone-secao" data-icone="balao" aria-hidden="true"></span><span><b>Isso é como…</b> empilhar mais de dois montes Everest: é a altura do penhasco de Miranda.</span></p>
+		</section>
+		<section class="bloco pixelado" id="secao-7">
+			<h2>Uma única visita</h2>
+			<div class="bloco-corpo">
+				<p>Só uma sonda visitou Urano: a Voyager 2, da NASA, que passou por ele em 1986 e tirou as únicas fotos de perto que temos até hoje. Anos depois, os cientistas perceberam que ela chegou durante uma tempestade de vento solar incomum, o que pode ter dado uma impressão errada sobre o planeta. Por isso, uma nova missão para orbitar Urano foi apontada pelos cientistas americanos como uma das grandes prioridades para as próximas décadas, mas ainda não tem data para sair do papel.</p>
+				<aside class="visor-dado"><b>1</b><span>visita só: a Voyager 2, em 1986</span></aside>
+			</div>
+			<p class="comparacao-dia"><span class="icone-secao" data-icone="balao" aria-hidden="true"></span><span><b>Isso é como…</b> a Voyager 2 levou 9 anos para chegar lá. De avião, a viagem duraria mais de 300 anos.</span></p>
+		</section>
 
-<h4> Um planeta que rola</h4>
-<h3> A característica mais estranha de Urano é que ele gira deitado, com o eixo inclinado em quase 98 graus. Em vez de rodar como um pião, ele rola ao redor do Sol como uma bola. A hipótese mais aceita é que, há bilhões de anos, uma colisão gigante o derrubou de lado.</h3> 
+		<!-- linha do tempo: cada marco acende quando chega na tela -->
+		<section class="bloco pixelado visual-extra" id="linha-do-tempo">
+			<h2>Linha do tempo</h2>
+			<ol class="linha-tempo">
+				<li><b>1781</b><span>William Herschel descobre Urano com um telescópio.</span></li>
+				<li><b>1787</b><span>Herschel encontra as duas primeiras luas: Titânia e Oberon.</span></li>
+				<li><b>1851</b><span>William Lassell descobre Ariel e Umbriel.</span></li>
+				<li><b>1948</b><span>Gerard Kuiper descobre Miranda, a lua do penhasco gigante.</span></li>
+				<li><b>1977</b><span>Os anéis de Urano são descobertos.</span></li>
+				<li><b>1986</b><span>A Voyager 2 passa por Urano: a única visita até hoje.</span></li>
+				<li><b>2025</b><span>Uma nova lua é encontrada, e Urano passa a ter 29.</span></li>
+			</ol>
+			<p class="linha-tempo-mais"><a href="linha-do-tempo.html">Ver a linha do tempo de todos os destinos juntos &rarr;</a></p>
+		</section>
 
+		<!-- calculadoras: idade em Urano e viagem até lá -->
+		<section class="bloco pixelado visual-extra" id="calculadoras">
+			<h2>Calculadoras espaciais</h2>
+			<div class="calculadoras">
+				<div class="calc" data-ferramenta="idade" data-ano="84.02" data-planeta="Urano">
+					<label class="calc-titulo" for="calc-idade">Quantos anos você teria em Urano?</label>
+					<div class="calc-entrada"><input id="calc-idade" type="number" min="0" max="130" value="10" inputmode="numeric"><span>anos na Terra</span></div>
+					<p class="calc-resultado" aria-live="polite"></p>
+				</div>
+				<div class="calc" data-ferramenta="viagem" data-km="2700000000">
+					<p class="calc-titulo">Quanto tempo para chegar a Urano?</p>
+					<div class="calc-opcoes" role="group" aria-label="Escolha o jeito de viajar">
+						<button type="button" data-kmh="100" data-icone="carro" data-frase="De carro, a 100 km/h">Carro</button>
+						<button type="button" data-kmh="900" data-icone="aviao" data-frase="De avião, a 900 km/h">Avião</button>
+						<button type="button" data-anos="9" data-icone="foguete" data-frase="Como a sonda Voyager 2" data-nota=" (ela saiu da Terra em 1977 e chegou em 1986)">Sonda</button>
+						<button type="button" data-kmh="1079252849" data-icone="luz" data-frase="Na velocidade da luz">Luz</button>
+					</div>
+					<div class="calc-trilha" aria-hidden="true"><i class="calc-terra"></i><i class="calc-veiculo"></i><i class="calc-urano"></i></div>
+					<p class="calc-resultado" aria-live="polite">Escolha um jeito de viajar.</p>
+					<small class="calc-nota">Da Terra até Urano: cerca de 2,7 bilhões de km, em média.</small>
+				</div>
+			</div>
+		</section>
 
-<h4>Verões e invernos de 42 anos</h4>
-<h3>Urano leva 84 anos terrestres para dar uma volta no Sol. Como está deitado, cada polo passa cerca de 42 anos seguidos com o Sol no céu e depois 42 anos em total escuridão. Uma pessoa que nascesse no começo do inverno em um dos polos poderia passar metade da vida sem ver o Sol.</h3>
+		<!-- sons de verdade: link para a sonificação da NASA -->
+		<section class="bloco pixelado visual-extra" id="sons">
+			<h2>Ouça de verdade</h2>
+			<p>No espaço não tem ar, e sem ar o som não anda. Mas os telescópios e as sondas captam luz e ondas de rádio, e os cientistas transformam esses dados em sons que a gente pode ouvir. Use fone de ouvido!</p>
+			<ul class="sons">
+				<li class="som"><button type="button" class="sons-tocar" data-audio="sons/urano.aac" data-duracao="14.1" aria-label="Tocar: Urano em som" aria-pressed="false"><span class="sons-icone" aria-hidden="true"></span></button><span class="sons-texto"><b>Urano em som</b><span>Os raios X de Urano, captados pelo telescópio Chandra, junto com a luz do planeta, transformados em música.</span><span class="sons-barra" aria-hidden="true"><i></i></span><small>NASA · telescópio Chandra · <a href="https://chandra.harvard.edu/sound/uranus.html" target="_blank" rel="noopener">ver no site original, em inglês &#8599;</a></small></span></li>
+			</ul>
+		</section>
 
-<br>
-<br>
-<br>
+		<!-- quiz: acertando tudo, ganha um selo especial no passaporte -->
+		<section class="bloco pixelado visual-extra" id="quiz">
+			<h2>Quiz de Urano</h2>
+			<div class="quiz" data-quiz="urano">
+				<p class="quiz-intro">Acerte as três perguntas: cada quiz certo conta para o selo especial "Sabe-tudo do Sistema Solar" do seu passaporte.</p>
+				<fieldset class="quiz-pergunta">
+					<legend>1. Quanto o eixo de Urano é inclinado?</legend>
+					<button type="button">23 graus</button><button type="button" data-certa>Quase 98 graus</button><button type="button">45 graus</button>
+				</fieldset>
+				<fieldset class="quiz-pergunta">
+					<legend>2. Qual sonda já visitou Urano?</legend>
+					<button type="button" data-certa>Voyager 2</button><button type="button">Cassini</button><button type="button">Juno</button>
+				</fieldset>
+				<fieldset class="quiz-pergunta">
+					<legend>3. As luas de Urano têm nomes de quê?</legend>
+					<button type="button">Deuses romanos</button><button type="button" data-certa>Personagens de teatro</button><button type="button">Cientistas famosos</button>
+				</fieldset>
+				<p class="quiz-resultado" aria-live="polite"></p>
+			</div>
+		</section>
 
-<img class="classe1" src="tamanhourano.png">
+		<p class="fecho">Deitado, gelado e visitado apenas uma vez, Urano é um dos planetas que menos conhecemos e, justamente por isso, um dos que mais têm surpresas a revelar.</p>
+		</article>
+		</div>
 
-<h4>O planeta mais frio</h4>
-<h3>Mesmo não sendo o mais distante do Sol, Urano tem a atmosfera mais fria do Sistema Solar, chegando a cerca de −224 °C. Os cientistas ainda tentam entender por que ele libera tão pouco calor de dentro, ao contrário dos outros gigantes. Há também a hipótese de que, lá no fundo, a pressão seja tão grande que o carbono do metano vire diamante e "chova" em direção ao centro do planeta.</h3>
+		<section id="balanca" data-planeta="urano"></section>
 
-<h4>Luas com nomes de teatro</h4>
-<h3>Urano tem anéis escuros e finos e, desde a descoberta de uma nova lua em 2025, 29 luas conhecidas. Enquanto os outros planetas têm luas com nomes da mitologia, as de Urano homenageiam personagens de William Shakespeare e Alexander Pope, como Titânia, Oberon, Ariel e Miranda. Miranda tem um dos maiores penhascos conhecidos do Sistema Solar, com cerca de 20 km de altura.</h3>
+		<nav class="vizinhos">
+		<a class="anterior" href="saturno.html"><img src="pixel/saturno.png" alt=""><span><small>Anterior</small>Saturno</span></a>
+		<a class="proximo" href="netuno.html"><span><small>Próximo</small>Netuno</span><img src="pixel/netuno.png" alt=""></a>
+		</nav>
+	</main>
 
-<h4>Uma única visita</h4>
-<h3>Só uma sonda visitou Urano: a Voyager 2, da NASA, que passou por ele em 1986 e tirou as únicas fotos de perto que temos até hoje. Anos depois, os cientistas perceberam que ela chegou durante uma tempestade de vento solar incomum, o que pode ter dado uma impressão errada sobre o planeta. Por isso, uma nova missão para orbitar Urano foi apontada pelos cientistas americanos como uma das grandes prioridades para as próximas décadas, mas ainda não tem data para sair do papel.</h3>
+	<footer class="rodape">
+		<nav class="rodape-planetas" aria-label="Todos os planetas">
+			<a href="mercurio.html"><img src="pixel/mercurio.png" alt="">Mercúrio</a>
+			<a href="venus.html"><img src="pixel/venus.png" alt="">Vênus</a>
+			<a href="terra.html"><img src="pixel/terra.png" alt="">Terra</a>
+			<a href="marte.html"><img src="pixel/marte.png" alt="">Marte</a>
+			<a href="jupiter.html"><img src="pixel/jupiter.png" alt="">Júpiter</a>
+			<a href="saturno.html"><img src="pixel/saturno.png" alt="">Saturno</a>
+			<a href="urano.html"><img src="pixel/urano.png" alt="">Urano</a>
+			<a href="netuno.html"><img src="pixel/netuno.png" alt="">Netuno</a>
+			<a href="sol.html"><img src="pixel/sol.png" alt="">Sol</a>
+		</nav>
+		<p><a href="sistema-solar.html">Nosso sistema solar</a> · <a href="index.html#galaxia">Via Láctea</a> · textos e pixel art feitos à mão</p>
+	</footer>
 
-	<br>
-	<br>
-
-Deitado, gelado e visitado apenas uma vez, Urano é um dos planetas que menos conhecemos e, justamente por isso, um dos que mais têm surpresas a revelar.
-
-
-
-
+	<script src="nave.js"></script>
+	<script src="transicao.js"></script>
+	<script src="radio.js"></script>
+	<script src="cabine.js"></script>
+	<script src="chegada.js"></script>
+	<script src="passaporte.js"></script>
+	<script src="marca.js"></script>
+	<script src="fundo.js"></script>
+	<script src="pixel/sprites.js"></script>
+	<script src="balanco.js"></script>
+	<script src="balanca.js"></script>
+	<script src="pagina.js"></script>
+	<script src="visuais.js"></script>
 </body>
 </html>

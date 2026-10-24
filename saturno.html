@@ -1,55 +1,139 @@
 <!DOCTYPE html>
-<html>
+<html lang="pt-BR">
 <head>
 	<meta charset="utf-8">
+	<!-- fundo escuro desde o primeiro instante; vindo de um salto, a página começa coberta pelo último quadro do salto (preso à tela, não à página), para nenhum quadro vazar antes das estrelas -->
+	<script>try{var h=document.documentElement;h.style.backgroundColor="#05030c";if(sessionStorage.getItem("salto")==="1"){var q=sessionStorage.getItem("saltoQuadro");h.className+=" em-salto";if(q){h.style.background="#05030c url("+q+") 0 0/100% 100% no-repeat fixed";h.style.imageRendering="pixelated"}}}catch(e){}</script>
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<title>Saturno</title>
-	<link rel="stylesheet" type="text/css" href="estilo.css">
+	<title>Saturno · Nosso sistema solar</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Silkscreen&family=Space+Grotesk:wght@400;500;700&family=Tiny5&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="estilo.css">
 </head>
-<center>
-<p = class="especial"> Saturno </p>
-</center>
-<body bgcolor="#000000">
+<body data-passaporte="sistema" style="--cor: #e3cc8f; --proporcao: 1.9; --largura-celular: 92vw; --ajuste-x: 2.1%">
 
-		<center>
-	<img src="planeta6.JPG" width="600px">
+	<header class="topo">
+		<a class="marca" href="sistema-solar.html">Nosso sistema solar</a>
+		<nav class="menu">
+		<a class="menu-galaxia" href="index.html#galaxia">&larr; Via Láctea</a>
+		<a href="mercurio.html">Mercúrio</a>
+		<a href="venus.html">Vênus</a>
+		<a href="terra.html">Terra</a>
+		<a href="marte.html">Marte</a>
+		<a href="jupiter.html">Júpiter</a>
+		<a href="saturno.html" aria-current="page">Saturno</a>
+		<a href="urano.html">Urano</a>
+		<a href="netuno.html">Netuno</a>
+		<a href="sol.html">Sol</a>
+		</nav>
+	</header>
 
+	<main>
+		<section class="destaque">
+			<div class="palco">
+				<img class="planeta" data-planeta="saturno" src="pixel/saturno.png" alt="Saturno em pixel art">
+			</div>
+			<div class="destaque-texto">
+				<p class="posicao">6º planeta a partir do Sol</p>
+				<h1>Saturno</h1>
+				<p class="lema">O senhor dos anéis</p>
+				<dl class="ficha">
+					<div><dt>Tipo</dt><dd>Gigante gasoso</dd></div>
+					<div><dt>Distância do Sol</dt><dd>Cerca de 1,4 bilhão de km</dd></div>
+					<div><dt>Um ano dura</dt><dd>Quase 30 anos</dd></div>
+					<div><dt>Luas</dt><dd>285</dd></div>
+				</dl>
+			</div>
+		</section>
 
+		<div class="leitura" id="leitura">
+		<aside class="sumario" aria-label="Nesta página">
+			<p>Nesta página</p>
+			<ol>
+				<li><a href="#secao-1">Saturno: o senhor dos anéis</a></li>
+				<li><a href="#secao-2">Um planeta que flutuaria</a></li>
+				<li><a href="#secao-3">Dia curto, ano longo</a></li>
+				<li><a href="#secao-4">Anéis de gelo</a></li>
+				<li><a href="#secao-5">Um hexágono no polo</a></li>
+				<li><a href="#secao-6">O campeão das luas</a></li>
+				<li><a href="#secao-7">Visitas ao senhor dos anéis</a></li>
+				<li class="extra"><a href="#balanca">Sua balança espacial</a></li>
+			</ol>
+		</aside>
 
-<h4> Saturno: o senhor dos anéis</h4>
-<h3>Saturno é o sexto planeta a partir do Sol e o segundo maior do Sistema Solar, perdendo só para Júpiter. Seu nome vem do deus romano do tempo e da agricultura, pai de Júpiter. Da Terra, dá para vê-lo a olho nu como um ponto amarelado, mas os famosos anéis só aparecem com um telescópio. Quando Galileu o observou em 1610, com um telescópio simples, achou que o planeta tinha "orelhas".</h3>
+		<article class="conteudo">
+		<section class="bloco pixelado" id="secao-1">
+			<h2>Saturno: o senhor dos anéis</h2>
+			<p>Saturno é o sexto planeta a partir do Sol e o segundo maior do Sistema Solar, perdendo só para Júpiter. Seu nome vem do deus romano do tempo e da agricultura, pai de Júpiter. Da Terra, dá para vê-lo a olho nu como um ponto amarelado, mas os famosos anéis só aparecem com um telescópio. Quando Galileu o observou em 1610, com um telescópio simples, achou que o planeta tinha "orelhas".</p>
+		</section>
+		<section class="bloco pixelado" id="secao-2">
+			<h2>Um planeta que flutuaria</h2>
+			<p>Assim como Júpiter, Saturno é um gigante gasoso, feito principalmente de hidrogênio e hélio, sem uma superfície firme. Ele é tão pouco denso que, se existisse uma banheira grande o suficiente, Saturno flutuaria na água. É o único planeta do Sistema Solar mais leve que a água em relação ao seu tamanho.</p>
+		</section>
+		<section class="bloco pixelado" id="secao-3">
+			<h2>Dia curto, ano longo</h2>
+			<p>Um dia em Saturno dura cerca de 10 horas e meia, mas um ano leva quase 30 anos terrestres. Ou seja, uma pessoa de 30 anos na Terra teria apenas 1 ano de idade em Saturno. Seus ventos também estão entre os mais rápidos do Sistema Solar, chegando a cerca de 1.800 km/h.</p>
+		</section>
+		<figure class="comparacao">
+			<img class="pixelado" src="tamanhosaturno.png" alt="Comparação do tamanho de Saturno">
+			<figcaption>Passe o mouse para ampliar</figcaption>
+		</figure>
+		<section class="bloco pixelado" id="secao-4">
+			<h2>Anéis de gelo</h2>
+			<p>Os anéis de Saturno são formados por bilhões de pedaços de gelo e rocha, alguns do tamanho de um grão de areia, outros do tamanho de uma casa. Eles se espalham por centenas de milhares de quilômetros, mas são finíssimos: na maior parte, têm só algumas dezenas de metros de espessura, como uma folha de papel do tamanho de um campo de futebol. De tempos em tempos, os anéis ficam de lado para a Terra e quase desaparecem de vista, como aconteceu em 2025. E eles não vão durar para sempre, porque aos poucos o gelo dos anéis está "chovendo" sobre o planeta.</p>
+		</section>
+		<section class="bloco pixelado" id="secao-5">
+			<h2>Um hexágono no polo</h2>
+			<p>No polo norte de Saturno existe uma tempestade com um formato surpreendente: um hexágono quase perfeito, com cada lado maior que o diâmetro da Terra. Ele gira há décadas e ainda intriga os cientistas, que tentam entender como uma forma tão geométrica consegue se manter na atmosfera de um planeta.</p>
+		</section>
+		<section class="bloco pixelado" id="secao-6">
+			<h2>O campeão das luas</h2>
+			<p>Saturno é o planeta com mais luas do Sistema Solar. Em março de 2026, mais 11 luas foram confirmadas, levando o total a 285, bem à frente de Júpiter, que tem 101. A maioria é minúscula, com poucos quilômetros de largura, mas duas se destacam. Titã, maior que o planeta Mercúrio, é a única lua com uma atmosfera densa e tem rios, lagos e até chuva, só que de metano em vez de água. Já Encélado, uma pequena lua de gelo, lança jatos de água para o espaço a partir de um oceano escondido sob a superfície.</p>
+		</section>
+		<section class="bloco pixelado" id="secao-7">
+			<h2>Visitas ao senhor dos anéis</h2>
+			<p>A sonda Cassini estudou Saturno por 13 anos e levou junto a Huygens, que em 2005 pousou em Titã, o pouso mais distante já feito pela humanidade. Em 2017, com o combustível acabando, a Cassini mergulhou de propósito em Saturno para não contaminar luas que podem ter condições para vida. A próxima visita será a Dragonfly, da NASA: um drone movido a energia nuclear, com lançamento previsto para 2028 e chegada em Titã em 2034, que vai voar de um ponto a outro da lua procurando os ingredientes químicos da vida.</p>
+		</section>
+		</article>
+		</div>
 
-<h4>Um planeta que flutuaria</h4>
-<h3> Assim como Júpiter, Saturno é um gigante gasoso, feito principalmente de hidrogênio e hélio, sem uma superfície firme. Ele é tão pouco denso que, se existisse uma banheira grande o suficiente, Saturno flutuaria na água. É o único planeta do Sistema Solar mais leve que a água em relação ao seu tamanho.</h3>
+		<section id="balanca" data-planeta="saturno"></section>
 
+		<nav class="vizinhos">
+		<a class="anterior" href="jupiter.html"><img src="pixel/jupiter.png" alt=""><span><small>Anterior</small>Júpiter</span></a>
+		<a class="proximo" href="urano.html"><span><small>Próximo</small>Urano</span><img src="pixel/urano.png" alt=""></a>
+		</nav>
+	</main>
 
-<h4> Dia curto, ano longo</h4>
-<h3> Um dia em Saturno dura cerca de 10 horas e meia, mas um ano leva quase 30 anos terrestres. Ou seja, uma pessoa de 30 anos na Terra teria apenas 1 ano de idade em Saturno. Seus ventos também estão entre os mais rápidos do Sistema Solar, chegando a cerca de 1.800 km/h.</h3> 
+	<footer class="rodape">
+		<nav class="rodape-planetas" aria-label="Todos os planetas">
+			<a href="mercurio.html"><img src="pixel/mercurio.png" alt="">Mercúrio</a>
+			<a href="venus.html"><img src="pixel/venus.png" alt="">Vênus</a>
+			<a href="terra.html"><img src="pixel/terra.png" alt="">Terra</a>
+			<a href="marte.html"><img src="pixel/marte.png" alt="">Marte</a>
+			<a href="jupiter.html"><img src="pixel/jupiter.png" alt="">Júpiter</a>
+			<a href="saturno.html"><img src="pixel/saturno.png" alt="">Saturno</a>
+			<a href="urano.html"><img src="pixel/urano.png" alt="">Urano</a>
+			<a href="netuno.html"><img src="pixel/netuno.png" alt="">Netuno</a>
+			<a href="sol.html"><img src="pixel/sol.png" alt="">Sol</a>
+		</nav>
+		<p><a href="sistema-solar.html">Nosso sistema solar</a> · <a href="index.html#galaxia">Via Láctea</a> · textos e pixel art feitos à mão</p>
+	</footer>
 
-<br>
-<br>
-<br>
-
-<img class="classe1" src="tamanhojupiter.png">
-
-<h4>Anéis de gelo</h4>
-<h3>Os anéis de Saturno são formados por bilhões de pedaços de gelo e rocha, alguns do tamanho de um grão de areia, outros do tamanho de uma casa. Eles se espalham por centenas de milhares de quilômetros, mas são finíssimos: na maior parte, têm só algumas dezenas de metros de espessura, como uma folha de papel do tamanho de um campo de futebol. De tempos em tempos, os anéis ficam de lado para a Terra e quase desaparecem de vista, como aconteceu em 2025. E eles não vão durar para sempre, porque aos poucos o gelo dos anéis está "chovendo" sobre o planeta.</h3>
-
-<h4>Um hexágono no polo</h4>
-<h3>No polo norte de Saturno existe uma tempestade com um formato surpreendente: um hexágono quase perfeito, com cada lado maior que o diâmetro da Terra. Ele gira há décadas e ainda intriga os cientistas, que tentam entender como uma forma tão geométrica consegue se manter na atmosfera de um planeta.</h3>
-
-<h4> O campeão das luas</h4>
-<h3>Saturno é o planeta com mais luas do Sistema Solar. Em março de 2026, mais 11 luas foram confirmadas, levando o total a 285, bem à frente de Júpiter, que tem 101. A maioria é minúscula, com poucos quilômetros de largura, mas duas se destacam. Titã, maior que o planeta Mercúrio, é a única lua com uma atmosfera densa e tem rios, lagos e até chuva, só que de metano em vez de água. Já Encélado, uma pequena lua de gelo, lança jatos de água para o espaço a partir de um oceano escondido sob a superfície.</h3>
-
-<h4> Visitas ao senhor dos anéis</h4>
-<h3>A sonda Cassini estudou Saturno por 13 anos e levou junto a Huygens, que em 2005 pousou em Titã, o pouso mais distante já feito pela humanidade. Em 2017, com o combustível acabando, a Cassini mergulhou de propósito em Saturno para não contaminar luas que podem ter condições para vida. A próxima visita será a Dragonfly, da NASA: um drone movido a energia nuclear, com lançamento previsto para 2028 e chegada em Titã em 2034, que vai voar de um ponto a outro da lua procurando os ingredientes químicos da vida.</h3>
-
-	<br>
-	<br>
-
-A mesma confirmação de março de 2026 elevou Júpiter para 101 luas, então no texto dele vale trocar "mais de 90 luas conhecidas" por "mais de 100 luas conhecidas".
-
-
-
+	<script src="nave.js"></script>
+	<script src="transicao.js"></script>
+	<script src="radio.js"></script>
+	<script src="cabine.js"></script>
+	<script src="chegada.js"></script>
+	<script src="passaporte.js"></script>
+	<script src="marca.js"></script>
+	<script src="fundo.js"></script>
+	<script src="pixel/sprites.js"></script>
+	<script src="balanco.js"></script>
+	<script src="balanca.js"></script>
+	<script src="visuais-dados.js"></script>
+	<script src="visuais.js"></script>
+	<script src="pagina.js"></script>
 </body>
 </html>

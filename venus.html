@@ -1,62 +1,142 @@
 <!DOCTYPE html>
-<html>
+<html lang="pt-BR">
 <head>
 	<meta charset="utf-8">
+	<!-- fundo escuro desde o primeiro instante; vindo de um salto, a página começa coberta pelo último quadro do salto (preso à tela, não à página), para nenhum quadro vazar antes das estrelas -->
+	<script>try{var h=document.documentElement;h.style.backgroundColor="#05030c";if(sessionStorage.getItem("salto")==="1"){var q=sessionStorage.getItem("saltoQuadro");h.className+=" em-salto";if(q){h.style.background="#05030c url("+q+") 0 0/100% 100% no-repeat fixed";h.style.imageRendering="pixelated"}}}catch(e){}</script>
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<title>Vênus</title>
-	<link rel="stylesheet" type="text/css" href="estilo.css">
+	<title>Vênus · Nosso sistema solar</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Silkscreen&family=Space+Grotesk:wght@400;500;700&family=Tiny5&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="estilo.css">
 </head>
-<center>
-<p = class="especial"> Vênus </p>
-</center>
-<body bgcolor="#000000">
+<body data-passaporte="sistema" style="--cor: #f5a83c; --largura: 380px">
 
-		<center>
-	<img src="planeta2.JPG" width="400px">
+	<header class="topo">
+		<a class="marca" href="sistema-solar.html">Nosso sistema solar</a>
+		<nav class="menu">
+		<a class="menu-galaxia" href="index.html#galaxia">&larr; Via Láctea</a>
+		<a href="mercurio.html">Mercúrio</a>
+		<a href="venus.html" aria-current="page">Vênus</a>
+		<a href="terra.html">Terra</a>
+		<a href="marte.html">Marte</a>
+		<a href="jupiter.html">Júpiter</a>
+		<a href="saturno.html">Saturno</a>
+		<a href="urano.html">Urano</a>
+		<a href="netuno.html">Netuno</a>
+		<a href="sol.html">Sol</a>
+		</nav>
+	</header>
+
+	<main>
+		<section class="destaque">
+			<div class="palco">
+				<img class="planeta" data-planeta="venus" src="pixel/venus.png" alt="Vênus em pixel art">
+			</div>
+			<div class="destaque-texto">
+				<p class="posicao">2º planeta a partir do Sol</p>
+				<h1>Vênus</h1>
+				<p class="lema">Um astro brilhante</p>
+				<dl class="ficha">
+					<div><dt>Tipo</dt><dd>Planeta rochoso</dd></div>
+					<div><dt>Distância do Sol</dt><dd>Cerca de 108 milhões de km</dd></div>
+					<div><dt>Um ano dura</dt><dd>225 dias</dd></div>
+					<div><dt>Luas</dt><dd>Nenhuma</dd></div>
+				</dl>
+			</div>
+		</section>
+
+		<div class="leitura" id="leitura">
+		<aside class="sumario" aria-label="Nesta página">
+			<p>Nesta página</p>
+			<ol>
+				<li><a href="#secao-1">Vênus: um astro brilhante</a></li>
+				<li><a href="#secao-2">Um planeta que gira ao contrário</a></li>
+				<li><a href="#secao-3">O planeta mais quente do Sistema Solar</a></li>
+				<li><a href="#secao-4">Esmagador e ácido</a></li>
+				<li><a href="#secao-5">Vulcões por toda parte</a></li>
+				<li><a href="#secao-6">Pousar no inferno</a></li>
+				<li><a href="#secao-7">Uma Terra que deu errado?</a></li>
+				<li class="extra"><a href="#balanca">Sua balança espacial</a></li>
+			</ol>
+		</aside>
+
+		<article class="conteudo">
+		<section class="bloco pixelado" id="secao-1">
+			<h2>Vênus: um astro brilhante</h2>
+			<p>Vênus é o segundo planeta a partir do Sol e o mais parecido com a Terra em tamanho, por isso é chamado de "planeta irmão". Seu nome vem da deusa romana do amor e da beleza, porque é o astro mais brilhante do céu noturno depois da Lua. No Brasil, é conhecido como Estrela d'Alva, embora não seja uma estrela, porque aparece brilhando forte logo antes do amanhecer ou logo depois do pôr do Sol.</p>
+		</section>
+		<section class="bloco pixelado" id="secao-2">
+			<h2>Um planeta que gira ao contrário</h2>
+			<p>Vênus leva 225 dias para dar a volta no Sol, mas precisa de 243 dias para girar uma vez em torno de si mesmo. Ou seja, ele completa uma volta ao redor do Sol antes de terminar uma volta em torno do próprio eixo. E ele gira no sentido oposto ao da maioria dos planetas, então lá o Sol nasce no oeste e se põe no leste.</p>
+		</section>
+		<figure class="comparacao">
+			<img class="pixelado" src="tamanhovenus.png" alt="Comparação do tamanho de Vênus">
+			<figcaption>Passe o mouse para ampliar</figcaption>
+		</figure>
+		<section class="bloco pixelado" id="secao-3">
+			<h2>O planeta mais quente do Sistema Solar</h2>
+			<p>Mercúrio fica mais perto do Sol, mas o mais quente é Vênus. Sua atmosfera, feita quase só de gás carbônico, funciona como um cobertor grosso que prende o calor, num efeito estufa descontrolado. A temperatura fica em torno de 465 °C, de dia e de noite, o bastante para derreter chumbo.</p>
+		</section>
+		<section class="bloco pixelado" id="secao-4">
+			<h2>Esmagador e ácido</h2>
+			<p>O ar de Vênus é tão denso que a pressão na superfície é cerca de 90 vezes maior que a da Terra, como estar a quase 1 km de profundidade no oceano. O planeta também é coberto por nuvens de ácido sulfúrico, que escondem a superfície de telescópios comuns.</p>
+		</section>
+		<section class="bloco pixelado" id="secao-5">
+			<h2>Vulcões por toda parte</h2>
+			<p>Vênus tem mais vulcões do que qualquer outro planeta. Em 2023, cientistas compararam imagens antigas da sonda Magellan e encontraram uma cratera vulcânica que mudou de forma em poucos meses, um forte sinal de que ainda há vulcões ativos por lá.</p>
+		</section>
+		<section class="bloco pixelado" id="secao-6">
+			<h2>Pousar no inferno</h2>
+			<p>Nenhum lugar do Sistema Solar é tão hostil para uma sonda. Mesmo assim, a União Soviética conseguiu: em 1970, a Venera 7 foi a primeira nave a enviar dados da superfície de outro planeta, e em 1982 a Venera 13 aguentou 127 minutos antes de ser destruída pelo calor e pela pressão, enviando as primeiras fotos coloridas do solo venusiano.</p>
+		</section>
+		<section class="bloco pixelado" id="secao-7">
+			<h2>Uma Terra que deu errado?</h2>
+			<p>Alguns cientistas acreditam que Vênus pode ter tido oceanos e um clima ameno no passado, antes de o efeito estufa sair do controle. Outros acham que ele nunca foi úmido, e o debate continua. Para responder a essa pergunta, o Envision, da ESA, começou a ser construído em 2025 e é uma das três grandes missões da chamada "década de Vênus", junto com DAVINCI e VERITAS, da NASA, previstas para a década de 2030, embora o orçamento apertado dificulte manter as três em andamento.</p>
+			<p>Bonito por fora e infernal por dentro, Vênus mostra como dois planetas quase gêmeos podem ter destinos completamente diferentes.</p>
+		</section>
 
 
+		</article>
+		</div>
 
-<h4> Vênus: Um astro brilhante </h4>
-<h3>Vênus é o segundo planeta a partir do Sol e o mais parecido com a Terra em tamanho, por isso é chamado de "planeta irmão". Seu nome vem da deusa romana do amor e da beleza, porque é o astro mais brilhante do céu noturno depois da Lua. No Brasil, é conhecido como Estrela d'Alva, embora não seja uma estrela, porque aparece brilhando forte logo antes do amanhecer ou logo depois do pôr do Sol.</h3>
+		<section id="balanca" data-planeta="venus"></section>
 
-<h4> Um planeta que gira ao contrário</h4>
-<h3> Vênus leva 225 dias para dar a volta no Sol, mas precisa de 243 dias para girar uma vez em torno de si mesmo. Ou seja, ele completa uma volta ao redor do Sol antes de terminar uma volta em torno do próprio eixo. E ele gira no sentido oposto ao da maioria dos planetas, então lá o Sol nasce no oeste e se põe no leste. </h3>
+		<nav class="vizinhos">
+		<a class="anterior" href="mercurio.html"><img src="pixel/mercurio.png" alt=""><span><small>Anterior</small>Mercúrio</span></a>
+		<a class="proximo" href="terra.html"><span><small>Próximo</small>Terra</span><img src="pixel/terra.png" alt=""></a>
+		</nav>
+	</main>
 
-<br>
-	<br>
-	<br>
-	<img class="classe1" src="tamanhovenus.png">
-	
+	<footer class="rodape">
+		<nav class="rodape-planetas" aria-label="Todos os planetas">
+			<a href="mercurio.html"><img src="pixel/mercurio.png" alt="">Mercúrio</a>
+			<a href="venus.html"><img src="pixel/venus.png" alt="">Vênus</a>
+			<a href="terra.html"><img src="pixel/terra.png" alt="">Terra</a>
+			<a href="marte.html"><img src="pixel/marte.png" alt="">Marte</a>
+			<a href="jupiter.html"><img src="pixel/jupiter.png" alt="">Júpiter</a>
+			<a href="saturno.html"><img src="pixel/saturno.png" alt="">Saturno</a>
+			<a href="urano.html"><img src="pixel/urano.png" alt="">Urano</a>
+			<a href="netuno.html"><img src="pixel/netuno.png" alt="">Netuno</a>
+			<a href="sol.html"><img src="pixel/sol.png" alt="">Sol</a>
+		</nav>
+		<p><a href="sistema-solar.html">Nosso sistema solar</a> · <a href="index.html#galaxia">Via Láctea</a> · textos e pixel art feitos à mão</p>
+	</footer>
 
-<h4> O planeta mais quente do Sistema Solar </h4>
-<h3> Mercúrio fica mais perto do Sol, mas o mais quente é Vênus. Sua atmosfera, feita quase só de gás carbônico, funciona como um cobertor grosso que prende o calor, num efeito estufa descontrolado. A temperatura fica em torno de 465 °C, de dia e de noite, o bastante para derreter chumbo.
- </h3>
-
-<h4> Esmagador e ácido </h4>
-<h3> O ar de Vênus é tão denso que a pressão na superfície é cerca de 90 vezes maior que a da Terra, como estar a quase 1 km de profundidade no oceano. O planeta também é coberto por nuvens de ácido sulfúrico, que escondem a superfície de telescópios comuns. </h3> 
-
-
-<h4> Vulcões por toda parte </h4>
-
-<h3>Vênus tem mais vulcões do que qualquer outro planeta. Em 2023, cientistas compararam imagens antigas da sonda Magellan e encontraram uma cratera vulcânica que mudou de forma em poucos meses, um forte sinal de que ainda há vulcões ativos por lá.</h3>
-
-<h4> Pousar no inferno </h4>
-
-<h3>Nenhum lugar do Sistema Solar é tão hostil para uma sonda. Mesmo assim, a União Soviética conseguiu: em 1970, a Venera 7 foi a primeira nave a enviar dados da superfície de outro planeta, e em 1982 a Venera 13 aguentou 127 minutos antes de ser destruída pelo calor e pela pressão, enviando as primeiras fotos coloridas do solo venusiano.</h3>
-
-<h4> Uma Terra que deu errado? </h4>
-
-<h3> Alguns cientistas acreditam que Vênus pode ter tido oceanos e um clima ameno no passado, antes de o efeito estufa sair do controle. Outros acham que ele nunca foi úmido, e o debate continua. Para responder essa pergunta, o Envision, da ESA, começou a ser construído em 2025 e é uma das três grandes missões da chamada "década de Vênus", junto com DAVINCI e VERITAS, da NASA, previstas para a década de 2030, embora o orçamento apertado dificulte manter as três em andamento. 
-	<br>
-	<br>
-
-Bonito por fora e infernal por dentro, Vênus mostra como dois planetas quase gêmeos podem ter destinos completamente diferentes.
- </h3> 
-
-<br> 
-<br> 
-
-	<img class="classe1" src="tamanhovenus.png">
-
+	<script src="nave.js"></script>
+	<script src="transicao.js"></script>
+	<script src="radio.js"></script>
+	<script src="cabine.js"></script>
+	<script src="chegada.js"></script>
+	<script src="passaporte.js"></script>
+	<script src="marca.js"></script>
+	<script src="fundo.js"></script>
+	<script src="pixel/sprites.js"></script>
+	<script src="balanco.js"></script>
+	<script src="balanca.js"></script>
+	<script src="visuais-dados.js"></script>
+	<script src="visuais.js"></script>
+	<script src="pagina.js"></script>
 </body>
 </html>

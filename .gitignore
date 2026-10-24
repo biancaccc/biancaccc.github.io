@@ -1,3 +1,6 @@
 .DS_Store
 __MACOSX/
 Thumbs.db
+# o pacote do site para baixar (fica fora do repositório) e a pasta de testes
+turismo-espacial-site.zip
+.claude/

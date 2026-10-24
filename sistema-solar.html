@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+	<meta charset="utf-8">
+	<!-- fundo escuro desde o primeiro instante; vindo de um salto, a página começa coberta pelo último quadro do salto (preso à tela, não à página), para nenhum quadro vazar antes das estrelas -->
+	<script>try{var h=document.documentElement;h.style.backgroundColor="#05030c";if(sessionStorage.getItem("salto")==="1"){var q=sessionStorage.getItem("saltoQuadro");h.className+=" em-salto";if(q){h.style.background="#05030c url("+q+") 0 0/100% 100% no-repeat fixed";h.style.imageRendering="pixelated"}}}catch(e){}</script>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Sistema Solar · Turismo espacial</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Silkscreen&family=Space+Grotesk:wght@400;500;700&family=Tiny5&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="estilo.css">
+</head>
+<body data-passaporte="sistema" class="pagina-inicial">
+
+	<a class="voltar-galaxia" href="index.html#galaxia">&larr; Via Láctea</a>
+	<div class="hud-moldura" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+
+	<main class="inicio">
+		<!-- o Sol na mesma escala dos planetas: ele é tão grande que só a beirada cabe, da altura da tela toda -->
+		<a class="sol-borda" href="sol.html" data-id="sol" aria-label="Sol: na mesma escala dos planetas, só a beirada dele cabe aqui"><canvas aria-hidden="true"></canvas><span class="sol-borda-nome" aria-hidden="true">Sol</span></a>
+		<p class="hud-rotulo">Destino: braço de Órion</p>
+		<h1>Nosso sistema solar</h1>
+		<p class="subtitulo">Conheça cada um dos planetas</p>
+
+		<!-- Mesma disposição da arte sistematodo.png: posições e tamanhos em % -->
+		<div class="rolagem">
+			<div class="sistema com-sol" id="sistema">
+				<a class="astro" href="mercurio.html" data-id="mercurio" data-nome="Mercúrio" style="--x: 0.468%; --y: 49.63%; --w: 1.426%">
+					<img class="planeta" data-planeta="mercurio" src="pixel/mercurio.png" alt="Mercúrio">
+				</a>
+				<a class="astro" href="venus.html" data-id="venus" data-nome="Vênus" style="--x: 3.415%; --y: 45.80%; --w: 3.543%">
+					<img class="planeta" data-planeta="venus" src="pixel/venus.png" alt="Vênus">
+				</a>
+				<a class="astro" href="terra.html" data-id="terra" data-nome="Terra" style="--x: 7.957%; --y: 45.55%; --w: 3.628%">
+					<img class="planeta" data-planeta="terra" src="pixel/terra.png" alt="Terra">
+				</a>
+				<a class="astro" href="marte.html" data-id="marte" data-nome="Marte" style="--x: 13.181%; --y: 48.41%; --w: 2.011%">
+					<img class="planeta" data-planeta="marte" src="pixel/marte.png" alt="Marte">
+				</a>
+				<a class="astro" href="jupiter.html" data-id="jupiter" data-nome="Júpiter" style="--x: 17.255%; --y: 2.163%; --w: 25.489%">
+					<img class="planeta" data-planeta="jupiter" src="pixel/jupiter.png" alt="Júpiter">
+				</a>
+				<a class="astro" href="saturno.html" data-id="saturno" data-nome="Saturno" style="--x: 44.085%; --y: 19.347%; --w: 31.819%">
+					<img class="planeta" data-planeta="saturno" src="pixel/saturno.png" alt="Saturno">
+				</a>
+				<a class="astro" href="urano.html" data-id="urano" data-nome="Urano" style="--x: 77.691%; --y: 36.939%; --w: 9.787%">
+					<img class="planeta" data-planeta="urano" src="pixel/urano.png" alt="Urano">
+				</a>
+				<a class="astro" href="netuno.html" data-id="netuno" data-nome="Netuno" style="--x: 89.681%; --y: 36.980%; --w: 9.830%">
+					<img class="planeta" data-planeta="netuno" src="pixel/netuno.png" alt="Netuno">
+				</a>
+			</div>
+		</div>
+
+		<nav class="planetas" id="links">
+			<a href="mercurio.html" data-id="mercurio">Mercúrio</a>
+			<a href="venus.html" data-id="venus">Vênus</a>
+			<a href="terra.html" data-id="terra">Terra</a>
+			<a href="marte.html" data-id="marte">Marte</a>
+			<a href="jupiter.html" data-id="jupiter">Júpiter</a>
+			<a href="saturno.html" data-id="saturno">Saturno</a>
+			<a href="urano.html" data-id="urano">Urano</a>
+			<a href="netuno.html" data-id="netuno">Netuno</a>
+			<a href="sol.html" data-id="sol">Sol</a>
+		</nav>
+		<div class="info-planeta" id="info" aria-live="polite">
+			<p class="info-vazio">Passe o mouse em um planeta ou nome para ver o que ele tem de especial.</p>
+		</div>
+	</main>
+
+
+	<script src="nave.js"></script>
+	<script src="transicao.js"></script>
+	<script src="radio.js"></script>
+	<script src="cabine.js"></script>
+	<script src="chegada.js"></script>
+	<script src="passaporte.js"></script>
+	<script src="marca.js"></script>
+	<script src="fundo.js"></script>
+	<script src="pixel/sprites.js"></script>
+	<script src="balanco.js"></script>
+	<script>
+		// A beirada do Sol, na mesma escala dos planetas da arte. Júpiter ocupa 25,5% da largura da
+		// fileira e o Sol é quase 10 vezes mais largo que ele: o Sol teria 2,5 vezes a largura da
+		// fileira inteira. Por isso só cabe a beirada, uma curva enorme que ocupa a altura toda da
+		// tela, entrando pela esquerda. O desenho segue a pixel art do Sol (a mesma paleta, os veios
+		// marrons e as explosões de raios amarelos), só que com mais detalhe, porque é um zoom.
+		(function () {
+			var link = document.querySelector('.sol-borda'), sistema = document.getElementById('sistema'), main = document.querySelector('main.inicio');
+			if (!link || !sistema) return;
+			var tela = link.querySelector('canvas'), nome = link.querySelector('.sol-borda-nome'), ctx = tela.getContext('2d');
+			var brilho = document.createElement('span');
+			brilho.className = 'sol-borda-brilho';
+			brilho.setAttribute('aria-hidden', 'true');
+			link.insertBefore(brilho, tela);
+			var calmo = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+			function cor(h) { return (255 << 24 | parseInt(h.substr(5, 2), 16) << 16 | parseInt(h.substr(3, 2), 16) << 8 | parseInt(h.substr(1, 2), 16)) >>> 0; }
+			// a paleta da pixel art do Sol
+			var ESCURO = cor('#573312'), MARROM = cor('#91561e'), LARANJA = cor('#ce8e33'), CLARO = cor('#f0d17c'), BRANCO = cor('#fff6e0');
+			var BRILHO = [cor('#ffb347'), cor('#e07a2a'), cor('#a8501e')];
+			var LIM16 = [0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5];
+			function hash(x, y) { var n = (Math.imul(x, 374761393) + Math.imul(y, 668265263)) | 0; n = Math.imul(n ^ (n >>> 13), 1274126177); return ((n ^ (n >>> 16)) >>> 0) / 4294967295; }
+			function ruido(x, y) {
+				var xi = Math.floor(x), yi = Math.floor(y), u = x - xi, v = y - yi;
+				u = u * u * (3 - 2 * u); v = v * v * (3 - 2 * v);
+				var a = hash(xi, yi), b = hash(xi + 1, yi), c = hash(xi, yi + 1), d = hash(xi + 1, yi + 1);
+				return a + (b - a) * u + (c - a) * v + (a - b - c + d) * u * v;
+			}
+			function fbm(x, y) { return ruido(x, y) * 0.55 + ruido(x * 2.1 + 7, y * 2.1) * 0.3 + ruido(x * 4.3 + 3, y * 4.3 + 9) * 0.15; }
+			var P, CW, CH, img, buf, R, cx, cy, borda, halo, explosoes;
+			function medir() {
+				var rm = main.getBoundingClientRect(), rs = sistema.getBoundingClientRect(), W = rs.width;
+				P = W > 700 ? 4 : 3; // o tamanho de cada pixel da arte na tela
+				borda = rs.left - rm.left - 0.05 * W; // onde fica a beirada: com folga antes de Mercúrio, para ele não ficar no brilho
+				halo = Math.max(36, 0.07 * W);
+				R = 0.25489 * 9.96 / 2 * W; cx = borda - R; cy = rs.top - rm.top + rs.height / 2;
+				var largura = Math.max(10, borda + 2), altura = rm.height;
+				link.style.width = largura + 'px'; link.style.height = altura + 'px';
+				// o brilho atrás, suave e pulsando (como o da página do Sol): um círculo enorme, do
+				// tamanho do Sol mais o brilho, com um degradê que só aparece em volta da beirada
+				var fora = Math.max(70, 0.11 * W), raio = R + fora, p = R / raio * 100;
+				brilho.style.left = (cx - raio) + 'px'; brilho.style.top = (cy - raio) + 'px';
+				brilho.style.width = brilho.style.height = raio * 2 + 'px';
+				brilho.style.background = 'radial-gradient(closest-side, rgba(255, 236, 160, 0.95) ' + (p - 1).toFixed(2) + '%, rgba(255, 196, 77, 0.7) ' + (p + (100 - p) * 0.12).toFixed(2) + '%, rgba(255, 140, 30, 0.32) ' + (p + (100 - p) * 0.35).toFixed(2) + '%, rgba(255, 90, 0, 0.1) ' + (p + (100 - p) * 0.65).toFixed(2) + '%, transparent 100%)';
+				CW = Math.ceil(largura / P); CH = Math.ceil(altura / P);
+				tela.width = CW; tela.height = CH;
+				img = ctx.createImageData(CW, CH); buf = new Uint32Array(img.data.buffer);
+				nome.style.left = Math.max(8, borda - 60) + 'px'; nome.style.top = cy + 'px';
+				// as explosões de raios (como na arte), espalhadas pelo pedaço que aparece
+				explosoes = [];
+				var s = 7;
+				for (var i = 0; i < 24; i++) {
+					s = (s * 16807) % 2147483647; var a = s / 2147483647;
+					s = (s * 16807) % 2147483647; var b = s / 2147483647;
+					s = (s * 16807) % 2147483647; var c = s / 2147483647;
+					var y = b * altura, x = borda - 12 - a * Math.max(30, borda * 0.9);
+					explosoes.push([x / P, y / P, (14 + c * 22) / P * 3, c * 6]);
+				}
+			}
+			function desenhar(t) {
+				for (var j = 0; j < CH; j++) for (var i = 0; i < CW; i++) {
+					var X = (i + 0.5) * P, Y = (j + 0.5) * P, k = j * CW + i;
+					var e = R - Math.sqrt((X - cx) * (X - cx) + (Y - cy) * (Y - cy)); // quanto o ponto está para dentro do Sol (em px)
+					var lim = LIM16[(i & 3) + ((j & 3) << 2)] / 16;
+					if (e < 0) { buf[k] = 0; continue; } // fora do Sol: transparente (o brilho suave fica atrás, no .sol-borda-brilho)
+					if (e < P * 1.5) { buf[k] = CLARO; continue; } // a borda amarela, como na arte
+					if (e < P * 3) { buf[k] = LARANJA; continue; }
+					// os veios marrons ondulados (cristas do ruído, com o espaço entortado)
+					var u = i * P / 46, v = j * P / 46;
+					var wx = fbm(u * 0.7 + 3, v * 0.7 + t * 0.03) - 0.5, wy = fbm(u * 0.7, v * 0.7 + 5 - t * 0.03) - 0.5;
+					var crista = 1 - Math.abs(2 * fbm(u + wx * 1.6, v + wy * 1.6) - 1);
+					var mancha = fbm(u * 0.8 + 11, v * 0.8 + 4);
+					var c = crista > 0.84 ? ESCURO : crista > 0.7 ? MARROM : mancha > 0.7 ? CLARO : LARANJA;
+					// as explosões: raios amarelos saindo de um miolo branco
+					for (var q = 0; q < explosoes.length; q++) {
+						var ex = explosoes[q], dx = i - ex[0], dy = j - ex[1];
+						if (Math.abs(dx) > ex[2] || Math.abs(dy) > ex[2]) continue;
+						var d = Math.sqrt(dx * dx + dy * dy) / ex[2];
+						if (d > 1) continue;
+						var raio = Math.pow(Math.max(0, Math.cos(Math.atan2(dy, dx) * 5 + ex[3] + Math.sin(d * 4) * 0.5)), 14) * (1 - d * 0.8); // raios finos, levemente tortos
+						if (d < 0.05 + Math.sin(t * 2 + ex[3]) * 0.015) c = BRANCO;
+						else if (raio > 0.3 || d < 0.12) c = CLARO;
+						else if (raio > 0.15 && c === ESCURO) c = MARROM;
+					}
+					buf[k] = c;
+				}
+				ctx.putImageData(img, 0, 0);
+			}
+			var inicio = performance.now();
+			function refazer() { medir(); desenhar(calmo ? 0 : (performance.now() - inicio) / 1000); }
+			refazer();
+			var espera;
+			window.addEventListener('resize', function () { clearTimeout(espera); espera = setTimeout(refazer, 150); });
+			if (document.fonts && document.fonts.ready) document.fonts.ready.then(refazer); // o título pode mudar de tamanho quando a fonte chega
+			if (calmo) return;
+			setInterval(function () { desenhar((performance.now() - inicio) / 1000); }, 200);
+		})();	</script>
+	<script>
+		// Destaca o planeta (com brilho rosa) ao passar o mouse nele ou no nome
+		(function () {
+			var sistema = document.getElementById('sistema');
+			var alvos = document.querySelectorAll('[data-id]');
+			var info = document.getElementById('info');
+			var vazio = info.innerHTML;
+			// posição e lema de cada planeta (os lemas vêm do primeiro título de cada página)
+			var DADOS = {
+				mercurio: ['1º planeta', 'Mercúrio', 'O pequeno mensageiro do Sol', '#a9b8ff'],
+				venus: ['2º planeta', 'Vênus', 'Um astro brilhante', '#f5a83c'],
+				terra: ['3º planeta', 'Terra', 'O planeta azul', '#6f9bff'],
+				marte: ['4º planeta', 'Marte', 'O planeta vermelho', '#e8906c'],
+				jupiter: ['5º planeta', 'Júpiter', 'O rei dos planetas', '#e6c49a'],
+				saturno: ['6º planeta', 'Saturno', 'O senhor dos anéis', '#e3cc8f'],
+				urano: ['7º planeta', 'Urano', 'O planeta deitado', '#a8ecf5'],
+				netuno: ['8º planeta', 'Netuno', 'O planeta encontrado pela matemática', '#6b95ff'],
+				sol: ['A nossa estrela', 'Sol', 'A estrela que nos dá vida', '#ffc04d']
+			};
+			var timer;
+			function destacar(id) {
+				sistema.classList.toggle('focado', !!id && !!sistema.querySelector('.astro[data-id="' + id + '"]'));
+				alvos.forEach(function (el) { el.classList.toggle('ativo', !!id && el.getAttribute('data-id') === id); });
+				clearTimeout(timer);
+				if (!id) { timer = setTimeout(function () { info.innerHTML = vazio; info.classList.remove('cheio'); }, 400); return; }
+				var d = DADOS[id];
+				info.style.setProperty('--cor-destino', d[3]);
+				info.innerHTML = '<p class="cartao-tipo">' + d[0] + '</p><p class="info-nome">' + d[1] + '</p><p class="info-lema">' + d[2] + '</p><a class="botao-hud" href="' + id + '.html">Visitar &rarr;</a>';
+				info.classList.add('cheio');
+			}
+			info.addEventListener('mouseenter', function () { clearTimeout(timer); });
+			alvos.forEach(function (el) {
+				var id = el.getAttribute('data-id');
+				el.addEventListener('mouseenter', function () { destacar(id); });
+				el.addEventListener('mouseleave', function () { destacar(null); });
+				el.addEventListener('focus', function () { destacar(id); });
+				el.addEventListener('blur', function () { destacar(null); });
+			});
+			// a faixa dos planetas passa por cima do meio do Sol: onde ela não tem planeta, o mouse e o
+			// clique "atravessam" até o Sol (que leva direto para a página dele)
+			var faixa = document.querySelector('.rolagem'), sol = document.querySelector('.sol-borda'), sobreSol = false;
+			function noSol(e) {
+				if (!faixa || !sol || e.target.closest('.astro')) return false;
+				var r = sol.getBoundingClientRect();
+				return e.clientX >= r.left && e.clientX <= r.right && e.clientY >= r.top && e.clientY <= r.bottom;
+			}
+			if (faixa && sol) {
+				faixa.addEventListener('mousemove', function (e) {
+					var agora = noSol(e);
+					if (agora === sobreSol) return;
+					sobreSol = agora; faixa.style.cursor = agora ? 'pointer' : '';
+					sol.classList.toggle('ativo', agora); destacar(agora ? 'sol' : null);
+				});
+				faixa.addEventListener('mouseleave', function () { if (sobreSol) { sobreSol = false; faixa.style.cursor = ''; sol.classList.remove('ativo'); destacar(null); } });
+				faixa.addEventListener('click', function (e) { if (noSol(e)) { e.preventDefault(); sol.click(); } });
+			}
+		})();
+	</script>
+</body>
+</html>

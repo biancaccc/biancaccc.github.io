@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+	<meta charset="utf-8">
+	<!-- fundo escuro desde o primeiro instante; vindo de um salto, a página começa coberta pelo último quadro do salto (preso à tela, não à página), para nenhum quadro vazar antes das estrelas -->
+	<script>try{var h=document.documentElement;h.style.backgroundColor="#05030c";if(sessionStorage.getItem("salto")==="1"){var q=sessionStorage.getItem("saltoQuadro");h.className+=" em-salto";if(q){h.style.background="#05030c url("+q+") 0 0/100% 100% no-repeat fixed";h.style.imageRendering="pixelated"}}}catch(e){}</script>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Estrela de Tabby · Turismo espacial</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Silkscreen&family=Space+Grotesk:wght@400;500;700&family=Tiny5&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="estilo.css">
+</head>
+<body data-passaporte="tabby" class="destino" style="--cor: #ff9d5c">
+
+	<header class="topo">
+		<a class="marca" href="index.html#galaxia">Turismo espacial</a>
+		<nav class="menu">
+		<a class="menu-galaxia" href="index.html#galaxia">&larr; Via Láctea</a>
+		</nav>
+	</header>
+
+	<main>
+		<section class="destaque">
+			<div class="palco">
+				<div class="abas-hipotese" role="tablist" aria-label="Escolha a hipótese" data-ativa="0">
+					<span class="abas-indicador" aria-hidden="true"></span>
+					<button type="button" role="tab" id="aba-poeira" aria-selected="true" aria-controls="arte-tabby" data-arte="tabby" style="--cor-aba: #ff9d5c">
+						<svg class="aba-icone" viewBox="0 0 12 12" aria-hidden="true" shape-rendering="crispEdges">
+							<rect x="1" y="5" width="2" height="2"/><rect x="4" y="3" width="1" height="1"/><rect x="5" y="6" width="2" height="2"/>
+							<rect x="8" y="4" width="1" height="1"/><rect x="9" y="7" width="2" height="2"/><rect x="3" y="9" width="1" height="1"/>
+							<rect x="7" y="1" width="1" height="1"/><rect x="2" y="1" width="1" height="1"/><rect x="10" y="2" width="1" height="1"/>
+						</svg>
+						<span class="aba-texto"><small>Hipótese 01</small><strong>Poeira</strong></span>
+						<span class="aba-selo">mais aceita</span>
+					</button>
+					<button type="button" role="tab" id="aba-alien" aria-selected="false" aria-controls="arte-tabby" data-arte="tabby-alien" style="--cor-aba: #7dffb2">
+						<svg class="aba-icone" viewBox="0 0 12 12" aria-hidden="true" shape-rendering="crispEdges">
+							<rect x="4" y="4" width="4" height="4" opacity="0.55"/>
+							<rect x="0" y="5" width="2" height="1"/><rect x="10" y="6" width="2" height="1"/>
+							<rect x="3" y="1" width="2" height="1"/><rect x="7" y="10" width="2" height="1"/>
+							<rect x="8" y="2" width="2" height="1"/><rect x="1" y="9" width="2" height="1"/>
+						</svg>
+						<span class="aba-texto"><small>Hipótese 02</small><strong>Megaestrutura</strong></span>
+						<span class="aba-selo">descartada</span>
+					</button>
+				</div>
+				<canvas class="planeta arte-destino" id="arte-tabby" data-arte="tabby" role="img" aria-label="Pixel art da Estrela de Tabby: uma estrela amarelo-alaranjada com nuvens irregulares de poeira passando na frente dela e, embaixo, um gráfico do brilho que cai quando a poeira passa"></canvas>
+				<!-- legenda curta sempre à mostra; a explicação completa abre só se a pessoa quiser -->
+				<div class="legenda-arte legenda-grafico">
+					<ul class="legenda-chaves" aria-label="Legenda do gráfico">
+						<li><span class="chave chave-linha" aria-hidden="true"></span>Brilho da estrela</li>
+						<li><span class="chave chave-pontilhada" aria-hidden="true"></span>Normal (100%)</li>
+						<li><span class="chave chave-ponto" aria-hidden="true"></span>Agora</li>
+					</ul>
+					<p class="legenda-hipotese" id="legenda-tabby" aria-live="polite"></p>
+					<details class="legenda-mais">
+						<summary><span class="quando-fechado">Como ler o gráfico</span><span class="quando-aberto">Fechar explicação</span></summary>
+						<p>O quadro mostra o brilho da estrela mudando com o tempo, como nos dados do telescópio Kepler. Quanto mais baixa a linha azul, mais escura a estrela está; o fundo do quadro corresponde a 75% do brilho normal. O gráfico corre para a esquerda, então o que está à esquerda já aconteceu.</p>
+						<p>Uma estrela com um planeta do tamanho de Júpiter passando na frente escurece menos de 1%, sempre do mesmo jeito. Já a Estrela de Tabby chegou a perder 22% do brilho, em quedas irregulares que duravam dias.</p>
+						<p id="legenda-tabby-mais"></p>
+						<button type="button" class="legenda-fechar" onclick="var d = this.closest('details'); d.open = false; d.querySelector('summary').focus();">Fechar explicação</button>
+					</details>
+				</div>
+			</div>
+			<div class="destaque-texto">
+				<p class="posicao">Constelação do Cisne</p>
+				<h1>Estrela de Tabby</h1>
+				<p class="lema">A estrela mais misteriosa da galáxia</p>
+				<dl class="ficha">
+					<div><dt>Nome oficial</dt><dd>KIC 8462852</dd></div>
+					<div><dt>Distância</dt><dd>Cerca de 1.470 anos-luz</dd></div>
+					<div><dt>Tipo</dt><dd>Estrela um pouco maior e mais quente que o Sol</dd></div>
+					<div><dt>Maior queda de brilho</dt><dd>22%</dd></div>
+				</dl>
+			</div>
+		</section>
+
+		<div class="leitura" id="leitura">
+		<aside class="sumario" aria-label="Nesta página">
+			<p>Nesta página</p>
+			<ol>
+				<li><a href="#secao-1">Estrela de Tabby: a estrela que pisca estranho</a></li>
+				<li><a href="#secao-2">Descoberta por voluntários</a></li>
+				<li><a href="#secao-3">Seria obra de extraterrestres?</a></li>
+				<li><a href="#secao-4">Ninguém respondeu</a></li>
+				<li><a href="#secao-5">A pista das cores</a></li>
+				<li><a href="#secao-6">De onde vem tanta poeira?</a></li>
+				<li><a href="#secao-7">E a vida fora da Terra?</a></li>
+			</ol>
+		</aside>
+
+		<article class="conteudo">
+		<section class="bloco pixelado" id="secao-1">
+			<h2>Estrela de Tabby: a estrela que pisca estranho</h2>
+			<p>Na constelação do Cisne, a cerca de 1.470 anos-luz da Terra, existe uma estrela um pouco maior e mais quente que o Sol, com o nome oficial de KIC 8462852. Ela ficou famosa como Estrela de Tabby, apelido da astrônoma Tabetha "Tabby" Boyajian, que liderou o estudo de 2015 que mostrou ao mundo o seu comportamento esquisito: de vez em quando, sem nenhum padrão, o brilho dela cai muito.</p>
+		</section>
+		<section class="bloco pixelado" id="secao-2">
+			<h2>Descoberta por voluntários</h2>
+			<p>Entre 2009 e 2013, o telescópio espacial Kepler mediu o brilho de cerca de 150 mil estrelas para encontrar planetas: quando um planeta passa na frente da sua estrela, o brilho cai um pouquinho, sempre do mesmo jeito e no mesmo ritmo. Voluntários do projeto Planet Hunters, que ajudavam a olhar esses gráficos, perceberam que essa estrela era diferente. Um planeta do tamanho de Júpiter faria o brilho cair cerca de 1%. Já o da Estrela de Tabby chegou a cair 22%, em quedas irregulares que duravam dias. O gráfico da pixel art imita essas quedas.</p>
+		</section>
+		<section class="bloco pixelado" id="secao-3">
+			<h2>Seria obra de extraterrestres?</h2>
+			<p>Nenhuma explicação comum parecia encaixar direito. Então, o astrônomo Jason Wright sugeriu, entre várias possibilidades, uma bem ousada: e se fosse uma estrutura gigante construída por uma civilização avançada, como um enxame de painéis em volta da estrela para captar a energia dela? A ideia correu o mundo, e a Estrela de Tabby virou a "estrela da megaestrutura alienígena". Os próprios cientistas avisaram que essa era a hipótese menos provável, mas que valia a pena testar.</p>
+		</section>
+		<section class="bloco pixelado" id="secao-4">
+			<h2>Ninguém respondeu</h2>
+			<p>Se existisse uma civilização tão avançada lá, talvez ela soltasse sinais de rádio. Por isso, radiotelescópios do Instituto SETI e do projeto Breakthrough Listen, que procuram sinais de vida inteligente, passaram horas apontados para a estrela. Não encontraram nada além do silêncio do espaço.</p>
+		</section>
+		<section class="bloco pixelado" id="secao-5">
+			<h2>A pista das cores</h2>
+			<p>A resposta veio das cores da luz. Com dinheiro arrecadado de mais de 1.700 pessoas pela internet, os cientistas acompanharam a estrela todos os dias e, em 2017, pegaram novas quedas acontecendo ao vivo (a primeira foi apelidada de Elsie). Eles notaram que a luz azul caía mais do que a vermelha. Isso é importante: uma estrutura sólida, como um painel, bloquearia todas as cores igualmente. Já grãos de poeira muito finos, menores que um milésimo de milímetro, bloqueiam mais a luz azul. Conclusão do estudo, publicado em 2018: o mais provável é que sejam nuvens de poeira passando na frente da estrela.</p>
+		</section>
+		<section class="bloco pixelado" id="secao-6">
+			<h2>De onde vem tanta poeira?</h2>
+			<p>Essa parte ainda é um mistério. Uma das ideias é um enxame de cometas que se despedaçaram perto da estrela. Outra é que sejam os restos de um planeta ou de uma lua destruídos: em 2019, um estudo sugeriu uma lua arrancada do seu planeta, que estaria evaporando e deixando um rastro de poeira pelo caminho. Os cientistas continuam observando a estrela para descobrir qual explicação é a certa.</p>
+		</section>
+		<section class="bloco pixelado" id="secao-7">
+			<h2>E a vida fora da Terra?</h2>
+			<p>A Estrela de Tabby não deu, até agora, nenhuma prova de vida extraterrestre, mas a pergunta continua aberta e a busca segue. Os astrônomos procuram planetas parecidos com a Terra, sinais de gases ligados à vida em atmosferas de outros mundos e até "tecnoassinaturas", como sinais de rádio artificiais. O caso da Estrela de Tabby ensinou como essa busca deve ser feita: considerar todas as hipóteses, até as mais ousadas, e deixar que as observações digam qual delas sobrevive.</p>
+		</section>
+
+		<p class="fecho">A Estrela de Tabby não era um farol alienígena, mas mostrou como a ciência funciona: levantar todas as hipóteses, testar cada uma e seguir as pistas até onde elas levam.</p>
+		</article>
+		</div>
+
+		<nav class="vizinhos volta" aria-label="Próxima viagem">
+		<a href="index.html#galaxia"><span><small>Escolher outro destino</small>&larr; Voltar para a Via Láctea</span></a>
+		</nav>
+	</main>
+
+	<footer class="rodape">
+		<p><a href="index.html#galaxia">Turismo espacial</a></p>
+	</footer>
+
+	<script src="nave.js"></script>
+	<script src="transicao.js"></script>
+	<script src="radio.js"></script>
+	<script src="cabine.js"></script>
+	<script src="chegada.js"></script>
+	<script src="passaporte.js"></script>
+	<script src="marca.js"></script>
+	<script src="fundo.js"></script>
+	<script src="destinos.js"></script>
+	<script src="visuais-dados.js"></script>
+	<script src="visuais.js"></script>
+	<script src="pagina.js"></script>
+	<script>
+		// Abas: troca entre a hipótese da poeira e a da megaestrutura alienígena
+		(function () {
+			var tela = document.getElementById('arte-tabby');
+			var legenda = document.getElementById('legenda-tabby');
+			var legendaMais = document.getElementById('legenda-tabby-mais');
+			var abas = document.querySelectorAll('.abas-hipotese [role="tab"]');
+			var TEXTOS = {
+				'tabby': {
+					curta: '<strong>Poeira:</strong> quedas irregulares, e a estrela fica mais avermelhada.',
+					legenda: '<strong>Nesta versão (poeira):</strong> cada nuvem de poeira que passa na frente da estrela cria uma queda diferente, com formato e tamanho irregulares, como nas observações reais. Repare também na cor: atrás da poeira, a estrela fica mais avermelhada, porque a poeira fina bloqueia mais a luz azul do que a vermelha. Medições feitas a partir de 2017 mostraram exatamente isso, e por isso a poeira é a explicação mais aceita hoje.',
+					rotulo: 'Pixel art da Estrela de Tabby: uma estrela amarelo-alaranjada com nuvens irregulares de poeira passando na frente dela e, embaixo, um gráfico do brilho que cai quando a poeira passa'
+				},
+				'tabby-alien': {
+					curta: '<strong>Megaestrutura:</strong> quedas mais regulares, e a cor da estrela não muda.',
+					legenda: '<strong>Nesta versão (megaestrutura):</strong> as quedas vêm dos painéis gigantes de um "enxame de Dyson" passando na frente da estrela. Como os painéis giram em anéis, as quedas se repetem de um jeito mais regular. E a estrela escurece sem mudar de cor, porque painéis sólidos bloqueiam todas as cores por igual. As medições mostraram o contrário (o azul caía mais do que o vermelho), por isso essa hipótese foi descartada.',
+					rotulo: 'Pixel art da hipótese alienígena: a Estrela de Tabby cercada por anéis de painéis gigantes que passam na frente e atrás dela, com um gráfico do brilho embaixo'
+				}
+			};
+			function escolher(arte) {
+				tela.setAttribute('data-arte', arte);
+				tela.setAttribute('aria-label', TEXTOS[arte].rotulo);
+				legenda.innerHTML = TEXTOS[arte].curta;
+				legendaMais.innerHTML = TEXTOS[arte].legenda;
+				abas.forEach(function (a, i) {
+					var ativa = a.getAttribute('data-arte') === arte;
+					a.setAttribute('aria-selected', ativa ? 'true' : 'false');
+					a.tabIndex = ativa ? 0 : -1;
+					if (ativa) {
+						a.parentNode.setAttribute('data-ativa', i);
+						a.parentNode.style.setProperty('--cor-ativa', a.style.getPropertyValue('--cor-aba'));
+					}
+				});
+				tela.classList.remove('trocando');
+				void tela.offsetWidth; // reinicia a animação de troca
+				tela.classList.add('trocando');
+				if (window.redesenharArtes) window.redesenharArtes();
+			}
+			abas.forEach(function (a, i) {
+				a.addEventListener('click', function () { escolher(a.getAttribute('data-arte')); });
+				a.addEventListener('keydown', function (e) {
+					if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
+					var outra = abas[(i + (e.key === 'ArrowRight' ? 1 : abas.length - 1)) % abas.length];
+					outra.focus();
+					escolher(outra.getAttribute('data-arte'));
+				});
+			});
+			escolher('tabby');
+		})();
+	</script>
+</body>
+</html>
