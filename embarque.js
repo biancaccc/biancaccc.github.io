@@ -1843,7 +1843,6 @@
 					var ref = ((((wx % GL) + GL) % GL) > 0.55 && (((wx % GL) + GL) % GL) < 1.65 && (((wz % 3) + 3) % 3) > 0.9 && (((wz % 3) + 3) % 3) < 1.7) ? -0.25 : 0;
 					var tom = 0.3 + ruido(Math.floor(gx), Math.floor(gz)) * 0.18 + longe * 0.25 + ref + (wz > ZC - 0.25 && wz < ZW ? 0.35 : 0);
 					c = (fx < 0.03 || fz < 0.03 * (1 + longe * 3)) ? '#a7abb4' : rampa(['#eef0f3', '#dfe2e7', '#d1d4db', '#c2c6ce', '#b0b4bd'], tom, x, y);
-					if (wz > 4.52 && wz < 4.6 && wx > 0.4 && wx < 23 && Math.floor(wx / 0.3) % 2 === 0) c = rampa(['#f0c840', '#d8b030'], longe, x, y); // a faixa amarela da fila
 				} else if (sup === 2) { // o teto: placas, luminárias embutidas e as grelhas de ar
 					var lx = ((wx % GL) + GL) % GL, lz = ((wz % 3) + 3) % 3, gx2 = wx / 0.6, gz2 = wz / 0.6;
 					if (lx > 0.55 && lx < 1.65 && lz > 1.0 && lz < 1.6) c = (lx < 0.6 || lx > 1.6 || lz < 1.05 || lz > 1.55) ? '#c8d4e4' : '#ffffff';
@@ -1936,9 +1935,7 @@
 				if (cl) colarSprite(pessoaDeCostas(s, cl), pp[0], pp[1]);
 				else colarSprite(sprite(0.7, 1.05, s, function (X, Y) { cadeira(X, Y, s); }), pp[0], pp[1]);
 			}
-			// o aviso pintado no chão e os postes com fita separando a fila
-			var aviso = pintar(new Pintura(72, 7), function () { letras('AGUARDE SUA SENHA', 36, 1, 1, '#d8b030', true); });
-			quadTex(aviso, [C(4.6, 0, 4.42), C(7.6, 0, 4.42), C(7.6, 0, 4.1), C(4.6, 0, 4.1)], 0.85);
+			// os postes com fita separando a fila
 			var postes = [6.2, 7.7, 9.2, 10.7];
 			postes.forEach(function (px0, i) {
 				var b0 = C(px0, 0, 4.6), b1 = C(px0, 0.95, 4.6), sp = 290 / b0[2];
@@ -2245,28 +2242,6 @@
 			c.globalAlpha = mostraCadeira ? 0.5 + pulso * 0.5 : 0; c.strokeStyle = '#ffe9a0'; c.lineWidth = 1;
 			c.beginPath(); c.ellipse(pc[0], pc[1], 0.46 * sc + pulso * 2, 0.1 * sc + pulso, 0, 0, Math.PI * 2); c.stroke();
 			c.restore();
-			// o cliente indo embora: levanta do guichê 6 e anda pelo corredor em direção à saída (para a esquerda)
-			var volta = (t + 3) % 18;
-			if (volta < 14) {
-				var u = volta / 14, ax0 = guicheX(7) + GL / 2 + 0.1, wx = ax0 - u * (ax0 + 1.5), wz = 5.05 - Math.min(1, u * 5) * 0.7;
-				var pw = C(wx, 0, wz), sw = 290 / pw[2], passo = Math.floor(volta * 3.2) % 2, chave = Math.round(sw) + '-' + passo;
-				var spw = andanteCache[chave] || (andanteCache[chave] = pessoaAndandoCanvas(sw, passo));
-				c.fillStyle = 'rgba(60,64,80,0.25)'; c.beginPath(); c.ellipse(pw[0], pw[1], 0.25 * sw, 0.05 * sw, 0, 0, Math.PI * 2); c.fill();
-				c.save(); c.translate(Math.round(pw[0]), 0); c.scale(-1, 1); c.drawImage(spw.k, -Math.round(spw.ax), Math.round(pw[1] - spw.ay - (passo ? 1 : 0))); c.restore();
-			}
-			// o totem e o porta-guarda-chuva por cima de quem passa atrás deles
-			if (this.totemCamada) c.drawImage(this.totemCamada, -OX, 0);
-			// o totem: a telinha brilhando e uma setinha chamando, até pegarmos a senha; depois, o papel saindo
-			var Tt = TOTEM, tela1 = C(Tt.x0 + 0.06, 1.18, Tt.z0), tela2 = C(Tt.x1 - 0.06, 0.88, Tt.z0);
-			if (!this.senha) {
-				c.save(); c.globalCompositeOperation = 'lighter'; c.globalAlpha = 0.25 + 0.25 * Math.sin(t * 5); R(c, tela1[0], tela1[1], tela2[0] - tela1[0], tela2[1] - tela1[1], '#7fe3ff'); c.restore();
-				var st = C((Tt.x0 + Tt.x1) / 2, Tt.h + 0.25, Tt.z0); // (a setinha em cima do totem é desenhada no fim, por cima das cadeiras)
-			} else {
-				var ps2 = Math.min(1, (t - this.senha) / 0.7), fenda = C((Tt.x0 + Tt.x1) / 2, 0.72, Tt.z0 - 0.01), es = 290 / fenda[2];
-				var pw2 = Math.max(4, Math.round(0.14 * es)), ph2 = Math.round(0.2 * es * ps2);
-				R(c, fenda[0] - pw2 / 2, fenda[1], pw2, ph2, '#fbfbf4'); R(c, fenda[0] + pw2 / 2 - 1, fenda[1], 1, ph2, '#d8d8cc');
-				if (ps2 > 0.6) { texto3(c, '011', Math.round(fenda[0] - 5), Math.round(fenda[1] + ph2 * 0.45), 1, '#1a2a7a'); }
-			}
 			// lá fora, pela vitrine: as naves decolando das torres, as luzes piscando e a chuva no vidro
 			if (this.vitrine) {
 				var lf = this.lafora.getContext('2d');
@@ -2312,6 +2287,28 @@
 				var hl1 = C(xh, HP + 0.3, ZP + 0.05), hl2 = C(xh, HP + 0.3, ZW - 0.05);
 				c.save(); c.globalAlpha = 0.75 + Math.sin(t * 1.5 + kh) * 0.2; linhaGrossa(c, hl1, hl2, 1, '#ff6ad8'); c.restore();
 				var bu2 = (t * 0.25 + kh * 0.13) % 1, bpos = C(xh, HP + 0.02, ZP + 0.05 + bu2 * (ZW - ZP - 0.1)); P(c, bpos[0], bpos[1] - 1, '#ffffff');
+			}
+			// o cliente indo embora: levanta do guichê 6 e anda pelo corredor em direção à saída (para a esquerda)
+			var volta = (t + 3) % 18;
+			if (volta < 14) {
+				var u = volta / 14, ax0 = guicheX(7) + GL / 2 + 0.1, wx = ax0 - u * (ax0 + 1.5), wz = 5.05 - Math.min(1, u * 5) * 0.7;
+				var pw = C(wx, 0, wz), sw = 290 / pw[2], passo = Math.floor(volta * 3.2) % 2, chave = Math.round(sw) + '-' + passo;
+				var spw = andanteCache[chave] || (andanteCache[chave] = pessoaAndandoCanvas(sw, passo));
+				c.fillStyle = 'rgba(60,64,80,0.25)'; c.beginPath(); c.ellipse(pw[0], pw[1], 0.25 * sw, 0.05 * sw, 0, 0, Math.PI * 2); c.fill();
+				c.save(); c.translate(Math.round(pw[0]), 0); c.scale(-1, 1); c.drawImage(spw.k, -Math.round(spw.ax), Math.round(pw[1] - spw.ay - (passo ? 1 : 0))); c.restore();
+			}
+			// o totem e o porta-guarda-chuva por cima de quem passa atrás deles
+			if (this.totemCamada) c.drawImage(this.totemCamada, -OX, 0);
+			// o totem: a telinha brilhando e uma setinha chamando, até pegarmos a senha; depois, o papel saindo
+			var Tt = TOTEM, tela1 = C(Tt.x0 + 0.06, 1.18, Tt.z0), tela2 = C(Tt.x1 - 0.06, 0.88, Tt.z0);
+			if (!this.senha) {
+				c.save(); c.globalCompositeOperation = 'lighter'; c.globalAlpha = 0.25 + 0.25 * Math.sin(t * 5); R(c, tela1[0], tela1[1], tela2[0] - tela1[0], tela2[1] - tela1[1], '#7fe3ff'); c.restore();
+				var st = C((Tt.x0 + Tt.x1) / 2, Tt.h + 0.25, Tt.z0); // (a setinha em cima do totem é desenhada no fim, por cima das cadeiras)
+			} else {
+				var ps2 = Math.min(1, (t - this.senha) / 0.7), fenda = C((Tt.x0 + Tt.x1) / 2, 0.72, Tt.z0 - 0.01), es = 290 / fenda[2];
+				var pw2 = Math.max(4, Math.round(0.14 * es)), ph2 = Math.round(0.2 * es * ps2);
+				R(c, fenda[0] - pw2 / 2, fenda[1], pw2, ph2, '#fbfbf4'); R(c, fenda[0] + pw2 / 2 - 1, fenda[1], 1, ph2, '#d8d8cc');
+				if (ps2 > 0.6) { texto3(c, '011', Math.round(fenda[0] - 5), Math.round(fenda[1] + ph2 * 0.45), 1, '#1a2a7a'); }
 			}
 			// o robô-garçom flutuante servindo café na sala de espera: desliza devagar de um lado para o
 			// outro, para de vez em quando, e leva uma bandeja com duas xícaras fumegando
