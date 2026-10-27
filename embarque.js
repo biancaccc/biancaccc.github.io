@@ -1834,6 +1834,10 @@
 	var salaPronta = null;
 	// o que se vê pela vitrine do fundo (em metros, no plano da parede): o céu da noite, a cidade
 	// lá longe, as torres de lançamento do porto espacial, as naves estacionadas e as luzes da pista
+	// a vitrine vista de pertinho, da mesa do guichê 11: que pedaço do porto aparece em cada pixel
+	// (um trecho com a torre de lançamento no meio)
+	var VIT_MESA = { x: function (sx) { return 5.6 + (sx + 80) / 640 * 3.2; }, y: function (sy) { return 2.93 - (sy - 10) / 70 * 0.86; },
+		sx: function (wx) { return (wx - 5.6) / 3.2 * 640 - 80; }, sy: function (wy) { return 10 + (2.93 - wy) / 0.86 * 70; } };
 	var JAN = null; /* a cor que a vitrine pintou em cada pixel (0 = fora da vitrine) */
 	var HORIZ_PORTO = 2.3, TORRES_PORTO = [0.6, 7.2, 14.1, 21.0];
 	function ceuDoPorto(wx, wy, x, y) {
@@ -2518,44 +2522,33 @@
 	CENAS.mesa = {
 		fundo: function () {
 			var p = pintar(tela0(), function () {
-				// a parede do fundo, escura (para o holograma aparecer bem), com painéis
-				ret(-OX, 0, W, 170, function (x, y) { return rampa(['#2a2e4a', '#232742', '#1c2038', '#16192e'], y / 170 + (ruido(x >> 3, y >> 3) - 0.5) * 0.06, x, y); });
-				for (var sx = -OX; sx < NUCLEO + OX; sx += 60) { ret(sx, 0, 1, 170, '#12142a'); ret(sx + 1, 0, 1, 170, '#323654'); }
-				ret(-OX, 120, W, 2, '#12142a'); ret(-OX, 122, W, 1, '#2f62b6'); // a faixa azul da agência
-				// as luzes do teto e a arandela que ilumina o quadro
-				ret(-OX, 0, W, 8, '#14162a');
-				for (var l = -1; l < 5; l++) { ret(30 + l * 120, 2, 60, 3, '#e8f0ff'); brilho(60 + l * 120, 10, 30, '#8aa0d8', 0.25); }
-				// a estante iluminada (à esquerda): miniaturas de naves, Saturno, troféu, pastas da agência
-				ret(54, 26, 120, 84, '#12142a'); ret(54, 26, 120, 1, '#3a3e5a');
-				for (var sl = 0; sl < 2; sl++) {
-					var py = 64 + sl * 44;
-					ret(54, py, 120, 3, function (x, y) { return rampa(['#c8a040', '#8a6a20'], (y - py) / 3, x, y); }); // a prateleira dourada
-					ret(58, py - 40, 112, 40, function (x, y) { mistura(x, y, '#fff0c8', 0.05 + 0.1 * (1 - (py - y) / 40)); return null; }); // a luz de cima
-				}
-				// prateleira de cima: um foguete branco e vermelho, Saturno num suporte e um troféu dourado
-				ret(66, 34, 6, 26, function (x, y) { return rampa(['#ffffff', '#e2e4ec', '#a8acbb'], (x - 66) / 6, x, y); }); poli([[66, 34], [72, 34], [69, 28]], '#e84a4a');
-				poli([[63, 54], [66, 50], [66, 60], [63, 60]], '#c83a3a'); poli([[75, 54], [72, 50], [72, 60], [75, 60]], '#a82a2a'); ret(68, 38, 2, 2, '#7fe3ff'); ret(67, 60, 4, 4, '#3a3d48');
-				ret(96, 56, 2, 8, '#8a8e98'); ret(91, 62, 12, 2, '#5a5e6a');
-				elip(97, 47, 8, 8, function (x, y, u, v) { return rampa(['#ffe0b0', '#e8b878', '#c8885a', '#8a5a3a'], (u + v + 1.2) / 2.6 + Math.sin(v * 8) * 0.06, x, y); });
-				for (var an = 0; an < Math.PI * 2; an += 0.03) { var axn = 97 + Math.cos(an) * 13, ayn = 47 + Math.sin(an) * 3; if (Math.sin(an) > 0 || Math.abs(axn - 97) > 8) px(axn, ayn, '#e8d0a8'); }
-				poli([[124, 42], [138, 42], [134, 52], [128, 52]], function (x, y) { return rampa(['#fff0b0', '#e8c46a', '#a87a20'], (x - 124) / 14, x, y); }); // o troféu
-				ret(129, 52, 4, 6, '#c8a040'); ret(125, 58, 12, 6, '#2a2c34'); ret(126, 60, 10, 1, '#e8c46a');
-				elip(122, 46, 2, 3, '#c8a040'); elip(140, 46, 2, 3, '#a87a20');
-				ret(150, 40, 18, 22, '#c8a040'); ret(151, 41, 16, 20, '#f2f4fa'); elip(159, 49, 4, 4, '#e8c46a'); ret(153, 56, 12, 1, '#8a86a8'); // o certificado emoldurado
-				// prateleira de baixo: pastas azul-marinho com etiqueta dourada, uma caixa de arquivo e uma planta
-				for (var f = 0; f < 9; f++) { var fh = 26 + (f % 3) * 3; ret(60 + f * 8, 108 - fh, 7, fh, function (x, y) { return rampa(['#34449a', '#24357e', '#1c2a6e', '#141f55'], (x - 60 - f * 8) / 7, x, y); }); ret(61 + f * 8, 108 - fh + 4, 5, 6, '#e8c46a'); ret(62 + f * 8, 108 - fh + 6, 3, 1, '#5a4418'); }
-				ret(134, 90, 22, 18, function (x, y) { return rampa(['#c8a070', '#a8865a', '#8a6a3a'], (x - 134) / 22, x, y); }); ret(134, 90, 22, 2, '#d8b888'); letras('2077', 145, 96, 1, '#3a2a1a', true);
-				ret(160, 96, 8, 12, '#d8d4cc'); for (var pl = 0; pl < 6; pl++) linha(164, 96, 160 + pl * 2 - 2, 86 + (pl % 2) * 3, '#4aa85a');				// o relógio
-				elip(208, 30, 10, 10, '#3a3e54'); elip(208, 30, 8, 8, '#e8ecf4'); linha(208, 30, 208, 24, '#1a1a22'); linha(208, 30, 212, 32, '#1a1a22'); px(208, 30, '#e04040');
-				// o quadro de galáxia abstrata, de lado (não atrás do robô), com a arandela em cima
-				ret(338, 22, 30, 3, '#2a2c34'); brilho(353, 50, 46, '#fff0c8', 0.18);
-				quadroGalaxia(322, 30, 62, 70);
+				// o fundo igual ao da recepção, agora de pertinho: o teto claro com as luminárias, a vitrine
+				// para o porto espacial (com a torre de lançamento), o friso dourado, a faixa azul da agência e
+				// a parede de placas brancas
+				ret(-OX, 0, W, 8, '#d2d8e2'); for (var l = -1; l < 5; l++) { ret(30 + l * 120, 2, 60, 3, '#ffffff'); brilho(60 + l * 120, 8, 26, '#ffffff', 0.25); }
+				ret(-OX, 8, W, 2, '#8a90a0');
+				for (var vy = 10; vy < 80; vy++) for (var vx = -OX; vx < NUCLEO + OX; vx++) px(vx, vy, ceuDoPorto(VIT_MESA.x(vx), VIT_MESA.y(vy), vx, vy));
+				ret(-OX, 80, W, 2, '#8a90a0'); ret(-OX, 82, W, 2, '#e8c46a'); ret(-OX, 82, W, 1, '#f0d480');
+				ret(-OX, 84, W, 9, function (x, y) { return rampa(['#26388a', '#1c2a6e'], (y - 84) / 9, x, y); });
+				ret(-OX, 93, W, 77, function (x, y) { return ((x + 400) % 220 === 0) ? '#c8cdd6' : rampa(['#f2f4f7', '#e8ebef', '#dde1e7', '#d0d5dc'], 0.15 + (y - 93) / 77 * 0.45, x, y); });
+				// o relógio e o quadro de galáxia (com a arandela em cima), pendurados na parede branca
+				elip(96, 116, 9, 9, '#3a3e54'); elip(96, 116, 7, 7, '#ffffff'); linha(96, 116, 96, 111, '#1a1a22'); linha(96, 116, 100, 118, '#1a1a22'); px(96, 116, '#e04040');
+				ret(344, 94, 26, 2, '#8a90a0'); brilho(357, 120, 36, '#fff0c8', 0.15);
+				quadroGalaxia(330, 98, 54, 54);
 				// as divisórias azuis do guichê, bem perto, dos dois lados (e o vidro jateado em cima)
-				poli([[-OX, 0], [44, 0], [44, 200], [-OX, 214]], function (x, y) { return y < 96 ? rampa(['#a8c0e0', '#98b0d4'], (x + OX) / (44 + OX), x, y) : rampa(['#4a82d8', '#3a6fc0', '#2b5ba8'], (x + OX) / (44 + OX) * 0.6 + y / 214 * 0.4, x, y); });
-				ret(44, 0, 3, 200, '#1d4282'); ret(-OX, 96, 44 + OX, 2, '#c8ccd6');
+				// (as divisórias vão só até a altura da recepção: o vidro jateado em cima, a horta no topo)
+				poli([[-OX, 38], [44, 42], [44, 200], [-OX, 214]], function (x, y) { return y < 96 ? rampa(['#c8d8f0', '#b0c4e4'], (x + OX) / (44 + OX), x, y) : rampa(['#4a82d8', '#3a6fc0', '#2b5ba8'], (x + OX) / (44 + OX) * 0.6 + y / 214 * 0.4, x, y); });
+				ret(44, 42, 3, 158, '#1d4282'); ret(-OX, 96, 44 + OX, 2, '#c8ccd6'); linha(-OX, 38, 44, 42, '#c8ccd6'); linha(-OX, 37, 44, 41, '#e8ecf4');
 				ret(8, 104, 30, 20, '#1a4aa2'); ret(9, 105, 28, 18, '#2a62c8'); ret(9, 105, 28, 1, '#7aa8f0'); letras('11', 23, 109, 2, '#ffffff', true);
-				poli([[436, 0], [NUCLEO + OX, 0], [NUCLEO + OX, 214], [436, 200]], function (x, y) { return y < 96 ? rampa(['#98b0d4', '#88a0c4'], (x - 436) / (44 + OX), x, y) : rampa(['#2b5ba8', '#244f98', '#1d4282'], (x - 436) / (44 + OX) * 0.6 + y / 214 * 0.4, x, y); });
-				ret(433, 0, 3, 200, '#4a82d8'); ret(436, 96, 44 + OX, 2, '#c8ccd6');
+				poli([[436, 42], [NUCLEO + OX, 38], [NUCLEO + OX, 214], [436, 200]], function (x, y) { return y < 96 ? rampa(['#b0c4e4', '#a0b4d8'], (x - 436) / (44 + OX), x, y) : rampa(['#2b5ba8', '#244f98', '#1d4282'], (x - 436) / (44 + OX) * 0.6 + y / 214 * 0.4, x, y); });
+				ret(433, 42, 3, 158, '#4a82d8'); ret(436, 96, 44 + OX, 2, '#c8ccd6'); linha(436, 42, NUCLEO + OX, 38, '#c8ccd6'); linha(436, 41, NUCLEO + OX, 37, '#e8ecf4');
+				// a horta hidropônica no topo das duas divisórias (a mesma da recepção)
+				[[-OX, 44, 38, 42], [436, NUCLEO + OX, 42, 38]].forEach(function (d) {
+					for (var hx2 = d[0] + 2; hx2 < d[1] - 2; hx2 += 5) {
+						var hy2 = d[2] + (d[3] - d[2]) * (hx2 - d[0]) / (d[1] - d[0]);
+						ret(hx2, hy2 - 6, 3, 6, (hx2 >> 2) % 3 ? '#4aa85a' : '#7ad86a'); ret(hx2 + 2, hy2 - 8, 2, 8, (hx2 >> 2) % 2 ? '#5ab86a' : '#3a8a4a');
+					}
+				});
 				// a mesa e tudo em cima dela: o mesmo modelo 3D da mesa vista de cima (ver desenharMesa3D)
 				desenharMesa3D(CAM_MESA);
 			});
@@ -2563,6 +2556,21 @@
 		},
 		quadro: function (c, t) {
 			if (!roboPerto) roboPerto = paraCanvas(desenharRoboPerto());
+			// pela vitrine: a luz da torre piscando, a nave decolando de vez em quando e a chuva no vidro
+			c.save(); c.beginPath(); c.rect(-OX, 10, W, 70); c.clip();
+			var torreX = VIT_MESA.sx(TORRES_PORTO[1]), naveX = VIT_MESA.sx(TORRES_PORTO[1] + 0.21);
+			if (Math.sin(t * 2.5 + 1.7) > 0.3) { R(c, torreX - 2, VIT_MESA.sy(2.83) - 2, 4, 4, 'rgba(255,58,90,0.5)'); R(c, torreX - 1, VIT_MESA.sy(2.83) - 1, 2, 2, '#ffb0b8'); }
+			var faseM = (t + 4) % 16;
+			if (faseM < 5.5) {
+				var sobeM = faseM < 1.2 ? 0 : (faseM - 1.2) * (faseM - 1.2) * 0.09, baseY = VIT_MESA.sy(HORIZ_PORTO + sobeM), pontaY = VIT_MESA.sy(HORIZ_PORTO + 0.3 + sobeM);
+				for (var fm = 0; fm < 16; fm++) { var fu = ((t * 2 + fm / 16) % 1); c.globalAlpha = (1 - fu) * 0.5 * Math.min(1, faseM); R(c, naveX + (ruido(fm, 5) - 0.5) * (20 + fu * 90) - 4 - fu * 6, VIT_MESA.sy(HORIZ_PORTO) - fu * 10, 8 + fu * 12, 3 + fu * 3, '#c8c0d8'); }
+				c.globalAlpha = 1;
+				if (faseM > 1.2) for (var rr = 0; rr < 1; rr += 0.03) { c.globalAlpha = (1 - rr) * 0.85; R(c, naveX - 2, baseY + Math.min(0.5, sobeM) * rr / 0.86 * 70, 4, 3, rr < 0.15 ? '#ffffff' : rr < 0.4 ? '#ffd36a' : '#ff7a3a'); }
+				c.globalAlpha = 1;
+				R(c, naveX - 3, pontaY, 6, baseY - pontaY, '#eef1fb'); R(c, naveX - 3, pontaY, 1, baseY - pontaY, '#ffffff'); R(c, naveX - 1, pontaY + 3, 2, 2, '#7fe3ff');
+			}
+			for (var gv = 0; gv < 30; gv++) { var gf = (t * (0.05 + ruido(gv, 62) * 0.08) + ruido(gv, 63)) % 1; c.globalAlpha = 0.45; R(c, -OX + ruido(gv, 61) * W, 10 + gf * 70, 1, 4, '#cfe8ff'); }
+			c.globalAlpha = 1; c.restore();
 			// um colega robô passando lá atrás com uma caixa de arquivos (de 13 em 13 segundos)
 			var volta = (t + 6) % 13;
 			if (volta < 7) {
