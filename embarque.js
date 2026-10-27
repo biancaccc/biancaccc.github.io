@@ -1169,13 +1169,22 @@
 				c.beginPath(); c.moveTo(h[0], 86); c.lineTo(h[0] + Math.cos(ang - 0.05) * comp, 86 + Math.sin(ang - 0.05) * comp); c.lineTo(h[0] + Math.cos(ang + 0.05) * comp, 86 + Math.sin(ang + 0.05) * comp); c.fill();
 			});
 			c.restore(); c.globalAlpha = 1;
-			// o dirigível com telão passando devagar lá no alto
-			/* (o dirigível começa já do lado direito: nunca na frente do rosto da gueixa no primeiro plano) */ var dz = ((t * 0.04 + 0.6) % 1.3) - 0.15, dxp = -OX + dz * (W + 80) - 40, dyp = 12 + Math.sin(t * 0.5) * 1.5;
+			// o dirigível com telão passando devagar lá no alto, da esquerda para a direita: o nariz
+			// redondo na frente (à direita), as aletas e a hélice girando atrás, a gôndola embaixo
+			/* (o dirigível começa já do lado direito: nunca na frente do rosto da gueixa no primeiro plano) */
+			var dz = ((t * 0.04 + 0.6) % 1.3) - 0.15, dxp = Math.round(-OX + dz * (W + 80) - 40), dyp = Math.round(12 + Math.sin(t * 0.5) * 1.5);
+			c.globalAlpha = 0.05; c.fillStyle = '#c8e8ff'; c.beginPath(); c.moveTo(dxp + 2, dyp + 9); c.lineTo(dxp - 10, dyp + 70); c.lineTo(dxp + 16, dyp + 70); c.fill(); c.globalAlpha = 1; /* o facho de luz da gôndola */
+			R(c, dxp - 27, dyp - 8, 6, 6, '#22243a'); R(c, dxp - 26, dyp - 8, 4, 1, '#3a3c58'); R(c, dxp - 27, dyp + 2, 6, 5, '#1a1c2c'); /* as aletas de cima e de baixo */
+			R(c, dxp - 29, dyp - 1, 7, 3, '#22243a');
+			var helice = Math.floor(t * 20) % 3; R(c, dxp - 31, dyp + (helice === 0 ? -3 : helice === 1 ? -1 : 0), 1, helice === 1 ? 6 : 4, '#8a8ea8'); P(c, dxp - 30, dyp + 1, '#5a5e7a');
 			c.fillStyle = '#1a1c30'; c.beginPath(); c.ellipse(dxp, dyp, 24, 7, 0, 0, Math.PI * 2); c.fill();
-			c.fillStyle = '#2a2c44'; c.beginPath(); c.ellipse(dxp - 2, dyp - 2, 20, 4, 0, 0, Math.PI * 2); c.fill();
+			c.fillStyle = '#2a2c44'; c.beginPath(); c.ellipse(dxp + 3, dyp - 2, 19, 4, 0, 0, Math.PI * 2); c.fill();
+			R(c, dxp + 14, dyp - 4, 6, 1, '#4a4e6a'); /* o brilho no nariz */
 			R(c, dxp - 14, dyp - 2, 28, 5, '#08040e');
 			c.save(); c.beginPath(); c.rect(dxp - 14, dyp - 2, 28, 5); c.clip(); texto3(c, 'VIAJE · SATURNO · SIRIUS · ', dxp - 14 - (Math.floor(t * 10) % 48), dyp - 2, 1, '#ff3ab8'); c.restore();
-			R(c, dxp + 22, dyp - 6, 3, 12, '#2a2c44'); if (Math.sin(t * 4) > 0) P(c, dxp - 24, dyp, '#ff3a3a');
+			R(c, dxp - 6, dyp + 7, 12, 3, '#14152a'); R(c, dxp - 5, dyp + 8, 10, 1, '#ffd890'); P(c, dxp - 2, dyp + 8, '#14152a'); P(c, dxp + 2, dyp + 8, '#14152a'); /* a gôndola com as janelinhas acesas */
+			if (Math.sin(t * 4) > 0.6) P(c, dxp + 24, dyp, '#ffffff'); /* a luz branca no nariz, na frente */
+			if (Math.sin(t * 4 + 2) > 0.6) P(c, dxp - 30, dyp - 8, '#ff3a3a'); /* e a vermelha na cauda */
 			// o letreiro correndo da farmácia
 			R(c, 356, 152, 112, 6, '#04140c');
 			c.save(); c.beginPath(); c.rect(356, 152, 112, 6); c.clip(); texto3(c, 'ABERTO 24H · REMÉDIO PARA ENJOO DE HIPERESPAÇO · ', 356 - (Math.floor(t * 16) % 200), 152, 1, '#3aff9a'); c.restore();
@@ -1187,6 +1196,69 @@
 				R(c, vx - 4 * esc, vy - 1, 8 * esc, 2 * esc, '#2a2a3e'); R(c, vx - 2 * esc, vy - 2, 4 * esc, 1, '#5a5e7a');
 				R(c, vx + ida * 4 * esc, vy, 1, 1, '#ffffff'); R(c, vx - ida * 4 * esc, vy, 1, 1, '#ff3a3a');
 			}
+			// os detalhes pequenos da rua (cada plano da câmera tem alguma coisa se mexendo de perto)
+			// as luzes vermelhas das antenas no alto dos prédios, piscando devagar (aviso para os carros voadores)
+			[[-OX + (128 + OX) * 0.7, 59, 0], [352 + (NUCLEO + OX - 352) * 0.7, 69, 1.1]].forEach(function (an) {
+				if (Math.sin(t * 2.2 + an[2]) > 0.2) { c.globalAlpha = 0.35; R(c, an[0] - 1, an[1] - 1, 3, 3, '#ff3a5a'); c.globalAlpha = 1; P(c, an[0], an[1], '#ffb0b8'); }
+			});
+			// o drone de entrega passando embaixo do telão da gueixa, com a caixinha pendurada
+			var udr = (t % 13) / 13, drx = -OX - 10 + udr * (200 + OX), dry = 96 + Math.sin(t * 1.6) * 3;
+			R(c, drx - 3, dry, 7, 2, '#2a2c3e'); R(c, drx - 2, dry - 1, 5, 1, '#5a5e7a');
+			var rot = Math.floor(t * 30) % 2; R(c, drx - 5 + rot, dry - 1, 2, 1, '#a8acc4'); R(c, drx + 4 - rot, dry - 1, 2, 1, '#a8acc4');
+			P(c, drx, dry + 2, '#5a5e7a'); P(c, drx, dry + 3, '#5a5e7a'); R(c, drx - 1, dry + 4, 3, 3, '#c8885a'); P(c, drx - 1, dry + 4, '#e8a870');
+			if (Math.sin(t * 9) > 0) P(c, drx + 3, dry + 1, '#3aff8a'); else P(c, drx - 3, dry + 1, '#ff3a3a');
+			// as gotas pingando: da moldura do telão, do toldo do lámen e da marquise da agência
+			[[28, 106, 87, 150, 5], [18, 126, 153, 212, 7], [198, 282, 157, 212, 6]].forEach(function (bd, ib) {
+				for (var gi = 0; gi < bd[4]; gi++) {
+					var gx0 = bd[0] + Math.floor(ruido(gi, ib + 40) * (bd[1] - bd[0])), per2 = 1.4 + ruido(gi, ib + 41) * 1.2, f = ((t / per2) + ruido(gi, ib + 42)) % 1;
+					if (f < 0.45) { if (f > 0.2) P(c, gx0, bd[2] + 1, 'rgba(184,208,255,0.8)'); continue; } /* a gota crescendo na beirada */
+					var qd = (f - 0.45) * per2, gy0 = bd[2] + 1 + 160 * qd * qd;
+					if (gy0 < bd[3]) R(c, gx0, gy0, 1, 2, 'rgba(184,208,255,0.75)');
+					else if (gy0 < bd[3] + 10) { P(c, gx0 - 1, bd[3] - 1, 'rgba(184,208,255,0.6)'); P(c, gx0 + 1, bd[3] - 1, 'rgba(184,208,255,0.6)'); } /* o respingo */
+				}
+			});
+			// o gato preto em cima dos sacos de lixo, abanando o rabo e piscando
+			R(c, 126, 199, 6, 5, '#0c0a12'); R(c, 130, 195, 4, 4, '#0c0a12'); P(c, 130, 194, '#0c0a12'); P(c, 133, 194, '#0c0a12');
+			if ((t % 5) > 0.15) { P(c, 131, 196, '#c8ff6a'); P(c, 133, 196, '#c8ff6a'); }
+			for (var rb = 0; rb < 6; rb++) P(c, 125 - Math.round(Math.sin(rb * 0.5) * 2), 203 - rb + Math.round(Math.sin(t * 2.4 + rb * 0.6) * rb * 0.4), '#0c0a12');
+			// o cozinheiro mexendo a panela com a concha
+			var conc = Math.sin(t * 2.6) * 1.5;
+			R(c, 63, 176, 5, 2, '#f2eee8'); P(c, 68, 177, '#d8a070'); linhaGrossa(c, [69, 177], [73, 180 + conc], 1, '#a8acb8'); R(c, 72, 181 + conc, 3, 2, '#c8ccd8');
+			// as lanternas vermelhas do lámen respirando
+			c.save(); c.globalCompositeOperation = 'lighter';
+			[[26, 146], [118, 146]].forEach(function (q, i) { c.globalAlpha = 0.12 + Math.sin(t * 1.8 + i) * 0.06; c.fillStyle = '#ff5a3a'; c.beginPath(); c.arc(q[0], q[1], 9, 0, Math.PI * 2); c.fill(); });
+			c.restore(); c.globalAlpha = 1;
+			// um letreiro vertical com mau contato: de vez em quando ele falha e volta
+			var falha = t % 11; if ((falha > 3 && falha < 3.12) || (falha > 3.25 && falha < 3.32) || (falha > 3.45 && falha < 3.9)) { c.globalAlpha = 0.75; R(c, 112, 71, 7, 47, '#0a0814'); c.globalAlpha = 1; }
+			// as mariposas rodeando a luz dos postes
+			[138, 342].forEach(function (lx, i) { for (var mo = 0; mo < 3; mo++) P(c, lx + Math.sin(t * (6 + mo) + mo * 2 + i) * 6, 153 + Math.cos(t * (4.5 + mo * 1.3) + mo) * 3, mo ? '#fff4c8' : '#d8c8a8'); });
+			// a câmera de segurança da agência virando devagar, com a luzinha vermelha
+			var cmv = Math.round(Math.sin(t * 0.5) * 1); R(c, 334, 150, 6, 3, '#2a2c34'); R(c, 338 + cmv, 151, 3, 2, '#5a5e6a'); if ((t % 2) < 1) P(c, 339 + cmv, 152, '#ff3a3a');
+			// o robozinho de limpeza indo e voltando na calçada da farmácia, deixando o chão brilhando
+			var ida2 = (t * 12) % 220, rbx = 360 + (ida2 < 110 ? ida2 : 220 - ida2), rdir = ida2 < 110 ? 1 : -1;
+			c.globalAlpha = 0.25; R(c, rdir > 0 ? rbx - 14 : rbx + 5, 219, 10, 1, '#9ad8ff'); c.globalAlpha = 1;
+			R(c, rbx - 4, 214, 9, 4, '#c8ccd8'); R(c, rbx - 3, 213, 7, 1, '#e8ecf4'); R(c, rbx - 4, 216, 9, 1, '#3ae0ff'); R(c, rbx - 3, 218, 2, 1, '#2a2a3a'); R(c, rbx + 2, 218, 2, 1, '#2a2a3a');
+			P(c, rbx + rdir * 5, 218 - (Math.floor(t * 12) % 2), '#a8acc4'); /* a escovinha girando */
+			if ((t % 1) < 0.5) P(c, rbx, 212, '#ffd36a');
+			// as carpas holográficas nadando no ar na frente da agência (um anúncio antigo, meio falhado)
+			c.save(); c.globalCompositeOperation = 'lighter';
+			[[0, '#7fe3ff'], [Math.PI, '#ff9ad8']].forEach(function (kf) {
+				c.globalAlpha = (Math.sin(t * 23 + kf[0]) > 0.92 ? 0.25 : 0.55);
+				var cabeca = null;
+				for (var sg = 9; sg >= 0; sg--) {
+					var aa = t * 0.2 + kf[0] - sg * 0.017, kx = 240 + Math.sin(aa) * 98, ky = 66 + Math.sin(aa * 2) * 20 + Math.sin(t * 3 - sg * 0.6) * sg * 0.15;
+					var lw = [3, 4, 5, 5, 5, 4, 3, 2, 1, 1][sg];
+					if (sg === 9) { /* o rabo em leque, abanando */ var ab = Math.round(Math.sin(t * 5) * 1.5); R(c, kx - 1, ky - 3 + ab, 2, 2, kf[1]); R(c, kx - 1, ky + 1 + ab, 2, 2, kf[1]); }
+					R(c, kx - lw / 2, ky - lw / 2, lw, lw, kf[1]);
+					if (sg === 3) { R(c, kx - 1, ky - lw / 2 - 1, 2, 1, kf[1]); R(c, kx - 1, ky + lw / 2, 2, 1, kf[1]); } /* as barbatanas */
+					if (sg === 0) cabeca = [kx, ky];
+				}
+				P(c, cabeca[0] + (Math.cos(t * 0.2 + kf[0]) > 0 ? 1 : -1), cabeca[1] - 1, '#ffffff'); /* o olhinho */
+			});
+			c.restore(); c.globalAlpha = 1;
+			// o relâmpago lá longe, de vez em quando: o céu e a rua inteira clareiam duas vezes, rapidinho
+			var rel = t % 17;
+			if (!calmo && ((rel > 9 && rel < 9.07) || (rel > 9.2 && rel < 9.3))) { c.save(); c.globalCompositeOperation = 'lighter'; c.globalAlpha = 0.16; R(c, -OX, 0, W, 200, '#b8a8ff'); c.restore(); c.globalAlpha = 1; }
 			// o neon do letreiro da agência zumbindo: de vez em quando o brilho dourado pulsa (um halo
 			// redondo e somado à luz, sem borda nenhuma, para não aparecer caixa em volta do nome)
 			var zum = Math.sin(t * 13) > 0.9 ? 1 : 0.35 + Math.sin(t * 2.1) * 0.1;
@@ -1267,25 +1339,42 @@
 			}
 		}
 	};
-	// o passeio da câmera pela rua: [segundo, x, y, zoom] (x e y no miolo, o ponto que fica no centro)
-	// (o começo é lento: a câmera fica um tempo no telão da gueixa, com a chuva caindo na frente)
-	// (em vez de a câmera correr de um ponto a outro, são planos separados, cada um com um movimento
-	// bem lento, e entre eles um corte suave: a tela escurece e volta já no plano seguinte)
+	// o passeio da câmera pela rua: cada plano é um movimento contínuo e lento por alguns pontos
+	// ([fração do plano, x, y, zoom], com x e y no miolo: o ponto que fica no centro da tela).
+	// Entre um plano e outro, um corte suave (a tela escurece e volta já no plano seguinte).
+	// A câmera desliza numa curva (sem quinas), o zoom anda em escala logarítmica (aproximar
+	// de 1x para 2x parece tão rápido quanto de 2x para 4x) e ela "respira" de leve, como na mão.
 	var PLANOS = [
-		{ dur: 5.6, de: [66, 30, 3.6], ate: [66, 42, 3.35] },   // o telão da gueixa, com a chuva na frente
-		{ dur: 4.2, de: [64, 156, 2.9], ate: [86, 160, 2.8] },  // o bar de lámen e o cozinheiro
-		{ dur: 3.8, de: [410, 168, 2.7], ate: [392, 166, 2.6] }, // a farmácia, as máquinas e o vapor do bueiro
-		{ dur: 4.2, de: [240, 64, 2.7], ate: [240, 72, 2.5] },  // o telão da agência
-		{ dur: 3.8, de: [250, 150, 2.4], ate: [244, 142, 2.2] }, // o letreiro e a porta
-		{ dur: 3.0, de: [240, 135, 1.12], ate: [240, 135, 1] }   // a rua inteira
+		/* o telão da gueixa: começa colado no rosto dela e desce devagar até a chuva na frente */
+		{ dur: 6.4, pts: [[0, 60, 22, 4.6], [0.55, 64, 36, 3.9], [1, 70, 52, 3.3]] },
+		/* o bar de lámen: um travelling da esquerda para a direita, na altura do balcão */
+		{ dur: 4.8, pts: [[0, 36, 166, 3.1], [0.5, 62, 162, 2.95], [1, 92, 166, 2.8]] },
+		/* a farmácia: o travelling volta, da direita para a esquerda, passando pelas máquinas */
+		{ dur: 4.6, pts: [[0, 446, 192, 3.0], [0.5, 420, 186, 2.85], [1, 394, 180, 2.7]] },
+		/* o grande final, num plano só: a grua desce do telão da agência, passa pelo letreiro,
+		   chega na porta e então recua, devagarinho, até mostrar a rua inteira */
+		{ dur: 10.5, pts: [[0, 240, 50, 3.1], [0.22, 240, 74, 2.7], [0.42, 246, 126, 2.5], [0.58, 242, 168, 2.6], [0.78, 240, 148, 1.7], [1, 240, 135, 1]] }
 	];
 	var CINE_FIM = PLANOS.reduce(function (s2, p) { return s2 + p.dur; }, 0);
+	function catmull(a, b, c2, d, s) { return 0.5 * (2 * b + (c2 - a) * s + (2 * a - 5 * b + 4 * c2 - d) * s * s + (3 * b - a - 3 * c2 + d) * s * s * s); }
 	function cameraCine(t) {
 		var ini = 0, i = 0;
 		while (i < PLANOS.length - 1 && t > ini + PLANOS[i].dur) { ini += PLANOS[i].dur; i++; }
 		var p = PLANOS[i], u = Math.max(0, Math.min(1, (t - ini) / p.dur));
-		u = u * u * (3 - 2 * u) * 0.6 + u * 0.4; // devagar e constante, sem tranco
-		return { x: p.de[0] + (p.ate[0] - p.de[0]) * u, y: p.de[1] + (p.ate[1] - p.de[1]) * u, z: p.de[2] + (p.ate[2] - p.de[2]) * u, plano: i, resta: ini + p.dur - t };
+		/* sai devagar e chega devagar, mas nunca para no meio */
+		u = (0.5 - Math.cos(u * Math.PI) / 2) * 0.75 + u * 0.25;
+		var pts = p.pts, k = 0;
+		while (k < pts.length - 2 && u > pts[k + 1][0]) k++;
+		var s = (u - pts[k][0]) / (pts[k + 1][0] - pts[k][0] || 1);
+		var A = pts[Math.max(0, k - 1)], B = pts[k], C = pts[k + 1], D = pts[Math.min(pts.length - 1, k + 2)];
+		var z = Math.exp(catmull(Math.log(A[3]), Math.log(B[3]), Math.log(C[3]), Math.log(D[3]), s));
+		/* a respiração da câmera na mão: some no fim, quando a rua inteira aparece */
+		var mao = (1 - suave((t - CINE_FIM + 2) / 2)) * 0.9 / Math.sqrt(z);
+		return {
+			x: catmull(A[1], B[1], C[1], D[1], s) + (Math.sin(t * 0.83) * 0.6 + Math.sin(t * 1.71 + 1.3) * 0.4) * mao,
+			y: catmull(A[2], B[2], C[2], D[2], s) + (Math.sin(t * 0.67 + 2.1) * 0.6 + Math.sin(t * 1.37) * 0.4) * mao,
+			z: z, plano: i, resta: ini + p.dur - t
+		};
 	}
 	function aplicarCine(cam) {
 		var cw = palco.clientWidth, ch = palco.clientHeight, k = cw / W, z = cam.z;
