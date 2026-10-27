@@ -675,6 +675,20 @@
 	var cena = null, inicioCena = 0, geracao = 0, falando = false;
 	// o escurecer entre as cenas (uma transição de CSS, que não depende de quantos quadros o navegador desenha)
 	function escurecer(v) { escuro.style.opacity = v; }
+	// as faixas pretas de cinema (em cima e embaixo): a altura anda até o alvo (em % do palco) no tempo pedido
+	var faixas = ['cima', 'baixo'].map(function (lado) { var f = document.createElement('div'); f.className = 'emb-faixa ' + lado; palco.appendChild(f); return f; });
+	var faixaAlt = 0, faixaAnim = 0;
+	function moverFaixas(alvo, dur) {
+		var de = faixaAlt, t0 = performance.now(), id = ++faixaAnim;
+		(function passo() {
+			if (id !== faixaAnim) return;
+			var u = dur > 0 ? Math.min(1, (performance.now() - t0) / (dur * 1000)) : 1;
+			u = u < 0.5 ? 4 * u * u * u : 1 - Math.pow(-2 * u + 2, 3) / 2; /* começa devagar e termina devagar */
+			faixaAlt = de + (alvo - de) * u;
+			faixas.forEach(function (f) { f.style.height = faixaAlt + '%'; });
+			if (u < 1) requestAnimationFrame(passo);
+		})();
+	}
 	function depois(fn, ms) { var g = geracao; return setTimeout(function () { if (g === geracao) fn(); }, ms); }
 	function prepararFundo(c) { if (c.fundo && !c.pronto) { c.fundoPronto = c.fundo(); c.pronto = true; } }
 	function refazerFundos() { Object.keys(CENAS).forEach(function (n) { CENAS[n].pronto = false; }); mesaFundo = null; if (cena) prepararFundo(cena); }
@@ -689,7 +703,7 @@
 			cena = nova; cena.nome = nome;
 			prepararFundo(cena);
 			mundo.hidden = !cena.mesa;
-			tela.style.transform = ''; tela.style.transformOrigin = ''; raiz.classList.remove('cinema', 'cinema-saindo');
+			tela.style.transform = ''; tela.style.transformOrigin = ''; raiz.classList.remove('cinema'); moverFaixas(0, 0);
 			tela.classList.toggle('aproxima', nome === 'hangar');
 			inicioCena = performance.now();
 			escurecer(0);
@@ -956,8 +970,8 @@
 			var u = i / L, x = hx + i;
 			var r = u < 0.1 ? R0 * (0.7 + 0.3 * u / 0.1) : u < 0.35 ? R0 : R0 * Math.max(0.12, 1 - Math.pow((u - 0.35) / 0.65, 1.3) * 0.9);
 			var cy = hy + Math.sin(onda - u * 3.2) * u * u * 5, y0 = cy - r * 0.85, y1 = cy + r * 0.8;
-			c.fillStyle = cor(0.15); c.fillRect(x, y0, 0.5, y1 - y0); /* o corpo translúcido */
-			c.fillStyle = cor(0.45); c.fillRect(x, y0, 0.5, 1); c.fillRect(x, y1 - 1, 0.5, 1); /* o contorno aceso */
+			c.fillStyle = cor(0.22); c.fillRect(x, y0, 0.5, y1 - y0); /* o corpo translúcido */
+			c.fillStyle = cor(0.6); c.fillRect(x, y0, 0.5, 1); c.fillRect(x, y1 - 1, 0.5, 1); /* o contorno aceso */
 			if (u > 0.06 && u < 0.42) { c.fillStyle = cor(0.22); for (var pg = cy + r * 0.2; pg < y1 - 1.5; pg += 2) c.fillRect(x, pg, 0.5, 1); } /* as pregas da garganta */
 			if (Math.abs(i - L * 0.1) < 0.25) { c.fillStyle = cor(1); c.fillRect(x, cy + r * 0.05 - 0.5, 1, 1); } /* o olho */
 			if (Math.abs(i - L * 0.3) < 0.25) { var aba = Math.sin(onda * 1.2) * 2; c.fillStyle = cor(0.45); for (var k = 0; k < L * 0.16; k += 0.5) c.fillRect(x + k * 0.8, cy + r * 0.8 + k * 0.45 + aba * k / 10, 1.5, 1); } /* a nadadeira peitoral */
@@ -1406,15 +1420,14 @@
 			R(c, rbx - 4, 214, 9, 4, '#c8ccd8'); R(c, rbx - 3, 213, 7, 1, '#e8ecf4'); R(c, rbx - 4, 216, 9, 1, '#3ae0ff'); R(c, rbx - 3, 218, 2, 1, '#2a2a3a'); R(c, rbx + 2, 218, 2, 1, '#2a2a3a');
 			P(c, rbx + rdir * 5, 218 - (Math.floor(t * 12) % 2), '#a8acc4'); /* a escovinha girando */
 			if ((t % 1) < 0.5) P(c, rbx, 212, '#ffd36a');
-			// as baleias holográficas (mãe e filhote) nadando devagar no céu, à direita da agência: entram
-			// pela direita, vão para a esquerda e se desfazem antes de chegar no prédio da agência; somem
-			// atrás dos telões da Andarilha, para nunca ficarem na frente dos anúncios dela
+			// as baleias holográficas (mãe e filhote) nadando devagar no céu, da direita para a esquerda,
+			// lá longe: passam por trás do prédio da agência e dos telões da Andarilha (nunca na frente deles)
 			c.save();
-			c.beginPath(); c.rect(-OX, 0, W, H); TELAS.forEach(function (tl) { if (tl.tipo === 1 || tl.tipo === 'agencia') c.rect(tl.x - 2, tl.y - 2, tl.w + 4, tl.h + 4); }); c.clip('evenodd');
+			c.beginPath(); c.rect(-OX, 0, W, H); c.rect(144, 20, 192, 200); TELAS.forEach(function (tl) { if (tl.tipo === 1) c.rect(tl.x - 2, tl.y - 2, tl.w + 4, tl.h + 4); }); c.clip('evenodd');
 			c.globalCompositeOperation = 'lighter';
-			var ciclo2 = (t * 6 + 100) % 300, bx0 = NUCLEO + OX + 30 - ciclo2;
-			baleia(c, bx0, 40 + Math.sin(t * 0.3) * 4, 112, [110, 215, 255], t, suave((bx0 - 350) / 40));
-			baleia(c, bx0 + 78, 70 + Math.sin(t * 0.3 + 1) * 3, 58, [200, 160, 255], t + 1.3, suave((bx0 + 78 - 350) / 40));
+			var volta2 = W + 300, ciclo2 = ((((t - BALEIA_DESL) * 6) % volta2) + volta2) % volta2, bx0 = NUCLEO + OX + 30 - ciclo2;
+			baleia(c, bx0, 40 + Math.sin(t * 0.3) * 4, 112, [110, 215, 255], t, 1);
+			baleia(c, bx0 + 78, 70 + Math.sin(t * 0.3 + 1) * 3, 58, [200, 160, 255], t + 1.3, 1);
 			c.restore(); c.globalAlpha = 1;
 			// o relâmpago lá longe, de vez em quando: o céu e a rua inteira clareiam duas vezes, rapidinho
 			var rel = t % 17;
@@ -1495,10 +1508,12 @@
 				iniciarAudio();
 				/* o primeiro plano começa com a gueixa normal, mostra o gole e termina no sorriso */
 				GUEIXA_DESL = (performance.now() - inicioCena) / 1000 - 2.0;
+				var tPlano2 = (performance.now() - inicioCena) / 1000 + PLANOS[0][0], centro2 = Math.min(PLANOS[1][1], W - OX - W / (2 * PLANOS[1][3]));
+				BALEIA_DESL = tPlano2 - (NUCLEO + OX + 30 - (centro2 - 30)) / 6;
 				if (audio && audio.state === 'suspended') audio.resume();
 				ligarAmbienteChuva();
 				limpar(); escuro.style.transition = 'opacity ' + ESCURO_CINE + 's ease-in-out'; aplicarCine(cameraCine(0)); escurecer(0);
-				cena0.cine = performance.now(); raiz.classList.add('cinema'); depois(function () { capitulo('I', 'A rua da agência'); }, 1200);
+				cena0.cine = performance.now(); raiz.classList.add('cinema'); moverFaixas(9, 0.8); depois(function () { capitulo('I', 'A rua da agência'); }, 1200);
 				// um clique durante o passeio da câmera pula direto para o final
 				var pular = alvoClicavel(-OX, 0, W, H, 'Pular a apresentação', function () { cena0.cine = performance.now() - CINE_FIM * 1000; });
 				pular.classList.add('emb-alvo-cheio');
@@ -1511,7 +1526,7 @@
 	// pedaço da vida nessa cidade do futuro: [duração, x, y, zoom], com x e y no miolo (o centro da tela).
 	var PLANOS = [
 		[7.8, 66, 40, 3.4],    /* o telão da gueixa: normal, depois o gole do chá Hoshi e o sorriso, com a chuva na frente */
-		[4.6, 452, 50, 2.3],   /* o céu da cidade: as baleias holográficas, as torres e os carros voadores */
+		[5.6, 452, 50, 2.3],   /* o céu da cidade: as baleias holográficas, as torres e os carros voadores */
 		[4.2, 24, 116, 3.5],   /* as janelas dos apartamentos (gente vendo TV, o gato, o aquário...) */
 		[4.4, 66, 168, 3.0],   /* o bar de lámen com o cozinheiro */
 		[3.8, 124, 202, 5.0],  /* o gato preto no lixo, com as gotas pingando do toldo */
@@ -1538,7 +1553,7 @@
 		if (cena0.mostrou) return; cena0.mostrou = true;
 		limpar(); escuro.style.transition = ''; aplicarCine({ x: 240, y: 135, z: 1 }); escurecer(0);
 		/* as faixas pretas de cinema recolhem devagar */
-		if (raiz.classList.contains('cinema')) { raiz.classList.add('cinema-saindo'); raiz.classList.remove('cinema'); depois(function () { raiz.classList.remove('cinema-saindo'); }, 2700); }
+		raiz.classList.remove('cinema'); moverFaixas(0, 2.8);
 		botao('&#9654; Entrar na agência', 240, 232, function () {
 			limpar(); cena0.abrindo = performance.now(); SONS.portaVidro(); depois(SONS.passos, 300);
 			depois(function () { irPara('recepcao'); }, 900);
@@ -1546,6 +1561,7 @@
 	}
 	// o telão gigante da gueixa (uma homenagem aos anúncios de Blade Runner): penteado alto com grampos
 	// dourados e flores, rosto claro, lábios vermelhos, quimono vermelho; ela pisca, sorri e toma chá
+	var BALEIA_DESL = 0; /* acerta as baleias para o segundo plano da apresentação pegar as duas nadando no meio do céu */
 	var GUEIXA_DESL = 0; /* acerta o relógio da gueixa para o primeiro plano da apresentação pegar o ciclo inteiro */
 	function telaoGueixa(c, tl, t) {
 		var x = tl.x, y = tl.y, w = tl.w, h = tl.h, cx = x + w / 2, ciclo = (((t - GUEIXA_DESL) % 9) + 9) % 9, levanta = ciclo > 5.1 && ciclo < 6.9, sorri = ciclo > 7.6 && ciclo < 8.9; // (levanta = o gole, com a tigela na boca; sorri = o "hum!" depois)
