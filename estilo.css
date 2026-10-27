@@ -4277,11 +4277,14 @@ body.embarcando { overflow: hidden; }
 }
 .pp-embarque svg { display: block; width: 100%; height: 100%; }
 /* a apresentação cinematográfica da rua: faixas pretas em cima e embaixo, e o clique que pula */
-.embarque .emb-palco::before, .embarque .emb-palco::after { content: ""; position: absolute; left: 0; right: 0; height: 0; background: #000; z-index: 3; pointer-events: none; transition: height 2.6s cubic-bezier(0.45, 0, 0.2, 1); }
-.embarque .emb-palco::before { top: 0; }
-.embarque .emb-palco::after { bottom: 0; }
-/* (as faixas entram em 0,8 s e, quando a rua inteira aparece, recolhem devagar) */
-.embarque.cinema .emb-palco::before, .embarque.cinema .emb-palco::after { height: 9%; transition-duration: 0.8s; }
+.embarque.cinema .emb-palco::before, .embarque.cinema .emb-palco::after,
+.embarque.cinema-saindo .emb-palco::before, .embarque.cinema-saindo .emb-palco::after { content: ""; position: absolute; left: 0; right: 0; height: 9%; background: #000; z-index: 3; pointer-events: none; animation: emb-faixa 0.8s ease both; }
+.embarque.cinema .emb-palco::before, .embarque.cinema-saindo .emb-palco::before { top: 0; }
+.embarque.cinema .emb-palco::after, .embarque.cinema-saindo .emb-palco::after { bottom: 0; }
+@keyframes emb-faixa { from { height: 0; } }
+/* (quando a rua inteira aparece, as faixas recolhem devagar, numa animação própria) */
+.embarque.cinema-saindo .emb-palco::before, .embarque.cinema-saindo .emb-palco::after { height: 0; animation: emb-faixa-sai 2.6s cubic-bezier(0.45, 0, 0.2, 1) both; }
+@keyframes emb-faixa-sai { from { height: 9%; } to { height: 0; } }
 .emb-alvo.emb-alvo-cheio { cursor: pointer; }
 .emb-alvo.emb-alvo-cheio:focus-visible { outline: none; }
 

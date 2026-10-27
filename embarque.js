@@ -689,7 +689,7 @@
 			cena = nova; cena.nome = nome;
 			prepararFundo(cena);
 			mundo.hidden = !cena.mesa;
-			tela.style.transform = ''; tela.style.transformOrigin = ''; raiz.classList.remove('cinema');
+			tela.style.transform = ''; tela.style.transformOrigin = ''; raiz.classList.remove('cinema', 'cinema-saindo');
 			tela.classList.toggle('aproxima', nome === 'hangar');
 			inicioCena = performance.now();
 			escurecer(0);
@@ -1536,7 +1536,9 @@
 	}
 	function mostrarEntrar(cena0) {
 		if (cena0.mostrou) return; cena0.mostrou = true;
-		limpar(); raiz.classList.remove('cinema'); escuro.style.transition = ''; aplicarCine({ x: 240, y: 135, z: 1 }); escurecer(0);
+		limpar(); escuro.style.transition = ''; aplicarCine({ x: 240, y: 135, z: 1 }); escurecer(0);
+		/* as faixas pretas de cinema recolhem devagar */
+		if (raiz.classList.contains('cinema')) { raiz.classList.add('cinema-saindo'); raiz.classList.remove('cinema'); depois(function () { raiz.classList.remove('cinema-saindo'); }, 2700); }
 		botao('&#9654; Entrar na agência', 240, 232, function () {
 			limpar(); cena0.abrindo = performance.now(); SONS.portaVidro(); depois(SONS.passos, 300);
 			depois(function () { irPara('recepcao'); }, 900);
