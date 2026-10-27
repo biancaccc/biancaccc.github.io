@@ -677,13 +677,14 @@
 	function escurecer(v) { escuro.style.opacity = v; }
 	// as faixas pretas de cinema (em cima e embaixo): a altura anda até o alvo (em % do palco) no tempo pedido
 	var faixas = ['cima', 'baixo'].map(function (lado) { var f = document.createElement('div'); f.className = 'emb-faixa ' + lado; palco.appendChild(f); return f; });
-	var faixaAlt = 0, faixaAnim = 0;
+	var faixaAlt = 0, faixaAnim = 0, faixaAlvo = 0;
 	function moverFaixas(alvo, dur) {
+		faixaAlvo = alvo;
 		var de = faixaAlt, t0 = performance.now(), id = ++faixaAnim;
 		(function passo() {
 			if (id !== faixaAnim) return;
 			var u = dur > 0 ? Math.min(1, (performance.now() - t0) / (dur * 1000)) : 1;
-			u = u < 0.5 ? 4 * u * u * u : 1 - Math.pow(-2 * u + 2, 3) / 2; /* começa devagar e termina devagar */
+			u = 0.5 - Math.cos(u * Math.PI) / 2; /* suave e quase constante, sem acelerar de repente no meio */
 			faixaAlt = de + (alvo - de) * u;
 			faixas.forEach(function (f) { f.style.height = faixaAlt + '%'; });
 			if (u < 1) requestAnimationFrame(passo);
@@ -958,35 +959,44 @@
 		for (var k = 0; k < n; k++) glifo(x + 1, y + 1 + k * 7, cor, semente + k);
 		for (var g = 0; g < n * 7; g += 2) { mistura(x - 2, y + g, cor, 0.25); mistura(x + 8, y + g, cor, 0.25); }
 	}
-	// uma baleia holográfica (de lado, nadando para a esquerda): corpo comprido com as pregas da
-	// garganta, o olho, a nadadeira peitoral comprida, a cauda em leque; translúcida, com uma faixa de
-	// varredura descendo devagar
-	function baleia(c, hx, hy, L, rgb, t, alfa) {
-		if (alfa <= 0) return;
-		/* (desenhada em posições quebradas, sem arredondar: o corpo desliza liso em vez de pular de pixel em pixel) */
+	// uma baleia holográfica (de lado, nadando para a esquerda), nadando como as jubartes de verdade:
+	// a cabeça quase parada, a onda do corpo crescendo só do meio para trás, a nadadeira da cauda
+	// (horizontal, como a das baleias, não em pé como a dos peixes) subindo e descendo devagar, a
+	// nadadeira peitoral comprida remando de leve e o corpo inteiro subindo um pouco a cada batida.
+	// o: { L, rgb, batida (segundos por batida da cauda), fase, alfa }
+	function baleia(c, hx, hy, t, o) {
+		if (o.alfa <= 0) return;
+		var L = o.L, rgb = o.rgb, alfa = o.alfa;
 		var cor = function (a) { return 'rgba(' + rgb[0] + ',' + rgb[1] + ',' + rgb[2] + ',' + (a * alfa) + ')'; };
-		var R0 = L * 0.12, fim = null, onda = t * 0.9;
+		var w = Math.PI * 2 / o.batida, ang = t * w + o.fase, R0 = L * 0.12, A = L * 0.05;
+		/* o deslocamento vertical de cada ponto do corpo (u = 0 na cabeça, 1 na cauda) */
+		var onda = function (u) { var k = Math.max(0, (u - 0.4) / 0.6); return Math.sin(ang - u * 2.4) * k * k * A + Math.sin(ang - 0.6) * 0.6; };
+		/* (desenhada em posições quebradas, sem arredondar: o corpo desliza liso) */
 		for (var i = 0; i < L; i += 0.5) {
 			var u = i / L, x = hx + i;
-			var r = u < 0.1 ? R0 * (0.7 + 0.3 * u / 0.1) : u < 0.35 ? R0 : R0 * Math.max(0.12, 1 - Math.pow((u - 0.35) / 0.65, 1.3) * 0.9);
-			var cy = hy + Math.sin(onda - u * 3.2) * u * u * 5, y0 = cy - r * 0.85, y1 = cy + r * 0.8;
+			var r = u < 0.1 ? R0 * (0.72 + 0.28 * Math.sqrt(u / 0.1)) : u < 0.38 ? R0 : R0 * Math.max(0.2, 1 - Math.pow((u - 0.38) / 0.62, 1.1) * 0.85);
+			var cy = hy + onda(u), y0 = cy - r * 0.82, y1 = cy + r * 0.8;
+			if (u > 0.6 && u < 0.68) y0 -= Math.sin((u - 0.6) / 0.08 * Math.PI) * 1.6; /* a corcova da nadadeira dorsal */
 			c.fillStyle = cor(0.22); c.fillRect(x, y0, 0.5, y1 - y0); /* o corpo translúcido */
 			c.fillStyle = cor(0.6); c.fillRect(x, y0, 0.5, 1); c.fillRect(x, y1 - 1, 0.5, 1); /* o contorno aceso */
-			if (u > 0.06 && u < 0.42) { c.fillStyle = cor(0.22); for (var pg = cy + r * 0.2; pg < y1 - 1.5; pg += 2) c.fillRect(x, pg, 0.5, 1); } /* as pregas da garganta */
+			if (u > 0.05 && u < 0.4) { c.fillStyle = cor(0.22); for (var pg = cy + r * 0.2; pg < y1 - 1.5; pg += 2) c.fillRect(x, pg, 0.5, 1); } /* as pregas da garganta */
 			if (Math.abs(i - L * 0.1) < 0.25) { c.fillStyle = cor(1); c.fillRect(x, cy + r * 0.05 - 0.5, 1, 1); } /* o olho */
-			if (Math.abs(i - L * 0.3) < 0.25) { var aba = Math.sin(onda * 1.2) * 2; c.fillStyle = cor(0.45); for (var k = 0; k < L * 0.16; k += 0.5) c.fillRect(x + k * 0.8, cy + r * 0.8 + k * 0.45 + aba * k / 10, 1.5, 1); } /* a nadadeira peitoral */
-			fim = [x, cy];
+			if (Math.abs(i - L * 0.28) < 0.25) { /* a nadadeira peitoral comprida, remando devagar */
+				var rema = Math.sin(ang * 0.5) * 0.12; c.fillStyle = cor(0.5);
+				for (var k = 0; k < L * 0.22; k += 0.5) c.fillRect(x + k * Math.cos(0.5 + rema), cy + r * 0.75 + k * Math.sin(0.5 + rema), 1.5, 1 + (k < L * 0.1 ? 1 : 0));
+			}
+		}
+		/* a nadadeira da cauda: uma lâmina fina que inclina para cima e para baixo seguindo a batida */
+		/* (vista de lado, a nadadeira abre num leque conforme inclina: fina quando passa reta, larga na ponta da batida) */
+		var xe = hx + L, ye = hy + onda(1), incl = (onda(1) - onda(0.94)) / (L * 0.06) * 1.4, lc = L * 0.18, abre = 2 + Math.abs(Math.sin(ang - 2.4)) * L * 0.07;
+		for (var k2 = 0; k2 < lc; k2 += 0.5) {
+			var f2 = k2 / lc, esp = 1.6 + f2 * abre * (f2 < 0.85 ? 1 : 1 - (f2 - 0.85) * 3), meio = ye + k2 * incl;
+			c.fillStyle = cor(0.2); c.fillRect(xe + k2, meio - esp / 2, 0.5, esp);
+			c.fillStyle = cor(0.6); c.fillRect(xe + k2, meio - esp / 2, 0.5, 1); c.fillRect(xe + k2, meio + esp / 2 - 1, 0.5, 1);
 		}
 		/* uma faixa de luz descendo devagar pelo corpo (a varredura do holograma) */
-		var varre = ((t * 0.35) % 1.4) - 0.2;
-		c.fillStyle = cor(0.18); c.fillRect(hx, hy - R0 + varre * R0 * 2, L * 0.75, 1.5);
-		/* a cauda em leque, abanando no mesmo ritmo da onda do corpo */
-		var fl = Math.sin(onda - 3.2) * 2.5, lc = L * 0.13;
-		for (var k2 = 0; k2 < lc; k2 += 0.5) {
-			var esp = 1 + k2 * 1.1, desl = fl * k2 / lc;
-			c.fillStyle = cor(0.45); c.fillRect(fim[0] + k2, fim[1] - esp + desl, 0.5, 1); c.fillRect(fim[0] + k2, fim[1] + esp + desl, 0.5, 1);
-			c.fillStyle = cor(0.15); c.fillRect(fim[0] + k2, fim[1] - esp + 1 + desl, 0.5, Math.max(0, esp * 2 - 1));
-		}
+		var varre = ((t * 0.3) % 1.4) - 0.2;
+		c.fillStyle = cor(0.14); c.fillRect(hx, hy - R0 + varre * R0 * 2, L * 0.75, 1.5);
 	}
 	// os carros flutuantes da rua (de lado, sem rodas: deslizam sobre os propulsores, com a luz azul
 	// embaixo). Desenhados virados para a direita; com lado = -1 o desenho espelha (a frente vai para a esquerda)
@@ -1294,7 +1304,10 @@
 				else {
 					var camC = cameraCine(tc);
 					/* o corte suave: escurece no fim de cada plano e clareia já no seguinte */
-					if (camC.plano !== this.planoAtual) { this.planoAtual = camC.plano; aplicarCine(camC); escurecer(0); }
+					if (camC.plano !== this.planoAtual) {
+						this.planoAtual = camC.plano; aplicarCine(camC); escurecer(0);
+						if (camC.plano === PLANOS.length - 1) moverFaixas(0, 5); /* a rua inteira: as faixas recolhem devagar */
+					}
 					else if (camC.resta < ESCURO_CINE && camC.plano < PLANOS.length - 1) escurecer(1);
 				}
 			}
@@ -1426,8 +1439,13 @@
 			c.beginPath(); c.rect(-OX, 0, W, H); c.rect(144, 20, 192, 200); TELAS.forEach(function (tl) { if (tl.tipo === 1) c.rect(tl.x - 2, tl.y - 2, tl.w + 4, tl.h + 4); }); c.clip('evenodd');
 			c.globalCompositeOperation = 'lighter';
 			var volta2 = W + 300, ciclo2 = ((((t - BALEIA_DESL) * 6) % volta2) + volta2) % volta2, bx0 = NUCLEO + OX + 30 - ciclo2;
-			baleia(c, bx0, 40 + Math.sin(t * 0.3) * 4, 112, [110, 215, 255], t, 1);
-			baleia(c, bx0 + 78, 70 + Math.sin(t * 0.3 + 1) * 3, 58, [200, 160, 255], t + 1.3, 1);
+			/* a mãe: batidas lentas (uma a cada 5 s), um leve avanço a cada batida e o corpo subindo e descendo devagar */
+			var maeX = bx0 + Math.sin(t * Math.PI * 2 / 5) * 1.5, maeY = 46 + Math.sin(t * 0.21) * 5;
+			baleia(c, maeX, maeY, t, { L: 112, rgb: [110, 215, 255], batida: 5, fase: 0, alfa: 1 });
+			/* o filhote nada colado nela, por cima das costas, perto da nadadeira peitoral (no "vácuo" da mãe):
+			   bate a cauda mais rápido, se afasta um pouquinho e volta */
+			var filX = maeX + 26 + Math.sin(t * 0.37) * 9, filY = maeY - 22 + Math.sin(t * 0.53 + 1) * 2.5;
+			baleia(c, filX, filY, t, { L: 54, rgb: [200, 160, 255], batida: 2.6, fase: 1.3, alfa: 1 });
 			c.restore(); c.globalAlpha = 1;
 			// o relâmpago lá longe, de vez em quando: o céu e a rua inteira clareiam duas vezes, rapidinho
 			var rel = t % 17;
@@ -1553,7 +1571,7 @@
 		if (cena0.mostrou) return; cena0.mostrou = true;
 		limpar(); escuro.style.transition = ''; aplicarCine({ x: 240, y: 135, z: 1 }); escurecer(0);
 		/* as faixas pretas de cinema recolhem devagar */
-		raiz.classList.remove('cinema'); moverFaixas(0, 2.8);
+		raiz.classList.remove('cinema'); if (faixaAlvo !== 0) moverFaixas(0, 2.8); /* (se pulou a apresentação) */
 		botao('&#9654; Entrar na agência', 240, 232, function () {
 			limpar(); cena0.abrindo = performance.now(); SONS.portaVidro(); depois(SONS.passos, 300);
 			depois(function () { irPara('recepcao'); }, 900);
@@ -1939,6 +1957,17 @@
 				face(C, [[xd, HP, ZP], [xd, HP, ZW], [xd, HP - 0.03, ZW], [xd, HP - 0.03, ZP]], '#c8ccd6');
 				face(C, [[xd, 1.27, ZP], [xd, 1.27, ZW], [xd, 1.23, ZW], [xd, 1.23, ZP]], '#a8b0bc');
 				face(C, [[x0 - 0.03, HP, ZP], [x0 + 0.03, HP, ZP], [x0 + 0.03, 0, ZP], [x0 - 0.03, 0, ZP]], function (sx, sy) { return sy < C(x0, 1.25, ZP)[1] ? '#c8ccd6' : '#2e5ca6'; });
+				// a horta hidropônica em cima da divisória: um tubo de vidro com alface e manjericão
+				// (desenhada aqui, antes da plaquinha, para a plaquinha pendurada ficar na frente)
+				if (k >= 2) {
+					var ha = C(xd, HP + 0.02, ZP + 0.05), hb2 = C(xd, HP + 0.02, ZW - 0.05);
+					for (var zh = ZP + 0.1; zh < ZW - 0.1; zh += 0.16) {
+						var ph = C(xd, HP + 0.02, zh), sh = 290 / ph[2], lf2 = Math.max(1, Math.round(0.07 * sh));
+						ret(ph[0] - lf2, ph[1] - lf2 * 2, lf2, lf2 * 2, (Math.floor(zh * 10) + k) % 3 ? '#4aa85a' : '#7ad86a');
+						ret(ph[0], ph[1] - lf2 * 2 - 1, lf2, lf2 * 2 + 1, (Math.floor(zh * 10) + k) % 2 ? '#5ab86a' : '#3a8a4a');
+					}
+					for (var e2 = 0; e2 < 2; e2++) linha(ha[0], ha[1] - 1 + e2, hb2[0], hb2[1] - 1 + e2, e2 ? '#a8c8d8' : '#d8f0ff');
+				}
 				// a plaquinha com o número, pendurada do teto por dois cabos
 				var pa = C(cx - 0.21, 2.18, 5.9), pb = C(cx + 0.21, 2.18, 5.9), pc = C(cx + 0.21, 1.9, 5.9), pd = C(cx - 0.21, 1.9, 5.9);
 				[cx - 0.14, cx + 0.14].forEach(function (cxx) { var a1 = C(cxx, 2.18, 5.9), a2 = C(cxx, TETO, 5.9); linha(a1[0], a1[1], a2[0], a2[1], '#8a90a0'); });
@@ -2292,22 +2321,6 @@
 				lf.globalAlpha = 1;
 				lf.setTransform(1, 0, 0, 1, 0, 0); lf.globalCompositeOperation = 'destination-in'; lf.drawImage(this.vitrine, 0, 0); lf.globalCompositeOperation = 'source-over';
 				c.drawImage(this.lafora, -OX, 0);
-			}
-			// a horta hidropônica em cima das divisórias de vidro: um tubo com alface e manjericão, a luz
-			// rosa de cultivo pulsando e bolhinhas correndo dentro
-			for (var kh = 2; kh < 13; kh++) {
-				var xh = guicheX(kh) - 0.03;
-				for (var zh = ZP + 0.1; zh < ZW - 0.1; zh += 0.16) {
-					var ph = C(xh, HP + 0.02, zh), sh = 290 / ph[2]; if (ph[0] < -OX - 10 || ph[0] > NUCLEO + OX + 10) continue;
-					var lf2 = Math.max(1, Math.round(0.07 * sh)), bal = Math.round(Math.sin(t * 1.3 + zh * 3 + kh) * 0.6);
-					R(c, ph[0] - lf2 + bal, ph[1] - lf2 * 2, lf2, lf2 * 2, (Math.floor(zh * 10) + kh) % 3 ? '#4aa85a' : '#7ad86a');
-					R(c, ph[0] + bal, ph[1] - lf2 * 2 - 1, lf2, lf2 * 2 + 1, (Math.floor(zh * 10) + kh) % 2 ? '#5ab86a' : '#3a8a4a');
-				}
-				var ha = C(xh, HP + 0.02, ZP + 0.05), hb2 = C(xh, HP + 0.02, ZW - 0.05);
-				c.save(); c.globalAlpha = 0.5; linhaGrossa(c, [ha[0], ha[1] - 1], [hb2[0], hb2[1] - 1], 2, '#d8f0ff'); c.restore();
-				var hl1 = C(xh, HP + 0.3, ZP + 0.05), hl2 = C(xh, HP + 0.3, ZW - 0.05);
-				c.save(); c.globalAlpha = 0.75 + Math.sin(t * 1.5 + kh) * 0.2; linhaGrossa(c, hl1, hl2, 1, '#ff6ad8'); c.restore();
-				var bu2 = (t * 0.25 + kh * 0.13) % 1, bpos = C(xh, HP + 0.02, ZP + 0.05 + bu2 * (ZW - ZP - 0.1)); P(c, bpos[0], bpos[1] - 1, '#ffffff');
 			}
 			// o cliente indo embora: levanta do guichê 6 e anda pelo corredor em direção à saída (para a esquerda)
 			var volta = (t + 3) % 18;
