@@ -1240,15 +1240,20 @@
 			var cena0 = this; cena0.abrindo = 0; cena0.cine = 0; cena0.mostrou = false; cena0.planoAtual = -1;
 			// antes de tudo, os créditos na tela preta ("feito por Bianca Cardador"), que somem devagar;
 			// depois, um toque para começar (é ele que libera o som no navegador)
+			// (os créditos estão ocultos por enquanto, a pedido da Bianca: voltam no fim do projeto;
+			// para mostrar de novo, troque CREDITOS para true)
+			var CREDITOS = false;
 			escurecer(1);
-			var cred = document.createElement('div');
-			cred.className = 'emb-creditos';
-			cred.innerHTML = '<small>feito por</small><strong>Bianca Cardador</strong><i aria-hidden="true">✦</i>';
-			palco.appendChild(cred);
-			depois(function () { cred.remove(); }, calmo ? 0 : 5200);
+			if (CREDITOS) {
+				var cred = document.createElement('div');
+				cred.className = 'emb-creditos';
+				cred.innerHTML = '<small>feito por</small><strong>Bianca Cardador</strong><i aria-hidden="true">✦</i>';
+				palco.appendChild(cred);
+				depois(function () { cred.remove(); }, calmo ? 0 : 5200);
+			}
 			depois(function () {
 				botao('&#9654; Começar a viagem', 240, 128, comecar, 'grande');
-			}, calmo ? 0 : 5000);
+			}, calmo || !CREDITOS ? 0 : 5000);
 			function comecar() {
 				iniciarAudio();
 				if (audio && audio.state === 'suspended') audio.resume();
