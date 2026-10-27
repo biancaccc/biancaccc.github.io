@@ -1030,20 +1030,20 @@
 	};
 	// as faixas da rua: a de trás vai para a esquerda, a da frente para a direita
 	var FAIXAS = [
-		{ chao: 236, lado: -1, vel: 34, carros: ['taxi', 'policia', 'prata', 'van'] },
+		{ chao: 238, lado: -1, vel: 34, carros: ['taxi', 'policia', 'prata', 'van'] },
 		{ chao: 256, lado: 1, vel: 52, carros: ['esporte', 'moto', 'van', 'taxi', 'prata'] }
 	];
-	// um pedestre de lado (cerca de 26 px, na escala do cozinheiro do lámen), andando com guarda-chuva aceso
+	// um pedestre de lado (cerca de 38 px de altura), andando com guarda-chuva aceso
 	// ou com a capa de chuva transparente de LED
 	function pedestre(c, gx, gy, lado, t, p) {
-		var f = Math.floor(t * 5 + p.fase) % 4, ab = [2, 0, -2, 0][f], sobe = f % 2 ? 0 : 1;
-		function Q(x, y, w, h, cor) { R(c, lado > 0 ? gx + x : gx - x - w, gy + y - sobe, w, h, cor); }
+		var f = Math.floor(t * 5 + p.fase) % 4, ab = [2, 0, -2, 0][f], sobe = f % 2 ? 0 : 1, E = 1.4; /* E = a escala do desenho */
+		function Q(x, y, w, h, cor) { var x0 = Math.round(x * E), x1 = Math.round((x + w) * E), y0 = Math.round((y - sobe) * E), y1 = Math.round((y - sobe + h) * E); R(c, lado > 0 ? gx + x0 : gx - x1, gy + y0, x1 - x0, y1 - y0, cor); }
 		Q(-1 + ab, -9, 2, 9 + sobe, p.calca); Q(-1 - ab, -9, 2, 9 + sobe, p.calca2); Q(-1 + ab, -1 + sobe, 3, 1, '#14141e'); Q(-1 - ab, -1 + sobe, 3, 1, '#14141e'); /* as pernas e os sapatos */
 		Q(-3, -21, 6, 12, p.casaco); Q(-4, -12, 8, 3, p.casaco); Q(-3, -21, 1, 12, p.casaco2); /* o casaco */
 		Q(-2, -26, 5, 5, p.pele); Q(-2, -27, 5, 2, p.cabelo); Q(-3, -26, 2, 4, p.cabelo); Q(2, -24, 1, 1, '#1a1418'); /* a cabeça */
 		if (p.guarda) {
 			Q(2, -19, 2, 6, p.casaco2); Q(3, -32, 1, 14, '#d8d8e8'); /* o braço e o cabo */
-			c.fillStyle = p.guarda; c.beginPath(); c.ellipse(lado > 0 ? gx + 3.5 : gx - 3.5, gy - 32 - sobe, 12, 5, 0, Math.PI, 0); c.fill();
+			c.fillStyle = p.guarda; c.beginPath(); c.ellipse(lado > 0 ? gx + 3.5 * E : gx - 3.5 * E, gy - (32 + sobe) * E, 12 * E, 5 * E, 0, Math.PI, 0); c.fill();
 			Q(-9, -32, 25, 1, p.aro); for (var gt = 0; gt < 3; gt++) { var fg = ((t * 1.6 + gt * 0.33 + p.fase) % 1); if (fg < 0.6) Q(-8 + gt * 11, -31 + fg * 12, 1, 1, 'rgba(184,208,255,0.8)'); }
 		} else {
 			c.save(); c.globalAlpha = 0.35; Q(-5, -28, 10, 20, p.capa); c.restore(); Q(-5, -28, 10, 1, p.capa); Q(-5, -28, 1, 20, p.capa); Q(4, -28, 1, 20, p.capa); Q(-5, -9, 10, 1, p.capa); /* a capa de LED */
@@ -1218,7 +1218,11 @@
 				ret(358, 158, 60, 50, function (x2, y2) { return rampa(['#d8fff0', '#a8f0d0', '#6ad0a8'], (y2 - 158) / 50, x2, y2); });
 				for (var pr = 0; pr < 3; pr++) { ret(362, 168 + pr * 12, 52, 2, '#3a8a6a'); for (var it = 0; it < 6; it++) ret(364 + it * 8, 162 + pr * 12, 5, 6, ['#ff6a8a', '#ffffff', '#6ac8ff', '#ffd36a'][(it + pr) % 4]); }
 				ret(380, 128, 26, 26, '#0a0814'); ret(389, 131, 8, 20, '#2aff8a'); ret(383, 137, 20, 8, '#2aff8a'); brilho(393, 141, 22, '#2aff8a', 0.3);
-				letras('FARMÁCIA', 393, 116, 1, '#7affb8', true);
+				// (com um painel holográfico verde translúcido atrás, para dar para ler)
+				ret(373, 112, 41, 11, function (x2, y2) { mistura(x2, y2, y2 % 2 ? '#04241a' : '#06301f', 0.82); return null; });
+				ret(373, 112, 41, 1, '#2ad88a'); ret(373, 122, 41, 1, '#2ad88a'); ret(373, 112, 1, 11, '#1a8a5a'); ret(413, 112, 1, 11, '#1a8a5a');
+				for (var hgx = 373; hgx < 414; hgx += 2) { mistura(hgx, 111, '#2ad88a', 0.35); mistura(hgx, 123, '#2ad88a', 0.35); }
+				letras('FARMÁCIA', 393, 116, 1, '#9affc8', true);
 				[[426, '#3ae0ff'], [446, '#ff3ab8']].forEach(function (q) { ret(q[0], 166, 16, 46, '#14141e'); ret(q[0] + 2, 168, 12, 24, q[1]); for (var vb = 0; vb < 4; vb++) ret(q[0] + 3, 170 + vb * 5, 10, 3, '#ffffff'); ret(q[0] + 3, 196, 10, 4, '#2a2a3a'); brilho(q[0] + 8, 180, 18, q[1], 0.25); });
 				// os letreiros verticais pendurados nos prédios dos lados (vermelho, ciano, rosa, amarelo)
 				letreiroVertical(112, 70, 7, '#ff4a6a', 3); letreiroVertical(94, 92, 4, '#3ae0ff', 11); letreiroVertical(-OX + 20, 74, 7, '#ffd36a', 21); letreiroVertical(8, 96, 4, '#ff3ab8', 61);
@@ -1429,7 +1433,7 @@
 			// gente passando na calçada (guarda-chuvas de cabo aceso, capa de chuva de LED)
 			PEDESTRES.forEach(function (pd) {
 				var up = ((t + pd.ini) % pd.per) / pd.per, gx = pd.lado > 0 ? -OX - 14 + up * (W + 28) : NUCLEO + OX + 14 - up * (W + 28);
-				pedestre(c, gx, 220, pd.lado, t, pd);
+				pedestre(c, gx, 221, pd.lado, t, pd);
 			});
 			// a porta de vidro: duas folhas que deslizam quando o piloto entra
 			var abre = this.abrindo ? Math.min(1, (performance.now() - this.abrindo) / 800) : 0, e = abre * abre * (3 - 2 * abre);
@@ -1695,7 +1699,7 @@
 	// diagonal para a fila de guichês. Cada guichê tem balcão azul com tampo branco, divisória com
 	// vidro jateado em cima, plaquinha pendurada com o número, um robô atendente e o computador.
 	// Clientes sentados de costas, o painel de senhas e a TV na parede, o selo da agência, a placa
-	// holográfica de licenças, o relógio, a porta dos hangares lá no fundo e um robô-aspirador.
+	// holográfica de licenças, o relógio, a porta dos hangares lá no fundo e o robô-garçom servindo café.
 	var CAM_REC = camera3d({ x: 0.4, y: 1.5, z: 1.7, yaw: 28 * RAD, pitch: 5 * RAD, f: 290, cx: 236, cy: 108 });
 	var GL = 2.2, GX0 = -2.0, ZC = 5.7, ZP = 5.45, ZW = 7.6, HC = 1.05, HP = 1.85, TETO = 3.0, XF = 26.4;
 	function guicheX(k) { return GX0 + k * GL; }
@@ -1816,6 +1820,7 @@
 	function recepcao(painel, soFrente) {
 		var C = CAM_REC;
 		return pintar(tela0(), function () {
+			if (soFrente === 'totem') return totemEtc(C, true);
 			if (soFrente) return cadeirasDaFrente(C);
 			// chão, teto e paredes: para cada pixel, o raio da câmera diz em que superfície ele bate
 			// (calculado uma vez só para cada largura de tela; as versões do painel reaproveitam)
@@ -1834,8 +1839,6 @@
 					var tom = 0.3 + ruido(Math.floor(gx), Math.floor(gz)) * 0.18 + longe * 0.25 + ref + (wz > ZC - 0.25 && wz < ZW ? 0.35 : 0);
 					c = (fx < 0.03 || fz < 0.03 * (1 + longe * 3)) ? '#a7abb4' : rampa(['#eef0f3', '#dfe2e7', '#d1d4db', '#c2c6ce', '#b0b4bd'], tom, x, y);
 					if (wz > 4.52 && wz < 4.6 && wx > 0.4 && wx < 23 && Math.floor(wx / 0.3) % 2 === 0) c = rampa(['#f0c840', '#d8b030'], longe, x, y); // a faixa amarela da fila
-					for (var pg = 0; pg < PEGADAS.length; pg++) { var ddx = (wx - PEGADAS[pg][0]) / 0.05, ddz = (wz - PEGADAS[pg][1]) / 0.11; if (ddx * ddx + ddz * ddz < 1) { c = ddz < -0.3 ? '#c8d8f0' : '#9aa6bc'; break; } } // pegadas molhadas
-					if (Math.abs(wz - 4.56) < 0.04 && Math.floor(wx / 0.3) % 2 === 1 && wx > 0.4 && wx < 23 && ruido(Math.floor(wx * 10), 3) > 0.7) c = '#c8a030'; // tinta gasta
 				} else if (sup === 2) { // o teto: placas, luminárias embutidas e as grelhas de ar
 					var lx = ((wx % GL) + GL) % GL, lz = ((wz % 3) + 3) % 3, gx2 = wx / 0.6, gz2 = wz / 0.6;
 					if (lx > 0.55 && lx < 1.65 && lz > 1.0 && lz < 1.6) c = (lx < 0.6 || lx > 1.6 || lz < 1.05 || lz > 1.55) ? '#c8d4e4' : '#ffffff';
@@ -1939,31 +1942,35 @@
 				elip(Math.round(b1[0]), Math.round(b1[1]), Math.max(1, Math.round(0.035 * sp)), Math.max(1, Math.round(0.035 * sp)), '#c8ccd6');
 				if (i < postes.length - 1) { var n1 = C(px0, 0.9, 4.6), n2 = C(postes[i + 1], 0.9, 4.6); for (var e = 0; e < Math.max(2, 0.05 * sp); e++) linha(n1[0], n1[1] + e, n2[0], n2[1] + e * 0.8, e < 1 ? '#5a8ee0' : '#2a5ab8'); }
 			});
-			// o totem de senhas: branco com o topo azul-marinho, a telinha, a fenda do papel e o selo dourado
-			var T = TOTEM;
-			face(C, [[T.x1, T.h, T.z0], [T.x1, T.h, T.z1], [T.x1, 0, T.z1], [T.x1, 0, T.z0]], function (sx, sy) { return rampa(['#c8ccd8', '#a8adbd', '#8a90a2'], ruido(sx, sy) * 0.3 + 0.4, sx, sy); });
-			face(C, [[T.x0, T.h, T.z0], [T.x1, T.h, T.z0], [T.x1, 0, T.z0], [T.x0, 0, T.z0]], function (sx, sy) { var topo = C(T.x0, T.h, T.z0)[1], base = C(T.x0, 0, T.z0)[1]; return rampa(['#ffffff', '#f2f4f8', '#dfe2ea', '#c4c8d4'], (sy - topo) / Math.max(1, base - topo) * 0.6 + 0.1, sx, sy); });
-			face(C, [[T.x0, T.h, T.z0], [T.x1, T.h, T.z0], [T.x1, T.h, T.z1], [T.x0, T.h, T.z1]], '#1c2a6e');
-			face(C, [[T.x0, T.h, T.z0 - 0.003], [T.x1, T.h, T.z0 - 0.003], [T.x1, T.h - 0.16, T.z0 - 0.003], [T.x0, T.h - 0.16, T.z0 - 0.003]], function (sx, sy) { return rampa(['#26388a', '#1c2a6e', '#141f55'], (sy % 4) / 6, sx, sy); });
-			quadTex(pintar(new Pintura(20, 14), function () { ret(0, 0, 20, 14, '#0a1840'); ret(1, 1, 18, 4, '#2a62c8'); letras('SENHA', 10, 1, 1, '#ffffff', true); letras('TOQUE', 10, 7, 1, '#7fe3ff', true); }), [C(T.x0 + 0.06, 1.18, T.z0 - 0.004), C(T.x1 - 0.06, 1.18, T.z0 - 0.004), C(T.x1 - 0.06, 0.88, T.z0 - 0.004), C(T.x0 + 0.06, 0.88, T.z0 - 0.004)]);
-			face(C, [[T.x0 + 0.1, 0.74, T.z0 - 0.004], [T.x1 - 0.1, 0.74, T.z0 - 0.004], [T.x1 - 0.1, 0.71, T.z0 - 0.004], [T.x0 + 0.1, 0.71, T.z0 - 0.004]], '#1a1b20'); // a fenda do papel
-			var selo = C((T.x0 + T.x1) / 2, 1.31, T.z0 - 0.004), ss = 290 / selo[2]; elip(Math.round(selo[0]), Math.round(selo[1]), Math.max(2, Math.round(0.05 * ss)), Math.max(2, Math.round(0.05 * ss)), '#e8c46a'); px(selo[0], selo[1], '#ff9a7a');
-			// o porta-guarda-chuva com três guarda-chuvas molhados, e a poça embaixo
-			var gb = C(5.05, 0, 3.9), gt = C(5.05, 0.55, 3.9), gs = 290 / gb[2];
-			elip(Math.round(gb[0]), Math.round(gb[1]) + 1, Math.round(0.3 * gs), Math.max(1, Math.round(0.05 * gs)), function (sx, sy) { mistura(sx, sy, '#8ab0e8', 0.35); return null; });
-			[['#ff3ab8', -0.06, 1.0], ['#3ae0ff', 0.04, 0.92], ['#ffd36a', 0.0, 1.05]].forEach(function (q) { var a = C(5.05 + q[1], 0.4, 3.9), b = C(5.05 + q[1] * 2.5, q[2], 3.9); for (var e = -1; e <= 1; e++) linha(a[0] + e, a[1], b[0] + e, b[1], q[0]); elip(Math.round(b[0]), Math.round(b[1]), 1, 1, '#3a3d48'); });
-			ret(gt[0] - 0.11 * gs, gt[1], 0.22 * gs, gb[1] - gt[1], function (sx, sy) { return rampa(['#8a90a0', '#5a5e6a', '#3a3d48'], (sx - gt[0] + 0.11 * gs) / (0.22 * gs), sx, sy); });
-			ret(gt[0] - 0.11 * gs, gt[1], 0.22 * gs, 1, '#c8ccd6');
-			// a plaquinha amarela de "piso molhado"
-			var pb = C(3.7, 0, 3.55), pt = C(3.7, 0.62, 3.55), ps = 290 / pb[2];
-			poli([[pt[0] - 0.06 * ps, pt[1]], [pt[0] + 0.06 * ps, pt[1]], [pb[0] + 0.16 * ps, pb[1]], [pb[0] - 0.16 * ps, pb[1]]], function (sx, sy) { return rampa(['#ffe060', '#f0c030', '#c89a20'], (sx - pb[0] + 0.16 * ps) / (0.32 * ps) * 0.6 + 0.1, sx, sy); });
-			var ic = C(3.7, 0.36, 3.55); elip(Math.round(ic[0]), Math.round(ic[1]), Math.max(1, Math.round(0.035 * ps)), Math.max(1, Math.round(0.035 * ps)), '#1a1a22'); ret(ic[0] - 0.05 * ps, ic[1] + 0.05 * ps, 0.1 * ps, Math.max(1, 0.02 * ps), '#1a1a22');
+			totemEtc(C);
 			jornalNoChao(C);
 		});
 	}
-	// onde fica o totem de senhas (metros) e as pegadas molhadas de quem chegou da chuva
+	// o totem de senhas, o porta-guarda-chuva e a plaquinha de piso molhado (no cenário e também numa
+	// camada à parte, desenhada por cima de quem passa andando atrás deles)
+	function totemEtc(C, camada) {
+		// o totem de senhas: branco com o topo azul-marinho, a telinha, a fenda do papel e o selo dourado
+		var T = TOTEM;
+		face(C, [[T.x1, T.h, T.z0], [T.x1, T.h, T.z1], [T.x1, 0, T.z1], [T.x1, 0, T.z0]], function (sx, sy) { return rampa(['#c8ccd8', '#a8adbd', '#8a90a2'], ruido(sx, sy) * 0.3 + 0.4, sx, sy); });
+		face(C, [[T.x0, T.h, T.z0], [T.x1, T.h, T.z0], [T.x1, 0, T.z0], [T.x0, 0, T.z0]], function (sx, sy) { var topo = C(T.x0, T.h, T.z0)[1], base = C(T.x0, 0, T.z0)[1]; return rampa(['#ffffff', '#f2f4f8', '#dfe2ea', '#c4c8d4'], (sy - topo) / Math.max(1, base - topo) * 0.6 + 0.1, sx, sy); });
+		face(C, [[T.x0, T.h, T.z0], [T.x1, T.h, T.z0], [T.x1, T.h, T.z1], [T.x0, T.h, T.z1]], '#1c2a6e');
+		face(C, [[T.x0, T.h, T.z0 - 0.003], [T.x1, T.h, T.z0 - 0.003], [T.x1, T.h - 0.16, T.z0 - 0.003], [T.x0, T.h - 0.16, T.z0 - 0.003]], function (sx, sy) { return rampa(['#26388a', '#1c2a6e', '#141f55'], (sy % 4) / 6, sx, sy); });
+		quadTex(pintar(new Pintura(20, 14), function () { ret(0, 0, 20, 14, '#0a1840'); ret(1, 1, 18, 4, '#2a62c8'); letras('SENHA', 10, 1, 1, '#ffffff', true); letras('TOQUE', 10, 7, 1, '#7fe3ff', true); }), [C(T.x0 + 0.06, 1.18, T.z0 - 0.004), C(T.x1 - 0.06, 1.18, T.z0 - 0.004), C(T.x1 - 0.06, 0.88, T.z0 - 0.004), C(T.x0 + 0.06, 0.88, T.z0 - 0.004)]);
+		face(C, [[T.x0 + 0.1, 0.74, T.z0 - 0.004], [T.x1 - 0.1, 0.74, T.z0 - 0.004], [T.x1 - 0.1, 0.71, T.z0 - 0.004], [T.x0 + 0.1, 0.71, T.z0 - 0.004]], '#1a1b20'); // a fenda do papel
+		var selo = C((T.x0 + T.x1) / 2, 1.31, T.z0 - 0.004), ss = 290 / selo[2]; elip(Math.round(selo[0]), Math.round(selo[1]), Math.max(2, Math.round(0.05 * ss)), Math.max(2, Math.round(0.05 * ss)), '#e8c46a'); px(selo[0], selo[1], '#ff9a7a');
+		// o porta-guarda-chuva com três guarda-chuvas molhados, e a poça embaixo
+		var gb = C(5.05, 0, 3.9), gt = C(5.05, 0.55, 3.9), gs = 290 / gb[2];
+		if (!camada) elip(Math.round(gb[0]), Math.round(gb[1]) + 1, Math.round(0.3 * gs), Math.max(1, Math.round(0.05 * gs)), function (sx, sy) { mistura(sx, sy, '#8ab0e8', 0.35); return null; });
+		[['#ff3ab8', -0.06, 1.0], ['#3ae0ff', 0.04, 0.92], ['#ffd36a', 0.0, 1.05]].forEach(function (q) { var a = C(5.05 + q[1], 0.4, 3.9), b = C(5.05 + q[1] * 2.5, q[2], 3.9); for (var e = -1; e <= 1; e++) linha(a[0] + e, a[1], b[0] + e, b[1], q[0]); elip(Math.round(b[0]), Math.round(b[1]), 1, 1, '#3a3d48'); });
+		ret(gt[0] - 0.11 * gs, gt[1], 0.22 * gs, gb[1] - gt[1], function (sx, sy) { return rampa(['#8a90a0', '#5a5e6a', '#3a3d48'], (sx - gt[0] + 0.11 * gs) / (0.22 * gs), sx, sy); });
+		ret(gt[0] - 0.11 * gs, gt[1], 0.22 * gs, 1, '#c8ccd6');
+		// a plaquinha amarela de "piso molhado"
+		var pb = C(3.7, 0, 3.55), pt = C(3.7, 0.62, 3.55), ps = 290 / pb[2];
+		poli([[pt[0] - 0.06 * ps, pt[1]], [pt[0] + 0.06 * ps, pt[1]], [pb[0] + 0.16 * ps, pb[1]], [pb[0] - 0.16 * ps, pb[1]]], function (sx, sy) { return rampa(['#ffe060', '#f0c030', '#c89a20'], (sx - pb[0] + 0.16 * ps) / (0.32 * ps) * 0.6 + 0.1, sx, sy); });
+		var ic = C(3.7, 0.36, 3.55); elip(Math.round(ic[0]), Math.round(ic[1]), Math.max(1, Math.round(0.035 * ps)), Math.max(1, Math.round(0.035 * ps)), '#1a1a22'); ret(ic[0] - 0.05 * ps, ic[1] + 0.05 * ps, 0.1 * ps, Math.max(1, 0.02 * ps), '#1a1a22');
+	}
+	// onde fica o totem de senhas (metros)
 	var TOTEM = { x0: 4.05, x1: 4.5, z0: 3.85, z1: 4.15, h: 1.42 };
-	var PEGADAS = (function () { var p = []; for (var i = 0; i < 9; i++) { var u = i / 8; p.push([7.6 - u * 3.1 + (i % 2 ? 0.09 : -0.09), 2.4 + u * 1.25]); } return p; })();
 	// as cadeiras azuis de espera, bem pertinho, presas numa barra de metal
 	function cadeirasDaFrente(C) {
 		{
@@ -2194,6 +2201,7 @@
 			this.antes = paraCanvas(recepcao(['010', '7'])); // (a senha anterior, antes de pegarmos a nossa)
 			this.outra = paraCanvas(recepcao(['012', '9']));
 			this.frente = paraCanvas(recepcao(null, true));
+			this.totemCamada = paraCanvas(recepcao(null, 'totem'));
 			andanteCache = {};
 			var principal = recepcao(['011', '11']);
 			this.vitrine = mascaraVitrine(principal);
@@ -2211,17 +2219,6 @@
 				var ciclo = Math.floor((ts - 7) / 9), fase = (ts - 7) % 9;
 				if (ciclo !== this.ultimaChamada) { this.ultimaChamada = ciclo; SONS.ding(); SONS.anuncio(); }
 				if (fase < 4) c.drawImage(Math.sin(t * 4) < -0.4 ? this.apagado : this.outra, -OX, 0);
-			}
-			// o totem: a telinha brilhando e uma setinha chamando, até pegarmos a senha; depois, o papel saindo
-			var Tt = TOTEM, tela1 = C(Tt.x0 + 0.06, 1.18, Tt.z0), tela2 = C(Tt.x1 - 0.06, 0.88, Tt.z0);
-			if (!this.senha) {
-				c.save(); c.globalCompositeOperation = 'lighter'; c.globalAlpha = 0.25 + 0.25 * Math.sin(t * 5); R(c, tela1[0], tela1[1], tela2[0] - tela1[0], tela2[1] - tela1[1], '#7fe3ff'); c.restore();
-				var st = C((Tt.x0 + Tt.x1) / 2, Tt.h + 0.25, Tt.z0); // (a setinha em cima do totem é desenhada no fim, por cima das cadeiras)
-			} else {
-				var ps2 = Math.min(1, (t - this.senha) / 0.7), fenda = C((Tt.x0 + Tt.x1) / 2, 0.72, Tt.z0 - 0.01), es = 290 / fenda[2];
-				var pw2 = Math.max(4, Math.round(0.14 * es)), ph2 = Math.round(0.2 * es * ps2);
-				R(c, fenda[0] - pw2 / 2, fenda[1], pw2, ph2, '#fbfbf4'); R(c, fenda[0] + pw2 / 2 - 1, fenda[1], 1, ph2, '#d8d8cc');
-				if (ps2 > 0.6) { texto3(c, '011', Math.round(fenda[0] - 5), Math.round(fenda[1] + ph2 * 0.45), 1, '#1a2a7a'); }
 			}
 			var mostraCadeira = this.chamada && t > this.chamada;
 			var x0 = guicheX(2), cx = x0 + GL / 2 + 0.1;
@@ -2252,12 +2249,19 @@
 				c.fillStyle = 'rgba(60,64,80,0.25)'; c.beginPath(); c.ellipse(pw[0], pw[1], 0.25 * sw, 0.05 * sw, 0, 0, Math.PI * 2); c.fill();
 				c.save(); c.translate(Math.round(pw[0]), 0); c.scale(-1, 1); c.drawImage(spw.k, -Math.round(spw.ax), Math.round(pw[1] - spw.ay - (passo ? 1 : 0))); c.restore();
 			}
-			// o robô-aspirador passeando pela faixa entre as cadeiras e os guichês (vira nas pontas)
-			var ida = (t * 0.12) % 2, ux = ida < 1 ? ida : 2 - ida, ax = 2.4 + ux * 7.5, az = 4.3 + Math.sin(t * 0.9) * 0.08, pa = C(ax, 0, az), sa = 290 / pa[2];
-			c.fillStyle = 'rgba(40,44,60,0.3)'; c.beginPath(); c.ellipse(pa[0], pa[1] + 1, 0.2 * sa, 0.05 * sa, 0, 0, Math.PI * 2); c.fill();
-			c.fillStyle = '#3a3d48'; c.beginPath(); c.ellipse(pa[0], pa[1] - 0.04 * sa, 0.17 * sa, 0.05 * sa, 0, 0, Math.PI * 2); c.fill();
-			c.fillStyle = '#d8dce6'; c.beginPath(); c.ellipse(pa[0], pa[1] - 0.07 * sa, 0.17 * sa, 0.045 * sa, 0, 0, Math.PI * 2); c.fill();
-			R(c, pa[0] + (ida < 1 ? 1 : -3), pa[1] - 0.09 * sa, 2, 1, Math.sin(t * 6) > 0 ? '#7dffa8' : '#2a6a4a');
+			// o totem e o porta-guarda-chuva por cima de quem passa atrás deles
+			if (this.totemCamada) c.drawImage(this.totemCamada, -OX, 0);
+			// o totem: a telinha brilhando e uma setinha chamando, até pegarmos a senha; depois, o papel saindo
+			var Tt = TOTEM, tela1 = C(Tt.x0 + 0.06, 1.18, Tt.z0), tela2 = C(Tt.x1 - 0.06, 0.88, Tt.z0);
+			if (!this.senha) {
+				c.save(); c.globalCompositeOperation = 'lighter'; c.globalAlpha = 0.25 + 0.25 * Math.sin(t * 5); R(c, tela1[0], tela1[1], tela2[0] - tela1[0], tela2[1] - tela1[1], '#7fe3ff'); c.restore();
+				var st = C((Tt.x0 + Tt.x1) / 2, Tt.h + 0.25, Tt.z0); // (a setinha em cima do totem é desenhada no fim, por cima das cadeiras)
+			} else {
+				var ps2 = Math.min(1, (t - this.senha) / 0.7), fenda = C((Tt.x0 + Tt.x1) / 2, 0.72, Tt.z0 - 0.01), es = 290 / fenda[2];
+				var pw2 = Math.max(4, Math.round(0.14 * es)), ph2 = Math.round(0.2 * es * ps2);
+				R(c, fenda[0] - pw2 / 2, fenda[1], pw2, ph2, '#fbfbf4'); R(c, fenda[0] + pw2 / 2 - 1, fenda[1], 1, ph2, '#d8d8cc');
+				if (ps2 > 0.6) { texto3(c, '011', Math.round(fenda[0] - 5), Math.round(fenda[1] + ph2 * 0.45), 1, '#1a2a7a'); }
+			}
 			// lá fora, pela vitrine: as naves decolando das torres, as luzes piscando e a chuva no vidro
 			if (this.vitrine) {
 				var lf = this.lafora.getContext('2d');
@@ -2307,7 +2311,7 @@
 			// o robô-garçom flutuante servindo café na sala de espera: desliza devagar de um lado para o
 			// outro, para de vez em quando, e leva uma bandeja com duas xícaras fumegando
 			var cic = (t * 0.07) % 2, ida3 = cic < 1, uu = ida3 ? cic : 2 - cic; uu = uu * uu * (3 - 2 * uu);
-			var gxr = 0.9 + uu * 3.4, gzr = 4.15, gyr = 1.45 + Math.sin(t * 2.2) * 0.03, gp2 = C(gxr, gyr, gzr), gs2 = 290 / gp2[2];
+			var gxr = 0.9 + uu * 2.7, gzr = 4.15, gyr = 1.45 + Math.sin(t * 2.2) * 0.03, gp2 = C(gxr, gyr, gzr), gs2 = 290 / gp2[2];
 			var gr2 = Math.max(4, Math.round(0.13 * gs2)), gch2 = C(gxr, 0, gzr);
 			c.save(); c.globalCompositeOperation = 'lighter'; c.globalAlpha = 0.12 + Math.sin(t * 6) * 0.03; c.fillStyle = '#7fe3ff';
 			c.beginPath(); c.moveTo(gp2[0] - gr2 * 0.5, gp2[1] + gr2); c.lineTo(gp2[0] + gr2 * 0.5, gp2[1] + gr2); c.lineTo(gch2[0] + gr2, gch2[1]); c.lineTo(gch2[0] - gr2, gch2[1]); c.fill(); /* o facho do propulsor */
