@@ -925,6 +925,7 @@
 	// Clicar em "Entrar" abre a porta de vidro.
 	var PORTA_F = { x0: 216, x1: 264, y0: 160, y1: 212 };
 	var TELAS = []; // os telões dos prédios (animados a cada quadro)
+	var JANELAS = []; // as janelas com coisas que se mexem (TV, computador, aquário)
 	// uma "letra" estrangeira inventada (5 x 5 pixels, simétrica), para os letreiros
 	function glifo(x, y, cor, semente, esc) {
 		esc = esc || 1;
@@ -936,9 +937,120 @@
 		for (var k = 0; k < n; k++) glifo(x + 1, y + 1 + k * 7, cor, semente + k);
 		for (var g = 0; g < n * 7; g += 2) { mistura(x - 2, y + g, cor, 0.25); mistura(x + 8, y + g, cor, 0.25); }
 	}
+	// uma baleia holográfica (de lado, nadando para a esquerda): corpo comprido com as pregas da
+	// garganta, o olho, a nadadeira peitoral comprida, a cauda em leque; translúcida, com as linhas
+	// de varredura e uma falha de imagem de vez em quando
+	function baleia(c, hx, hy, L, rgb, t, alfa) {
+		if (alfa <= 0) return;
+		var cor = function (a) { return 'rgba(' + rgb[0] + ',' + rgb[1] + ',' + rgb[2] + ',' + (a * alfa) + ')'; };
+		var R0 = L * 0.12, falha = Math.sin(t * 5.3) > 0.96 ? Math.round(Math.sin(t * 40) * 3) : 0, fim = null;
+		for (var i = 0; i < L; i++) {
+			var u = i / L, x = Math.round(hx + i);
+			var r = u < 0.1 ? R0 * (0.7 + 0.3 * u / 0.1) : u < 0.35 ? R0 : R0 * Math.max(0.12, 1 - Math.pow((u - 0.35) / 0.65, 1.3) * 0.9);
+			var cy = hy + Math.sin(t * 1.1 - u * 3.5) * u * u * 5;
+			var y0 = Math.round(cy - r * 0.85), y1 = Math.round(cy + r * 0.8);
+			for (var y = y0; y <= y1; y++) {
+				var borda = y === y0 || y === y1, a = borda ? 0.9 : 0.3;
+				if (!borda && u > 0.06 && u < 0.42 && y > cy + r * 0.15 && (y & 1)) a = 0.45; /* as pregas da garganta */
+				if ((y + Math.floor(t * 12)) % 3 === 0) a += 0.12; /* as linhas de varredura */
+				c.fillStyle = cor(a); c.fillRect(x + (y % 7 < 2 ? falha : 0), y, 1, 1);
+			}
+			if (i === Math.round(L * 0.1)) { c.fillStyle = cor(1); c.fillRect(x, Math.round(cy + r * 0.05), 1, 1); } /* o olho */
+			if (i === Math.round(L * 0.3)) { var aba = Math.sin(t * 1.4) * 2; for (var k = 0; k < L * 0.16; k++) { c.fillStyle = cor(0.55); c.fillRect(x + Math.round(k * 0.8), Math.round(cy + r * 0.8 + k * 0.45 + aba * k / 10), 2, 1); } } /* a nadadeira peitoral */
+			fim = [x, cy];
+		}
+		/* a cauda em leque, abanando */
+		var fl = Math.sin(t * 1.1 - 3.5) * 2, lc = L * 0.13;
+		for (var k2 = 0; k2 < lc; k2++) {
+			var esp = 1 + k2 * 1.1;
+			c.fillStyle = cor(0.6); c.fillRect(fim[0] + k2, Math.round(fim[1] - esp + fl * k2 / lc), 1, 1); c.fillRect(fim[0] + k2, Math.round(fim[1] + esp + fl * k2 / lc), 1, 1);
+			c.fillStyle = cor(0.2); c.fillRect(fim[0] + k2, Math.round(fim[1] - esp + 1 + fl * k2 / lc), 1, Math.max(0, Math.round(esp * 2 - 1)));
+		}
+	}
+	// os carros flutuantes da rua (de lado, sem rodas: deslizam sobre os propulsores, com a luz azul
+	// embaixo). Desenhados virados para a direita; com lado = -1 o desenho espelha (a frente vai para a esquerda)
+	function carroRua(c, modelo, cx, chao, lado, t) {
+		var base = Math.round(chao - 5 + Math.sin(t * 3 + cx * 0.01)), L = modelo.L;
+		function Q(x, y, w, h, cor) { R(c, lado > 0 ? cx + x : cx - x - w, base + y, w, h, cor); }
+		/* a luz azul dos propulsores no asfalto molhado e o facho do farol na frente */
+		c.save(); c.globalCompositeOperation = 'lighter';
+		var gl = c.createRadialGradient(cx, chao, 1, cx, chao, L * 0.6); gl.addColorStop(0, modelo.brilho); gl.addColorStop(1, 'rgba(0,0,0,0)');
+		c.fillStyle = gl; c.save(); c.translate(cx, chao); c.scale(1, 0.12); c.translate(-cx, -chao); c.beginPath(); c.arc(cx, chao, L * 0.6, 0, Math.PI * 2); c.fill(); c.restore();
+		c.globalAlpha = 0.07; c.fillStyle = '#fff8e0'; var fx = cx + lado * L / 2;
+		c.beginPath(); c.moveTo(fx, base - 9); c.lineTo(fx + lado * 60, base - 16); c.lineTo(fx + lado * 60, base + 4); c.fill();
+		c.globalAlpha = 0.25; for (var rf = 2; rf < 12; rf += 2) { R(c, fx - lado * 2, chao + rf, 2, 1, '#fff8e0'); R(c, cx - lado * L / 2, chao + rf, 2, 1, '#ff3a3a'); } /* os reflexos das luzes no chão molhado */
+		c.restore(); c.globalAlpha = 1;
+		modelo.desenho(Q, t, L);
+		if (modelo.texto) texto3(c, modelo.texto, (lado > 0 ? cx - 34 : cx - 16) + 9, base - 19, 1, '#9af0ff'); /* o nome na lateral (sempre de frente para quem lê) */
+	}
+	function sedan(cores) {
+		return { L: 64, brilho: cores.brilho || 'rgba(58,224,255,0.5)', desenho: function (Q, t, L) {
+			Q(-30, -3, 10, 3, '#14141e'); Q(14, -3, 12, 3, '#14141e'); Q(-28, 0, 6, 1, '#3ae0ff'); Q(16, 0, 8, 1, '#3ae0ff'); /* os propulsores */
+			Q(-32, -8, 64, 5, cores.b); Q(-32, -4, 64, 1, cores.d); Q(28, -10, 5, 4, cores.b); Q(-33, -11, 61, 3, cores.b); Q(-31, -12, 56, 1, cores.B);
+			Q(-34, -14, 5, 2, cores.d); Q(-33, -12, 2, 2, cores.d); /* o aerofólio atrás */
+			for (var j = 0; j < 6; j++) Q(-20 + j, -13 - j, 34 - j * 3, 1, j === 5 ? cores.B : '#1a2e48'); /* a cabine de vidro inclinada */
+			Q(-12, -16, 9, 1, '#8ac8ff'); Q(0, -15, 1, 3, cores.d); Q(-2, -11, 1, 6, cores.d);
+			Q(-31, -5, 62, 1, '#3ae0ff'); Q(31, -10, 2, 2, '#ffffff'); Q(29, -10, 2, 1, '#cfe8ff'); Q(-33, -10, 2, 3, '#ff3a3a');
+			if (cores.taxi) { Q(-8, -22, 15, 4, '#ffd36a'); Q(-7, -21, 13, 2, '#1a1418'); for (var tx = 0; tx < 13; tx += 2) Q(-31 + tx * 4.6, -7, 2, 1, '#1a1418'); }
+		} };
+	}
+	var MODELOS = {
+		esporte: sedan({ b: '#c8306a', B: '#ff6aa0', d: '#7a1a40', brilho: 'rgba(255,58,184,0.5)' }),
+		prata: sedan({ b: '#8a90a8', B: '#c8d0e8', d: '#4a5068' }),
+		taxi: sedan({ b: '#e8b030', B: '#ffe08a', d: '#9a7020', taxi: true, brilho: 'rgba(255,211,106,0.45)' }),
+		van: { L: 76, brilho: 'rgba(58,224,255,0.5)', desenho: function (Q, t) {
+			Q(-30, -3, 12, 3, '#14141e'); Q(18, -3, 12, 3, '#14141e'); Q(-28, 0, 8, 1, '#3ae0ff'); Q(20, 0, 8, 1, '#3ae0ff');
+			Q(-38, -26, 58, 23, '#d8dce8'); Q(-38, -26, 58, 1, '#ffffff'); Q(-38, -5, 76, 2, '#8a8ea8');
+			Q(20, -20, 14, 17, '#d8dce8'); for (var j = 0; j < 6; j++) Q(20 + j, -20 + j, 1, 1, '#d8dce8'); Q(26, -18, 10, 7, '#1a2e48'); Q(27, -17, 4, 1, '#8ac8ff'); Q(34, -11, 4, 8, '#d8dce8');
+			Q(-34, -21, 50, 9, '#2a3a6a'); Q(-34, -21, 50, 1, '#3ae0ff'); /* a faixa da transportadora */
+			Q(36, -9, 2, 3, '#ffffff'); Q(-39, -14, 2, 4, '#ff3a3a'); Q(-39, -24, 2, 2, '#ffb030');
+		}, texto: 'ENTREGAS' },
+		policia: { L: 66, brilho: 'rgba(120,140,255,0.5)', desenho: function (Q, t) {
+			Q(-30, -3, 10, 3, '#14141e'); Q(16, -3, 12, 3, '#14141e'); Q(-28, 0, 6, 1, '#7a8aff'); Q(18, 0, 8, 1, '#7a8aff');
+			Q(-33, -11, 66, 8, '#14182e'); Q(-33, -7, 66, 2, '#e8ecf4'); Q(30, -13, 4, 4, '#14182e'); Q(-32, -12, 58, 1, '#3a4268');
+			for (var j = 0; j < 6; j++) Q(-18 + j, -12 - j, 30 - j * 3, 1, j === 5 ? '#3a4268' : '#1a2e48');
+			var pisca = Math.floor(t * 6) % 2; Q(-6, -19, 6, 2, pisca ? '#ff2a3a' : '#3a1a20'); Q(0, -19, 6, 2, pisca ? '#1a2048' : '#3a6aff');
+			Q(32, -10, 2, 2, '#ffffff'); Q(-34, -10, 2, 3, '#ff3a3a');
+		} },
+		moto: { L: 34, brilho: 'rgba(176,90,255,0.5)', desenho: function (Q, t) {
+			Q(-14, -3, 8, 3, '#14141e'); Q(8, -3, 8, 3, '#14141e'); Q(-12, 0, 4, 1, '#b05aff'); Q(10, 0, 4, 1, '#b05aff');
+			Q(-16, -8, 34, 5, '#2a2a3e'); Q(-14, -9, 26, 1, '#5a5e7a'); Q(10, -11, 8, 3, '#2a2a3e'); Q(-16, -6, 34, 1, '#b05aff');
+			/* a piloto de capacete com o visor aceso */
+			Q(-4, -18, 7, 9, '#1a1a2a'); Q(1, -16, 6, 2, '#1a1a2a'); Q(6, -15, 2, 3, '#1a1a2a');
+			Q(-3, -24, 7, 6, '#e8e2d8'); Q(1, -22, 4, 2, '#3ae0ff'); Q(-6, -21, 3, 1, '#ff3ab8');
+			Q(17, -8, 2, 2, '#ffffff'); Q(-17, -7, 2, 2, '#ff3a3a');
+		} }
+	};
+	// as faixas da rua: a de trás vai para a esquerda, a da frente para a direita
+	var FAIXAS = [
+		{ chao: 236, lado: -1, vel: 34, carros: ['taxi', 'policia', 'prata', 'van'] },
+		{ chao: 256, lado: 1, vel: 52, carros: ['esporte', 'moto', 'van', 'taxi', 'prata'] }
+	];
+	// um pedestre de lado (cerca de 26 px, na escala do cozinheiro do lámen), andando com guarda-chuva aceso
+	// ou com a capa de chuva transparente de LED
+	function pedestre(c, gx, gy, lado, t, p) {
+		var f = Math.floor(t * 5 + p.fase) % 4, ab = [2, 0, -2, 0][f], sobe = f % 2 ? 0 : 1;
+		function Q(x, y, w, h, cor) { R(c, lado > 0 ? gx + x : gx - x - w, gy + y - sobe, w, h, cor); }
+		Q(-1 + ab, -9, 2, 9 + sobe, p.calca); Q(-1 - ab, -9, 2, 9 + sobe, p.calca2); Q(-1 + ab, -1 + sobe, 3, 1, '#14141e'); Q(-1 - ab, -1 + sobe, 3, 1, '#14141e'); /* as pernas e os sapatos */
+		Q(-3, -21, 6, 12, p.casaco); Q(-4, -12, 8, 3, p.casaco); Q(-3, -21, 1, 12, p.casaco2); /* o casaco */
+		Q(-2, -26, 5, 5, p.pele); Q(-2, -27, 5, 2, p.cabelo); Q(-3, -26, 2, 4, p.cabelo); Q(2, -24, 1, 1, '#1a1418'); /* a cabeça */
+		if (p.guarda) {
+			Q(2, -19, 2, 6, p.casaco2); Q(3, -32, 1, 14, '#d8d8e8'); /* o braço e o cabo */
+			c.fillStyle = p.guarda; c.beginPath(); c.ellipse(lado > 0 ? gx + 3.5 : gx - 3.5, gy - 32 - sobe, 12, 5, 0, Math.PI, 0); c.fill();
+			Q(-9, -32, 25, 1, p.aro); for (var gt = 0; gt < 3; gt++) { var fg = ((t * 1.6 + gt * 0.33 + p.fase) % 1); if (fg < 0.6) Q(-8 + gt * 11, -31 + fg * 12, 1, 1, 'rgba(184,208,255,0.8)'); }
+		} else {
+			c.save(); c.globalAlpha = 0.35; Q(-5, -28, 10, 20, p.capa); c.restore(); Q(-5, -28, 10, 1, p.capa); Q(-5, -28, 1, 20, p.capa); Q(4, -28, 1, 20, p.capa); Q(-5, -9, 10, 1, p.capa); /* a capa de LED */
+			Q(-3, -25, 1, 2, '#3ae0ff'); /* o fone aceso */
+		}
+	}
+	var PEDESTRES = [
+		{ per: 18, ini: 0, lado: 1, fase: 0, pele: '#d8a888', cabelo: '#1a1418', casaco: '#2a3a4a', casaco2: '#1a2a3a', calca: '#1a1a22', calca2: '#2a2a32', guarda: 'rgba(58,224,255,0.85)', aro: '#9af0ff' },
+		{ per: 22, ini: 8, lado: -1, fase: 1, pele: '#a06a48', cabelo: '#3a2a1a', casaco: '#4a2a4a', casaco2: '#3a1a3a', calca: '#1a1a22', calca2: '#2a2a32', guarda: 'rgba(255,58,184,0.85)', aro: '#ffa0e0' },
+		{ per: 26, ini: 15, lado: 1, fase: 2, pele: '#e8c0a0', cabelo: '#c8b070', casaco: '#3a3a3e', casaco2: '#2a2a2e', calca: '#2a2a3a', calca2: '#3a3a4a', capa: '#ff9ad8' }
+	];
 	CENAS.abertura = {
 		fundo: function () {
-			TELAS = [];
+			TELAS = []; JANELAS = [];
 			var p = pintar(tela0(), function () {
 				var X0 = -OX, X1 = NUCLEO + OX, HORIZ = 212;
 				// o céu: noite carregada, com a neblina iluminada pela cidade (rosa embaixo, azul em cima)
@@ -991,16 +1103,40 @@
 					for (var wy = topo + 6; wy < HORIZ - 66; wy += 14) {
 						if (Math.floor((wy - topo) / 14) % 2 === 1) { ret(x0 + 2, wy + 11, x1 - x0 - 4, 1, '#4a4258'); for (var gx2 = x0 + 4; gx2 < x1 - 4; gx2 += 3) px(gx2, wy + 9, '#3a3448'); } // a sacadinha com grade
 						for (var wx = x0 + 6; wx < x1 - 12; wx += 18) {
-							var r = ruido(wx, wy), acesa = r > 0.45, luz = r > 0.8 ? '#ffd890' : r > 0.65 ? '#c8e8ff' : '#ff9ad8';
+							/* o que tem em cada janela acesa: abajur entre cortinas, gente vendo TV no sofá, estante de
+							   livros, planta, gato no parapeito, alguém no computador, aquário, cozinha e persiana */
+							var r = ruido(wx, wy), acesa = r > 0.45, tipo = Math.floor(ruido(wx, wy + 1) * 9);
+							var luz = (tipo === 1 || tipo === 5) ? '#4a5a9a' : r > 0.8 ? '#ffd890' : r > 0.65 ? '#c8e8ff' : '#ffb8d8';
 							ret(wx - 1, wy - 1, 12, 11, '#0e0c16');
-							ret(wx, wy, 10, 9, acesa ? function (a, b) { return rampa([luz, luz, '#2a2030'], (b - wy) / 12, a, b); } : '#0a0a18');
+							ret(wx, wy, 10, 9, acesa ? function (a, b) { return rampa([luz, luz, '#2a2030'], (b - wy) / 14, a, b); } : '#0a0a18');
 							if (acesa) {
-								var tipo = Math.floor(ruido(wx, wy + 1) * 5);
-								if (tipo === 0) { ret(wx, wy, 4, 9, '#8a3a4a'); ret(wx + 6, wy, 4, 9, '#8a3a4a'); } // cortinas
-								else if (tipo === 1) { elip(wx + 5, wy + 4, 2, 2, '#2a1a24'); ret(wx + 3, wy + 6, 5, 3, '#2a1a24'); } // alguém na janela
-								else if (tipo === 2) { for (var bl = 0; bl < 9; bl += 2) ret(wx, wy + bl, 10, 1, '#3a2a30'); } // persiana
-								else if (tipo === 3) { ret(wx + 2, wy + 6, 6, 3, '#6a3a1e'); px(wx + 3, wy + 4, '#4aa85a'); px(wx + 5, wy + 3, '#3a8a4a'); px(wx + 7, wy + 4, '#4aa85a'); } // vasinho de planta
-								ret(wx + 4, wy, 1, 9, '#1a1624'); // o caixilho
+								if (tipo === 0) { /* o abajur aceso entre as cortinas */
+									ret(wx, wy, 2, 9, '#8a3a4a'); ret(wx + 8, wy, 2, 9, '#8a3a4a'); px(wx + 1, wy + 2, '#6a2a3a'); px(wx + 8, wy + 5, '#6a2a3a');
+									ret(wx + 4, wy + 3, 3, 2, '#fff0b0'); px(wx + 3, wy + 4, '#ffe08a'); px(wx + 7, wy + 4, '#ffe08a'); ret(wx + 5, wy + 5, 1, 2, '#3a2a20'); ret(wx + 3, wy + 7, 5, 2, '#5a3a24');
+								} else if (tipo === 1) { /* a sala de TV: o sofá de costas, duas cabeças e a TV (que pisca, desenhada a cada quadro) */
+									ret(wx + 1, wy + 1, 5, 4, '#14141e'); JANELAS.push({ x: wx + 2, y: wy + 2, tipo: 'tv' });
+									ret(wx, wy + 6, 10, 3, '#5a2a3a'); ret(wx, wy + 6, 10, 1, '#7a3a4a');
+									ret(wx + 2, wy + 4, 2, 2, '#1a1418'); ret(wx + 6, wy + 4, 2, 2, '#3a2418');
+								} else if (tipo === 2) { /* a estante de livros, com lombadas coloridas */
+									for (var pl = 0; pl < 3; pl++) { ret(wx, wy + 2 + pl * 3, 10, 1, '#4a3020'); for (var lv2 = 0; lv2 < 9; lv2++) if (ruido(wx + lv2, wy + pl) > 0.25) ret(wx + lv2, wy + pl * 3, 1, 2, ['#c83a3a', '#3a6ac8', '#e8c46a', '#4aa85a', '#e8e2d8', '#8a4ac8'][Math.floor(ruido(wx + lv2, wy + pl + 9) * 6)]); }
+								} else if (tipo === 3) { /* a costela-de-adão no vaso, com a cortina de lado */
+									ret(wx + 7, wy, 3, 9, '#5a7a8a'); ret(wx + 2, wy + 6, 4, 3, '#b0603a'); ret(wx + 2, wy + 6, 4, 1, '#d0805a');
+									[[1, 2], [2, 1], [3, 3], [4, 0], [5, 2], [6, 4], [2, 4], [4, 4], [3, 1], [1, 4], [5, 5]].forEach(function (f) { px(wx + f[0], wy + f[1], f[0] % 2 ? '#3a8a4a' : '#5ab86a'); });
+								} else if (tipo === 4) { /* o gato sentado no parapeito, de perfil */
+									ret(wx + 3, wy + 4, 4, 5, '#1a1418'); ret(wx + 4, wy + 1, 3, 3, '#1a1418'); px(wx + 4, wy, '#1a1418'); px(wx + 6, wy, '#1a1418'); px(wx + 6, wy + 2, '#c8ff6a');
+									px(wx + 2, wy + 8, '#1a1418'); px(wx + 1, wy + 7, '#1a1418'); px(wx + 1, wy + 6, '#1a1418');
+								} else if (tipo === 5) { /* alguém no computador, de costas, com o monitor brilhando */
+									ret(wx + 5, wy + 1, 4, 3, '#9ad8ff'); ret(wx + 6, wy + 4, 2, 1, '#3a3a4a'); ret(wx, wy + 5, 10, 1, '#5a3a24');
+									ret(wx + 2, wy + 2, 3, 3, '#2a1a14'); ret(wx + 1, wy + 5, 5, 4, '#3a3a5a'); JANELAS.push({ x: wx + 5, y: wy + 1, tipo: 'pc' });
+								} else if (tipo === 6) { /* o aquário em cima do móvel (os peixinhos nadam a cada quadro) */
+									ret(wx + 1, wy + 3, 8, 4, '#2a7ab8'); ret(wx + 1, wy + 3, 8, 1, '#8ad0ff'); px(wx + 2, wy + 6, '#4aa85a'); px(wx + 2, wy + 5, '#4aa85a'); px(wx + 7, wy + 6, '#e8c46a');
+									ret(wx, wy + 7, 10, 2, '#5a3a24'); JANELAS.push({ x: wx + 1, y: wy + 4, tipo: 'aquario' });
+								} else if (tipo === 7) { /* a cozinha: a luminária pendurada, a prateleira com potes e as panelas */
+									ret(wx + 5, wy, 1, 2, '#3a3a4a'); ret(wx + 4, wy + 2, 3, 1, '#fff0b0'); ret(wx, wy + 4, 4, 1, '#5a3a24'); px(wx + 1, wy + 3, '#c83a3a'); px(wx + 3, wy + 3, '#e8e2d8');
+									px(wx + 7, wy + 4, '#8a8e98'); ret(wx + 7, wy + 5, 2, 2, '#5a5e6a'); px(wx + 8, wy + 4, '#8a8e98'); ret(wx, wy + 7, 10, 2, '#e8e2d8');
+								} else { /* a persiana meio aberta */
+									for (var bl = 0; bl < 5; bl += 1) ret(wx, wy + bl, 10, 1, bl % 2 ? '#d8c8b0' : '#b8a890');
+								}
 								mistura(wx + 5, wy + 12, luz, 0.25); mistura(wx + 4, wy + 13, luz, 0.15);
 							}
 							ret(wx - 1, wy + 9, 12, 1, '#4a4258'); // o peitoril
@@ -1114,11 +1250,6 @@
 				for (var fx = 150; fx < 340; fx += 16) ret(fx, 238, 9, 30, function (x2, y2) { mistura(x2, y2, '#d8d8e8', 0.28); return null; });
 				elip(420, 250, 12, 3, '#0a0a12'); for (var gr = -10; gr <= 10; gr += 3) ret(420 + gr, 248, 1, 4, '#2a2a3a');
 				letras('BIANCA CARDADOR', 360, 262, 1, '#5a5440'); // (a assinatura da autora, pintada no asfalto)
-				// o carro flutuante estacionado à esquerda, com a luz azul embaixo
-				elip(70, 252, 44, 5, function (x2, y2, u, v) { mistura(x2, y2, '#3ae0ff', 0.35 * (1 - u * u - v * v)); return null; });
-				poli([[30, 238], [108, 238], [116, 246], [24, 246]], function (x2, y2) { return rampa(['#5a5e7a', '#3a3e5a', '#262a40'], (y2 - 238) / 8, x2, y2); });
-				poli([[46, 230], [92, 230], [102, 238], [38, 238]], function (x2, y2) { return rampa(['#2a4a6a', '#1a2e48', '#101c30'], (x2 - 38) / 64, x2, y2); });
-				ret(52, 232, 14, 1, '#8ac8ff'); ret(110, 241, 5, 2, '#ff3a3a'); ret(25, 241, 5, 2, '#ffffff'); ret(30, 246, 86, 1, '#3ae0ff');
 			});
 			var k = paraCanvas(p), g = k.getContext('2d');
 			if (simbImg) { g.imageSmoothingEnabled = false; g.drawImage(simbImg, OX + 156, 113, 32, 32); } // o símbolo do lado do nome, no tamanho certo (nítido)
@@ -1130,10 +1261,8 @@
 				if (tc >= CINE_FIM) mostrarEntrar(this);
 				else {
 					var camC = cameraCine(tc);
-					// o corte suave: escurece no fim de cada plano e clareia no começo do seguinte
-					if (camC.plano !== this.planoAtual) { this.planoAtual = camC.plano; escurecer(0); }
-					else if (camC.resta < 0.45 && camC.plano < PLANOS.length - 1) escurecer(1);
-					aplicarCine(camC);
+					/* o primeiro plano entra direto; os outros entram com a fusão (feita no fim do quadro, já desenhado) */
+					if (camC.plano !== this.planoAtual) { if (this.planoAtual < 0) aplicarCine(camC); else this.corte = camC; this.planoAtual = camC.plano; }
 				}
 			}
 			// os telões dos prédios: cada um com seu anúncio mexendo
@@ -1196,6 +1325,12 @@
 				R(c, vx - 4 * esc, vy - 1, 8 * esc, 2 * esc, '#2a2a3e'); R(c, vx - 2 * esc, vy - 2, 4 * esc, 1, '#5a5e7a');
 				R(c, vx + ida * 4 * esc, vy, 1, 1, '#ffffff'); R(c, vx - ida * 4 * esc, vy, 1, 1, '#ff3a3a');
 			}
+			// as janelas dos apartamentos: a TV piscando de cor, o monitor rolando e os peixinhos do aquário
+			JANELAS.forEach(function (jn, ij) {
+				if (jn.tipo === 'tv') { var cena2 = Math.floor(t * 0.8 + ij) % 4; R(c, jn.x, jn.y, 3, 2, ['#5ab8ff', '#ff8a5a', '#8aff9a', '#ffe08a'][cena2]); if (Math.sin(t * 9 + ij) > 0.6) R(c, jn.x, jn.y, 3, 2, 'rgba(255,255,255,0.4)'); }
+				else if (jn.tipo === 'pc') { R(c, jn.x, jn.y, 4, 3, '#9ad8ff'); R(c, jn.x + 1, jn.y + (Math.floor(t * 2 + ij) % 3), 2, 1, '#2a4a7a'); }
+				else { P(c, jn.x + 1 + Math.round((Math.sin(t * 0.9 + ij) + 1) * 2.5), jn.y + 1, '#ff8a3a'); P(c, jn.x + 1 + Math.round((Math.cos(t * 0.7 + ij) + 1) * 2.5), jn.y + 2, '#ffe08a'); }
+			});
 			// os detalhes pequenos da rua (cada plano da câmera tem alguma coisa se mexendo de perto)
 			// as luzes vermelhas das antenas no alto dos prédios, piscando devagar (aviso para os carros voadores)
 			[[-OX + (128 + OX) * 0.7, 59, 0], [352 + (NUCLEO + OX - 352) * 0.7, 69, 1.1]].forEach(function (an) {
@@ -1240,21 +1375,15 @@
 			R(c, rbx - 4, 214, 9, 4, '#c8ccd8'); R(c, rbx - 3, 213, 7, 1, '#e8ecf4'); R(c, rbx - 4, 216, 9, 1, '#3ae0ff'); R(c, rbx - 3, 218, 2, 1, '#2a2a3a'); R(c, rbx + 2, 218, 2, 1, '#2a2a3a');
 			P(c, rbx + rdir * 5, 218 - (Math.floor(t * 12) % 2), '#a8acc4'); /* a escovinha girando */
 			if ((t % 1) < 0.5) P(c, rbx, 212, '#ffd36a');
-			// as carpas holográficas nadando no ar na frente da agência (um anúncio antigo, meio falhado)
-			c.save(); c.globalCompositeOperation = 'lighter';
-			[[0, '#7fe3ff'], [Math.PI, '#ff9ad8']].forEach(function (kf) {
-				c.globalAlpha = (Math.sin(t * 23 + kf[0]) > 0.92 ? 0.25 : 0.55);
-				var cabeca = null;
-				for (var sg = 9; sg >= 0; sg--) {
-					var aa = t * 0.2 + kf[0] - sg * 0.017, kx = 240 + Math.sin(aa) * 98, ky = 66 + Math.sin(aa * 2) * 20 + Math.sin(t * 3 - sg * 0.6) * sg * 0.15;
-					var lw = [3, 4, 5, 5, 5, 4, 3, 2, 1, 1][sg];
-					if (sg === 9) { /* o rabo em leque, abanando */ var ab = Math.round(Math.sin(t * 5) * 1.5); R(c, kx - 1, ky - 3 + ab, 2, 2, kf[1]); R(c, kx - 1, ky + 1 + ab, 2, 2, kf[1]); }
-					R(c, kx - lw / 2, ky - lw / 2, lw, lw, kf[1]);
-					if (sg === 3) { R(c, kx - 1, ky - lw / 2 - 1, 2, 1, kf[1]); R(c, kx - 1, ky + lw / 2, 2, 1, kf[1]); } /* as barbatanas */
-					if (sg === 0) cabeca = [kx, ky];
-				}
-				P(c, cabeca[0] + (Math.cos(t * 0.2 + kf[0]) > 0 ? 1 : -1), cabeca[1] - 1, '#ffffff'); /* o olhinho */
-			});
+			// as baleias holográficas (mãe e filhote) nadando devagar no céu, à direita da agência: entram
+			// pela direita, vão para a esquerda e se desfazem antes de chegar no prédio da agência; somem
+			// atrás dos telões da Andarilha, para nunca ficarem na frente dos anúncios dela
+			c.save();
+			c.beginPath(); c.rect(-OX, 0, W, H); TELAS.forEach(function (tl) { if (tl.tipo === 1 || tl.tipo === 'agencia') c.rect(tl.x - 2, tl.y - 2, tl.w + 4, tl.h + 4); }); c.clip('evenodd');
+			c.globalCompositeOperation = 'lighter';
+			var ciclo2 = (t * 7 + 100) % 300, bx0 = NUCLEO + OX + 30 - ciclo2;
+			baleia(c, bx0, 40 + Math.sin(t * 0.3) * 4, 112, [110, 215, 255], t, suave((bx0 - 350) / 40));
+			baleia(c, bx0 + 78, 70 + Math.sin(t * 0.3 + 1) * 3, 58, [200, 160, 255], t + 1.3, suave((bx0 + 78 - 350) / 40));
 			c.restore(); c.globalAlpha = 1;
 			// o relâmpago lá longe, de vez em quando: o céu e a rua inteira clareiam duas vezes, rapidinho
 			var rel = t % 17;
@@ -1275,14 +1404,11 @@
 				var lxv = 60 + Math.sin(v + t) * 10, lyv = 186 - kv * 40; c.globalAlpha = (1 - kv) * 0.2; R(c, lxv, lyv, 2 + kv * 3, 2, '#ffe0c8');
 			}
 			c.globalAlpha = 1;
-			// gente passando na calçada com guarda-chuvas de cabo aceso
-			for (var pe = 0; pe < 2; pe++) {
-				var perp = 16 + pe * 5, up = ((t + pe * 8) % perp) / perp, dir = pe ? -1 : 1, gx = dir > 0 ? -OX - 10 + up * (W + 20) : NUCLEO + OX + 10 - up * (W + 20), gy = 214, passo = Math.floor(t * 4 + pe) % 2;
-				R(c, gx - 2, gy - 14, 4, 9, pe ? '#3a2a4a' : '#2a3a4a'); R(c, gx - 2, gy - 5, 1, 5 - passo, '#1a1a22'); R(c, gx + 1, gy - 5, 1, 4 + passo, '#1a1a22');
-				R(c, gx - 1, gy - 17, 3, 3, '#d8a888');
-				c.fillStyle = pe ? 'rgba(255,58,184,0.85)' : 'rgba(58,224,255,0.85)'; c.beginPath(); c.ellipse(gx, gy - 19, 8, 3, 0, Math.PI, 0); c.fill();
-				R(c, gx, gy - 19, 1, 6, '#d8d8e8');
-			}
+			// gente passando na calçada (guarda-chuvas de cabo aceso, capa de chuva de LED)
+			PEDESTRES.forEach(function (pd) {
+				var up = ((t + pd.ini) % pd.per) / pd.per, gx = pd.lado > 0 ? -OX - 14 + up * (W + 28) : NUCLEO + OX + 14 - up * (W + 28);
+				pedestre(c, gx, 220, pd.lado, t, pd);
+			});
 			// a porta de vidro: duas folhas que deslizam quando o piloto entra
 			var abre = this.abrindo ? Math.min(1, (performance.now() - this.abrindo) / 800) : 0, e = abre * abre * (3 - 2 * abre);
 			var meio = (PORTA_F.x0 + PORTA_F.x1) / 2, larg = (PORTA_F.x1 - PORTA_F.x0) / 2, desl = Math.round(e * larg);
@@ -1297,6 +1423,14 @@
 			c.restore();
 			c.globalAlpha = 0.1 + e * 0.3; c.fillStyle = '#ffe8b0';
 			c.beginPath(); c.moveTo(PORTA_F.x0, PORTA_F.y1); c.lineTo(PORTA_F.x1, PORTA_F.y1); c.lineTo(PORTA_F.x1 + 24, H); c.lineTo(PORTA_F.x0 - 24, H); c.fill(); c.globalAlpha = 1;
+			// os carros flutuantes passando nas duas faixas da rua
+			FAIXAS.forEach(function (fx2) {
+				var vao = (W + 260) / fx2.carros.length;
+				fx2.carros.forEach(function (nome, ic) {
+					var pos = (t * fx2.vel + ic * vao) % (W + 260), cxr = fx2.lado > 0 ? -OX - 130 + pos : NUCLEO + OX + 130 - pos, m = MODELOS[nome];
+					carroRua(c, m, Math.round(cxr), fx2.chao, fx2.lado, t + ic);
+				});
+			});
 			// a chuva: riscos finos caindo na diagonal, e as gotas respingando nas poças
 			for (var gch = 0; gch < 140; gch++) {
 				var semente = gch * 13.7, gxx = ((ruido(gch, 1) * (W + 60) + t * 40) % (W + 60)) - OX - 30, gyy = (ruido(gch, 2) * 300 + t * (220 + ruido(gch, 3) * 80)) % 300 - 20;
@@ -1307,9 +1441,11 @@
 				c.globalAlpha = (1 - ciclo) * 0.5; c.strokeStyle = '#b8d0ff'; c.beginPath(); c.ellipse(spx, spy, 1 + ciclo * 5, 0.5 + ciclo * 1.5, 0, 0, Math.PI * 2); c.stroke();
 			}
 			c.globalAlpha = 1;
+			// a troca de plano da apresentação (aqui no fim, com o quadro inteiro já desenhado para a fusão)
+			if (this.corte) { fundir(); aplicarCine(this.corte); this.corte = null; }
 		},
 		entrar: function () {
-			var cena0 = this; cena0.abrindo = 0; cena0.cine = 0; cena0.mostrou = false; cena0.planoAtual = -1;
+			var cena0 = this; cena0.abrindo = 0; cena0.cine = 0; cena0.mostrou = false; cena0.planoAtual = -1; cena0.corte = null;
 			// antes de tudo, os créditos na tela preta ("feito por Bianca Cardador"), que somem devagar;
 			// depois, um toque para começar (é ele que libera o som no navegador)
 			// (os créditos estão ocultos por enquanto, a pedido da Bianca: voltam no fim do projeto;
@@ -1339,42 +1475,37 @@
 			}
 		}
 	};
-	// o passeio da câmera pela rua: cada plano é um movimento contínuo e lento por alguns pontos
-	// ([fração do plano, x, y, zoom], com x e y no miolo: o ponto que fica no centro da tela).
-	// Entre um plano e outro, um corte suave (a tela escurece e volta já no plano seguinte).
-	// A câmera desliza numa curva (sem quinas), o zoom anda em escala logarítmica (aproximar
-	// de 1x para 2x parece tão rápido quanto de 2x para 4x) e ela "respira" de leve, como na mão.
+	// a apresentação da rua: uma sequência de planos parados (a câmera não se mexe), ligados por
+	// fusões lentas (o plano que sai vai sumindo por cima do que entra). Cada plano mostra um
+	// pedaço da vida nessa cidade do futuro: [duração, x, y, zoom], com x e y no miolo (o centro da tela).
 	var PLANOS = [
-		/* o telão da gueixa: começa colado no rosto dela e desce devagar até a chuva na frente */
-		{ dur: 6.4, pts: [[0, 60, 22, 4.6], [0.55, 64, 36, 3.9], [1, 70, 52, 3.3]] },
-		/* o bar de lámen: um travelling da esquerda para a direita, na altura do balcão */
-		{ dur: 4.8, pts: [[0, 36, 166, 3.1], [0.5, 62, 162, 2.95], [1, 92, 166, 2.8]] },
-		/* a farmácia: o travelling volta, da direita para a esquerda, passando pelas máquinas */
-		{ dur: 4.6, pts: [[0, 446, 192, 3.0], [0.5, 420, 186, 2.85], [1, 394, 180, 2.7]] },
-		/* o grande final, num plano só: a grua desce do telão da agência, passa pelo letreiro,
-		   chega na porta e então recua, devagarinho, até mostrar a rua inteira */
-		{ dur: 10.5, pts: [[0, 240, 50, 3.1], [0.22, 240, 74, 2.7], [0.42, 246, 126, 2.5], [0.58, 242, 168, 2.6], [0.78, 240, 148, 1.7], [1, 240, 135, 1]] }
+		[4.6, 66, 40, 3.4],    /* o telão da gueixa tomando o chá Hoshi, com a chuva na frente */
+		[4.6, 452, 50, 2.3],   /* o céu da cidade: as baleias holográficas, as torres e os carros voadores */
+		[4.2, 24, 116, 3.5],   /* as janelas dos apartamentos (gente vendo TV, o gato, o aquário...) */
+		[4.4, 66, 168, 3.0],   /* o bar de lámen com o cozinheiro */
+		[3.8, 124, 202, 5.0],  /* o gato preto no lixo, com as gotas pingando do toldo */
+		[4.4, 120, 218, 2.6],  /* a rua: os carros passando e as poças refletindo os neons */
+		[4.2, 410, 186, 2.8],  /* a farmácia, as máquinas e o robozinho de limpeza */
+		[4.4, 240, 66, 2.8],   /* o telão da agência */
+		[4.2, 240, 166, 2.3],  /* o letreiro dourado e a porta */
+		[5.2, 240, 135, 1]     /* a rua inteira */
 	];
-	var CINE_FIM = PLANOS.reduce(function (s2, p) { return s2 + p.dur; }, 0);
-	function catmull(a, b, c2, d, s) { return 0.5 * (2 * b + (c2 - a) * s + (2 * a - 5 * b + 4 * c2 - d) * s * s + (3 * b - a - 3 * c2 + d) * s * s * s); }
+	var FUSAO = 1.6; /* segundos da fusão entre um plano e outro */
+	var CINE_FIM = PLANOS.reduce(function (s2, p) { return s2 + p[0]; }, 0);
 	function cameraCine(t) {
 		var ini = 0, i = 0;
-		while (i < PLANOS.length - 1 && t > ini + PLANOS[i].dur) { ini += PLANOS[i].dur; i++; }
-		var p = PLANOS[i], u = Math.max(0, Math.min(1, (t - ini) / p.dur));
-		/* sai devagar e chega devagar, mas nunca para no meio */
-		u = (0.5 - Math.cos(u * Math.PI) / 2) * 0.75 + u * 0.25;
-		var pts = p.pts, k = 0;
-		while (k < pts.length - 2 && u > pts[k + 1][0]) k++;
-		var s = (u - pts[k][0]) / (pts[k + 1][0] - pts[k][0] || 1);
-		var A = pts[Math.max(0, k - 1)], B = pts[k], C = pts[k + 1], D = pts[Math.min(pts.length - 1, k + 2)];
-		var z = Math.exp(catmull(Math.log(A[3]), Math.log(B[3]), Math.log(C[3]), Math.log(D[3]), s));
-		/* a respiração da câmera na mão: some no fim, quando a rua inteira aparece */
-		var mao = (1 - suave((t - CINE_FIM + 2) / 2)) * 0.9 / Math.sqrt(z);
-		return {
-			x: catmull(A[1], B[1], C[1], D[1], s) + (Math.sin(t * 0.83) * 0.6 + Math.sin(t * 1.71 + 1.3) * 0.4) * mao,
-			y: catmull(A[2], B[2], C[2], D[2], s) + (Math.sin(t * 0.67 + 2.1) * 0.6 + Math.sin(t * 1.37) * 0.4) * mao,
-			z: z, plano: i, resta: ini + p.dur - t
-		};
+		while (i < PLANOS.length - 1 && t > ini + PLANOS[i][0]) { ini += PLANOS[i][0]; i++; }
+		return { x: PLANOS[i][1], y: PLANOS[i][2], z: PLANOS[i][3], plano: i };
+	}
+	// a fusão: uma cópia do quadro que sai fica por cima e vai sumindo devagar
+	function fundir() {
+		var f = document.createElement('canvas'); f.width = tela.width; f.height = tela.height;
+		f.getContext('2d').drawImage(tela, 0, 0);
+		f.className = 'emb-tela'; f.style.transformOrigin = tela.style.transformOrigin; f.style.transform = tela.style.transform;
+		f.style.pointerEvents = 'none'; f.style.transition = 'opacity ' + FUSAO + 's ease-in-out';
+		tela.parentNode.insertBefore(f, tela.nextSibling);
+		requestAnimationFrame(function () { requestAnimationFrame(function () { f.style.opacity = 0; }); });
+		setTimeout(function () { f.remove(); }, FUSAO * 1000 + 200);
 	}
 	function aplicarCine(cam) {
 		var cw = palco.clientWidth, ch = palco.clientHeight, k = cw / W, z = cam.z;
@@ -1466,7 +1597,7 @@
 		// a faixa da propaganda embaixo, com o texto correndo (é um anúncio de chá)
 		R(c, x, y + h - 9, w, 9, '#1a0a14'); R(c, x, y + h - 9, w, 1, '#e8c46a');
 		c.save(); c.beginPath(); c.rect(x, y + h - 8, w, 8); c.clip();
-		var msg = 'CHÁ DE NEBULOSA · SÓ NA ANDARILHA · ', passo = msg.length * 4;
+		var msg = 'CHÁ HOSHI · O CHÁ DAS ESTRELAS · ', passo = msg.length * 4;
 		texto3(c, msg + msg, x + 2 - (Math.floor(t * 14) % passo), y + h - 7, 1, '#ffd36a');
 		c.restore();
 		// as linhas de tela e um brilho que passa
