@@ -945,33 +945,33 @@
 		for (var g = 0; g < n * 7; g += 2) { mistura(x - 2, y + g, cor, 0.25); mistura(x + 8, y + g, cor, 0.25); }
 	}
 	// uma baleia holográfica (de lado, nadando para a esquerda): corpo comprido com as pregas da
-	// garganta, o olho, a nadadeira peitoral comprida, a cauda em leque; translúcida, com as linhas
-	// de varredura e uma falha de imagem de vez em quando
+	// garganta, o olho, a nadadeira peitoral comprida, a cauda em leque; translúcida, com uma faixa de
+	// varredura descendo devagar
 	function baleia(c, hx, hy, L, rgb, t, alfa) {
 		if (alfa <= 0) return;
+		/* (desenhada em posições quebradas, sem arredondar: o corpo desliza liso em vez de pular de pixel em pixel) */
 		var cor = function (a) { return 'rgba(' + rgb[0] + ',' + rgb[1] + ',' + rgb[2] + ',' + (a * alfa) + ')'; };
-		var R0 = L * 0.12, falha = Math.sin(t * 5.3) > 0.96 ? Math.round(Math.sin(t * 40) * 3) : 0, fim = null;
-		for (var i = 0; i < L; i++) {
-			var u = i / L, x = Math.round(hx + i);
+		var R0 = L * 0.12, fim = null, onda = t * 0.9;
+		for (var i = 0; i < L; i += 0.5) {
+			var u = i / L, x = hx + i;
 			var r = u < 0.1 ? R0 * (0.7 + 0.3 * u / 0.1) : u < 0.35 ? R0 : R0 * Math.max(0.12, 1 - Math.pow((u - 0.35) / 0.65, 1.3) * 0.9);
-			var cy = hy + Math.sin(t * 1.1 - u * 3.5) * u * u * 5;
-			var y0 = Math.round(cy - r * 0.85), y1 = Math.round(cy + r * 0.8);
-			for (var y = y0; y <= y1; y++) {
-				var borda = y === y0 || y === y1, a = borda ? 0.9 : 0.3;
-				if (!borda && u > 0.06 && u < 0.42 && y > cy + r * 0.15 && (y & 1)) a = 0.45; /* as pregas da garganta */
-				if ((y + Math.floor(t * 12)) % 3 === 0) a += 0.12; /* as linhas de varredura */
-				c.fillStyle = cor(a); c.fillRect(x + (y % 7 < 2 ? falha : 0), y, 1, 1);
-			}
-			if (i === Math.round(L * 0.1)) { c.fillStyle = cor(1); c.fillRect(x, Math.round(cy + r * 0.05), 1, 1); } /* o olho */
-			if (i === Math.round(L * 0.3)) { var aba = Math.sin(t * 1.4) * 2; for (var k = 0; k < L * 0.16; k++) { c.fillStyle = cor(0.55); c.fillRect(x + Math.round(k * 0.8), Math.round(cy + r * 0.8 + k * 0.45 + aba * k / 10), 2, 1); } } /* a nadadeira peitoral */
+			var cy = hy + Math.sin(onda - u * 3.2) * u * u * 5, y0 = cy - r * 0.85, y1 = cy + r * 0.8;
+			c.fillStyle = cor(0.15); c.fillRect(x, y0, 0.5, y1 - y0); /* o corpo translúcido */
+			c.fillStyle = cor(0.45); c.fillRect(x, y0, 0.5, 1); c.fillRect(x, y1 - 1, 0.5, 1); /* o contorno aceso */
+			if (u > 0.06 && u < 0.42) { c.fillStyle = cor(0.22); for (var pg = cy + r * 0.2; pg < y1 - 1.5; pg += 2) c.fillRect(x, pg, 0.5, 1); } /* as pregas da garganta */
+			if (Math.abs(i - L * 0.1) < 0.25) { c.fillStyle = cor(1); c.fillRect(x, cy + r * 0.05 - 0.5, 1, 1); } /* o olho */
+			if (Math.abs(i - L * 0.3) < 0.25) { var aba = Math.sin(onda * 1.2) * 2; c.fillStyle = cor(0.45); for (var k = 0; k < L * 0.16; k += 0.5) c.fillRect(x + k * 0.8, cy + r * 0.8 + k * 0.45 + aba * k / 10, 1.5, 1); } /* a nadadeira peitoral */
 			fim = [x, cy];
 		}
-		/* a cauda em leque, abanando */
-		var fl = Math.sin(t * 1.1 - 3.5) * 2, lc = L * 0.13;
-		for (var k2 = 0; k2 < lc; k2++) {
-			var esp = 1 + k2 * 1.1;
-			c.fillStyle = cor(0.6); c.fillRect(fim[0] + k2, Math.round(fim[1] - esp + fl * k2 / lc), 1, 1); c.fillRect(fim[0] + k2, Math.round(fim[1] + esp + fl * k2 / lc), 1, 1);
-			c.fillStyle = cor(0.2); c.fillRect(fim[0] + k2, Math.round(fim[1] - esp + 1 + fl * k2 / lc), 1, Math.max(0, Math.round(esp * 2 - 1)));
+		/* uma faixa de luz descendo devagar pelo corpo (a varredura do holograma) */
+		var varre = ((t * 0.35) % 1.4) - 0.2;
+		c.fillStyle = cor(0.18); c.fillRect(hx, hy - R0 + varre * R0 * 2, L * 0.75, 1.5);
+		/* a cauda em leque, abanando no mesmo ritmo da onda do corpo */
+		var fl = Math.sin(onda - 3.2) * 2.5, lc = L * 0.13;
+		for (var k2 = 0; k2 < lc; k2 += 0.5) {
+			var esp = 1 + k2 * 1.1, desl = fl * k2 / lc;
+			c.fillStyle = cor(0.45); c.fillRect(fim[0] + k2, fim[1] - esp + desl, 0.5, 1); c.fillRect(fim[0] + k2, fim[1] + esp + desl, 0.5, 1);
+			c.fillStyle = cor(0.15); c.fillRect(fim[0] + k2, fim[1] - esp + 1 + desl, 0.5, Math.max(0, esp * 2 - 1));
 		}
 	}
 	// os carros flutuantes da rua (de lado, sem rodas: deslizam sobre os propulsores, com a luz azul
@@ -1412,7 +1412,7 @@
 			c.save();
 			c.beginPath(); c.rect(-OX, 0, W, H); TELAS.forEach(function (tl) { if (tl.tipo === 1 || tl.tipo === 'agencia') c.rect(tl.x - 2, tl.y - 2, tl.w + 4, tl.h + 4); }); c.clip('evenodd');
 			c.globalCompositeOperation = 'lighter';
-			var ciclo2 = (t * 7 + 100) % 300, bx0 = NUCLEO + OX + 30 - ciclo2;
+			var ciclo2 = (t * 6 + 100) % 300, bx0 = NUCLEO + OX + 30 - ciclo2;
 			baleia(c, bx0, 40 + Math.sin(t * 0.3) * 4, 112, [110, 215, 255], t, suave((bx0 - 350) / 40));
 			baleia(c, bx0 + 78, 70 + Math.sin(t * 0.3 + 1) * 3, 58, [200, 160, 255], t + 1.3, suave((bx0 + 78 - 350) / 40));
 			c.restore(); c.globalAlpha = 1;
@@ -1493,6 +1493,8 @@
 			}, calmo || !CREDITOS ? 0 : 5000);
 			function comecar() {
 				iniciarAudio();
+				/* o primeiro plano começa com a gueixa normal, mostra o gole e termina no sorriso */
+				GUEIXA_DESL = (performance.now() - inicioCena) / 1000 - 2.0;
 				if (audio && audio.state === 'suspended') audio.resume();
 				ligarAmbienteChuva();
 				limpar(); escuro.style.transition = 'opacity ' + ESCURO_CINE + 's ease-in-out'; aplicarCine(cameraCine(0)); escurecer(0);
@@ -1508,7 +1510,7 @@
 	// cortes suaves e lentos (a tela escurece até o preto e volta já no plano seguinte). Cada plano mostra um
 	// pedaço da vida nessa cidade do futuro: [duração, x, y, zoom], com x e y no miolo (o centro da tela).
 	var PLANOS = [
-		[4.6, 66, 40, 3.4],    /* o telão da gueixa tomando o chá Hoshi, com a chuva na frente */
+		[7.8, 66, 40, 3.4],    /* o telão da gueixa: normal, depois o gole do chá Hoshi e o sorriso, com a chuva na frente */
 		[4.6, 452, 50, 2.3],   /* o céu da cidade: as baleias holográficas, as torres e os carros voadores */
 		[4.2, 24, 116, 3.5],   /* as janelas dos apartamentos (gente vendo TV, o gato, o aquário...) */
 		[4.4, 66, 168, 3.0],   /* o bar de lámen com o cozinheiro */
@@ -1542,8 +1544,9 @@
 	}
 	// o telão gigante da gueixa (uma homenagem aos anúncios de Blade Runner): penteado alto com grampos
 	// dourados e flores, rosto claro, lábios vermelhos, quimono vermelho; ela pisca, sorri e toma chá
+	var GUEIXA_DESL = 0; /* acerta o relógio da gueixa para o primeiro plano da apresentação pegar o ciclo inteiro */
 	function telaoGueixa(c, tl, t) {
-		var x = tl.x, y = tl.y, w = tl.w, h = tl.h, cx = x + w / 2, ciclo = t % 9, levanta = ciclo > 5.1 && ciclo < 6.9, sorri = ciclo > 7.6 && ciclo < 8.9; // (levanta = o gole, com a tigela na boca; sorri = o "hum!" depois)
+		var x = tl.x, y = tl.y, w = tl.w, h = tl.h, cx = x + w / 2, ciclo = (((t - GUEIXA_DESL) % 9) + 9) % 9, levanta = ciclo > 5.1 && ciclo < 6.9, sorri = ciclo > 7.6 && ciclo < 8.9; // (levanta = o gole, com a tigela na boca; sorri = o "hum!" depois)
 		// (o fundo: céu azul-noite com um grande sol rosado atrás dela, para o quimono vermelho aparecer)
 		var fundo = c.createLinearGradient(0, y, 0, y + h); fundo.addColorStop(0, '#0e1a4a'); fundo.addColorStop(1, '#2a3a7a'); c.fillStyle = fundo; c.fillRect(x, y, w, h);
 		c.fillStyle = '#ff9ab8'; c.beginPath(); c.arc(cx, y + 36, 30, 0, Math.PI * 2); c.fill();
