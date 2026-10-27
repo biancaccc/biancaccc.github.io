@@ -1376,6 +1376,11 @@
 			if ((t % 5) > 0.15) { P(c, 131, 196, '#c8ff6a'); P(c, 133, 196, '#c8ff6a'); }
 			for (var rb = 0; rb < 6; rb++) P(c, 125 - Math.round(Math.sin(rb * 0.5) * 2), 203 - rb + Math.round(Math.sin(t * 2.4 + rb * 0.6) * rb * 0.4), '#0c0a12');
 			// o cozinheiro mexendo a panela com a concha
+			/* o rosto do cozinheiro: os olhinhos (que piscam e olham para a panela de vez em quando) e o sorriso */
+			var olhaPanela = (t % 6) > 3.5 ? 1 : 0;
+			if ((t % 4.3) > 0.15) { P(c, 56 + olhaPanela, 167 + olhaPanela, '#1a1418'); P(c, 60 + olhaPanela, 167 + olhaPanela, '#1a1418'); }
+			else { P(c, 56 + olhaPanela, 168, '#8a5a3a'); P(c, 60 + olhaPanela, 168, '#8a5a3a'); }
+			P(c, 57, 170, '#a0603a'); P(c, 58, 170, '#a0603a'); P(c, 59, 170, '#a0603a');
 			var conc = Math.sin(t * 2.6) * 1.5;
 			R(c, 63, 176, 5, 2, '#f2eee8'); P(c, 68, 177, '#d8a070'); linhaGrossa(c, [69, 177], [73, 180 + conc], 1, '#a8acb8'); R(c, 72, 181 + conc, 3, 2, '#c8ccd8');
 			// a cliente do banquinho: a cabeça abaixa de vez em quando para comer, e o vapor da tigela sobe
@@ -1430,11 +1435,6 @@
 				var lxv = 60 + Math.sin(v + t) * 10, lyv = 186 - kv * 40; c.globalAlpha = (1 - kv) * 0.2; R(c, lxv, lyv, 2 + kv * 3, 2, '#ffe0c8');
 			}
 			c.globalAlpha = 1;
-			// gente passando na calçada (guarda-chuvas de cabo aceso, capa de chuva de LED)
-			PEDESTRES.forEach(function (pd) {
-				var up = ((t + pd.ini) % pd.per) / pd.per, gx = pd.lado > 0 ? -OX - 14 + up * (W + 28) : NUCLEO + OX + 14 - up * (W + 28);
-				pedestre(c, gx, 221, pd.lado, t, pd);
-			});
 			// a porta de vidro: duas folhas que deslizam quando o piloto entra
 			var abre = this.abrindo ? Math.min(1, (performance.now() - this.abrindo) / 800) : 0, e = abre * abre * (3 - 2 * abre);
 			var meio = (PORTA_F.x0 + PORTA_F.x1) / 2, larg = (PORTA_F.x1 - PORTA_F.x0) / 2, desl = Math.round(e * larg);
@@ -1449,6 +1449,11 @@
 			c.restore();
 			c.globalAlpha = 0.1 + e * 0.3; c.fillStyle = '#ffe8b0';
 			c.beginPath(); c.moveTo(PORTA_F.x0, PORTA_F.y1); c.lineTo(PORTA_F.x1, PORTA_F.y1); c.lineTo(PORTA_F.x1 + 24, H); c.lineTo(PORTA_F.x0 - 24, H); c.fill(); c.globalAlpha = 1;
+			// gente passando na calçada, na frente da porta da agência (guarda-chuvas de cabo aceso, capa de chuva de LED)
+			PEDESTRES.forEach(function (pd) {
+				var up = ((t + pd.ini) % pd.per) / pd.per, gx = pd.lado > 0 ? -OX - 14 + up * (W + 28) : NUCLEO + OX + 14 - up * (W + 28);
+				pedestre(c, gx, 221, pd.lado, t, pd);
+			});
 			// os carros flutuantes passando nas duas faixas da rua
 			FAIXAS.forEach(function (fx2) {
 				var vao = (W + 260) / fx2.carros.length;
