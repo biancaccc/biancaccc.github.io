@@ -4247,19 +4247,40 @@ body.embarcando { overflow: hidden; }
 	.embarque::after { content: "↻ Gire o celular para ver melhor"; position: fixed; left: 0; right: 0; bottom: 18%; text-align: center; font: 11px/1.4 Silkscreen, monospace; color: rgba(205, 246, 255, 0.6); }
 }
 
-/* o link para assistir de novo, embaixo do botão de iniciar */
-.intro-embarque { position: relative; }
+/* o botão para assistir de novo ao embarque: um botão secundário dourado, do lado do "Iniciar viagem"
+   (no celular, embaixo dele), longe da nave */
+.intro-embarque .intro-botao { margin-top: 0; }
 .rever-embarque {
-	position: absolute;
-	left: 50%;
-	top: calc(100% + 10px);
-	transform: translateX(-50%);
-	font: 10px/1 Silkscreen, monospace;
-	letter-spacing: 0.06em;
-	color: rgba(205, 246, 255, 0.55);
+	display: inline-flex;
+	align-items: center;
+	gap: 10px;
+	padding: 15px 20px;
+	font-family: var(--titulo);
+	font-size: 12px;
+	line-height: 1;
+	letter-spacing: 0.16em;
+	text-transform: uppercase;
+	text-decoration: none;
 	white-space: nowrap;
+	color: #ffe6a0;
+	background: rgba(232, 196, 106, 0.08);
+	border: 1px solid rgba(232, 196, 106, 0.55);
+	transition: color 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
 }
-.rever-embarque:hover, .rever-embarque:focus-visible { color: #ffd36a; }
+.rever-seta { /* o "voltar" em pixel: o mesmo triângulo do botão de iniciar, virado */
+	width: 8px;
+	height: 10px;
+	background: currentColor;
+	transform: scaleX(-1);
+	clip-path: polygon(0 0, 25% 0, 25% 10%, 50% 10%, 50% 20%, 75% 20%, 75% 40%, 100% 40%, 100% 60%, 75% 60%, 75% 80%, 50% 80%, 50% 90%, 25% 90%, 25% 100%, 0 100%);
+}
+.rever-embarque:hover { color: #05030c; background: #e8c46a; box-shadow: 0 0 20px rgba(232, 196, 106, 0.4); }
+.rever-embarque:focus-visible { outline: 2px solid var(--rosa); outline-offset: 4px; }
+@media (max-width: 620px) {
+	.intro-embarque { flex-direction: column; gap: 12px; }
+	.intro-embarque::before, .intro-embarque::after { display: none; }
+	.rever-embarque { padding: 12px 18px; font-size: 11px; }
+}
 
 /* o carimbo verde de embarque aprovado, do lado esquerdo da assinatura (embaixo da foto), sem cobrir o nome */
 .pp-embarque {
