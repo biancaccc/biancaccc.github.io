@@ -29,7 +29,7 @@ Object.assign(window.EN.t, {
 	'Turismo espacial': 'Space tourism',
 	'Voltar para': 'Back to',
 	'Escolher outro destino': 'Choose another destination',
-	'Escolher outro destino ← Voltar para a Via Láctea': '<small>Choose another destination</small>&larr; Back to the Milky Way',
+	'Escolher outro destino← Voltar para a Via Láctea': '<small>Choose another destination</small>&larr; Back to the Milky Way',
 	'Linha do tempo': 'Timeline',
 	'Nosso sistema solar': 'Our solar system',
 	'Nosso sistema solar · Via Láctea · textos e pixel art feitos à mão': '<a href="sistema-solar.html">Our solar system</a> · <a href="index.html#galaxia">Milky Way</a> · texts and pixel art made by hand',
