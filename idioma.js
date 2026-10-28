@@ -32,14 +32,28 @@
 	// dicionário { 'texto em português': 'English (com as mesmas marcações)' }; a troca procura cada
 	// elemento pelo texto dele (sem as marcações) e troca o de dentro mais fundo que tiver aquele texto
 	function chave(el) { return el.textContent.replace(/\s+/g, ' ').trim(); }
+	// (só troca o de dentro de quem tem apenas texto e marcações de texto: nada de imagem, canvas ou id lá dentro)
+	var SO_TEXTO = ':not(b):not(i):not(em):not(strong):not(small):not(span):not(a):not(br):not(sup):not(sub):not(abbr):not(kbd):not(mark)';
+	function soTexto(el) { return !el.querySelector(SO_TEXTO) && !el.querySelector('[id]'); }
+	// os textos soltos ao lado de imagens (como os nomes dos planetas no rodapé): troca só o texto
+	var conversor = document.createElement('div');
+	function soltos(el) {
+		for (var n = el.firstChild; n; n = n.nextSibling) {
+			if (n.nodeType !== 3) continue;
+			var t = n.nodeValue.replace(/\s+/g, ' ').trim(), v = t && window.EN.t[t];
+			if (v === undefined || !v) continue;
+			conversor.innerHTML = v;
+			n.nodeValue = n.nodeValue.replace(n.nodeValue.trim(), conversor.textContent);
+		}
+	}
 	function porDicionario(raiz) {
 		var EN = window.EN; if (!EN) return;
 		(function andar(el) {
 			for (var c = el.firstElementChild; c; c = c.nextElementSibling) {
 				if (/^(SCRIPT|STYLE|CANVAS|SVG)$/i.test(c.tagName) || c.classList.contains('idioma')) continue;
 				var k = chave(c), filho = c.children.length === 1 ? c.children[0] : null;
-				if (k && EN.t[k] !== undefined && !(filho && chave(filho) === k)) c.innerHTML = EN.t[k];
-				else andar(c);
+				if (k && EN.t[k] !== undefined && !(filho && chave(filho) === k) && soTexto(c)) c.innerHTML = EN.t[k];
+				else { soltos(c); andar(c); }
 			}
 		})(raiz.body || raiz);
 		ATRIBUTOS.forEach(function (a) {
