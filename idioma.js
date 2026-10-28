@@ -28,8 +28,33 @@
 			[].forEach.call(raiz.querySelectorAll('[data-en-' + a + ']'), function (el) { el.setAttribute(a, el.getAttribute('data-en-' + a)); });
 		});
 	}
-	window.traduzirPagina = traduzir;
+	// os textos longos das páginas ficam em en/<página>.js (e os repetidos em en/comum.js), num
+	// dicionário { 'texto em português': 'English (com as mesmas marcações)' }; a troca procura cada
+	// elemento pelo texto dele (sem as marcações) e troca o de dentro mais fundo que tiver aquele texto
+	function chave(el) { return el.textContent.replace(/\s+/g, ' ').trim(); }
+	function porDicionario(raiz) {
+		var EN = window.EN; if (!EN) return;
+		(function andar(el) {
+			for (var c = el.firstElementChild; c; c = c.nextElementSibling) {
+				if (/^(SCRIPT|STYLE|CANVAS|SVG)$/i.test(c.tagName) || c.classList.contains('idioma')) continue;
+				var k = chave(c), filho = c.children.length === 1 ? c.children[0] : null;
+				if (k && EN.t[k] !== undefined && !(filho && chave(filho) === k)) c.innerHTML = EN.t[k];
+				else andar(c);
+			}
+		})(raiz.body || raiz);
+		ATRIBUTOS.forEach(function (a) {
+			[].forEach.call(raiz.querySelectorAll('[' + a + ']'), function (el) { var v = el.getAttribute(a); if (EN.a[v] !== undefined) el.setAttribute(a, EN.a[v]); });
+		});
+		if (EN.t[document.title] !== undefined) document.title = EN.t[document.title];
+	}
+	window.traduzirPagina = function (raiz) { traduzir(raiz); porDicionario(raiz); };
 	traduzir(document);
+	if (idioma === 'en') {
+		// o dicionário desta página (carregado agora, antes dos outros scripts lerem a página)
+		var pagina = (location.pathname.split('/').pop() || 'index').replace(/\.html$/, '') || 'index';
+		document.write('<script src="en/comum.js"><\/script><script src="en/' + pagina + '.js"><\/script><script>window.traduzirPagina && porDicionarioAgora()<\/script>');
+		window.porDicionarioAgora = function () { porDicionario(document); };
+	}
 
 	// o seletor PT | EN, discreto, no canto de baixo à esquerda (trocar recarrega a página no outro idioma)
 	var seletor = document.createElement('div');

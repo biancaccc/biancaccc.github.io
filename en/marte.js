@@ -1,0 +1,31 @@
+// Os textos da página marte.html em inglês (veja idioma.js e en/comum.js).
+window.EN = window.EN || { t: {}, a: {} };
+Object.assign(window.EN.t, {
+	"Marte · Nosso sistema solar": "Mars · Our solar system",
+	"4º planeta a partir do Sol": "4th planet from the Sun",
+	"O planeta vermelho": "The red planet",
+	"Cerca de 228 milhões de km": "About 228 million km",
+	"687 dias": "687 days",
+	"2, Fobos e Deimos": "2, Phobos and Deimos",
+	"Marte: o planeta vermelho": "Mars: the red planet",
+	"Um dia quase igual ao nosso": "A day almost like ours",
+	"Frio, seco e empoeirado": "Cold, dry and dusty",
+	"Gigantes do Sistema Solar": "Giants of the Solar System",
+	"Duas luas em forma de batata": "Two potato-shaped moons",
+	"Um passado com rios e lagos": "A past with rivers and lakes",
+	"Robôs exploradores": "Robot explorers",
+	"Marte é o quarto planeta a partir do Sol e o mais estudado depois da Terra. Sua cor avermelhada vem da ferrugem: o solo e a poeira são cheios de óxido de ferro. Por lembrar a cor do sangue, ele recebeu o nome do deus romano da guerra. Da Terra, dá para vê-lo a olho nu como um ponto alaranjado no céu noturno.": "Mars is the fourth planet from the Sun and the most studied after Earth. Its reddish color comes from rust: the soil and dust are full of iron oxide. Because it recalls the color of blood, it was named after the Roman god of war. From Earth, you can see it with the naked eye as an orange dot in the night sky.",
+	"O dia em Marte, chamado de \"sol\", dura 24 horas e 37 minutos, bem parecido com o da Terra. Já o ano é bem mais longo: Marte leva 687 dias terrestres para dar a volta no Sol, quase o dobro do nosso. Como seu eixo também é inclinado, Marte tem estações do ano, só que cada uma dura cerca de seis meses.": "A day on Mars, called a \"sol\", lasts 24 hours and 37 minutes, very similar to Earth's. The year, however, is much longer: Mars takes 687 Earth days to go around the Sun, almost twice as long as ours. Since its axis is also tilted, Mars has seasons, but each one lasts about six months.",
+	"A atmosfera de Marte é tão fina que a pressão lá é menos de 1% da pressão da Terra. Sem um \"cobertor\" para guardar o calor, a temperatura média fica em torno de −60 °C. De tempos em tempos, tempestades de poeira crescem tanto que cobrem o planeta inteiro por semanas. E, ao contrário daqui, o pôr do Sol em Marte é azulado.": "The atmosphere of Mars is so thin that the pressure there is less than 1% of Earth's. Without a \"blanket\" to hold in the heat, the average temperature is around −60 °C. Every now and then, dust storms grow so large that they cover the whole planet for weeks. And, unlike here, sunsets on Mars are bluish.",
+	"Mesmo tendo metade do tamanho da Terra, Marte guarda recordes. O Monte Olimpo é o maior vulcão conhecido do Sistema Solar, com cerca de 22 km de altura, mais de duas vezes e meia a altura do Everest. E o Valles Marineris é um cânion com cerca de 4.000 km de comprimento, que atravessaria o Brasil de ponta a ponta.": "Even though it is half the size of Earth, Mars holds records. Olympus Mons is the largest known volcano in the Solar System, about 22 km high, more than two and a half times the height of Everest. And Valles Marineris is a canyon about 4,000 km long, which would stretch across Brazil from end to end.",
+	"Marte tem duas luas pequenas e irregulares, Fobos e Deimos, que provavelmente são asteroides capturados. Fobos está se aproximando de Marte aos poucos e, daqui a dezenas de milhões de anos, deve se despedaçar e talvez formar um anel ao redor do planeta.": "Mars has two small, irregular moons, Phobos and Deimos, which are probably captured asteroids. Phobos is slowly getting closer to Mars and, tens of millions of years from now, it should break apart and perhaps form a ring around the planet.",
+	"Hoje Marte é um deserto gelado, mas nem sempre foi assim. Há leitos de rios secos, deltas e antigos lagos por toda a superfície, e seus polos guardam gelo de água. Bilhões de anos atrás, Marte provavelmente era mais quente e úmido, com condições que poderiam ter permitido vida microscópica.": "Today Mars is a frozen desert, but it was not always like this. There are dry riverbeds, deltas and ancient lakes all over its surface, and its poles hold water ice. Billions of years ago, Mars was probably warmer and wetter, with conditions that could have allowed microscopic life.",
+	"Marte é o único planeta além da Terra onde robôs passeiam pela superfície. Hoje, dois jipes da NASA trabalham lá: o Curiosity, que chegou em 2012, e o Perseverance, que chegou em 2021 trazendo o Ingenuity, o primeiro helicóptero a voar em outro planeta. Em 2026, os cientistas anunciaram que o Curiosity encontrou a maior variedade de moléculas orgânicas já vista em Marte, incluindo sete nunca detectadas antes no planeta. Essas moléculas não provam que houve vida, mas são os mesmos \"tijolinhos\" que deram origem à vida na Terra. Para ter certeza, será preciso trazer as amostras coletadas pelo Perseverance para análise em laboratórios aqui.": "Mars is the only planet besides Earth where robots roam the surface. Today, two NASA rovers work there: Curiosity, which arrived in 2012, and Perseverance, which arrived in 2021 carrying Ingenuity, the first helicopter to fly on another planet. In 2026, scientists announced that Curiosity had found the greatest variety of organic molecules ever seen on Mars, including seven never detected on the planet before. These molecules do not prove that there was life, but they are the same \"building blocks\" that gave rise to life on Earth. To be sure, the samples collected by Perseverance will need to be brought back for analysis in laboratories here.",
+	"Frio, vermelho e cheio de pistas sobre o passado, Marte é o planeta que mais alimenta o sonho de encontrar vida fora da Terra e, quem sabe um dia, de receber os primeiros visitantes humanos.": "Cold, red and full of clues about the past, Mars is the planet that most feeds the dream of finding life beyond Earth and, who knows, one day welcoming the first human visitors.",
+	"AnteriorTerra": "<small>Previous</small>Earth",
+	"PróximoJúpiter": "<small>Next</small>Jupiter"
+});
+Object.assign(window.EN.a, {
+	"Comparação do tamanho de Marte": "Size comparison of Mars",
+	"Marte em pixel art": "Mars in pixel art"
+});
