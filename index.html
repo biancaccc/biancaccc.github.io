@@ -5,7 +5,7 @@
 	<!-- fundo escuro desde o primeiro instante; vindo de um salto, a página começa coberta pelo último quadro do salto (preso à tela, não à página), para nenhum quadro vazar antes das estrelas -->
 	<script>try{var h=document.documentElement;h.style.backgroundColor="#05030c";if(sessionStorage.getItem("salto")==="1"){var q=sessionStorage.getItem("saltoQuadro");h.className+=" em-salto";if(q){h.style.background="#05030c url("+q+") 0 0/100% 100% no-repeat fixed";h.style.imageRendering="pixelated"}}}catch(e){}</script>
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<title>Agência Andarilha · Turismo espacial em pixel art pela Via Láctea</title>
+	<title data-en="Andarilha Agency · Pixel art space tourism across the Milky Way">Agência Andarilha · Turismo espacial em pixel art pela Via Láctea</title>
 	<link rel="preconnect" href="https://fonts.googleapis.com">
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 	<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Mrs+Saint+Delafield&family=Silkscreen&family=Space+Grotesk:wght@400;500;700&family=Tiny5&display=swap" rel="stylesheet">
@@ -19,34 +19,34 @@
 	<!-- 1. A nave em cruzeiro -->
 	<section class="intro" id="intro">
 		<div class="hud-linha hud-topo">
-			<span><small>Nave</small> PX-01</span>
-			<span><small>Velocidade</small> <b id="velocidade">0,02 c</b></span>
-			<span><small>Destino</small> Via Láctea</span>
+			<span data-en="&lt;small&gt;Ship&lt;/small&gt; PX-01"><small>Nave</small> PX-01</span>
+			<span><small data-en="Speed">Velocidade</small> <b id="velocidade">0,02 c</b></span>
+			<span data-en="&lt;small&gt;Destination&lt;/small&gt; Milky Way"><small>Destino</small> Via Láctea</span>
 		</div>
 		<div class="intro-centro">
-			<div class="selo-agencia" id="selo-agencia" role="img" aria-label="Selo da Agência Andarilha, turismo espacial desde 2077: um planeta com a órbita e a nave passando"></div>
+			<div class="selo-agencia" id="selo-agencia" role="img" aria-label="Selo da Agência Andarilha, turismo espacial desde 2077: um planeta com a órbita e a nave passando" data-en-aria-label="Seal of the Andarilha Agency, space tourism since 2077: a planet with its orbit and the ship flying by"></div>
 			<div class="intro-titulo">
-				<p class="hud-rotulo">Agência de turismo espacial</p>
+				<p class="hud-rotulo" data-en="Space tourism agency">Agência de turismo espacial</p>
 				<h1>Andarilha</h1>
-				<p class="intro-sub">Uma viagem em pixel art pela nossa galáxia</p>
+				<p class="intro-sub" data-en="A pixel art journey across our galaxy">Uma viagem em pixel art pela nossa galáxia</p>
 			</div>
 			<div class="intro-embarque">
-				<button type="button" class="intro-botao" id="iniciar" aria-keyshortcuts="Space"><span class="intro-botao-seta" aria-hidden="true"></span>Iniciar viagem<kbd aria-hidden="true">espaço</kbd></button>
-				<a class="rever-embarque" href="?embarque"><span class="rever-seta" aria-hidden="true"></span>Rever o embarque</a>
+				<button type="button" class="intro-botao" id="iniciar" aria-keyshortcuts="Space"><span class="intro-botao-seta" aria-hidden="true"></span><span data-en="Start the journey">Iniciar viagem</span><kbd aria-hidden="true" data-en="space">espaço</kbd></button>
+				<a class="rever-embarque" href="?embarque"><span class="rever-seta" aria-hidden="true"></span><span data-en="Replay the boarding">Rever o embarque</span></a>
 			</div>
 		</div>
 		<div class="hud-linha hud-base" aria-hidden="true">
-			<span><i class="hud-luz"></i>Sistemas ok</span>
-			<span>Portão 01 · embarque liberado</span>
+			<span data-en="&lt;i class=&quot;hud-luz&quot;&gt;&lt;/i&gt;Systems ok"><i class="hud-luz"></i>Sistemas ok</span>
+			<span data-en="Gate 01 · now boarding">Portão 01 · embarque liberado</span>
 		</div>
 	</section>
 
 	<!-- 2. A galáxia com os destinos -->
 	<section class="galaxia" id="galaxia" hidden>
 		<header class="galaxia-topo">
-			<p class="hud-rotulo">Chegamos</p>
-			<h1>Via Láctea</h1>
-			<p>Escolha um destino turístico</p>
+			<p class="hud-rotulo" data-en="We have arrived">Chegamos</p>
+			<h1 data-en="Milky Way">Via Láctea</h1>
+			<p data-en="Choose a tourist destination">Escolha um destino turístico</p>
 		</header>
 		<div class="marcadores" id="marcadores"></div>
 		<aside class="cartao-destino" id="cartao" aria-live="polite">
@@ -61,9 +61,9 @@
 			</div>
 			<div class="cartao-corpo"></div>
 		</aside>
-		<p class="nota-mapa">Mapa ilustrativo: as posições e distâncias não estão em escala.</p>
-		<button type="button" class="rever" id="rever">&#8634; Ver a decolagem de novo</button>
-		<a class="botao-linha" href="linha-do-tempo.html"><span class="bl-ampulheta" aria-hidden="true"><i></i></span><span class="bl-texto"><b>Linha do tempo</b><small>a história do céu</small></span></a>
+		<p class="nota-mapa" data-en="Illustrative map: positions and distances are not to scale.">Mapa ilustrativo: as posições e distâncias não estão em escala.</p>
+		<button type="button" class="rever" id="rever" data-en="&amp;#8634; Watch the takeoff again">&#8634; Ver a decolagem de novo</button>
+		<a class="botao-linha" href="linha-do-tempo.html"><span class="bl-ampulheta" aria-hidden="true"><i></i></span><span class="bl-texto" data-en="&lt;b&gt;Timeline&lt;/b&gt;&lt;small&gt;the story of the sky&lt;/small&gt;"><b>Linha do tempo</b><small>a história do céu</small></span></a>
 	</section>
 
 	<div class="flash" id="flash" aria-hidden="true"></div>
@@ -87,6 +87,7 @@
 		</nav>
 	</noscript>
 
+	<script src="idioma.js"></script>
 	<script src="nave.js"></script>
 	<script src="transicao.js"></script>
 	<script src="tempo-do-sol.js"></script>

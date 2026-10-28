@@ -108,7 +108,7 @@
 			'<circle cx="100" cy="100" r="93" class="selo-aro fino"/>' +
 			'<circle cx="100" cy="100" r="66" class="selo-aro fino"/>' +
 			'<text class="selo-nome"><textPath href="#selo-cima" startOffset="50%" text-anchor="middle">Agência Andarilha</textPath></text>' +
-			'<text class="selo-lema"><textPath href="#selo-baixo" startOffset="50%" text-anchor="middle">Turismo espacial · desde 2077</textPath></text>' +
+			'<text class="selo-lema"><textPath href="#selo-baixo" startOffset="50%" text-anchor="middle">' + (window.T ? T('Turismo espacial · desde 2077', 'Space tourism · since 2077') : 'Turismo espacial · desde 2077') + '</textPath></text>' +
 			'<g class="selo-estrelas" shape-rendering="crispEdges">' + estrela(14, 100) + estrela(186, 100) + '</g>' +
 			'<g transform="translate(40 40) scale(3.75)" shape-rendering="crispEdges">' + RETS + '</g>' +
 			'</svg>';
@@ -124,7 +124,7 @@
 	// a assinatura da autora, discreta, no pé de todas as páginas
 	var credito = document.createElement('p');
 	credito.className = 'credito-autora';
-	credito.textContent = 'por Bianca Cardador';
+	credito.textContent = window.T ? T('por Bianca Cardador', 'by Bianca Cardador') : 'por Bianca Cardador';
 	document.body.appendChild(credito);
 
 	// o ícone da aba

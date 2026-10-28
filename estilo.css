@@ -4421,3 +4421,22 @@ html.chegando .carimbo-novo { z-index: 160; }
 .emb-retrato figcaption span { font: 1.5cqh/1 Silkscreen, monospace; color: #cfe4ff; letter-spacing: 0.08em; text-transform: uppercase; }
 .emb-retrato button { padding: 0.9cqh 2.2cqh; font: 1.7cqh/1 Silkscreen, monospace; letter-spacing: 0.08em; color: #101a4a; background: #e8c46a; border: 0; cursor: pointer; }
 .emb-retrato button:hover, .emb-retrato button:focus-visible { background: #ffe6a0; outline: none; }
+
+/* ---------- O seletor de idioma (idioma.js): PT | EN, discreto, embaixo, do lado do crédito da autora ---------- */
+.idioma {
+	position: fixed;
+	left: calc(50% + 80px);
+	bottom: 1px;
+	z-index: 60;
+	display: flex;
+	align-items: center;
+	gap: 2px;
+	padding: 2px 4px;
+	font: 9px/1 Silkscreen, monospace;
+	letter-spacing: 0.08em;
+}
+.idioma button { padding: 2px 4px; font: inherit; letter-spacing: inherit; color: rgba(205, 246, 255, 0.5); background: none; border: 0; cursor: pointer; }
+.idioma button[aria-pressed="true"] { color: #ffd36a; }
+.idioma button:hover, .idioma button:focus-visible { color: #ffffff; }
+.idioma-sep { color: rgba(205, 246, 255, 0.25); }
+html.em-salto .idioma { visibility: hidden; }

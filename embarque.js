@@ -33,7 +33,7 @@
 	var raiz = document.createElement('div');
 	raiz.className = 'embarque';
 	raiz.setAttribute('role', 'dialog');
-	raiz.setAttribute('aria-label', 'Embarque na Agência Andarilha');
+	raiz.setAttribute('aria-label', T('Embarque na Agência Andarilha', 'Boarding at the Andarilha Agency'));
 	raiz.innerHTML =
 		'<div class="emb-palco">' +
 			'<canvas class="emb-tela" aria-hidden="true"></canvas>' +
@@ -43,8 +43,8 @@
 			'<div class="emb-escuro"></div>' +
 			'<div class="emb-camada"></div>' +
 		'</div>' +
-		'<div class="emb-topo"><button type="button" class="emb-som" aria-pressed="true" title="Som ligado">&#9835; Som</button>' +
-		'<button type="button" class="emb-pular">Pular embarque &#9656;</button></div>';
+		'<div class="emb-topo"><button type="button" class="emb-som" aria-pressed="true" title="' + T('Som ligado', 'Sound on') + '">&#9835; ' + T('Som', 'Sound') + '</button>' +
+		'<button type="button" class="emb-pular">' + T('Pular embarque', 'Skip boarding') + ' &#9656;</button></div>';
 	document.body.appendChild(raiz);
 	document.body.classList.add('embarcando');
 	var palco = raiz.querySelector('.emb-palco');
@@ -663,7 +663,7 @@
 	}
 
 	// o primeiro nome do piloto, para o ZÖ-11 chamar pelo nome
-	function primeiroNome() { var n = (nomePiloto || '').trim().split(/\s+/)[0]; return n ? n.charAt(0).toUpperCase() + n.slice(1) : 'piloto'; }
+	function primeiroNome() { var n = (nomePiloto || '').trim().split(/\s+/)[0]; return n ? n.charAt(0).toUpperCase() + n.slice(1) : T('piloto', 'pilot'); }
 	// o título de capítulo que aparece num canto no começo de cada parte, como num filme
 	var capEl = document.createElement('div'); capEl.className = 'emb-capitulo'; palco.appendChild(capEl);
 	function capitulo(numero, nome) {
@@ -786,7 +786,7 @@
 	function escreverNome(s) {
 		if (!docs) return;
 		docs.assinatura.textContent = s; docs.campoNome.value = s;
-		docs.cnhNome.textContent = s || 'Piloto sem nome'; docs.cnhAssinatura.textContent = s;
+		docs.cnhNome.textContent = s || T('Piloto sem nome', 'Unnamed pilot'); docs.cnhAssinatura.textContent = s;
 	}
 
 	// ================== As pessoas e os robôs ==================
@@ -1542,12 +1542,12 @@
 			if (CREDITOS) {
 				var cred = document.createElement('div');
 				cred.className = 'emb-creditos';
-				cred.innerHTML = '<small>feito por</small><strong>Bianca Cardador</strong><i aria-hidden="true">✦</i>';
+				cred.innerHTML = '<small>' + T('feito por', 'made by') + '</small><strong>Bianca Cardador</strong><i aria-hidden="true">✦</i>';
 				palco.appendChild(cred);
 				depois(function () { cred.remove(); }, calmo ? 0 : 5200);
 			}
 			depois(function () {
-				botao('&#9654; Começar a viagem', 240, 128, comecar, 'grande');
+				botao('&#9654; ' + T('Começar a viagem', 'Begin the journey'), 240, 128, comecar, 'grande');
 			}, calmo || !CREDITOS ? 0 : 5000);
 			function comecar() {
 				iniciarAudio();
@@ -1558,9 +1558,9 @@
 				if (audio && audio.state === 'suspended') audio.resume();
 				ligarAmbienteChuva();
 				limpar(); escuro.style.transition = 'opacity ' + ESCURO_CINE + 's ease-in-out'; aplicarCine(cameraCine(0)); escurecer(0);
-				cena0.cine = performance.now(); raiz.classList.add('cinema'); moverFaixas(9, 0.8); depois(function () { capitulo('I', 'A rua da agência'); }, 1200);
+				cena0.cine = performance.now(); raiz.classList.add('cinema'); moverFaixas(9, 0.8); depois(function () { capitulo('I', T('A rua da agência', 'The agency street')); }, 1200);
 				// um clique durante o passeio da câmera pula direto para o final
-				var pular = alvoClicavel(-OX, 0, W, H, 'Pular a apresentação', function () { cena0.cine = performance.now() - CINE_FIM * 1000; });
+				var pular = alvoClicavel(-OX, 0, W, H, T('Pular a apresentação', 'Skip the intro'), function () { cena0.cine = performance.now() - CINE_FIM * 1000; });
 				pular.classList.add('emb-alvo-cheio');
 				depois(function () { mostrarEntrar(cena0); }, CINE_FIM * 1000);
 			}
@@ -1599,7 +1599,7 @@
 		limpar(); escuro.style.transition = ''; aplicarCine({ x: 240, y: 135, z: 1 }); escurecer(0);
 		/* as faixas pretas de cinema recolhem devagar */
 		raiz.classList.remove('cinema'); if (faixaAlvo !== 0) moverFaixas(0, 2.8); /* (se pulou a apresentação) */
-		botao('&#9654; Entrar na agência', 240, 232, function () {
+		botao('&#9654; ' + T('Entrar na agência', 'Enter the agency'), 240, 232, function () {
 			limpar(); cena0.abrindo = performance.now(); SONS.portaVidro(); depois(SONS.passos, 300);
 			depois(function () { irPara('recepcao'); }, 900);
 		}, 'grande');
@@ -2266,8 +2266,8 @@
 		var j = document.createElement('div');
 		j.className = 'emb-jornal';
 		j.innerHTML =
-			'<article class="emb-jornal-folha" role="dialog" aria-label="Gazeta Estelar, primeira página">' +
-				'<header><span>Ano LI · nº 2077</span><h2>Gazeta Estelar</h2><span>Porto Andarilha · 1 crédito</span></header>' +
+			'<article class="emb-jornal-folha" role="dialog" aria-label="' + T('Gazeta Estelar, primeira página', 'Stellar Gazette, front page') + '">' +
+				T('<header><span>Ano LI · nº 2077</span><h2>Gazeta Estelar</h2><span>Porto Andarilha · 1 crédito</span></header>' +
 				'<h3>A Agência Andarilha abre as portas</h3>' +
 				'<p class="emb-jornal-linha-fina">A primeira agência de turismo espacial em pixel art da galáxia abre as portas com fila, senha, guichê 11 e um robô atendente muito educado</p>' +
 				'<figure><figcaption>A fundadora no dia da inauguração</figcaption></figure>' +
@@ -2276,7 +2276,17 @@
 					'<p>O atendente ZÖ-11 recebeu o primeiro piloto com um aceno e um café. "Ele não bebe, mas gosta de oferecer", explicou a fundadora. A nave da casa, a PX-01, espera no hangar 11 com o tanque cheio.</p>' +
 					'<p><b>Previsão do tempo:</b> chuva ácida leve na rua, céu limpo acima da atmosfera. <b>Classificados:</b> vende-se capacete usado, pouco orbitado.</p>' +
 				'</div>' +
-				'<button type="button" class="emb-jornal-fechar">Dobrar o jornal</button>' +
+				'<button type="button" class="emb-jornal-fechar">Dobrar o jornal</button>',
+				'<header><span>Year LI · No. 2077</span><h2>Stellar Gazette</h2><span>Andarilha Port · 1 credit</span></header>' +
+				'<h3>The Andarilha Agency opens its doors</h3>' +
+				'<p class="emb-jornal-linha-fina">The first pixel art space tourism agency in the galaxy opens its doors with a queue, ticket numbers, desk 11 and a very polite robot clerk</p>' +
+				'<figure><figcaption>The founder on opening day</figcaption></figure>' +
+				'<div class="emb-jornal-colunas">' +
+					'<p>ANDARILHA PORT — Anyone who walked down the agency street last night, in the rain, saw the line wrap around the corner. The founder cut the golden ribbon at 8 p.m. local time and promised "the whole galaxy, one stamp at a time".</p>' +
+					'<p>The clerk ZÖ-11 welcomed the first pilot with a wave and a coffee. "He doesn\'t drink it, but he likes to offer", the founder explained. The house ship, the PX-01, waits in hangar 11 with a full tank.</p>' +
+					'<p><b>Weather:</b> light acid rain on the street, clear skies above the atmosphere. <b>Classifieds:</b> used helmet for sale, barely orbited.</p>' +
+				'</div>' +
+				'<button type="button" class="emb-jornal-fechar">Fold the newspaper</button>') +
 			'</article>';
 		var foto = paraCanvas(retratoFundadora(false)); foto.className = 'emb-jornal-foto';
 		var fig = j.querySelector('figure'); fig.insertBefore(foto, fig.firstChild);
@@ -2459,24 +2469,24 @@
 		},
 		entrar: function () {
 			var cena1 = this; cena1.ultimaChamada = -1; cena1.senha = 0; cena1.chamada = 0;
-			ligarAmbiente('recepcao'); capitulo('II', 'A recepção');
+			ligarAmbiente('recepcao'); capitulo('II', T('A recepção', 'The reception'));
 			var C = CAM_REC, Tt = TOTEM, ta = C(Tt.x0, Tt.h + 0.1, Tt.z0), tb = C(Tt.x1, 0, Tt.z0);
-			var leg = legenda('Pegue sua senha no <b>totem</b>', 12, 236);
+			var leg = legenda(T('Pegue sua senha no <b>totem</b>', 'Take a ticket number at the <b>kiosk</b>'), 12, 236);
 			// (o jornal da senhora da frente: escondido, sem seta, só para quem reparar)
 			var aj = areaJornal(C);
-			var alvoJornal = alvoClicavel(aj[0], aj[1], aj[2], aj[3], 'Ler o jornal caído no chão', abrirJornal);
+			var alvoJornal = alvoClicavel(aj[0], aj[1], aj[2], aj[3], T('Ler o jornal caído no chão', 'Read the newspaper on the floor'), abrirJornal);
 			alvoJornal.classList.add('discreto');
 			// 1. pegar a senha: o totem imprime o papelzinho "011"
-			var alvoTotem = alvoClicavel(ta[0] - 6, ta[1] - 16, tb[0] - ta[0] + 12, tb[1] - ta[1] + 18, 'Pegar a senha no totem', function () {
+			var alvoTotem = alvoClicavel(ta[0] - 6, ta[1] - 16, tb[0] - ta[0] + 12, tb[1] - ta[1] + 18, T('Pegar a senha no totem', 'Take a ticket number at the kiosk'), function () {
 				alvoTotem.remove(); leg.remove(); SONS.impressora();
 				cena1.senha = (performance.now() - inicioCena) / 1000;
 				// 2. o painel chama a nossa senha, com o "ding" e o alto-falante
 				depois(function () {
 					cena1.chamada = (performance.now() - inicioCena) / 1000;
 					SONS.ding(); SONS.anuncio();
-					legenda('Senha <b>011</b>: vá até o <b>guichê 11</b>', 12, 236);
+					legenda(T('Senha <b>011</b>: vá até o <b>guichê 11</b>', 'Number <b>011</b>: go to <b>desk 11</b>'), 12, 236);
 					var cx = guicheX(2) + GL / 2 + 0.1, a = C(cx, 1.3, 5.05), b = C(cx, 0, 5.05), s = 300 / b[2];
-					alvoClicavel(b[0] - 0.45 * s, a[1] - 0.3 * s, 0.9 * s, b[1] - a[1] + 0.4 * s, 'Sentar na cadeira do guichê 11', function () { SONS.passos(); depois(SONS.cadeira, 1300); depois(function () { irPara('mesa'); }, 1100); });
+					alvoClicavel(b[0] - 0.45 * s, a[1] - 0.3 * s, 0.9 * s, b[1] - a[1] + 0.4 * s, T('Sentar na cadeira do guichê 11', 'Sit in the chair at desk 11'), function () { SONS.passos(); depois(SONS.cadeira, 1300); depois(function () { irPara('mesa'); }, 1100); });
 				}, 1600);
 			});
 		}
@@ -2681,11 +2691,11 @@
 		},
 		entrar: function () {
 			var cenaMesa = this; cenaMesa.seta = false; cenaMesa.feliz = false;
-			ligarAmbiente('mesa'); capitulo('III', 'O guichê 11');
+			ligarAmbiente('mesa'); capitulo('III', T('O guichê 11', 'Desk 11'));
 			depois(function () {
-				falar('Olá, piloto! Documentos, por favor.', 460).then(function () {
+				falar(T('Olá, piloto! Documentos, por favor.', 'Hello, pilot! Documents, please.'), 460).then(function () {
 					cenaMesa.seta = true;
-					botao('Dar documentos', 240, 236, function () { irPara('entrega'); }, 'pulsa');
+					botao(T('Dar documentos', 'Hand over documents'), 240, 236, function () { irPara('entrega'); }, 'pulsa');
 				});
 			}, 500);
 		}
@@ -2959,7 +2969,7 @@
 			depois(function () { SONS.papel('livro'); pousar(docs.pp, LUGAR.pp, PP_ESC, 860, 602, 0.9); }, 150);
 			depois(function () { SONS.papel('cartao'); pousar(docs.cnh, LUGAR.cnh, CNH_ESC, 600, 400, 0.9); }, 550);
 			depois(SONS.bipLeitor, 1300);
-			depois(function () { falar('Obrigado! Um momento…', 460).then(function () { depois(function () { irPara('assinar'); }, 600); }); }, 1500);
+			depois(function () { falar(T('Obrigado! Um momento…', 'Thank you! One moment…'), 460).then(function () { depois(function () { irPara('assinar'); }, 600); }); }, 1500);
 		}
 	};
 	// 4. ASSINAR: o atendente endireita e abre o passaporte (a mesma animação da capa do jogo)
@@ -2971,10 +2981,10 @@
 			depois(function () { SONS.folha(); docs.livro.classList.add('aberto'); }, 700);
 			depois(function () {
 				docs.dados.classList.add('emb-chama-assinatura');
-				falar('Assine aqui, por gentileza.', 460).then(function () {
-					legenda('Clique na linha da assinatura', 12, 248);
+				falar(T('Assine aqui, por gentileza.', 'Please sign here.'), 460).then(function () {
+					legenda(T('Clique na linha da assinatura', 'Click the signature line'), 12, 248);
 					var r = retanguloNaTela(docs.dados.querySelector('.pp-assinatura'));
-					alvoClicavel(r.x - 6, r.y - 18, r.w + 12, r.h + 26, 'Assinar o passaporte', function () { docs.dados.classList.remove('emb-chama-assinatura'); irPara('nome'); });
+					alvoClicavel(r.x - 6, r.y - 18, r.w + 12, r.h + 26, T('Assinar o passaporte', 'Sign the passport'), function () { docs.dados.classList.remove('emb-chama-assinatura'); irPara('nome'); });
 				});
 			}, 2000);
 		}
@@ -2997,8 +3007,8 @@
 				var caixa = document.createElement('form');
 				caixa.className = 'emb-nome';
 				pos(caixa, 150, 226, 180);
-				caixa.innerHTML = '<label class="emb-nome-rotulo" for="emb-nome">Digite seu nome para assinar</label>' +
-					'<input id="emb-nome" type="text" maxlength="32" autocomplete="off" spellcheck="false" placeholder="seu nome">' +
+				caixa.innerHTML = '<label class="emb-nome-rotulo" for="emb-nome">' + T('Digite seu nome para assinar', 'Type your name to sign') + '</label>' +
+					'<input id="emb-nome" type="text" maxlength="32" autocomplete="off" spellcheck="false" placeholder="' + T('seu nome', 'your name') + '">' +
 					'<button type="submit" class="emb-botao emb-ok">OK</button>';
 				camada.appendChild(caixa);
 				var campo = caixa.querySelector('input');
@@ -3050,12 +3060,12 @@
 				} catch (e) {}
 				SONS.aprovado();
 				if (docs.holo) docs.holo.classList.remove('desligada');
-				falar('Tudo certo, ' + primeiroNome() + '! Boa viagem!', 520).then(function () {
+				falar(T('Tudo certo, ' + primeiroNome() + '! Boa viagem!', 'All set, ' + primeiroNome() + '! Have a good trip!'), 520).then(function () {
 					apontar(1000, 660, 1.1, 1.2);
 					depois(imprimirBilhete, 500);
 					depois(function () {
 						limpar();
-						falar('E aqui está o seu cartão de embarque. Hangar 11!', 460).then(function () { depois(function () { irPara('retirar'); }, 1200); });
+						falar(T('E aqui está o seu cartão de embarque. Hangar 11!', 'And here is your boarding pass. Hangar 11!'), 460).then(function () { depois(function () { irPara('retirar'); }, 1200); });
 					}, 2400);
 				});
 			}, 2900);
@@ -3070,9 +3080,9 @@
 			depois(function () { SONS.folha(); docs.livro.classList.remove('aberto'); }, 200);
 			depois(function () { SONS.papel('livro'); pousar(docs.pp, LUGAR.pp, PP_ESC, 860, 602, 0.9); }, 1100);
 			depois(function () {
-				falar('Pode retirar os documentos, ' + primeiroNome() + '.', 460).then(function () {
-					legenda('Clique nos documentos para pegar', 12, 248);
-					alvoClicavel(110, 80, 260, 160, 'Pegar os documentos', function () {
+				falar(T('Pode retirar os documentos, ' + primeiroNome() + '.', 'You can take your documents, ' + primeiroNome() + '.'), 460).then(function () {
+					legenda(T('Clique nos documentos para pegar', 'Click the documents to take them'), 12, 248);
+					alvoClicavel(110, 80, 260, 160, T('Pegar os documentos', 'Take the documents'), function () {
 						limpar(); SONS.whoosh();
 						mundo.classList.add('ventania');
 						pousar(docs.pp, { x: LUGAR.pp.x + 100, y: LUGAR.pp.y + 1100, giro: -2 }, PP_ESC * 1.6, 860, 602, 0.7);
@@ -3270,8 +3280,8 @@
 			for (var i = 0; i < 30; i++) { var px2 = (ruido(i, 81) * W + t * (6 + ruido(i, 82) * 8)) % W - OX, py2 = ruido(i, 83) * 220 + Math.sin(t + i) * 4; P(c, px2, py2, 'rgba(255,240,200,0.55)'); }
 		},
 		entrar: function () {
-			ligarAmbiente('hangar'); capitulo('IV', 'O hangar'); depois(SONS.fanfarra, 500);
-			legenda('Hangar 11 · <b>PX-01 Millennium Falcon</b>, sua nave', 12, 248);
+			ligarAmbiente('hangar'); capitulo('IV', T('O hangar', 'The hangar')); depois(SONS.fanfarra, 500);
+			legenda(T('Hangar 11 · <b>PX-01 Millennium Falcon</b>, sua nave', 'Hangar 11 · <b>PX-01 Millennium Falcon</b>, your ship'), 12, 248);
 			depois(function () { irPara('porta'); }, 7000);
 		}
 	};
@@ -3387,9 +3397,9 @@
 		},
 		entrar: function () {
 			var cena9 = this; cena9.abrindo = 0; cena9.vapor = [];
-			ligarAmbiente('nave'); capitulo('V', 'A nave');
-			legenda('Clique na porta para embarcar', 12, 248);
-			alvoClicavel(182, 34, 116, 204, 'Entrar na nave', function () {
+			ligarAmbiente('nave'); capitulo('V', T('A nave', 'The ship'));
+			legenda(T('Clique na porta para embarcar', 'Click the door to board'), 12, 248);
+			alvoClicavel(182, 34, 116, 204, T('Entrar na nave', 'Board the ship'), function () {
 				limpar(); cena9.abrindo = performance.now(); SONS.porta();
 				depois(function () { irPara('cabine'); }, 3800);
 			});
@@ -3670,24 +3680,24 @@
 		},
 		entrar: function () {
 			var cena10 = this; cena10.ligada = 0; cena10.contagem = 0; cena10.subida = 0; cena10.apontado = 'ignicao';
-			ligarAmbiente('nave'); capitulo('VI', 'A decolagem');
-			legenda('Aperte o botão de <b>ignição</b> para ligar a nave', 12, 248);
-			alvoClicavel(292, 178, 34, 36, 'Apertar o botão de ignição', function () {
+			ligarAmbiente('nave'); capitulo('VI', T('A decolagem', 'The takeoff'));
+			legenda(T('Aperte o botão de <b>ignição</b> para ligar a nave', 'Press the <b>ignition</b> button to start the ship'), 12, 248);
+			alvoClicavel(292, 178, 34, 36, T('Apertar o botão de ignição', 'Press the ignition button'), function () {
 				limpar(); cena10.apontado = null; cena10.ligada = tempoCena(); SONS.ligar();
 				depois(function () { ligarAmbiente('cabine'); }, 1200);
 				depois(function () {
 					SONS.radio();
-					falar('PX-01, aqui é a torre do hangar 11. Na escuta, ' + primeiroNome() + '?', 460, 'ZÖ-11 · rádio').then(function () {
+					falar(T('PX-01, aqui é a torre do hangar 11. Na escuta, ' + primeiroNome() + '?', 'PX-01, this is hangar 11 tower. Do you copy, ' + primeiroNome() + '?'), 460, T('ZÖ-11 · rádio', 'ZÖ-11 · radio')).then(function () {
 						depois(function () {
 							limpar(); SONS.radio();
 							/* a torre conta o tempo do Sol de verdade (dados da NOAA), quando eles chegaram */
 							var sol = window.TempoDoSol, avisoS = sol && sol.aviso(), bol = sol && sol.boletim();
-							var liberada = avisoS ? 'Atenção, PX-01: ' + avisoS.replace('Atenção: o Sol', 'o Sol') + ' Liberada para decolar, com cuidado!'
-								: bol ? 'Tempo do Sol calmo: ' + bol + '. PX-01, liberada para decolar!' : 'Céu limpo lá em cima. PX-01, liberada para decolar!';
-							falar(liberada, 460, 'ZÖ-11 · rádio').then(function () {
+							var liberada = avisoS ? T('Atenção, PX-01: ' + avisoS.replace('Atenção: o Sol', 'o Sol') + ' Liberada para decolar, com cuidado!', 'Heads up, PX-01: ' + avisoS.replace('Attention: the Sun', 'the Sun') + ' Cleared for takeoff, carefully!')
+								: bol ? T('Tempo do Sol calmo: ' + bol + '. PX-01, liberada para decolar!', 'Calm solar weather: ' + bol + '. PX-01, cleared for takeoff!') : T('Céu limpo lá em cima. PX-01, liberada para decolar!', 'Clear skies up there. PX-01, cleared for takeoff!');
+							falar(liberada, 460, T('ZÖ-11 · rádio', 'ZÖ-11 · radio')).then(function () {
 								cena10.apontado = 'alavanca';
-								legenda('Empurre as <b>alavancas</b> de potência para decolar', 12, 248);
-								alvoClicavel(218, 226, 44, 44, 'Empurrar as alavancas de potência e decolar', function () {
+								legenda(T('Empurre as <b>alavancas</b> de potência para decolar', 'Push the power <b>levers</b> to take off'), 12, 248);
+								alvoClicavel(218, 226, 44, 44, T('Empurrar as alavancas de potência e decolar', 'Push the power levers and take off'), function () {
 									limpar(); cena10.apontado = null; cena10.contagem = tempoCena(); tocarMusica('decolagem');
 									[0, 1, 2].forEach(function (n) { depois(function () { SONS.contagem(false); }, n * 1000); });
 									depois(function () { SONS.contagem(true); SONS.motor(); cena10.subida = tempoCena(); }, 3000);
