@@ -4277,10 +4277,10 @@ body.embarcando { overflow: hidden; }
 }
 .pp-embarque svg { display: block; width: 100%; height: 100%; }
 /* a apresentação cinematográfica da rua: faixas pretas em cima e embaixo, e o clique que pula */
-.embarque.cinema .emb-palco::before, .embarque.cinema .emb-palco::after { content: ""; position: absolute; left: 0; right: 0; height: 9%; background: #000; z-index: 3; pointer-events: none; animation: emb-faixa 0.8s ease both; }
-.embarque.cinema .emb-palco::before { top: 0; }
-.embarque.cinema .emb-palco::after { bottom: 0; }
-@keyframes emb-faixa { from { height: 0; } }
+/* (são duas divs de verdade; a altura delas é animada pelo embarque.js, quadro a quadro) */
+.emb-faixa { position: absolute; left: 0; right: 0; height: 0; background: #000; z-index: 3; pointer-events: none; }
+.emb-faixa.cima { top: 0; }
+.emb-faixa.baixo { bottom: 0; }
 .emb-alvo.emb-alvo-cheio { cursor: pointer; }
 .emb-alvo.emb-alvo-cheio:focus-visible { outline: none; }
 
