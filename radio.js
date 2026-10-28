@@ -908,6 +908,9 @@
 		if (E.bateria) camadaBateria(E.bateria);
 		(E.melodias || []).forEach(camadaMelodia);
 		(E.eventos || []).forEach(function (e) { repetir(e.cada, function () { EVENTOS[e.tipo](e); }); });
+		// apagão de rádio de verdade agora (escala R da NOAA, por causa de uma explosão solar): o rádio estala
+		var est = window.TempoDoSol && window.TempoDoSol.estado(), esc = window.TempoDoSol && window.TempoDoSol.dados && window.TempoDoSol.dados.escalas;
+		if (est && esc && esc.R >= 1) repetir(4 / esc.R, function () { for (var k = 0; k < 6 + esc.R * 4; k++) agendar(function () { estalo(0.25); }, k * 40 + Math.random() * 60); });
 	}
 
 	function desligarSom() {
@@ -953,11 +956,16 @@
 	doca.appendChild(botao);
 	try { localStorage.removeItem('radioVersao'); } catch (e) {} // sobra do teste das duas versões
 
+	// de 8 em 8 segundos o visor mostra o boletim do Sol ao vivo (dados da NOAA) no lugar do nome da estação
+	var mostraSol = false;
+	setInterval(function () { mostraSol = !mostraSol && !!(window.TempoDoSol && window.TempoDoSol.boletim()); if (ligado) atualizar(); }, 8000);
 	function atualizar() {
 		botao.setAttribute('aria-pressed', ligado ? 'true' : 'false');
 		botao.classList.toggle('ligado', ligado && !esperando);
 		botao.classList.toggle('esperando', esperando);
-		nomeTela.textContent = esperando ? 'Toque para sintonizar' : ligado ? E.nome : 'Rádio desligado';
+		var sol = ligado && !esperando && mostraSol && window.TempoDoSol && window.TempoDoSol.dados, bol = null;
+		if (sol && sol.vento) bol = 'Sol ao vivo · ' + Math.round(sol.vento.v) + ' km/s' + (sol.kp ? ' · Kp ' + sol.kp.v.toFixed(1).replace('.', ',') : '');
+		nomeTela.textContent = esperando ? 'Toque para sintonizar' : bol ? bol : ligado ? E.nome : 'Rádio desligado';
 		botao.title = ligado ? E.nome + ' · ' + E.nota + '. Clique para desligar.' : 'Ligar o rádio da nave (' + E.nome + ')';
 		botao.setAttribute('aria-label', ligado ? 'Desligar o rádio: ' + E.nome : 'Ligar o rádio da nave: ' + E.nome);
 		try { sessionStorage.setItem('radio', ligado ? '1' : '0'); } catch (e) {}

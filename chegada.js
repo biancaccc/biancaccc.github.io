@@ -155,7 +155,7 @@
 		S: '011100010001110', T: '111010010010010', U: '101101101101111', V: '101101101101010', W: '101101111111101', X: '101101010101101',
 		Y: '101101010010010', Z: '111001010100111', 0: '111101101101111', 1: '010110010010111', 2: '110001010100111', 3: '110001010001110',
 		4: '101101111001001', 5: '111100110001110', 6: '011100111101111', 7: '111001010010010', 8: '111101111101111', 9: '111101111001110',
-		'-': '000000111000000', '.': '000000000000010', ':': '000010000010000', '>': '100010001010100', '·': '000000010000000', '*': '101010101000000', ',': '000000000010100'
+		'/': '001001010100100', '-': '000000111000000', '.': '000000000000010', ':': '000010000010000', '>': '100010001010100', '·': '000000010000000', '*': '101010101000000', ',': '000000000010100'
 	};
 	var SEM_ACENTO = { 'Á': 'A', 'Â': 'A', 'Ã': 'A', 'À': 'A', 'É': 'E', 'Ê': 'E', 'Í': 'I', 'Ó': 'O', 'Ô': 'O', 'Õ': 'O', 'Ú': 'U', 'Ç': 'C', 'Ö': 'O' };
 	function letras(s, x, y, esc, c, centro) {
@@ -273,6 +273,11 @@
 				c.strokeStyle = 'rgba(125,255,168,0.35)'; c.lineWidth = 1; [6, 11, 15].forEach(function (r) { c.beginPath(); c.arc(cx + 0.5, cy + 0.5, r, 0, Math.PI * 2); c.stroke(); });
 				c.strokeStyle = '#7dffa8'; c.beginPath(); c.moveTo(cx, cy); c.lineTo(cx + Math.cos(a) * 15, cy + Math.sin(a) * 15); c.stroke();
 				if (Math.sin(t * 3) > 0) R(c, cx + 6, cy - 4, 2, 2, '#dfffe8');
+			} else if (q.tipo === 'ondas' && window.TempoDoSol) {
+				/* o tempo do Sol ao vivo (dados da NOAA), com a moldura piscando em vermelho no alerta */
+				var vs = window.TempoDoSol.visor(t);
+				vs.linhas.forEach(function (l, il) { texto3(c, l[0], q.x + q.w / 2, q.y + 4 + il * 9, 1, l[1], true); });
+				if (vs.alerta && Math.floor(t * 3) % 2) { R(c, q.x, q.y, q.w, 1, '#ff6a5a'); R(c, q.x, q.y + q.h - 1, q.w, 1, '#ff6a5a'); R(c, q.x, q.y, 1, q.h, '#ff6a5a'); R(c, q.x + q.w - 1, q.y, 1, q.h, '#ff6a5a'); }
 			} else if (q.tipo === 'ondas') {
 				for (var b2 = 0; b2 < 12; b2++) { var hb = 3 + Math.abs(Math.sin(t * 3 + b2 * 0.7) * Math.cos(t * 1.3 + b2)) * (q.h - 8); R(c, q.x + 3 + b2 * 4, q.y + q.h - 2 - hb, 3, hb, b2 % 3 ? '#7fe3ff' : '#ffd36a'); }
 			} else {
@@ -899,7 +904,15 @@
 				depois(function () { balao(FALAS_EVENTO[evento], 'Computador de bordo', 380); }, evento === 'raio' || evento === 'micrometeorito' ? 1700 : 900);
 				try { var vs = lerLista('eventosVistos'); if (vs.indexOf(evento) < 0) { vs.push(evento); localStorage.setItem('eventosVistos', JSON.stringify(vs)); } } catch (e) {}
 			}
-			depois(aproximar, temEvento ? 9000 : 1400);
+			// sem evento no caminho: se o Sol estiver agitado de verdade agora, o computador de bordo avisa
+			// (uma vez por visita)
+			var avisoSol = !temEvento && window.TempoDoSol && window.TempoDoSol.aviso(), jaAvisou = false;
+			try { jaAvisou = sessionStorage.getItem('avisoSol') === '1'; } catch (e) {}
+			if (avisoSol && !jaAvisou) {
+				try { sessionStorage.setItem('avisoSol', '1'); } catch (e) {}
+				depois(function () { balao(avisoSol, 'Computador de bordo', 380); }, 900);
+				depois(aproximar, 8500);
+			} else depois(aproximar, temEvento ? 9000 : 1400);
 		}, 1500);
 	}
 	function aproximar() {

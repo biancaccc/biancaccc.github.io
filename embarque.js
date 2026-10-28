@@ -3617,6 +3617,11 @@
 					c.strokeStyle = 'rgba(125,255,168,0.35)'; c.lineWidth = 1; [6, 11, 15].forEach(function (r) { c.beginPath(); c.arc(cx + 0.5, cy + 0.5, r, 0, Math.PI * 2); c.stroke(); });
 					for (var w2 = 0; w2 < 8; w2++) { c.globalAlpha = 0.5 - w2 * 0.06; linhaGrossa(c, [cx, cy], [cx + Math.cos(a - w2 * 0.08) * 15, cy + Math.sin(a - w2 * 0.08) * 15], 1, '#7dffa8'); }
 					c.globalAlpha = 1; [[8, -5], [-10, 4], [3, 9]].forEach(function (b, j) { if (Math.sin(t * 2 + j * 2) > 0) R(c, cx + b[0], cy + b[1], 2, 2, '#dfffe8'); });
+				} else if (q.tipo === 'ondas' && window.TempoDoSol) {
+					/* o tempo do Sol ao vivo (dados da NOAA), com a moldura piscando em vermelho no alerta */
+					var vs = window.TempoDoSol.visor(t);
+					vs.linhas.forEach(function (l, il) { texto3(c, l[0], Math.round(q.x + q.w / 2 - (l[0].length * 4 - 1) / 2), q.y + 4 + il * 9, 1, l[1]); });
+					if (vs.alerta && Math.floor(t * 3) % 2) { R(c, q.x, q.y, q.w, 1, '#ff6a5a'); R(c, q.x, q.y + q.h - 1, q.w, 1, '#ff6a5a'); R(c, q.x, q.y, 1, q.h, '#ff6a5a'); R(c, q.x + q.w - 1, q.y, 1, q.h, '#ff6a5a'); }
 				} else if (q.tipo === 'ondas') {
 					for (var b2 = 0; b2 < 12; b2++) { var hb = 3 + Math.abs(Math.sin(t * 3 + b2 * 0.7) * Math.cos(t * 1.3 + b2)) * (q.h - 8); R(c, q.x + 3 + b2 * 4, q.y + q.h - 2 - hb, 3, hb, b2 % 3 ? '#7fe3ff' : '#ffd36a'); }
 				} else {
@@ -3675,7 +3680,11 @@
 					falar('PX-01, aqui é a torre do hangar 11. Na escuta, ' + primeiroNome() + '?', 460, 'ZÖ-11 · rádio').then(function () {
 						depois(function () {
 							limpar(); SONS.radio();
-							falar('Céu limpo lá em cima. PX-01, liberada para decolar!', 460, 'ZÖ-11 · rádio').then(function () {
+							/* a torre conta o tempo do Sol de verdade (dados da NOAA), quando eles chegaram */
+							var sol = window.TempoDoSol, avisoS = sol && sol.aviso(), bol = sol && sol.boletim();
+							var liberada = avisoS ? 'Atenção, PX-01: ' + avisoS.replace('Atenção: o Sol', 'o Sol') + ' Liberada para decolar, com cuidado!'
+								: bol ? 'Tempo do Sol calmo: ' + bol + '. PX-01, liberada para decolar!' : 'Céu limpo lá em cima. PX-01, liberada para decolar!';
+							falar(liberada, 460, 'ZÖ-11 · rádio').then(function () {
 								cena10.apontado = 'alavanca';
 								legenda('Empurre as <b>alavancas</b> de potência para decolar', 12, 248);
 								alvoClicavel(218, 226, 44, 44, 'Empurrar as alavancas de potência e decolar', function () {
