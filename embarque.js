@@ -1104,6 +1104,8 @@
 						// um telão gigante em algumas torres do meio
 						if (cam === 1 && bw > 22 && ruido(bx, 77) > 0.3 && TELAS.length < 7 && (bx + bw < 140 || bx > 340)) { // (nunca atrás da agência nem dos prédios da frente)
 							var ty = topo + 8 + Math.floor(ruido(bx, 78) * 20), lim = bx + bw < 140 ? 84 : 94, th = Math.min(46, bh - 30, lim - ty);
+							/* (o anúncio do retrato precisa de pelo menos 34 px de altura: a tela sobe um pouco no prédio) */
+							if (TELAS.length % 3 === 0 && th < 34 && ty - (34 - th) > topo + 3) { ty -= 34 - th; th = 34; }
 							if (th > 12) TELAS.push({ x: bx + 3, y: ty, w: bw - 7, h: th, tipo: TELAS.length % 3 });
 						}
 						bx += bw + (cam === 0 ? 0 : Math.floor(ruido(bx, 9) * 6));
@@ -1201,19 +1203,52 @@
 				});
 				ret(334, 150, 6, 3, '#2a2c34'); ret(338, 151, 3, 2, '#5a5e6a'); px(339, 152, '#ff3a3a');
 				ret(270, 176, 5, 9, '#14141e'); ret(271, 177, 3, 3, '#7fe3ff'); for (var ib = 0; ib < 3; ib++) px(271 + ib, 182, '#5a5e6a');
-				// as vitrines da agência, com luz quente e os guichês azuis lá dentro
-				[[172, 210], [270, 308]].forEach(function (q) {
+				// as vitrines da agência: lá dentro, a mesma recepção (a vitrine do porto no alto, o friso dourado,
+				// a faixa azul e a parede branca); na da esquerda, o guichê com o robô atendente; na da direita,
+				// a horta hidropônica, o totem de senhas e o robô-garçom (que flutua, desenhado a cada quadro)
+				function salaPelaVitrine(x0, x1, y0) {
+					ret(x0, y0, x1 - x0, 212 - y0, function (x2, y2) { return rampa(['#f6f8fb', '#eceff4', '#e0e4ea', '#d4d8e0'], (y2 - y0) / (212 - y0) * 0.8, x2, y2); });
+					ret(x0, y0, x1 - x0, 10, function (x2, y2) { return ruido(x2 * 3, y2 * 5) > 0.93 ? '#ffffff' : y2 > y0 + 7 ? (ruido(x2, 9) > 0.6 ? '#ffd890' : '#161838') : rampa(['#0e0c2e', '#1c1446', '#3a1a5a'], (y2 - y0) / 8, x2, y2); });
+					ret(x0, y0 + 10, x1 - x0, 1, '#e8c46a'); ret(x0, y0 + 11, x1 - x0, 2, '#1c2a6e');
+				}
+				[[172, 210], [270, 308]].forEach(function (q, iv) {
 					ret(q[0] - 2, 156, q[1] - q[0] + 4, 56, '#c8a040');
-					ret(q[0], 158, q[1] - q[0], 54, function (x2, y2) { return rampa(['#fff0c8', '#ffe0a0', '#f0c878', '#d8a858'], (y2 - 158) / 54 * 0.8, x2, y2); });
-					ret(q[0] + 4, 184, 14, 22, '#2f62b6'); ret(q[0] + 4, 182, 14, 3, '#f2f4f8'); ret(q[0] + 8, 172, 8, 8, '#a8acc4'); ret(q[0] + 9, 174, 6, 3, '#0a1424');
-					ret(q[0] + 22, 194, 12, 12, '#2a66d8'); ret(q[0] + 22, 194, 12, 2, '#6fa4ff');
+					salaPelaVitrine(q[0], q[1], 158);
+					if (iv === 0) {
+						/* o robô atendente atrás do balcão: cabeça de metal, visor com os olhos, antena, uniforme azul */
+						var rx = q[0] + 13;
+						ret(rx + 3, 176, 1, 3, '#8a8ea8'); px(rx + 3, 175, '#ff8ad8');
+						ret(rx, 179, 8, 7, '#c8ccdc'); ret(rx, 179, 8, 1, '#eef0f8'); ret(rx + 7, 180, 1, 6, '#8a8ea8'); ret(rx + 1, 181, 6, 3, '#0a1424');
+						ret(rx + 3, 186, 2, 1, '#8a8ea8'); ret(rx - 3, 187, 14, 5, '#24357e'); ret(rx + 2, 187, 4, 2, '#f2eefc'); px(rx + 4, 189, '#e8c46a'); px(rx + 4, 190, '#e8c46a');
+						/* o monitor (de costas) e o balcão azul de tampo branco, com o friso dourado e o selo */
+						ret(q[0] + 25, 184, 9, 7, '#2a2c34'); ret(q[0] + 28, 191, 3, 1, '#2a2c34');
+						ret(q[0] + 1, 192, q[1] - q[0] - 2, 2, '#ffffff'); ret(q[0] + 1, 194, q[1] - q[0] - 2, 18, function (x2, y2) { return rampa(['#4a84dc', '#3a70c8', '#2c5cb0', '#224a92'], (y2 - 194) / 18, x2, y2); });
+						ret(q[0] + 1, 195, q[1] - q[0] - 2, 1, '#e8c46a'); elip(q[0] + 19, 202, 2, 2, '#c8a040'); px(q[0] + 19, 202, '#e8905a');
+						/* a plaquinha do guichê pendurada */
+						ret(q[0] + 4, 171, 1, 3, '#8a90a0'); ret(q[0] + 2, 174, 6, 4, '#1c2a6e'); ret(q[0] + 2, 174, 6, 1, '#e8c46a'); px(q[0] + 4, 176, '#ffffff'); px(q[0] + 5, 176, '#ffffff');
+					} else {
+						/* a horta hidropônica: dois tubos de vidro com folhas e a luz rosa em cima */
+						[q[0] + 3, q[0] + 8].forEach(function (tx) {
+							ret(tx, 176, 3, 32, '#d8e8f4'); ret(tx, 175, 3, 1, '#ff6ad8'); ret(tx - 1, 208, 5, 4, '#3a3d48');
+							for (var fo = 0; fo < 6; fo++) { px(tx + (fo % 2 ? 2 : 0), 178 + fo * 5, '#4aa85a'); px(tx + 1, 179 + fo * 5, '#7ad86a'); }
+						});
+						/* o totem de senhas: branco, topo azul-marinho, a telinha ciano e o selo dourado */
+						var tx2 = q[0] + 16;
+						ret(tx2, 180, 7, 32, '#f2f4f8'); ret(tx2 + 6, 180, 1, 32, '#c4c8d4'); ret(tx2, 180, 7, 3, '#1c2a6e'); ret(tx2 + 1, 186, 5, 4, '#7fe3ff'); px(tx2 + 3, 184, '#e8c46a'); ret(tx2 + 2, 193, 3, 1, '#1a1b20');
+						/* uma cadeira de espera azul */
+						ret(q[0] + 26, 198, 10, 6, '#3a70c8'); ret(q[0] + 26, 198, 10, 1, '#6fa4ff'); ret(q[0] + 26, 204, 10, 2, '#2c5cb0'); ret(q[0] + 28, 206, 1, 6, '#5a5e6a'); ret(q[0] + 34, 206, 1, 6, '#5a5e6a');
+					}
 					for (var rf = 0; rf < 10; rf++) mistura(q[0] + 2 + rf * 3, 160 + rf * 4, '#ffffff', 0.3);
 				});
 				// a marquise dourada e a porta (que desliza; desenhada a cada quadro)
 				poli([[204, 150], [276, 150], [282, 157], [198, 157]], function (x2, y2) { return rampa(['#f0d480', '#c8a040', '#8a6a20'], (y2 - 150) / 7, x2, y2); });
 				ret(PORTA_F.x0 - 3, PORTA_F.y0 - 3, PORTA_F.x1 - PORTA_F.x0 + 6, PORTA_F.y1 - PORTA_F.y0 + 3, '#c8a040');
 				ret(PORTA_F.x0, PORTA_F.y0, PORTA_F.x1 - PORTA_F.x0, PORTA_F.y1 - PORTA_F.y0, function (x2, y2) { return rampa(['#fff4d0', '#ffe8b0', '#f0d090'], (y2 - PORTA_F.y0) / 52, x2, y2); });
-				ret(PORTA_F.x0 + 8, PORTA_F.y0 + 18, 10, 26, '#2f62b6'); ret(PORTA_F.x0 + 28, PORTA_F.y0 + 20, 10, 24, '#a8acc4');
+				/* pela porta: a recepção lá dentro, com o painel de senhas em holograma e a fileira de cadeiras azuis */
+				salaPelaVitrine(PORTA_F.x0, PORTA_F.x1, PORTA_F.y0);
+				ret(PORTA_F.x0 + 14, PORTA_F.y0 + 17, 20, 8, '#1a5a8a'); ret(PORTA_F.x0 + 14, PORTA_F.y0 + 17, 20, 1, '#3ae0ff'); letras('011', PORTA_F.x0 + 24, PORTA_F.y0 + 19, 1, '#ffffff', true);
+				for (var cd = 0; cd < 4; cd++) { var cdx = PORTA_F.x0 + 3 + cd * 11; ret(cdx, PORTA_F.y0 + 36, 9, 6, '#3a70c8'); ret(cdx, PORTA_F.y0 + 36, 9, 1, '#6fa4ff'); ret(cdx, PORTA_F.y0 + 42, 9, 2, '#2c5cb0'); ret(cdx + 4, PORTA_F.y0 + 44, 1, 8, '#5a5e6a'); }
+				ret(PORTA_F.x0, PORTA_F.y0 + 50, PORTA_F.x1 - PORTA_F.x0, 2, '#c8ccd6');
 				// o bar de lámen, à esquerda: lanternas vermelhas, cortina de pano, balcão com banquinhos
 				ret(16, 150, 112, 62, '#1a0c10'); ret(16, 150, 112, 3, '#c83a2a');
 				ret(20, 156, 104, 30, function (x2, y2) { return rampa(['#ffb070', '#e8783a', '#a84a22'], (y2 - 156) / 30, x2, y2); });
@@ -1316,15 +1351,7 @@
 				c.save(); c.beginPath(); c.rect(tl.x, tl.y, tl.w, tl.h); c.clip();
 				if (tl.tipo === 'agencia') telaoAgencia(c, tl, t);
 				else if (tl.tipo === 'gueixa') telaoGueixa(c, tl, t);
-				else if (tl.tipo === 0) { // um rosto de anúncio, em blocos de cor (como os telões de Blade Runner)
-					R(c, tl.x, tl.y, tl.w, tl.h, '#2a0a3a');
-					var mx = tl.x + tl.w / 2, my = tl.y + tl.h * 0.55, pisc = (t + i) % 4 > 3.8;
-					c.fillStyle = '#ff5a8a'; c.beginPath(); c.ellipse(mx, my, tl.w * 0.32, tl.h * 0.36, 0, 0, Math.PI * 2); c.fill();
-					c.fillStyle = '#f2d0c0'; c.beginPath(); c.ellipse(mx, my + 2, tl.w * 0.24, tl.h * 0.28, 0, 0, Math.PI * 2); c.fill();
-					R(c, mx - tl.w * 0.32, my - tl.h * 0.36, tl.w * 0.64, tl.h * 0.18, '#1a0a2a'); // a franja
-					if (!pisc) { R(c, mx - 6, my - 2, 4, 2, '#1a0a2a'); R(c, mx + 2, my - 2, 4, 2, '#1a0a2a'); }
-					R(c, mx - 2, my + 6, 4, 1, '#c83a5a');
-					for (var sl = tl.y; sl < tl.y + tl.h; sl += 2) { c.globalAlpha = 0.2; R(c, tl.x, sl, tl.w, 1, '#000000'); } c.globalAlpha = 1;
+				else if (tl.tipo === 0) { anuncioIris(c, tl, t, i); /* o anúncio das lentes ÍRIS 9 */
 				} else if (tl.tipo === 1) { // um letreiro correndo
 					R(c, tl.x, tl.y, tl.w, tl.h, '#0a1a3a');
 					var msg = 'VIAJE PARA SATURNO · ANDARILHA 2077 · ', off = Math.floor(t * 18) % (msg.length * 4 * 2);
@@ -1580,6 +1607,46 @@
 	// o telão gigante da gueixa (uma homenagem aos anúncios de Blade Runner): penteado alto com grampos
 	// dourados e flores, rosto claro, lábios vermelhos, quimono vermelho; ela pisca, sorri e toma chá
 	var BALEIA_DESL = 0; /* acerta as baleias para o segundo plano da apresentação pegar as duas nadando no meio do céu */
+	// o anúncio das lentes de contato com luz ÍRIS 9 (um retrato de moda, como os telões de Blade Runner):
+	// uma moça de cabelo chanel com mecha ciano, um olho normal e o outro com a lente acesa, que pisca,
+	// solta um anel de varredura e muda de cor; atrás, o halo e a grade; embaixo, a marca e o slogan
+	function anuncioIris(c, tl, t, i) {
+		var x = tl.x, y = tl.y, w = tl.w, h = tl.h, faixa = 8;
+		var fundo = c.createLinearGradient(0, y, 0, y + h); fundo.addColorStop(0, '#3a0a4a'); fundo.addColorStop(1, '#0a1a4a'); c.fillStyle = fundo; c.fillRect(x, y, w, h);
+		c.globalAlpha = 0.25; for (var gx = x + ((t * 4) % 6); gx < x + w; gx += 6) R(c, gx, y, 1, h - faixa, '#b05aff'); c.globalAlpha = 1; /* a grade correndo */
+		var ox = Math.round(x + w / 2 - 10), oy = Math.round(y + Math.max(1, (h - faixa - 26) / 2));
+		var lente = ['#7fe3ff', '#ff6ad8', '#ffd36a'][Math.floor((t + i) / 3) % 3];
+		c.save(); c.globalCompositeOperation = 'lighter'; c.globalAlpha = 0.25 + Math.sin(t * 2) * 0.08; c.fillStyle = lente; c.beginPath(); c.arc(ox + 10, oy + 12, 12, 0, Math.PI * 2); c.fill(); c.restore(); c.globalAlpha = 1;
+		function Q(a, b, cw, ch, cor) { R(c, ox + a, oy + b, cw, ch, cor); }
+		/* os ombros, a jaqueta com a gola de neon e o pescoço */
+		Q(2, 22, 16, 4, '#2a1a4a'); Q(4, 21, 12, 1, '#2a1a4a'); Q(7, 21, 6, 1, '#ff3ab8'); Q(8, 19, 4, 3, '#d8a088');
+		/* o cabelo chanel atrás do rosto, com a mecha ciano */
+		Q(4, 0, 12, 1, '#1a0a2a'); Q(2, 1, 16, 2, '#1a0a2a'); Q(1, 3, 18, 15, '#1a0a2a'); Q(2, 18, 4, 2, '#1a0a2a'); Q(14, 18, 4, 2, '#1a0a2a');
+		[[3, 3], [3, 4], [2, 5], [2, 6], [2, 7], [2, 8], [3, 9]].forEach(function (m) { Q(m[0], m[1], 1, 1, '#3ae0ff'); }); Q(7, 1, 4, 1, '#3a2a5a');
+		/* o rosto, com a franja de lado */
+		Q(5, 5, 10, 11, '#f2c8b0'); Q(6, 16, 8, 1, '#f2c8b0'); Q(7, 17, 6, 1, '#e8b8a0'); Q(14, 7, 1, 9, '#d8a088'); Q(13, 16, 1, 1, '#d8a088');
+		Q(4, 3, 12, 2, '#1a0a2a'); Q(4, 5, 5, 1, '#1a0a2a'); Q(4, 6, 3, 1, '#1a0a2a'); Q(4, 7, 1, 1, '#1a0a2a');
+		/* as sobrancelhas, o olho normal (que pisca) e o olho com a lente ÍRIS acesa */
+		Q(6, 8, 3, 1, '#3a1a2a'); Q(11, 8, 3, 1, '#3a1a2a');
+		if ((t + i * 1.7) % 4.2 > 0.14) { Q(6, 9, 3, 1, '#1a0a2a'); Q(6, 10, 3, 1, '#ffffff'); Q(7, 10, 1, 1, '#3a1a2a'); }
+		else Q(6, 10, 3, 1, '#3a1a2a');
+		Q(11, 9, 3, 1, '#1a0a2a'); Q(11, 10, 3, 1, '#ffffff'); Q(12, 10, 1, 1, lente);
+		c.save(); c.globalCompositeOperation = 'lighter'; c.globalAlpha = 0.6; Q(11, 10, 3, 1, lente); c.restore(); c.globalAlpha = 1;
+		var anel = (t * 0.7 + i * 0.3) % 1; /* o anel de varredura saindo da lente */
+		c.globalAlpha = (1 - anel) * 0.8; c.strokeStyle = lente; c.lineWidth = 1; c.beginPath(); c.arc(ox + 12.5, oy + 10.5, 1 + anel * 7, 0, Math.PI * 2); c.stroke(); c.globalAlpha = 1;
+		Q(15, 10, 1, 1, lente); Q(15, 12, 1, 1, lente); Q(14, 11, 1, 1, '#5ab8d8'); /* o implante na têmpora */
+		/* o nariz, as bochechas, a boca e o brinco */
+		Q(10, 12, 1, 1, '#d8a088'); Q(6, 13, 1, 1, '#f08aa0'); Q(13, 13, 1, 1, '#f08aa0');
+		Q(8, 14, 4, 1, '#e8306a'); Q(9, 15, 2, 1, '#c82050'); Q(9, 14, 1, 1, '#ff7a9a');
+		Q(4, 12, 1, 1, '#ffd36a'); Q(4, 13, 1, 2, Math.sin(t * 3 + i) > 0 ? '#ffd36a' : '#c8a040');
+		/* a faixa de baixo: a marca e o slogan, se revezando */
+		R(c, x, y + h - faixa, w, faixa, '#0a0418'); R(c, x, y + h - faixa, w, 1, lente);
+		c.save(); c.beginPath(); c.rect(x, y + h - faixa + 1, w, faixa - 1); c.clip();
+		var msg = 'ÍRIS 9 · LENTES DE LUZ · ', passo = msg.length * 4;
+		texto3(c, msg + msg, x + 1 - (Math.floor(t * 10 + i * 7) % passo), y + h - faixa + 2, 1, '#ffffff');
+		c.restore();
+		for (var sl = y; sl < y + h; sl += 2) { c.globalAlpha = 0.12; R(c, x, sl, w, 1, '#000000'); } c.globalAlpha = 1;
+	}
 	var GUEIXA_DESL = 0; /* acerta o relógio da gueixa para o primeiro plano da apresentação pegar o ciclo inteiro */
 	function telaoGueixa(c, tl, t) {
 		var x = tl.x, y = tl.y, w = tl.w, h = tl.h, cx = x + w / 2, ciclo = (((t - GUEIXA_DESL) % 9) + 9) % 9, levanta = ciclo > 5.1 && ciclo < 6.9, sorri = ciclo > 7.6 && ciclo < 8.9; // (levanta = o gole, com a tigela na boca; sorri = o "hum!" depois)
