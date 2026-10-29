@@ -652,8 +652,8 @@
 		}));
 	}
 	// o posto da alfândega: uma cúpula pressurizada com a câmara de ar e a placa. Fica numa imagem só
-	// dela (100 x 64, com o pé da cúpula em 50, 40) para começar pequenininho lá embaixo e ir crescendo
-	// enquanto a nave desce; pousada, ela fica no tamanho de verdade, em (330, HOR + 30) do chão
+	// dela (100 x 64, com o pé da cúpula em 50, 40), presa no chão em (330, HOR + 30), e sobe junto
+	// com o chão durante a descida
 	var posto = null;
 	function fazerPosto() {
 		return paraCanvas(pintar(new Pintura(100, 64, 0), function () {
@@ -1142,13 +1142,15 @@
 			if (!solo) solo = fazerSolo(SOLO[pagina]);
 			var kd = fase === 'pousado' ? 1 : suave(tf / 4.2), oy = Math.round(-HOR + 92 + (1 - kd) * 110 + (fase === 'descida' ? Math.sin(t * 9) * (1 - kd) : 0));
 			// o horizonte vai subindo até a altura dos olhos (a nave descendo de pé)
-			ctx.drawImage(solo, -OX, oy);
-			// o posto da alfândega: lá de cima ele é um pontinho perto do horizonte e vai crescendo até o
-			// tamanho de verdade no toque (a nave desce na frente dele)
+			// a descida em pé, como é de verdade: lá do alto, o chão aparece "esticado" para baixo do
+			// horizonte; descendo, ele vai se achatando em direção ao horizonte (cada ponto do chão desce
+			// na tela proporcional à altura da nave). O posto da alfândega fica preso no chão e sobe junto,
+			// sem mudar de tamanho nem escorregar
+			var hyp = HOR + oy, esticar = fase === 'pousado' ? 1 : 1 + 2.4 * (1 - kd) * (1 - kd);
+			ctx.save(); ctx.beginPath(); ctx.rect(-OX, 0, W, hyp); ctx.clip(); ctx.drawImage(solo, -OX, oy); ctx.restore();
+			ctx.drawImage(solo, 0, HOR, solo.width, solo.height - HOR, -OX, hyp, W, (solo.height - HOR) * esticar);
 			if (!posto) posto = fazerPosto();
-			var zp = fase === 'pousado' ? 1 : 0.16 + 0.84 * kd * kd, hyp = HOR + oy;
-			var pxp = 240 + (330 - 240) * zp, pyp = hyp + 30 * zp;
-			ctx.drawImage(posto, Math.round(pxp - 50 * zp), Math.round(pyp - 40 * zp), Math.max(1, Math.round(100 * zp)), Math.max(1, Math.round(64 * zp)));
+			ctx.drawImage(posto, 330 - 50, Math.round(hyp + 30 * esticar - 40));
 			if (fase === 'pousado') {
 				// a poeira levantada no toque: no vácuo de Mercúrio ela cai rápido, em Marte fica no ar
 				if (tf < 0.15 && !poeira.length) for (var i = 0; i < 90; i++) poeira.push({ x: 240 + (Math.random() - 0.5) * 60, y: 156, vx: (Math.random() - 0.5) * 160, vy: -Math.random() * 60, r: 1 + Math.random() * 3 });

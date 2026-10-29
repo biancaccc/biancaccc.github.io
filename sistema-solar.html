@@ -263,7 +263,7 @@
 		// As luas dando voltas nos seus planetas, na própria imagem do sistema. Cada uma: o planeta,
 		// o tamanho da órbita (em raios do globo do planeta), o achatamento e a inclinação da elipse
 		// (as luas de Urano giram "em pé", como o planeta deitado; Tritão vai inclinado e na contramão),
-		// o tempo de uma volta (em segundos, só para a animação) e o tamanho da lua (em % da largura; bem maior
+		// o tempo de uma volta (em dias, o de verdade: aqui, cada dia passa em 3 segundos) e o tamanho da lua (em % da largura; bem maior
 		// que o de verdade, para dar para ver e clicar).
 		(function () {
 			var sistema = document.getElementById('sistema'), svg = sistema.querySelector('.orbitas-luas');
@@ -272,18 +272,19 @@
 				/* (inclinações de verdade: a Lua quase no plano da órbita da Terra; as de Júpiter e Saturno no
 				   equador deles, junto dos anéis; as de Urano "em pé", porque o planeta é deitado; Tritão
 				   inclinado e na contramão) */
-				lua: { pai: 'terra', r: 1.75, ach: 0.3, incl: -5, volta: 28, tam: 1.4, fase: 1.2 },
-				io: { pai: 'jupiter', r: 1.14, ach: 0.3, incl: -3, volta: 10, tam: 1.3, fase: 0.3 },
-				europa: { pai: 'jupiter', r: 1.28, ach: 0.3, incl: -3, volta: 16, tam: 1.2, fase: 2.4 },
-				ganimedes: { pai: 'jupiter', r: 1.42, ach: 0.3, incl: -3, volta: 25, tam: 1.6, fase: 4.4 },
-				mimas: { pai: 'saturno', r: 1.62, ach: 0.3, incl: 0, volta: 11, tam: 0.95, fase: 1.0 },
-				encelado: { pai: 'saturno', r: 1.82, ach: 0.3, incl: 0, volta: 15, tam: 1.05, fase: 3.6 },
-				tita: { pai: 'saturno', r: 2.05, ach: 0.3, incl: 0, volta: 27, tam: 1.55, fase: 5.3 },
-				miranda: { pai: 'urano', r: 1.5, ach: 0.3, incl: 82, volta: 14, tam: 1.05, fase: 0.8 },
-				tritao: { pai: 'netuno', r: 1.45, ach: 0.4, incl: -28, volta: -22, tam: 1.25, fase: 2.0 }
+				lua: { pai: 'terra', r: 1.75, ach: 0.3, incl: -5, dias: 27.32, tam: 1.4, fase: 1.2 },
+				io: { pai: 'jupiter', r: 1.14, ach: 0.3, incl: -3, dias: 1.769, tam: 1.3, fase: 0.3 },
+				europa: { pai: 'jupiter', r: 1.28, ach: 0.3, incl: -3, dias: 3.551, tam: 1.2, fase: 2.4 },
+				ganimedes: { pai: 'jupiter', r: 1.42, ach: 0.3, incl: -3, dias: 7.155, tam: 1.6, fase: 4.4 },
+				mimas: { pai: 'saturno', r: 1.62, ach: 0.3, incl: 0, dias: 0.942, tam: 0.95, fase: 1.0 },
+				encelado: { pai: 'saturno', r: 1.82, ach: 0.3, incl: 0, dias: 1.37, tam: 1.05, fase: 3.6 },
+				tita: { pai: 'saturno', r: 2.05, ach: 0.3, incl: 0, dias: 15.945, tam: 1.55, fase: 5.3 },
+				miranda: { pai: 'urano', r: 1.5, ach: 0.3, incl: 82, dias: 1.413, tam: 1.05, fase: 0.8 },
+				tritao: { pai: 'netuno', r: 1.45, ach: 0.4, incl: -28, dias: -5.877, tam: 1.25, fase: 2.0 }
 			};
 			/* o raio do globo, em fração da largura da arte (Saturno é mais largo por causa dos anéis) */
 			var GLOBO = { saturno: 0.265 };
+			var SEGUNDOS_POR_DIA = 3;
 			var luas = [].slice.call(sistema.querySelectorAll('.lua-orbita')), parado = false;
 			luas.forEach(function (el) {
 				el.addEventListener('mouseenter', function () { parado = true; });
@@ -316,7 +317,7 @@
 					if (!pai) return;
 					var rp = pai.getBoundingClientRect(), cx = rp.left - rs.left + rp.width / 2, cy = rp.top - rs.top + rp.height / 2;
 					var R = rp.width * (GLOBO[L.pai] || 0.5), rx = R * L.r * Math.max(0.4, escala[L.pai] || 1), ry = rx * L.ach, inc = L.incl * Math.PI / 180;
-					var a = L.fase + tempo / L.volta * Math.PI * 2, ex = Math.cos(a) * rx, ey = Math.sin(a) * ry;
+					var a = L.fase + tempo / (L.dias * SEGUNDOS_POR_DIA) * Math.PI * 2, ex = Math.cos(a) * rx, ey = Math.sin(a) * ry;
 					var x = cx + ex * Math.cos(inc) - ey * Math.sin(inc), y = cy + ex * Math.sin(inc) + ey * Math.cos(inc);
 					var tam = Math.max(W < 700 ? 6 : 12, W * L.tam / 100);
 					el.style.width = tam + 'px'; el.style.left = (x - tam / 2) + 'px'; el.style.top = (y - tam / 2) + 'px';
