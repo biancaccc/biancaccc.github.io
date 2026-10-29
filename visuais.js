@@ -8,6 +8,8 @@
 // os dados ficam em visuais-dados.js e este arquivo monta o HTML primeiro (montarDaPagina).
 (function () {
 	'use strict';
+	/* (TR: o texto no idioma da visita, veja idioma.js; não é T porque uma animação tem uma variável T) */
+	var TR = window.T || function (pt) { return pt; };
 	var calmo = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 	// ---------- Montar os visuais a partir dos dados (visuais-dados.js) ----------
@@ -32,7 +34,7 @@
 		// "isso é como…"
 		Object.keys(D.comparacoes || {}).forEach(function (n) {
 			var sec = document.getElementById('secao-' + n);
-			if (sec) sec.appendChild(el('p', 'comparacao-dia', '<span class="icone-secao" data-icone="balao" aria-hidden="true"></span><span><b>Isso é como…</b> ' + D.comparacoes[n] + '</span>'));
+			if (sec) sec.appendChild(el('p', 'comparacao-dia', '<span class="icone-secao" data-icone="balao" aria-hidden="true"></span><span><b>' + TR('Isso é como…', 'That is like…') + '</b> ' + D.comparacoes[n] + '</span>'));
 		});
 		// mini animações (cada página tem duas, em seções diferentes)
 		[D.animacao, D.animacao2].forEach(function (a) {
@@ -48,7 +50,7 @@
 			var todos = el('figure', 'comparacao-viva');
 			todos.setAttribute('data-todos', '1');
 			todos.setAttribute('role', 'img');
-			todos.setAttribute('aria-label', 'Comparação de tamanho: o Sol e, ao lado, os oito planetas em tamanho real. Até Júpiter, o maior, parece pequeno perto do Sol, e a Terra é um pontinho.');
+			todos.setAttribute('aria-label', TR('Comparação de tamanho: o Sol e, ao lado, os oito planetas em tamanho real. Até Júpiter, o maior, parece pequeno perto do Sol, e a Terra é um pontinho.', 'Size comparison: the Sun and, next to it, the eight planets at true scale. Even Jupiter, the largest, looks small beside the Sun, and Earth is a tiny dot.'));
 			antiga.parentNode.replaceChild(todos, antiga);
 		} else if (antiga && c) {
 			var viva = el('figure', 'comparacao-viva');
@@ -58,7 +60,7 @@
 			viva.setAttribute('data-plural', c.plural);
 			if (c.proporcao) viva.setAttribute('data-proporcao', c.proporcao);
 			viva.setAttribute('role', 'img');
-			viva.setAttribute('aria-label', 'Comparação de tamanho: ' + D.nome + ' em tamanho real ao lado do Sol. O diâmetro do Sol é cerca de ' + Math.round(1392700 / c.km) + ' vezes maior.');
+			viva.setAttribute('aria-label', TR('Comparação de tamanho: ' + D.nome + ' em tamanho real ao lado do Sol. O diâmetro do Sol é cerca de ' + Math.round(1392700 / c.km) + ' vezes maior.', 'Size comparison: ' + D.nome + ' at true scale next to the Sun. The Sun is about ' + Math.round(1392700 / c.km) + ' times wider.'));
 			antiga.parentNode.replaceChild(viva, antiga);
 		}
 		// seções extras no fim: linha do tempo, calculadoras e quiz
@@ -70,66 +72,66 @@
 			extras.push([id, titulo]);
 		}
 		// o céu visto de lá (só nos destinos da galáxia): um texto e um céu em pixel art
-		if (D.ceu) secaoExtra('ceu', 'O céu visto daqui', '<p>' + D.ceu.texto + '</p>' +
+		if (D.ceu) secaoExtra('ceu', TR('O céu visto daqui', 'The sky from here'), '<p>' + D.ceu.texto + '</p>' +
 			'<figure class="animacao"><canvas data-animacao="ceu" width="200" height="110" role="img" aria-label="' + D.ceu.aria + '"></canvas>' +
 			'<div class="animacao-hud" aria-hidden="true"><span data-hud="ano">' + D.ceu.hud[0] + '</span><span data-hud="estacao">' + D.ceu.hud[1] + '</span></div>' +
 			'<figcaption>' + D.ceu.legenda + '</figcaption></figure>');
-		if (D.linha) secaoExtra('linha-do-tempo', 'Linha do tempo', '<ol class="linha-tempo">' +
+		if (D.linha) secaoExtra('linha-do-tempo', TR('Linha do tempo', 'Timeline'), '<ol class="linha-tempo">' +
 			D.linha.map(function (m) { return '<li><b>' + m[0] + '</b><span>' + m[1] + '</span></li>'; }).join('') + '</ol>' +
-			'<p class="linha-tempo-mais"><a href="linha-do-tempo.html">Ver a linha do tempo de todos os destinos juntos &rarr;</a></p>');
+			'<p class="linha-tempo-mais"><a href="linha-do-tempo.html">' + TR('Ver a linha do tempo de todos os destinos juntos', 'See the timeline of all destinations together') + ' &rarr;</a></p>');
 		var K = D.calculadoras;
 		if (K) {
 			var cards = '';
 			if (K.idade) cards +=
 				'<div class="calc" data-ferramenta="idade" data-ano="' + K.idade + '" data-planeta="' + D.nome + '">' +
-				'<label class="calc-titulo" for="calc-idade">Quantos anos você teria em ' + D.nome + '?</label>' +
-				'<div class="calc-entrada"><input id="calc-idade" type="number" min="0" max="130" value="10" inputmode="numeric"><span>anos na Terra</span></div>' +
+				'<label class="calc-titulo" for="calc-idade">' + TR('Quantos anos você teria em ' + D.nome + '?', 'How old would you be on ' + D.nome + '?') + '</label>' +
+				'<div class="calc-entrada"><input id="calc-idade" type="number" min="0" max="130" value="10" inputmode="numeric"><span>' + TR('anos na Terra', 'Earth years') + '</span></div>' +
 				'<p class="calc-resultado" aria-live="polite"></p></div>';
 			if (K.voltas) cards +=
 				'<div class="calc" data-ferramenta="voltas" data-km-ano="940000000">' +
-				'<label class="calc-titulo" for="calc-voltas">Quanto você já viajou em volta do Sol?</label>' +
-				'<div class="calc-entrada"><input id="calc-voltas" type="number" min="0" max="130" value="10" inputmode="numeric"><span>anos de idade</span></div>' +
+				'<label class="calc-titulo" for="calc-voltas">' + TR('Quanto você já viajou em volta do Sol?', 'How far have you traveled around the Sun?') + '</label>' +
+				'<div class="calc-entrada"><input id="calc-voltas" type="number" min="0" max="130" value="10" inputmode="numeric"><span>' + TR('anos de idade', 'years old') + '</span></div>' +
 				'<p class="calc-resultado" aria-live="polite"></p></div>';
 			// nos destinos da galáxia: quando saiu a luz que vemos de lá (e quando chega a de hoje)
 			if (K.luz) cards +=
 				'<div class="calc" data-ferramenta="luz" data-anos-luz="' + K.luz + '" data-de="' + K.de + '">' +
-				'<label class="calc-titulo" for="calc-luz">Quando saiu a luz que você vê ' + K.de + '?</label>' +
-				'<div class="calc-entrada"><input id="calc-luz" type="number" min="1900" max="2100" value="2015" inputmode="numeric"><span>ano em que você nasceu</span></div>' +
+				'<label class="calc-titulo" for="calc-luz">' + TR('Quando saiu a luz que você vê ' + K.de + '?', 'When did the light you see from ' + K.de + ' leave?') + '</label>' +
+				'<div class="calc-entrada"><input id="calc-luz" type="number" min="1900" max="2100" value="2015" inputmode="numeric"><span>' + TR('ano em que você nasceu', 'year you were born') + '</span></div>' +
 				'<p class="calc-resultado" aria-live="polite"></p></div>';
 			var V = K.viagem;
 			if (V) cards +=
 				'<div class="calc" data-ferramenta="viagem" data-km="' + V.km + '">' +
-				'<p class="calc-titulo">' + (V.titulo || 'Quanto tempo para chegar a ' + V.destino + '?') + '</p>' +
-				'<div class="calc-opcoes" role="group" aria-label="Escolha o jeito de viajar">' +
-					'<button type="button" data-kmh="100" data-icone="carro" data-frase="De carro, a 100 km/h">Carro</button>' +
-					'<button type="button" data-kmh="900" data-icone="aviao" data-frase="De avião, a 900 km/h">Avião</button>' +
-					'<button type="button" ' + (V.sonda.kmh ? 'data-kmh="' + V.sonda.kmh + '"' : 'data-anos="' + V.sonda.anos + '"') + ' data-icone="foguete" data-frase="' + V.sonda.frase + '" data-nota="' + V.sonda.nota + '">' + (pagina === 'terra' ? 'Foguete' : 'Sonda') + '</button>' +
-					'<button type="button" data-kmh="1079252849" data-icone="luz" data-frase="Na velocidade da luz">Luz</button>' +
+				'<p class="calc-titulo">' + (V.titulo || TR('Quanto tempo para chegar a ' + V.destino + '?', 'How long to get to ' + V.destino + '?')) + '</p>' +
+				'<div class="calc-opcoes" role="group" aria-label="' + TR('Escolha o jeito de viajar', 'Choose how to travel') + '">' +
+					'<button type="button" data-kmh="100" data-icone="carro" data-frase="' + TR('De carro, a 100 km/h', 'By car, at 100 km/h') + '">' + TR('Carro', 'Car') + '</button>' +
+					'<button type="button" data-kmh="900" data-icone="aviao" data-frase="' + TR('De avião, a 900 km/h', 'By plane, at 900 km/h') + '">' + TR('Avião', 'Plane') + '</button>' +
+					'<button type="button" ' + (V.sonda.kmh ? 'data-kmh="' + V.sonda.kmh + '"' : 'data-anos="' + V.sonda.anos + '"') + ' data-icone="foguete" data-frase="' + V.sonda.frase + '" data-nota="' + V.sonda.nota + '">' + (pagina === 'terra' ? TR('Foguete', 'Rocket') : TR('Sonda', 'Probe')) + '</button>' +
+					'<button type="button" data-kmh="1079252849" data-icone="luz" data-frase="' + TR('Na velocidade da luz', 'At the speed of light') + '">' + TR('Luz', 'Light') + '</button>' +
 				'</div>' +
 				'<div class="calc-trilha" aria-hidden="true"><i class="calc-terra"></i><i class="calc-veiculo"></i>' +
 					(pagina === 'terra' ? '<i class="calc-urano calc-lua"></i>'
 						: D.quizGalaxia ? '<i class="calc-urano calc-estrela"></i>' // os destinos não têm pixel art pequena: uma estrelinha na cor deles
 						: '<i class="calc-urano calc-destino" style="--destino:url(pixel/' + pagina + '.png)"></i>') + '</div>' +
-				'<p class="calc-resultado" aria-live="polite">Escolha um jeito de viajar.</p>' +
+				'<p class="calc-resultado" aria-live="polite">' + TR('Escolha um jeito de viajar.', 'Choose a way to travel.') + '</p>' +
 				'<small class="calc-nota">' + V.nota + '</small></div>';
-			secaoExtra('calculadoras', 'Calculadoras espaciais', '<div class="calculadoras">' + cards + '</div>');
+			secaoExtra('calculadoras', TR('Calculadoras espaciais', 'Space calculators'), '<div class="calculadoras">' + cards + '</div>');
 		}
 		// sons de verdade: gravações e "sonificações" da NASA e de observatórios (links para os sites deles)
-		if (D.sons) secaoExtra('sons', 'Ouça de verdade',
-			'<p>No espaço não tem ar, e sem ar o som não anda. Mas os telescópios e as sondas captam luz e ondas de rádio, e os cientistas transformam esses dados em sons que a gente pode ouvir. Use fone de ouvido!</p>' +
+		if (D.sons) secaoExtra('sons', TR('Ouça de verdade', 'Hear it for real'),
+			'<p>' + TR('No espaço não tem ar, e sem ar o som não anda. Mas os telescópios e as sondas captam luz e ondas de rádio, e os cientistas transformam esses dados em sons que a gente pode ouvir. Use fone de ouvido!', 'There is no air in space, and without air sound cannot travel. But telescopes and probes pick up light and radio waves, and scientists turn that data into sounds we can hear. Use headphones!') + '</p>' +
 			'<ul class="sons">' + D.sons.map(function (s) {
 				// com o som guardado no site: um tocador (botão, barrinha e o link para a página original)
-				if (s.audio) return '<li class="som"><button type="button" class="sons-tocar" data-audio="' + s.audio + '" data-duracao="' + (s.duracao || '') + '" aria-pressed="false" aria-label="Tocar: ' + s.titulo + '"><span class="sons-icone" aria-hidden="true"></span></button>' +
+				if (s.audio) return '<li class="som"><button type="button" class="sons-tocar" data-audio="' + s.audio + '" data-duracao="' + (s.duracao || '') + '" aria-pressed="false" aria-label="' + TR('Tocar: ', 'Play: ') + s.titulo + '"><span class="sons-icone" aria-hidden="true"></span></button>' +
 					'<span class="sons-texto"><b>' + s.titulo + '</b><span>' + s.texto + '</span><span class="sons-barra" aria-hidden="true"><i></i></span>' +
-					'<small>' + s.fonte + ' · <a href="' + s.url + '" target="_blank" rel="noopener">ver no site original, em inglês &#8599;</a></small></span></li>';
-				return '<li><a href="' + s.url + '" target="_blank" rel="noopener"><span class="sons-icone" aria-hidden="true">&#9835;</span><span class="sons-texto"><b>' + s.titulo + '</b><span>' + s.texto + '</span><small>' + s.fonte + ' · o site é em inglês &#8599;</small></span></a></li>';
+					'<small>' + s.fonte + ' · <a href="' + s.url + '" target="_blank" rel="noopener">' + TR('ver no site original, em inglês', 'see it on the original site') + ' &#8599;</a></small></span></li>';
+				return '<li><a href="' + s.url + '" target="_blank" rel="noopener"><span class="sons-icone" aria-hidden="true">&#9835;</span><span class="sons-texto"><b>' + s.titulo + '</b><span>' + s.texto + '</span><small>' + s.fonte + ' · ' + TR('o site é em inglês', 'original site') + ' &#8599;</small></span></a></li>';
 			}).join('') + '</ul>');
-		var SELO_QUIZ = D.quizGalaxia ? 'Sabe-tudo da Via Láctea' : 'Sabe-tudo do Sistema Solar';
+		var SELO_QUIZ = D.quizGalaxia ? TR('Sabe-tudo da Via Láctea', 'Milky Way Know-it-all') : TR('Sabe-tudo do Sistema Solar', 'Solar System Know-it-all');
 		// "Quiz da Terra", "Quiz das Plêiades"... (o resto fica com "de")
 		var DE = { 'Terra': 'da Terra', 'Nebulosa de Órion': 'da Nebulosa de Órion', 'Plêiades': 'das Plêiades', 'Bolhas de Fermi': 'das Bolhas de Fermi',
 			'Nebulosa da Hélice': 'da Nebulosa da Hélice', 'Estrela de Tabby': 'da Estrela de Tabby', 'Nebulosa do Caranguejo': 'da Nebulosa do Caranguejo' };
-		if (D.quiz) secaoExtra('quiz', 'Quiz ' + (DE[D.nome] || 'de ' + D.nome),'<div class="quiz" data-quiz="' + pagina + '"' + (D.quizGalaxia ? ' data-quiz-galaxia' : '') + '>' +
-			'<p class="quiz-intro">Acerte as três perguntas: cada quiz certo conta para o selo especial "' + SELO_QUIZ + '" do seu passaporte.</p>' +
+		if (D.quiz) secaoExtra('quiz', TR('Quiz ' + (DE[D.nome] || 'de ' + D.nome), D.nome + ' quiz'),'<div class="quiz" data-quiz="' + pagina + '"' + (D.quizGalaxia ? ' data-quiz-galaxia' : '') + '>' +
+			'<p class="quiz-intro">' + TR('Acerte as três perguntas: cada quiz certo conta para o selo especial "' + SELO_QUIZ + '" do seu passaporte.', 'Get all three questions right: each quiz you ace counts toward the special "' + SELO_QUIZ + '" seal in your passport.') + '</p>' +
 			D.quiz.map(function (q, i) {
 				return '<fieldset class="quiz-pergunta"><legend>' + (i + 1) + '. ' + q[0] + '</legend>' +
 					q[1].map(function (r) { return r.charAt(0) === '*' ? '<button type="button" data-certa>' + r.slice(1) + '</button>' : '<button type="button">' + r + '</button>'; }).join('') +
@@ -269,9 +271,9 @@
 				if (hud) {
 					var ano = Math.floor(((ang / (Math.PI * 2)) % 1) * 84);
 					var frente = -Math.cos(ang); // 1 = polo norte de frente para o Sol
-					hud.ano.textContent = 'ano ' + ano + ' de 84';
+					hud.ano.textContent = TR('ano ' + ano + ' de 84', 'year ' + ano + ' of 84');
 					// virando para o Sol = primavera; se afastando dele = outono
-					hud.estacao.textContent = (frente > 0.6 ? 'verão' : frente < -0.6 ? 'inverno' : Math.sin(ang) > 0 ? 'primavera' : 'outono') + ' no polo norte';
+					hud.estacao.textContent = TR((frente > 0.6 ? 'verão' : frente < -0.6 ? 'inverno' : Math.sin(ang) > 0 ? 'primavera' : 'outono') + ' no polo norte', (frente > 0.6 ? 'summer' : frente < -0.6 ? 'winter' : Math.sin(ang) > 0 ? 'spring' : 'autumn') + ' at the north pole');
 				}
 			};
 		},
@@ -359,7 +361,7 @@
 			var MAR = [hex('#bfe0ff'), hex('#8fc0ff'), hex('#5f9fe8'), hex('#3a6fc0'), hex('#244a8a'), hex('#17305e'), hex('#0e1c3a')];
 			var cx = L / 2, cy = A / 2, rx = L * 0.36, ry = A * 0.3;
 			var VERDE = [hex('#c8e89a'), hex('#b8e08a'), hex('#9fd07a'), hex('#7fbf5a'), hex('#5f9a44'), hex('#3f6a36'), hex('#244a22')];
-			var MESES = ['dezembro', 'janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho', 'julho', 'agosto', 'setembro', 'outubro', 'novembro'];
+			var MESES = TR(['dezembro', 'janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho', 'julho', 'agosto', 'setembro', 'outubro', 'novembro'], ['December', 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November']);
 			return function (buf, t, hud) {
 				buf.fill(FUNDO);
 				function ponto(x, y, c) { if (x >= 0 && y >= 0 && x < L && y < A) buf[y * L + x] = c; }
@@ -383,7 +385,7 @@
 				if (hud) {
 					var mes = MESES[Math.floor(((ang / (Math.PI * 2)) % 1) * 12)], sul = Math.cos(ang); // 1 = hemisfério sul de frente para o Sol
 					hud.ano.textContent = mes;
-					hud.estacao.textContent = (sul > 0.7 ? 'verão' : sul < -0.7 ? 'inverno' : Math.sin(ang) > 0 ? 'outono' : 'primavera') + ' no Brasil';
+					hud.estacao.textContent = TR((sul > 0.7 ? 'verão' : sul < -0.7 ? 'inverno' : Math.sin(ang) > 0 ? 'outono' : 'primavera') + ' no Brasil', (sul > 0.7 ? 'summer' : sul < -0.7 ? 'winter' : Math.sin(ang) > 0 ? 'autumn' : 'spring') + ' in Brazil');
 				}
 			};
 		},
@@ -426,8 +428,8 @@
 				anel(true);
 				if (hud) {
 					var ano = Math.floor(((fase / (Math.PI * 2)) % 1) * 29.5), abrindo = Math.sign(b) * Math.cos(fase) > 0;
-					hud.ano.textContent = 'ano ' + ano + ' de 29';
-					hud.estacao.textContent = Math.abs(b) > 0.32 ? 'anéis bem abertos' : Math.abs(b) < 0.06 ? 'anéis de lado (como em 2025)' : abrindo ? 'anéis abrindo' : 'anéis fechando';
+					hud.ano.textContent = TR('ano ' + ano + ' de 29', 'year ' + ano + ' of 29');
+					hud.estacao.textContent = TR(Math.abs(b) > 0.32 ? 'anéis bem abertos' : Math.abs(b) < 0.06 ? 'anéis de lado (como em 2025)' : abrindo ? 'anéis abrindo' : 'anéis fechando', Math.abs(b) > 0.32 ? 'rings wide open' : Math.abs(b) < 0.06 ? 'rings edge-on (as in 2025)' : abrindo ? 'rings opening' : 'rings closing');
 				}
 			};
 		},
@@ -477,8 +479,8 @@
 				pintar(buf, L, A, meio + 1, chao - 4, hex('#ff4a5a')); pintar(buf, L, A, meio + 2, chao - 4, hex('#ff4a5a')); pintar(buf, L, A, meio + 1, chao - 3, hex('#ff4a5a'));
 				if (hud) {
 					var c = Math.cos(h), s = Math.sin(h);
-					hud.ano.textContent = 'volta ' + (Math.floor(th / (Math.PI * 2)) % 2 + 1) + ' de 2 no Sol';
-					hud.estacao.textContent = c > 0.93 ? 'meio-dia lá (430 °C)' : c > 0.2 ? (s < 0 ? 'manhã lá' : 'tarde lá') : c > -0.2 ? (s < 0 ? 'o Sol nascendo lá' : 'o Sol se pondo lá') : 'noite lá (−180 °C)';
+					hud.ano.textContent = TR('volta ' + (Math.floor(th / (Math.PI * 2)) % 2 + 1) + ' de 2 no Sol', 'orbit ' + (Math.floor(th / (Math.PI * 2)) % 2 + 1) + ' of 2 around the Sun');
+					hud.estacao.textContent = TR(c > 0.93 ? 'meio-dia lá (430 °C)' : c > 0.2 ? (s < 0 ? 'manhã lá' : 'tarde lá') : c > -0.2 ? (s < 0 ? 'o Sol nascendo lá' : 'o Sol se pondo lá') : 'noite lá (−180 °C)', c > 0.93 ? 'noon there (430 °C)' : c > 0.2 ? (s < 0 ? 'morning there' : 'afternoon there') : c > -0.2 ? (s < 0 ? 'sunrise there' : 'sunset there') : 'night there (−180 °C)');
 				}
 			};
 		},
@@ -511,8 +513,8 @@
 					buf[(Math.round(cy) + y) * L + Math.round(cx) + x] = c;
 				}
 				if (hud) {
-					hud.ano.textContent = 'semana ' + Math.floor(ciclo * 20);
-					hud.estacao.textContent = k < 0.05 ? 'céu limpo' : k > 0.95 ? 'o planeta inteiro coberto' : fase < 0.5 ? 'a tempestade crescendo' : 'a poeira baixando';
+					hud.ano.textContent = TR('semana ' + Math.floor(ciclo * 20), 'week ' + Math.floor(ciclo * 20));
+					hud.estacao.textContent = TR(k < 0.05 ? 'céu limpo' : k > 0.95 ? 'o planeta inteiro coberto' : fase < 0.5 ? 'a tempestade crescendo' : 'a poeira baixando', k < 0.05 ? 'clear sky' : k > 0.95 ? 'the whole planet covered' : fase < 0.5 ? 'the storm growing' : 'the dust settling');
 				}
 			};
 		},
@@ -647,7 +649,7 @@
 				[[-1, 0], [2, 0], [0, -1], [1, -1], [0, 2], [1, 2]].forEach(function (d) { pintar(buf, L, A, sx + d[0], sy + d[1], hex('#8fd3fa')); });
 				if (hud) {
 					var dist = Math.sqrt(X * X + Y * Y), v = Math.sqrt(2 / dist - 1 / a) / vPeri * 7650;
-					hud.ano.textContent = 'ano ' + Math.floor((M / (Math.PI * 2)) * 16) + ' de 16';
+					hud.ano.textContent = TR('ano ' + Math.floor((M / (Math.PI * 2)) * 16) + ' de 16', 'year ' + Math.floor((M / (Math.PI * 2)) * 16) + ' of 16');
 					hud.estacao.textContent = numero(Math.round(v / 10) * 10, 0) + ' km/s';
 				}
 			};
@@ -710,8 +712,8 @@
 				}
 				if (hud) {
 					var ma = c < 3 ? 4 : Math.max(0, 4 - (c - 3) / 8 * 4);
-					hud.ano.textContent = ma <= 0.05 ? 'hoje' : 'há ' + numero(ma, ma < 1 ? 1 : 0).replace(',0', '') + (ma >= 2 ? ' milhões' : ' milhão') + ' de anos';
-					hud.estacao.textContent = c < 2.4 ? 'uma nuvem de gás cai no centro' : c < 3.4 ? 'o buraco negro engole a nuvem' : c < 9 ? 'jatos soprando as bolhas' : 'bolhas de 25 mil anos-luz';
+					hud.ano.textContent = TR(ma <= 0.05 ? 'hoje' : 'há ' + numero(ma, ma < 1 ? 1 : 0).replace(',0', '') + (ma >= 2 ? ' milhões' : ' milhão') + ' de anos', ma <= 0.05 ? 'today' : numero(ma, ma < 1 ? 1 : 0).replace('.0', '') + ' million years ago');
+					hud.estacao.textContent = TR(c < 2.4 ? 'uma nuvem de gás cai no centro' : c < 3.4 ? 'o buraco negro engole a nuvem' : c < 9 ? 'jatos soprando as bolhas' : 'bolhas de 25 mil anos-luz', c < 2.4 ? 'a gas cloud falls to the center' : c < 3.4 ? 'the black hole swallows the cloud' : c < 9 ? 'jets blowing the bubbles' : 'bubbles 25 thousand light-years tall');
 				}
 			};
 		},
@@ -757,8 +759,8 @@
 				});
 				desenharPoeira(true);
 				if (hud) {
-					hud.ano.textContent = c < 2.8 ? numero(Math.round(c / 2.8 * 100), 0) + ' mil anos' : c < 6 ? numero(0.1 + (c - 2.8) / 3.2 * 0.9, 1) + ' milhão de anos' : numero(Math.min(10, 1 + (c - 6) / 6 * 9), 0) + ' milhões de anos';
-					hud.estacao.textContent = c < 2.8 ? 'a nuvem encolhe e gira' : c < 6 ? 'uma estrela acende no disco' : c < 12 ? 'planetas se formando' : 'um novo sistema solar';
+					hud.ano.textContent = TR(c < 2.8 ? numero(Math.round(c / 2.8 * 100), 0) + ' mil anos' : c < 6 ? numero(0.1 + (c - 2.8) / 3.2 * 0.9, 1) + ' milhão de anos' : numero(Math.min(10, 1 + (c - 6) / 6 * 9), 0) + ' milhões de anos', c < 2.8 ? numero(Math.round(c / 2.8 * 100), 0) + ' thousand years' : c < 6 ? numero(0.1 + (c - 2.8) / 3.2 * 0.9, 1) + ' million years' : numero(Math.min(10, 1 + (c - 6) / 6 * 9), 0) + ' million years');
+					hud.estacao.textContent = TR(c < 2.8 ? 'a nuvem encolhe e gira' : c < 6 ? 'uma estrela acende no disco' : c < 12 ? 'planetas se formando' : 'um novo sistema solar', c < 2.8 ? 'the cloud shrinks and spins' : c < 6 ? 'a star lights up in the disk' : c < 12 ? 'planets forming' : 'a new solar system');
 				}
 			};
 		},
@@ -802,8 +804,8 @@
 					}
 				});
 				if (hud) {
-					hud.ano.textContent = k < 0.02 ? 'hoje' : 'daqui a ' + numero(Math.round(k * 250 / 10) * 10, 0) + ' milhões de anos';
-					hud.estacao.textContent = k < 0.3 ? 'irmãs juntas' : k < 0.7 ? 'se afastando' : 'cada uma no seu caminho';
+					hud.ano.textContent = TR(k < 0.02 ? 'hoje' : 'daqui a ' + numero(Math.round(k * 250 / 10) * 10, 0) + ' milhões de anos', k < 0.02 ? 'today' : numero(Math.round(k * 250 / 10) * 10, 0) + ' million years from now');
+					hud.estacao.textContent = TR(k < 0.3 ? 'irmãs juntas' : k < 0.7 ? 'se afastando' : 'cada uma no seu caminho', k < 0.3 ? 'sisters together' : k < 0.7 ? 'drifting apart' : 'each on its own path');
 				}
 			};
 		},
@@ -865,8 +867,8 @@
 				// o brilho azulado da anã branca
 				if (c > 7) for (var s = 2; s <= 4; s++) [[-s, 0], [s, 0], [0, -s], [0, s]].forEach(function (p) { pintar(buf, L, A, cx + p[0], cy + p[1], s < 4 ? hex('#bff6ff') : hex('#5fd6d0')); });
 				if (hud) {
-					hud.ano.textContent = c < 2.5 ? 'estrela como o Sol' : c < 6 ? 'gigante vermelha' : c < 8 ? 'solta as camadas' : 'nebulosa planetária';
-					hud.estacao.textContent = c < 2.5 ? 'bilhões de anos' : c < 6 ? 'o combustível acaba' : c < 15.4 ? 'há ' + numero(Math.max(1, Math.round((c - 6) / 9.4 * 10)), 0) + ' mil anos' : 'o gás se espalha';
+					hud.ano.textContent = TR(c < 2.5 ? 'estrela como o Sol' : c < 6 ? 'gigante vermelha' : c < 8 ? 'solta as camadas' : 'nebulosa planetária', c < 2.5 ? 'a star like the Sun' : c < 6 ? 'red giant' : c < 8 ? 'sheds its layers' : 'planetary nebula');
+					hud.estacao.textContent = TR(c < 2.5 ? 'bilhões de anos' : c < 6 ? 'o combustível acaba' : c < 15.4 ? 'há ' + numero(Math.max(1, Math.round((c - 6) / 9.4 * 10)), 0) + ' mil anos' : 'o gás se espalha', c < 2.5 ? 'billions of years' : c < 6 ? 'the fuel runs out' : c < 15.4 ? numero(Math.max(1, Math.round((c - 6) / 9.4 * 10)), 0) + ' thousand years ago' : 'the gas spreads out');
 				}
 			};
 		},
@@ -908,8 +910,8 @@
 					pintar(buf, L, A, gx, yDo(1 - kk * 0.22), hex('#6fb0ff'));
 				}
 				if (hud) {
-					hud.ano.textContent = 'azul: ' + Math.round((1 - k * 0.22) * 100) + '%';
-					hud.estacao.textContent = 'vermelho: ' + Math.round((1 - k * 0.13) * 100) + '%';
+					hud.ano.textContent = TR('azul: ' + Math.round((1 - k * 0.22) * 100) + '%', 'blue: ' + Math.round((1 - k * 0.22) * 100) + '%');
+					hud.estacao.textContent = TR('vermelho: ' + Math.round((1 - k * 0.13) * 100) + '%', 'red: ' + Math.round((1 - k * 0.13) * 100) + '%');
 				}
 			};
 		},
@@ -985,9 +987,9 @@
 				var zero = Math.round(base - 1 - (180 / 610) * (base - topo - 2));
 				for (x = tx - 4; x < tx - 1; x++) pintar(buf, L, A, x, zero, hex('#cdbfff'));
 				if (hud) {
-					hud.ano.textContent = 'dia ' + Math.floor((t / 16) * 176) + ' de 176';
+					hud.ano.textContent = TR('dia ' + Math.floor((t / 16) * 176) + ' de 176', 'day ' + Math.floor((t / 16) * 176) + ' of 176');
 					var graus = Math.round(temp / 10) * 10;
-					hud.estacao.textContent = (graus < 0 ? '−' + Math.abs(graus) : graus) + ' °C no pontinho' + (frente ? '' : ' (atrás)');
+					hud.estacao.textContent = TR((graus < 0 ? '−' + Math.abs(graus) : graus) + ' °C no pontinho' + (frente ? '' : ' (atrás)'), (graus < 0 ? '−' + Math.abs(graus) : graus) + ' °C at the dot' + (frente ? '' : ' (behind)'));
 				}
 			};
 		},
@@ -1039,8 +1041,8 @@
 				var cheio = Math.round(base - 1 - alto * (base - topo - 2));
 				for (y = cheio; y < base; y++) for (x = tx; x <= tx + 3; x++) pintar(buf, L, A, x, y, hex('#ff5a3a'));
 				if (hud) {
-					hud.ano.textContent = Math.round(temp / 5) * 5 + ' °C no chão';
-					hud.estacao.textContent = c < 1.2 ? 'a luz do Sol entra' : calor < 0.6 ? 'o calor não consegue sair' : 'quente de derreter chumbo';
+					hud.ano.textContent = TR(Math.round(temp / 5) * 5 + ' °C no chão', Math.round(temp / 5) * 5 + ' °C on the ground');
+					hud.estacao.textContent = TR(c < 1.2 ? 'a luz do Sol entra' : calor < 0.6 ? 'o calor não consegue sair' : 'quente de derreter chumbo', c < 1.2 ? 'sunlight comes in' : calor < 0.6 ? 'the heat cannot escape' : 'hot enough to melt lead');
 				}
 			};
 		},
@@ -1071,8 +1073,8 @@
 					pintar(buf, L, A, lx + x, ly + y, c);
 				}
 				if (hud) {
-					var f = fase, nome = f < 0.25 || f > 6.03 ? 'lua nova' : f < 1.32 ? 'lua crescente' : f < 1.82 ? 'quarto crescente' : f < 2.9 ? 'crescente, quase cheia' : f < 3.39 ? 'lua cheia' : f < 4.46 ? 'minguante' : f < 4.96 ? 'quarto minguante' : 'minguante, quase nova';
-					hud.ano.textContent = 'dia ' + Math.floor((t % CICLO) / CICLO * 29.5) + ' de 29';
+					var f = fase, nome = f < 0.25 || f > 6.03 ? TR('lua nova', 'new moon') : f < 1.32 ? TR('lua crescente', 'waxing crescent') : f < 1.82 ? TR('quarto crescente', 'first quarter') : f < 2.9 ? TR('crescente, quase cheia', 'waxing gibbous') : f < 3.39 ? TR('lua cheia', 'full moon') : f < 4.46 ? TR('minguante', 'waning gibbous') : f < 4.96 ? TR('quarto minguante', 'last quarter') : TR('minguante, quase nova', 'waning crescent');
+					hud.ano.textContent = TR('dia ' + Math.floor((t % CICLO) / CICLO * 29.5) + ' de 29', 'day ' + Math.floor((t % CICLO) / CICLO * 29.5) + ' of 29');
 					hud.estacao.textContent = nome;
 				}
 			};
@@ -1102,8 +1104,8 @@
 				corpos.filter(function (c) { return !c.atras; }).sort(function (a, b) { return a.z - b.z; }).forEach(function (c) { c.d(); });
 				if (hud) {
 					var voltas = Math.floor(t / PT);
-					hud.ano.textContent = 'dia ' + Math.floor((t / CICLO) * 687) + ' de 687';
-					hud.estacao.textContent = 'a Terra já deu ' + voltas + (voltas === 1 ? ' volta' : ' voltas');
+					hud.ano.textContent = TR('dia ' + Math.floor((t / CICLO) * 687) + ' de 687', 'day ' + Math.floor((t / CICLO) * 687) + ' of 687');
+					hud.estacao.textContent = TR('a Terra já deu ' + voltas + (voltas === 1 ? ' volta' : ' voltas'), 'Earth has gone around ' + voltas + (voltas === 1 ? ' time' : ' times'));
 				}
 			};
 		},
@@ -1140,8 +1142,8 @@
 					for (var q = 0; q < Math.PI * 2; q += 0.06) pintar(buf, L, A, ex + Math.cos(q) * raio, cy + Math.sin(q) * raio, hex('#d8f0ff'));
 				}
 				if (hud) {
-					hud.ano.textContent = 'ano ' + (1879 + Math.round(k * 145));
-					hud.estacao.textContent = 'cabem ' + numero(terras, 1) + ' Terras lado a lado';
+					hud.ano.textContent = TR('ano ' + (1879 + Math.round(k * 145)), 'year ' + (1879 + Math.round(k * 145)));
+					hud.estacao.textContent = TR('cabem ' + numero(terras, 1) + ' Terras lado a lado', numero(terras, 1) + ' Earths fit side by side');
 				}
 			};
 		},
@@ -1179,8 +1181,8 @@
 					if (c > 1 && c < 1.7) for (var s = 0; s < 6; s++) { var f = (c - 1) / 0.7; pintar(buf, L, A, p.x + (s - 2.5) * 5 * f, AGUA - 1 - Math.sin(f * Math.PI) * (6 + s % 3 * 2), hex('#d8f4ff')); }
 				});
 				if (hud) {
-					hud.ano.textContent = 'uma banheira gigante';
-					hud.estacao.textContent = c < 1 ? 'soltando na água…' : c < 2.6 ? 'a Terra afunda rapidinho' : c < 8 ? 'Júpiter afunda devagar' : 'Saturno flutua!';
+					hud.ano.textContent = TR('uma banheira gigante', 'a giant bathtub');
+					hud.estacao.textContent = TR(c < 1 ? 'soltando na água…' : c < 2.6 ? 'a Terra afunda rapidinho' : c < 8 ? 'Júpiter afunda devagar' : 'Saturno flutua!', c < 1 ? 'dropping into the water…' : c < 2.6 ? 'Earth sinks fast' : c < 8 ? 'Jupiter sinks slowly' : 'Saturn floats!');
 				}
 			};
 		},
@@ -1206,8 +1208,8 @@
 				if (O.atras(ang)) { netuno(); O.sol(buf); } else { O.sol(buf); netuno(); }
 				if (hud) {
 					var ano = 1846 + Math.floor(k * 165);
-					hud.ano.textContent = 'ano ' + ano;
-					hud.estacao.textContent = k < 0.05 ? 'descoberto em 1846 (marca vermelha)' : k > 0.95 ? 'primeira volta completa: 2011' : 'a primeira volta desde a descoberta';
+					hud.ano.textContent = TR('ano ' + ano, 'year ' + ano);
+					hud.estacao.textContent = TR(k < 0.05 ? 'descoberto em 1846 (marca vermelha)' : k > 0.95 ? 'primeira volta completa: 2011' : 'a primeira volta desde a descoberta', k < 0.05 ? 'discovered in 1846 (red mark)' : k > 0.95 ? 'first full orbit: 2011' : 'the first orbit since its discovery');
 				}
 			};
 		},
@@ -1298,8 +1300,8 @@
 				});
 				if (hud) {
 					var erupcao = ERUPCOES.some(function (e0) { return c - e0 >= -0.4 && c - e0 < 0.5; }), viajando = ERUPCOES.some(function (e0) { return c - e0 >= 0.5 && c - e0 < VIAGEM; });
-					hud.ano.textContent = 'ano ' + Math.floor(ano) + ' de 11';
-					hud.estacao.textContent = aurora > 0.05 ? 'aurora na Terra!' : erupcao ? 'erupção!' : viajando ? 'partículas a caminho da Terra' : ativo < 0.25 ? 'Sol calmo, poucas manchas' : 'Sol agitado, cheio de manchas';
+					hud.ano.textContent = TR('ano ' + Math.floor(ano) + ' de 11', 'year ' + Math.floor(ano) + ' of 11');
+					hud.estacao.textContent = TR(aurora > 0.05 ? 'aurora na Terra!' : erupcao ? 'erupção!' : viajando ? 'partículas a caminho da Terra' : ativo < 0.25 ? 'Sol calmo, poucas manchas' : 'Sol agitado, cheio de manchas', aurora > 0.05 ? 'aurora on Earth!' : erupcao ? 'eruption!' : viajando ? 'particles heading to Earth' : ativo < 0.25 ? 'calm Sun, few spots' : 'restless Sun, full of spots');
 				}
 			};
 		},
@@ -1368,8 +1370,8 @@
 				[[-1, 0], [2, 0], [0, -1], [1, -1], [0, 2], [1, 2]].forEach(function (s) { pintar(buf, L, A, fx + s[0], fy + s[1], hex('#7fe3ff')); });
 				[[0, 0], [1, 0], [0, 1], [1, 1]].forEach(function (s) { pintar(buf, L, A, fx + s[0], fy + s[1], hex('#ffffff')); });
 				if (hud) {
-					hud.ano.textContent = c < T1 ? numero(Math.round(c / T1 * 50), 0) + ' mil anos dentro do Sol' : c < T2 ? 'subindo numa bolha de gás' : c < T3 ? numero(Math.min(8, Math.floor((c - T2) / (T3 - T2) * 8)), 0) + ' min viajando' : 'chegou à Terra!';
-					hud.estacao.textContent = c < T1 ? 'presa no labirinto' : c < T2 ? 'quase lá fora' : 'só 8 minutos até aqui';
+					hud.ano.textContent = TR(c < T1 ? numero(Math.round(c / T1 * 50), 0) + ' mil anos dentro do Sol' : c < T2 ? 'subindo numa bolha de gás' : c < T3 ? numero(Math.min(8, Math.floor((c - T2) / (T3 - T2) * 8)), 0) + ' min viajando' : 'chegou à Terra!', c < T1 ? numero(Math.round(c / T1 * 50), 0) + ' thousand years inside the Sun' : c < T2 ? 'rising in a gas bubble' : c < T3 ? numero(Math.min(8, Math.floor((c - T2) / (T3 - T2) * 8)), 0) + ' min traveling' : 'reached Earth!');
+					hud.estacao.textContent = TR(c < T1 ? 'presa no labirinto' : c < T2 ? 'quase lá fora' : 'só 8 minutos até aqui', c < T1 ? 'trapped in the maze' : c < T2 ? 'almost outside' : 'only 8 minutes to here');
 				}
 			};
 		},
@@ -1442,8 +1444,8 @@
 				});
 				for (y = 0; y < A; y++) { pintar(buf, L, A, corte, y, hex('#ffffff')); if (y % 2) pintar(buf, L, A, corte + 1, y, hex('#9ffcff')); }
 				if (hud) {
-					hud.ano.textContent = '← raios gama';
-					hud.estacao.textContent = 'luz que os olhos veem →';
+					hud.ano.textContent = TR('← raios gama', '← gamma rays');
+					hud.estacao.textContent = TR('luz que os olhos veem →', 'light our eyes see →');
 				}
 			};
 		},
@@ -1498,8 +1500,8 @@
 					pintar(buf, L, A, p[0], p[1], i === 1 && c > 4 && c < 6.2 && Math.sin(t * 8) > 0 ? hex('#ff9ad0') : hex('#e8e0ff'));
 				});
 				if (hud) {
-					hud.ano.textContent = c < 1.5 ? 'a constelação de Órion' : c < 4 ? 'as Três Marias' : c < 6.2 ? 'a espada: a do meio é borrada' : 'chegando mais perto…';
-					hud.estacao.textContent = c < 7.5 ? 'vista do Brasil' : 'não é estrela: é a nebulosa!';
+					hud.ano.textContent = TR(c < 1.5 ? 'a constelação de Órion' : c < 4 ? 'as Três Marias' : c < 6.2 ? 'a espada: a do meio é borrada' : 'chegando mais perto…', c < 1.5 ? 'the constellation Orion' : c < 4 ? "Orion's Belt" : c < 6.2 ? 'the sword: the middle one is blurry' : 'getting closer…');
+					hud.estacao.textContent = TR(c < 7.5 ? 'vista do Brasil' : 'não é estrela: é a nebulosa!', c < 7.5 ? 'seen from Brazil' : 'not a star: it is the nebula!');
 				}
 			};
 		},
@@ -1536,8 +1538,8 @@
 					if (Math.min(dl, dr) > 50) buf[y2 * L + x2] = hex('#000000');
 				}
 				if (hud) {
-					hud.ano.textContent = ['no céu da cidade', 'no céu do campo', 'com binóculo'][etapa];
-					hud.estacao.textContent = 'você vê ' + vistas + ' estrelas';
+					hud.ano.textContent = TR(['no céu da cidade', 'no céu do campo', 'com binóculo'][etapa], ['in a city sky', 'in a country sky', 'with binoculars'][etapa]);
+					hud.estacao.textContent = TR('você vê ' + vistas + ' estrelas', 'you see ' + vistas + ' stars');
 				}
 			};
 		},
@@ -1605,7 +1607,7 @@
 				linha(buf, 24, 50, planeta, t, hex('#7fd8ff'));
 				linha(buf, 72, 100, tabby, t, hex('#ffb347'));
 				if (hud) {
-					hud.ano.textContent = 'com planeta: ' + (qp > 0 ? '99%' : '100%');
+					hud.ano.textContent = TR('com planeta: ' + (qp > 0 ? '99%' : '100%'), 'with planet: ' + (qp > 0 ? '99%' : '100%'));
 					hud.estacao.textContent = 'Tabby: ' + Math.round((1 - qt) * 100) + '%';
 				}
 			};
@@ -1650,8 +1652,8 @@
 				for (y = -2; y <= 2; y++) for (x = -2; x <= 2; x++) if (x * x + y * y <= 5) pintar(buf, L, A, cc[0] + x, cc[1] + y, x * x + y * y < 2 ? hex('#fff1b8') : hex('#ffc65a'));
 				if (hud) {
 					var bi = 10 - Math.min(1, k) * 10;
-					hud.ano.textContent = bi < 0.4 ? 'hoje' : 'há ' + numero(bi, bi < 2 ? 1 : 0) + (bi < 2 ? ' bilhão' : ' bilhões') + ' de anos';
-					hud.estacao.textContent = k < 0.2 ? 'uma galáxia pequena chega perto' : k < 0.75 ? 'a Via Láctea arranca as estrelas de fora' : k < 1 ? 'sobra só o miolo' : 'Omega Centauri, dando voltas na Via Láctea';
+					hud.ano.textContent = TR(bi < 0.4 ? 'hoje' : 'há ' + numero(bi, bi < 2 ? 1 : 0) + (bi < 2 ? ' bilhão' : ' bilhões') + ' de anos', bi < 0.4 ? 'today' : numero(bi, bi < 2 ? 1 : 0) + ' billion years ago');
+					hud.estacao.textContent = TR(k < 0.2 ? 'uma galáxia pequena chega perto' : k < 0.75 ? 'a Via Láctea arranca as estrelas de fora' : k < 1 ? 'sobra só o miolo' : 'Omega Centauri, dando voltas na Via Láctea', k < 0.2 ? 'a small galaxy comes close' : k < 0.75 ? 'the Milky Way strips its outer stars' : k < 1 ? 'only the core is left' : 'Omega Centauri, orbiting the Milky Way');
 				}
 			};
 		},
@@ -1661,7 +1663,7 @@
 		// vira poeira na frente dela, o brilho cai pela metade e depois a poeira se espalha
 		'betelgeuse-apagao': function (L, A) {
 			var fundo = estrelasFundo(L, A, 151, 50), cx = 56, cy = A / 2 + 6, R = 34, CICLO = 14;
-			var MESES = ['outubro de 2019', 'novembro de 2019', 'dezembro de 2019', 'janeiro de 2020', 'fevereiro de 2020', 'março de 2020', 'abril de 2020'];
+			var MESES = TR(['outubro de 2019', 'novembro de 2019', 'dezembro de 2019', 'janeiro de 2020', 'fevereiro de 2020', 'março de 2020', 'abril de 2020'], ['October 2019', 'November 2019', 'December 2019', 'January 2020', 'February 2020', 'March 2020', 'April 2020']);
 			var SOLO = [hex('#ffe0a0'), hex('#ffb060'), hex('#f07a32'), hex('#c8461e'), hex('#8a2414'), hex('#4a1008')];
 			function brilho(k) { var x = (k - 0.55) / 0.22; return 1 - 0.6 * Math.exp(-x * x); } // o mínimo em fevereiro de 2020
 			var g0 = 112, g1 = 194, gt = 26, gb = 96; // o gráfico do brilho
@@ -1693,7 +1695,7 @@
 				pintar(buf, L, A, ate, gt + (1 - b) / 0.7 * (gb - gt) - 1, hex('#ffffff'));
 				if (hud) {
 					hud.ano.textContent = MESES[Math.min(6, Math.floor(k * 6.99))];
-					hud.estacao.textContent = 'brilho: ' + Math.round(b * 100) + '%' + (k > 0.25 && k < 0.75 ? ' (poeira na frente)' : '');
+					hud.estacao.textContent = TR('brilho: ' + Math.round(b * 100) + '%' + (k > 0.25 && k < 0.75 ? ' (poeira na frente)' : ''), 'brightness: ' + Math.round(b * 100) + '%' + (k > 0.25 && k < 0.75 ? ' (dust in front)' : ''));
 				}
 			};
 		},
@@ -1746,8 +1748,8 @@
 				}
 				if (hud) {
 					var semanas = Math.round(k * 52);
-					hud.ano.textContent = !explode ? 'uma noite comum' : c < 4 ? 'o dia da explosão!' : c < 14 ? semanas + ' semanas depois' : 'um ano depois';
-					hud.estacao.textContent = !explode ? 'Betelgeuse vermelhinha' : forca > 0.5 ? 'quase tão forte quanto a Lua' : forca > 0.15 ? 'ainda dá para ver de dia' : c < 14 ? 'apagando devagar' : 'Órion sem o ombro';
+					hud.ano.textContent = TR(!explode ? 'uma noite comum' : c < 4 ? 'o dia da explosão!' : c < 14 ? semanas + ' semanas depois' : 'um ano depois', !explode ? 'an ordinary night' : c < 4 ? 'the day of the explosion!' : c < 14 ? semanas + ' weeks later' : 'a year later');
+					hud.estacao.textContent = TR(!explode ? 'Betelgeuse vermelhinha' : forca > 0.5 ? 'quase tão forte quanto a Lua' : forca > 0.15 ? 'ainda dá para ver de dia' : c < 14 ? 'apagando devagar' : 'Órion sem o ombro', !explode ? 'little red Betelgeuse' : forca > 0.5 ? 'almost as bright as the Moon' : forca > 0.15 ? 'still visible by day' : c < 14 ? 'slowly fading' : 'Orion without its shoulder');
 				}
 			};
 		},
@@ -1794,8 +1796,8 @@
 				for (var x = mxx - 1; x <= mxx + 6; x++) { pintar(buf, L, A, x, topo, hex('#4a4280')); pintar(buf, L, A, x, base, hex('#4a4280')); }
 				for (y = Math.round(base - 1 - nivel * (base - topo - 2)); y < base; y++) for (x = mxx; x <= mxx + 5; x++) pintar(buf, L, A, x, y, nivel > 0.7 ? hex('#ffffff') : nivel > 0.4 ? hex('#ffe08a') : hex('#c8902a'));
 				if (hud) {
-					hud.ano.textContent = 'ano ' + numero(k * 5.5, 1) + ' de 5,5';
-					hud.estacao.textContent = perto > 0.5 ? 'pertinho: o choque brilha muito!' : perto > 0.1 ? 'se aproximando…' : 'longe: o choque é fraco';
+					hud.ano.textContent = TR('ano ' + numero(k * 5.5, 1) + ' de 5,5', 'year ' + numero(k * 5.5, 1) + ' of 5.5');
+					hud.estacao.textContent = TR(perto > 0.5 ? 'pertinho: o choque brilha muito!' : perto > 0.1 ? 'se aproximando…' : 'longe: o choque é fraco', perto > 0.5 ? 'up close: the shock glows bright!' : perto > 0.1 ? 'getting closer…' : 'far apart: the shock is faint');
 				}
 			};
 		},
@@ -1831,8 +1833,8 @@
 					if (v2 > 0.15 && B4[(((cx + xx) | 0) & 1) + ((((cy + yy) | 0) & 1) << 1)] < v2 * 1.5) pintar(buf, L, A, cx + xx, cy + yy, v2 > 0.6 ? hex('#ffffff') : v2 > 0.35 ? hex('#ffe8c8') : hex('#ffb070'));
 				}
 				if (hud) {
-					hud.ano.textContent = 'ano ' + Math.round(an);
-					hud.estacao.textContent = an < 1840 ? 'uma estrela comum' : an < 1846 ? '2ª estrela mais brilhante do céu!' : an < 1860 ? 'o gás forma duas bolhas' : an < 1945 ? 'escondida pela própria poeira' : 'o Homúnculo hoje';
+					hud.ano.textContent = TR('ano ' + Math.round(an), 'year ' + Math.round(an));
+					hud.estacao.textContent = TR(an < 1840 ? 'uma estrela comum' : an < 1846 ? '2ª estrela mais brilhante do céu!' : an < 1860 ? 'o gás forma duas bolhas' : an < 1945 ? 'escondida pela própria poeira' : 'o Homúnculo hoje', an < 1840 ? 'an ordinary star' : an < 1846 ? '2nd brightest star in the sky!' : an < 1860 ? 'the gas forms two bubbles' : an < 1945 ? 'hidden by its own dust' : 'the Homunculus today');
 				}
 			};
 		},
@@ -1876,8 +1878,8 @@
 					if (Math.sin(t * 6) > -0.3) for (var g = 0; g < Math.PI * 2; g += 0.3) pintar(buf, L, A, bx + Math.cos(g) * 7, by + Math.sin(g) * 7, hex('#ffe08a'));
 				}
 				if (hud) {
-					hud.ano.textContent = 'ano ' + Math.round(an);
-					hud.estacao.textContent = !bessel ? 'Sirius anda pelo céu… fazendo ondas' : !clark ? 'Bessel: algo invisível a puxa!' : 'Clark vê a companheira (na mira)';
+					hud.ano.textContent = TR('ano ' + Math.round(an), 'year ' + Math.round(an));
+					hud.estacao.textContent = TR(!bessel ? 'Sirius anda pelo céu… fazendo ondas' : !clark ? 'Bessel: algo invisível a puxa!' : 'Clark vê a companheira (na mira)', !bessel ? 'Sirius moves across the sky… in waves' : !clark ? 'Bessel: something invisible pulls it!' : 'Clark sees the companion (in the crosshair)');
 				}
 			};
 		},
@@ -1927,8 +1929,8 @@
 					}
 				}
 				if (hud) {
-					hud.ano.textContent = hoje ? 'hoje' : 'há ' + Math.round(milhoes(c)) + ' milhões de anos';
-					hud.estacao.textContent = c < 3.5 ? 'duas estrelas nascem: B é a maior' : c < 7.5 ? 'Sirius B incha: uma gigante vermelha' : !hoje ? 'ela solta as camadas de fora' : 'B virou uma anã branca, do tamanho da Terra';
+					hud.ano.textContent = TR(hoje ? 'hoje' : 'há ' + Math.round(milhoes(c)) + ' milhões de anos', hoje ? 'today' : Math.round(milhoes(c)) + ' million years ago');
+					hud.estacao.textContent = TR(c < 3.5 ? 'duas estrelas nascem: B é a maior' : c < 7.5 ? 'Sirius B incha: uma gigante vermelha' : !hoje ? 'ela solta as camadas de fora' : 'B virou uma anã branca, do tamanho da Terra', c < 3.5 ? 'two stars are born: B is the bigger one' : c < 7.5 ? 'Sirius B swells: a red giant' : !hoje ? 'it sheds its outer layers' : 'B became a white dwarf, the size of Earth');
 				}
 			};
 		},
@@ -1943,11 +1945,11 @@
 			var TOURO = [[96, 52], [102, 58], [108, 64], [112, 58], [118, 52], [86, 40], [126, 40], [104, 70]];
 			var NEBULOSA = [hex('#ffb070'), hex('#e0603a'), hex('#9fc0ff'), hex('#ffe0a0')];
 			function quando(c) {
-				if (c < 1.5) return ['junho de 1054', 'uma noite comum'];
-				if (c < 5) return ['4 de julho de 1054', 'dá para ver até de dia!'];
-				if (c < 12) { var m = Math.round((c - 5) / 7 * 21) + 1; return [m + (m > 1 ? ' meses' : ' mês') + ' depois', 'à noite, ainda brilhando'] }
-				if (c < 13.5) return ['1056', 'apagou'];
-				return ['hoje, num telescópio', 'a Nebulosa do Caranguejo'];
+				if (c < 1.5) return TR(['junho de 1054', 'uma noite comum'], ['June 1054', 'an ordinary night']);
+				if (c < 5) return TR(['4 de julho de 1054', 'dá para ver até de dia!'], ['July 4, 1054', 'visible even by day!']);
+				if (c < 12) { var m = Math.round((c - 5) / 7 * 21) + 1; return TR([m + (m > 1 ? ' meses' : ' mês') + ' depois', 'à noite, ainda brilhando'], [m + (m > 1 ? ' months' : ' month') + ' later', 'at night, still shining']) }
+				if (c < 13.5) return ['1056', TR('apagou', 'faded away')];
+				return TR(['hoje, num telescópio', 'a Nebulosa do Caranguejo'], ['today, in a telescope', 'the Crab Nebula']);
 			}
 			return function (buf, t, hud) {
 				var c = t % CICLO, dia = c >= 1.5 && c < 5, forca = c < 1.5 ? 0 : c < 5 ? 1 : c < 12 ? 1 - (c - 5) / 7 * 0.92 : 0;
@@ -2046,8 +2048,8 @@
 					for (var yy = 0; yy <= alt; yy++) pintar(buf, L, A, gx, gy - yy, hex('#9be36a'));
 				}
 				if (hud) {
-					hud.ano.textContent = 'piscadas: ' + Math.floor(t / VOLTA * 2);
-					hud.estacao.textContent = pisca || lendo ? 'o feixe passou pela Terra: pisca!' : 'em câmera lenta (de verdade, 30 voltas por segundo)';
+					hud.ano.textContent = TR('piscadas: ' + Math.floor(t / VOLTA * 2), 'blinks: ' + Math.floor(t / VOLTA * 2));
+					hud.estacao.textContent = TR(pisca || lendo ? 'o feixe passou pela Terra: pisca!' : 'em câmera lenta (de verdade, 30 voltas por segundo)', pisca || lendo ? 'the beam swept past Earth: blink!' : 'in slow motion (really 30 turns per second)');
 				}
 			};
 		},
@@ -2084,8 +2086,8 @@
 				};
 				if (O.atras(a)) { planeta(); estrela(buf, t); } else { estrela(buf, t); planeta(); }
 				if (hud) {
-					hud.ano.textContent = 'dia ' + Math.floor(k * 11) + ' de 11';
-					hud.estacao.textContent = 'a bandeirinha fica sempre de dia';
+					hud.ano.textContent = TR('dia ' + Math.floor(k * 11) + ' de 11', 'day ' + Math.floor(k * 11) + ' of 11');
+					hud.estacao.textContent = TR('a bandeirinha fica sempre de dia', 'the little flag is always in daylight');
 				}
 			};
 		},
@@ -2116,8 +2118,8 @@
 				var gx = x0 + 1, gy = PISTAS[2];
 				pintar(buf, L, A, gx, gy, hex('#c8c8e8')); pintar(buf, L, A, gx - 1, gy - 1, hex('#8a8ab0')); pintar(buf, L, A, gx - 1, gy + 1, hex('#8a8ab0')); pintar(buf, L, A, gx + 1, gy, hex('#ffffff'));
 				if (hud) {
-					hud.ano.textContent = 'ano ' + numero(an, an < 10 ? 1 : 0);
-					hud.estacao.textContent = an < 4.2 ? 'a luz vai na frente' : an < 21 ? 'a luz chegou! a vela ainda vai' : 'a vela chegou! a Voyager… nem saiu';
+					hud.ano.textContent = TR('ano ' + numero(an, an < 10 ? 1 : 0), 'year ' + numero(an, an < 10 ? 1 : 0));
+					hud.estacao.textContent = TR(an < 4.2 ? 'a luz vai na frente' : an < 21 ? 'a luz chegou! a vela ainda vai' : 'a vela chegou! a Voyager… nem saiu', an < 4.2 ? 'light goes first' : an < 21 ? 'light arrived! the sail is still going' : 'the sail arrived! Voyager… barely left');
 				}
 			};
 		}
@@ -2526,13 +2528,13 @@
 			var controle = document.createElement('div');
 			controle.className = 'animacao-controle';
 			controle.innerHTML = '<button type="button" class="animacao-play"></button>' +
-				'<input type="range" min="0" max="1000" step="1" value="0" aria-label="Linha do tempo da animação: arraste para ir e voltar">';
+				'<input type="range" min="0" max="1000" step="1" value="0" aria-label="' + TR('Linha do tempo da animação: arraste para ir e voltar', 'Animation timeline: drag to go back and forth') + '">';
 			figura.insertBefore(controle, figura.querySelector('figcaption'));
 			botao = controle.querySelector('button');
 			barra = controle.querySelector('input');
 			var atualizarBotao = function () {
 				botao.classList.toggle('pausado', !tocando);
-				botao.setAttribute('aria-label', tocando ? 'Pausar a animação' : 'Continuar a animação');
+				botao.setAttribute('aria-label', tocando ? TR('Pausar a animação', 'Pause the animation') : TR('Continuar a animação', 'Resume the animation'));
 			};
 			botao.addEventListener('click', function () { tocando = !tocando; anterior = performance.now(); atualizarBotao(); });
 			// arrastando a barra, a animação pausa e mostra exatamente aquele momento
@@ -2563,18 +2565,18 @@
 	// reconhecer, e de tempos em tempos ele passa na frente do Sol, como uma sombrinha.
 	var KM_SOL = 1392700, KM_TERRA = 12742;
 	function quantos(n) {
-		if (n >= 1e6) return numero(n / 1e6, n < 2e6 ? 1 : 0) + (n < 2e6 ? ' milhão' : ' milhões');
-		if (n >= 10000) return numero(Math.round(n / 1000), 0) + ' mil';
-		if (n >= 1000) return numero(n / 1000, 1) + ' mil';
+		if (n >= 1e6) return numero(n / 1e6, n < 2e6 ? 1 : 0) + TR(n < 2e6 ? ' milhão' : ' milhões', ' million');
+		if (n >= 10000) return numero(Math.round(n / 1000), 0) + TR(' mil', ' thousand');
+		if (n >= 1000) return numero(n / 1000, 1) + TR(' mil', ' thousand');
 		return numero(Math.round(n), 0);
 	}
 	// na página do Sol: ele com os 8 planetas em fila, cada um no tamanho real em relação a ele
-	var PLANETAS = [['mercurio', 'Mercúrio', 4879], ['venus', 'Vênus', 12104], ['terra', 'Terra', 12742], ['marte', 'Marte', 6779],
-		['jupiter', 'Júpiter', 139820], ['saturno', 'Saturno', 116460, 1.9], ['urano', 'Urano', 51118], ['netuno', 'Netuno', 49244]];
+	var PLANETAS = [['mercurio', TR('Mercúrio', 'Mercury'), 4879], ['venus', TR('Vênus', 'Venus'), 12104], ['terra', TR('Terra', 'Earth'), 12742], ['marte', TR('Marte', 'Mars'), 6779],
+		['jupiter', TR('Júpiter', 'Jupiter'), 139820], ['saturno', TR('Saturno', 'Saturn'), 116460, 1.9], ['urano', TR('Urano', 'Uranus'), 51118], ['netuno', TR('Netuno', 'Neptune'), 49244]];
 	var TOQUE = window.matchMedia && window.matchMedia('(hover: none)').matches;
 	// um planetinha com lupa: passando o mouse (ou tocando), aparece ele ampliado
 	function comLupa(nome, img, astro) {
-		return '<span class="cv-item cv-com-lupa" tabindex="0" aria-label="' + nome + ' em tamanho real; passe o mouse ou toque para ampliar">' +
+		return '<span class="cv-item cv-com-lupa" tabindex="0" aria-label="' + TR(nome + ' em tamanho real; passe o mouse ou toque para ampliar', nome + ' at true scale; hover or tap to zoom in') + '">' +
 			astro + '<small>' + nome + '</small>' +
 			'<span class="cv-lupa" aria-hidden="true"><span class="cv-lupa-vidro"><img src="' + img + '" alt=""></span><small class="cv-zoom"></small></span></span>';
 	}
@@ -2582,22 +2584,22 @@
 	function medirLupas(fig) {
 		fig.querySelectorAll('.cv-com-lupa').forEach(function (item) {
 			var d = item.querySelector('.cv-astro').getBoundingClientRect().height;
-			item.querySelector('.cv-zoom').textContent = 'ampliado ' + Math.round(132 * 0.8 / d) + '×'; // a lupa tem 132 px
+			item.querySelector('.cv-zoom').textContent = TR('ampliado ', 'zoom ') + Math.round(132 * 0.8 / d) + '×'; // a lupa tem 132 px
 		});
 	}
 	document.querySelectorAll('.comparacao-viva[data-todos]').forEach(function (fig) {
 		fig.innerHTML =
 			'<div class="cv-cena">' +
-				'<div class="cv-sol"><img src="pixel/sol.png" alt=""><i class="cv-transito"><small>Terra</small></i></div>' +
+				'<div class="cv-sol"><img src="pixel/sol.png" alt=""><i class="cv-transito"><small>' + TR('Terra', 'Earth') + '</small></i></div>' +
 				'<div class="cv-lado">' +
-					'<p class="cv-titulo">Os planetas em tamanho real ao lado do Sol</p>' +
+					'<p class="cv-titulo">' + TR('Os planetas em tamanho real ao lado do Sol', 'The planets at true scale next to the Sun') + '</p>' +
 					'<div class="cv-fila">' + PLANETAS.map(function (p) {
 						return comLupa(p[1], 'pixel/' + p[0] + '.png', '<span class="cv-astro" data-km="' + p[2] + '" data-prop="' + (p[3] || 1) + '"><img src="pixel/' + p[0] + '.png" alt=""></span>');
 					}).join('') + '</div>' +
-					'<p class="cv-dica">' + (TOQUE ? 'Toque' : 'Passe o mouse') + ' em um planeta para ampliar</p>' +
+					'<p class="cv-dica">' + (TOQUE ? TR('Toque', 'Tap') : TR('Passe o mouse', 'Hover')) + TR(' em um planeta para ampliar', ' over a planet to zoom in') + '</p>' +
 				'</div>' +
 			'</div>' +
-			'<figcaption>O Sol é <b>109 vezes</b> mais largo que a Terra, e dentro dele caberiam cerca de <b>1,3 milhão de Terras</b>. Até Júpiter, o maior planeta, cabe dez vezes lado a lado no diâmetro do Sol.</figcaption>';
+			'<figcaption>' + TR('O Sol é <b>109 vezes</b> mais largo que a Terra, e dentro dele caberiam cerca de <b>1,3 milhão de Terras</b>. Até Júpiter, o maior planeta, cabe dez vezes lado a lado no diâmetro do Sol.', 'The Sun is <b>109 times</b> wider than Earth, and about <b>1.3 million Earths</b> would fit inside it. Even Jupiter, the largest planet, fits ten times side by side across the Sun.') + '</figcaption>';
 		var sol = fig.querySelector('.cv-sol'), transito = fig.querySelector('.cv-transito');
 		function medir() {
 			var D = sol.getBoundingClientRect().width * 0.92;
@@ -2618,20 +2620,20 @@
 	document.querySelectorAll('.comparacao-viva:not([data-todos])').forEach(function (fig) {
 		var nome = fig.getAttribute('data-astro'), img = fig.getAttribute('data-img'), km = parseFloat(fig.getAttribute('data-km'));
 		var plural = fig.getAttribute('data-plural') || nome + 's', prop = parseFloat(fig.getAttribute('data-proporcao')) || 1; // proporção: Saturno é mais largo por causa dos anéis
-		var razao = km / KM_SOL, ladoALado = Math.round(1 / razao), dentro = Math.pow(1 / razao, 3), ehTerra = nome === 'Terra';
+		var razao = km / KM_SOL, ladoALado = Math.round(1 / razao), dentro = Math.pow(1 / razao, 3), ehTerra = img === 'pixel/terra.png';
 		fig.innerHTML =
 			'<div class="cv-cena">' +
 				'<div class="cv-sol"><img src="pixel/sol.png" alt=""><i class="cv-transito"><small>' + nome + '</small></i></div>' +
 				'<div class="cv-lado">' +
-					'<p class="cv-titulo">Tamanho real em relação ao Sol</p>' +
+					'<p class="cv-titulo">' + TR('Tamanho real em relação ao Sol', 'True size compared to the Sun') + '</p>' +
 					'<div class="cv-pequenos">' +
 						comLupa(nome, img, '<span class="cv-astro cv-alvo"><img src="' + img + '" alt=""></span>') +
-						(ehTerra ? '' : comLupa('Terra', 'pixel/terra.png', '<span class="cv-astro cv-terra"></span>')) + // na Terra, ela mesma já é a régua
+						(ehTerra ? '' : comLupa(TR('Terra', 'Earth'), 'pixel/terra.png', '<span class="cv-astro cv-terra"></span>')) + // na Terra, ela mesma já é a régua
 					'</div>' +
-					'<p class="cv-dica">' + (TOQUE ? 'Toque' : 'Passe o mouse') + ' em ' + nome + (ehTerra ? '' : ' ou na Terra') + ' para ampliar</p>' +
+					'<p class="cv-dica">' + (TOQUE ? TR('Toque', 'Tap') : TR('Passe o mouse', 'Hover')) + TR(' em ', ' over ') + nome + (ehTerra ? '' : TR(' ou na Terra', ' or Earth')) + TR(' para ampliar', ' to zoom in') + '</p>' +
 				'</div>' +
 			'</div>' +
-			'<figcaption><b>' + ladoALado + ' ' + plural + '</b> lado a lado atravessariam o Sol de uma ponta à outra, e dentro dele caberiam cerca de <b>' + quantos(dentro) + ' ' + plural + '</b>.</figcaption>';
+			'<figcaption>' + TR('<b>' + ladoALado + ' ' + plural + '</b> lado a lado atravessariam o Sol de uma ponta à outra, e dentro dele caberiam cerca de <b>' + quantos(dentro) + ' ' + plural + '</b>.', '<b>' + ladoALado + ' ' + plural + '</b> side by side would stretch across the Sun, and about <b>' + quantos(dentro) + ' ' + plural + '</b> would fit inside it.') + '</figcaption>';
 		var sol = fig.querySelector('.cv-sol'), alvo = fig.querySelector('.cv-alvo'), terra = fig.querySelector('.cv-terra');
 		var transito = fig.querySelector('.cv-transito');
 		function medir() {
@@ -2661,7 +2663,7 @@
 	}
 
 	// ---------- Calculadoras ----------
-	function numero(n, casas) { return n.toLocaleString('pt-BR', { minimumFractionDigits: casas || 0, maximumFractionDigits: casas || 0 }); }
+	function numero(n, casas) { return n.toLocaleString(window.LOCALE || 'pt-BR', { minimumFractionDigits: casas || 0, maximumFractionDigits: casas || 0 }); }
 	document.querySelectorAll('[data-ferramenta="idade"]').forEach(function (c) {
 		var ano = parseFloat(c.getAttribute('data-ano')), planeta = c.getAttribute('data-planeta');
 		var campo = c.querySelector('input'), saida = c.querySelector('.calc-resultado');
@@ -2669,9 +2671,10 @@
 			var idade = Math.max(0, Math.min(130, parseFloat(campo.value) || 0));
 			var la = idade / ano, falta = ano - (idade % ano);
 			// aniversário: em dias se faltar menos de um ano da Terra
-			var quando = falta < 1 ? numero(Math.max(1, falta * 365.25), 0) + ' dias' : numero(falta, 0) + (Math.round(falta) === 1 ? ' ano' : ' anos') + ' da Terra';
-			saida.innerHTML = 'Em ' + planeta + ' você teria <b>' + numero(la, la < 1 ? 2 : 1) + ' ' + (la >= 1 && la < 2 ? 'ano' : 'anos') + '</b>.<br>' +
-				'Seu próximo aniversário de ' + planeta + ' seria daqui a ' + quando + '.';
+			var quando = falta < 1 ? numero(Math.max(1, falta * 365.25), 0) + TR(' dias', ' days') : numero(falta, 0) + (Math.round(falta) === 1 ? TR(' ano', ' Earth year') : TR(' anos', ' Earth years')) + TR(' da Terra', '');
+			saida.innerHTML = TR('Em ' + planeta + ' você teria <b>' + numero(la, la < 1 ? 2 : 1) + ' ' + (la >= 1 && la < 2 ? 'ano' : 'anos') + '</b>.<br>' +
+				'Seu próximo aniversário de ' + planeta + ' seria daqui a ' + quando + '.', 'On ' + planeta + ' you would be <b>' + numero(la, la < 1 ? 2 : 1) + ' ' + (la >= 1 && la < 2 ? 'year' : 'years') + ' old</b>.<br>' +
+				'Your next ' + planeta + ' birthday would be in ' + quando + '.');
 		}
 		campo.addEventListener('input', calcular);
 		calcular();
@@ -2679,38 +2682,40 @@
 	function tempoBonito(horas) {
 		var anos = horas / 8766;
 		// tempos de viagem até os destinos da galáxia: milhões e bilhões de anos
-		if (anos >= 1e9) return 'cerca de ' + numero(anos / 1e9, anos < 1e10 ? 1 : 0) + (anos < 2e9 ? ' bilhão' : ' bilhões') + ' de anos';
-		if (anos >= 1e6) return 'cerca de ' + numero(anos / 1e6, anos < 1e7 ? 1 : 0) + (anos < 2e6 ? ' milhão' : ' milhões') + ' de anos';
-		if (anos >= 2) return 'cerca de ' + numero(anos, 0) + ' anos';
-		if (horas >= 48) return 'cerca de ' + numero(horas / 24, 0) + ' dias';
-		if (horas * 60 < 1) return 'cerca de ' + numero(horas * 3600, 1) + ' segundo' + (horas * 3600 >= 2 ? 's' : '');
+		var cerca = TR('cerca de ', 'about ');
+		if (anos >= 1e9) return cerca + numero(anos / 1e9, anos < 1e10 ? 1 : 0) + TR((anos < 2e9 ? ' bilhão' : ' bilhões') + ' de anos', ' billion years');
+		if (anos >= 1e6) return cerca + numero(anos / 1e6, anos < 1e7 ? 1 : 0) + TR((anos < 2e6 ? ' milhão' : ' milhões') + ' de anos', ' million years');
+		if (anos >= 2) return cerca + numero(anos, 0) + TR(' anos', ' years');
+		if (horas >= 48) return cerca + numero(horas / 24, 0) + TR(' dias', ' days');
+		if (horas * 60 < 1) return cerca + numero(horas * 3600, 1) + TR(' segundo', ' second') + (horas * 3600 >= 2 ? 's' : '');
 		var h = Math.floor(horas), min = Math.round((horas - h) * 60);
-		return 'cerca de ' + (h ? h + ' h ' : '') + min + ' min';
+		return cerca + (h ? h + ' h ' : '') + min + ' min';
 	}
 	// quanto já viajamos em volta do Sol (na página da Terra): uns 940 milhões de km por ano
 	document.querySelectorAll('[data-ferramenta="voltas"]').forEach(function (c) {
 		var porAno = parseFloat(c.getAttribute('data-km-ano')), campo = c.querySelector('input'), saida = c.querySelector('.calc-resultado');
 		function calcular() {
 			var idade = Math.max(0, Math.min(130, parseFloat(campo.value) || 0)), km = idade * porAno;
-			var texto = km >= 1e9 ? numero(km / 1e9, 1) + ' bilhões de km' : numero(km / 1e6, 0) + ' milhões de km';
-			saida.innerHTML = 'Você já viajou cerca de <b>' + texto + '</b> com a Terra em volta do Sol, ' +
-				'dando ' + numero(idade, 0) + (Math.round(idade) === 1 ? ' volta' : ' voltas') + ' nele, sem sair do lugar.';
+			var texto = km >= 1e9 ? numero(km / 1e9, 1) + TR(' bilhões de km', ' billion km') : numero(km / 1e6, 0) + TR(' milhões de km', ' million km');
+			saida.innerHTML = TR('Você já viajou cerca de <b>' + texto + '</b> com a Terra em volta do Sol, ' +
+				'dando ' + numero(idade, 0) + (Math.round(idade) === 1 ? ' volta' : ' voltas') + ' nele, sem sair do lugar.', 'You have already traveled about <b>' + texto + '</b> with Earth around the Sun, ' +
+				'going around it ' + numero(idade, 0) + (Math.round(idade) === 1 ? ' time' : ' times') + ' without leaving your spot.');
 		}
 		campo.addEventListener('input', calcular);
 		calcular();
 	});
 	// a luz que vemos de um destino saiu de lá há tantos anos quanto a distância em anos-luz
 	function anoBonito(a) {
-		if (a <= 0) return numero(-a, 0) + ' a.C.';
+		if (a <= 0) return numero(-a, 0) + TR(' a.C.', ' BC');
 		return a >= 10000 ? numero(a, 0) : String(a);
 	}
 	function epoca(a) {
-		if (a < -10000) return 'quando os mamutes ainda andavam pela Terra';
-		if (a < -3000) return 'antes da invenção da escrita';
-		if (a < 476) return 'na Antiguidade';
-		if (a < 1500) return 'na Idade Média';
-		if (a < 1822) return 'quando o Brasil ainda era colônia de Portugal';
-		return 'há pouco tempo';
+		if (a < -10000) return TR('quando os mamutes ainda andavam pela Terra', 'when mammoths still walked the Earth');
+		if (a < -3000) return TR('antes da invenção da escrita', 'before writing was invented');
+		if (a < 476) return TR('na Antiguidade', 'in Antiquity');
+		if (a < 1500) return TR('na Idade Média', 'in the Middle Ages');
+		if (a < 1822) return TR('quando o Brasil ainda era colônia de Portugal', 'when Brazil was still a Portuguese colony');
+		return TR('há pouco tempo', 'not long ago');
 	}
 	document.querySelectorAll('[data-ferramenta="luz"]').forEach(function (c) {
 		var al = parseFloat(c.getAttribute('data-anos-luz')), de = c.getAttribute('data-de');
@@ -2720,8 +2725,9 @@
 		var arred = al >= 10000 ? 100 : al >= 100 ? 10 : 1, saiu = Math.round((hoje - al) / arred) * arred;
 		function calcular() {
 			var nasceu = Math.max(1900, Math.min(hoje, Math.round(parseFloat(campo.value) || hoje)));
-			saida.innerHTML = 'A luz que chega hoje saiu ' + de + ' por volta do ano <b>' + anoBonito(saiu) + '</b>, ' + epoca(saiu) + '.<br>' +
-				'E a luz que saiu de lá quando você nasceu só chega aqui no ano <b>' + anoBonito(Math.round(nasceu + al)) + '</b>.';
+			saida.innerHTML = TR('A luz que chega hoje saiu ' + de + ' por volta do ano <b>' + anoBonito(saiu) + '</b>, ' + epoca(saiu) + '.<br>' +
+				'E a luz que saiu de lá quando você nasceu só chega aqui no ano <b>' + anoBonito(Math.round(nasceu + al)) + '</b>.', 'The light arriving today left ' + de + ' around the year <b>' + anoBonito(saiu) + '</b>, ' + epoca(saiu) + '.<br>' +
+				'And the light that left there when you were born only gets here in the year <b>' + anoBonito(Math.round(nasceu + al)) + '</b>.');
 		}
 		campo.addEventListener('input', calcular);
 		calcular();
@@ -2760,18 +2766,18 @@
 					if (acertos === perguntas.length) {
 						// os quizzes dos planetas contam para um selo; os dos destinos da galáxia, para outro
 						var galaxia = q.hasAttribute('data-quiz-galaxia');
-						var selo = galaxia ? 'Sabe-tudo da Via Láctea' : 'Sabe-tudo do Sistema Solar', total = galaxia ? 12 : 8;
+						var selo = galaxia ? TR('Sabe-tudo da Via Láctea', 'Milky Way Know-it-all') : TR('Sabe-tudo do Sistema Solar', 'Solar System Know-it-all'), total = galaxia ? 12 : 8;
 						if (window.PassaporteEspacial) window.PassaporteEspacial.anotar(galaxia ? 'quizGalaxia' : 'quiz', q.getAttribute('data-quiz'));
 						var feitos = 0;
 						try { feitos = ((JSON.parse(localStorage.getItem('passaporteEspacial')) || {})[galaxia ? 'quizzesGalaxia' : 'quizzes'] || []).length; } catch (e) {}
-						saida.innerHTML = '<b>Acertou tudo!</b> ' + (feitos >= total ? 'Você ganhou o selo especial "' + selo + '"! Ele está no passaporte, na aba Conquistas.'
-							: 'Quiz anotado no passaporte: ' + feitos + ' de ' + total + ' para o selo especial "' + selo + '".');
+						saida.innerHTML = TR('<b>Acertou tudo!</b> ', '<b>All correct!</b> ') + (feitos >= total ? TR('Você ganhou o selo especial "' + selo + '"! Ele está no passaporte, na aba Conquistas.', 'You earned the special "' + selo + '" seal! It is in your passport, in the Achievements tab.')
+							: TR('Quiz anotado no passaporte: ' + feitos + ' de ' + total + ' para o selo especial "' + selo + '".', 'Quiz stamped in your passport: ' + feitos + ' of ' + total + ' toward the special "' + selo + '" seal.'));
 					} else {
-						saida.innerHTML = 'Você acertou ' + acertos + ' de ' + perguntas.length + '. ';
+						saida.innerHTML = TR('Você acertou ' + acertos + ' de ' + perguntas.length + '. ', 'You got ' + acertos + ' of ' + perguntas.length + ' right. ');
 						var deNovo = document.createElement('button');
 						deNovo.type = 'button';
 						deNovo.className = 'quiz-de-novo';
-						deNovo.textContent = 'Tentar de novo';
+						deNovo.textContent = TR('Tentar de novo', 'Try again');
 						deNovo.addEventListener('click', function () {
 							respondidas = 0; acertos = 0; saida.textContent = '';
 							perguntas.forEach(function (pp) { pp.classList.remove('respondida'); pp.querySelectorAll('button').forEach(function (o) { o.disabled = false; o.classList.remove('certa', 'errada'); }); });

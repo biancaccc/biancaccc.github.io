@@ -166,6 +166,18 @@
 					rotulo: 'Pixel art da hipótese alienígena: a Estrela de Tabby cercada por anéis de painéis gigantes que passam na frente e atrás dela, com um gráfico do brilho embaixo'
 				}
 			};
+			if (window.IDIOMA === 'en') TEXTOS = {
+				'tabby': {
+					curta: '<strong>Dust:</strong> irregular dips, and the star gets redder.',
+					legenda: '<strong>In this version (dust):</strong> each dust cloud passing in front of the star makes a different dip, with an irregular shape and size, just like the real observations. Notice the color too: behind the dust, the star turns redder, because fine dust blocks more blue light than red. Measurements made from 2017 on showed exactly that, which is why dust is the most accepted explanation today.',
+					rotulo: "Pixel art of Tabby's Star: a yellow-orange star with irregular dust clouds passing in front of it and, below, a graph of the brightness dropping as the dust goes by"
+				},
+				'tabby-alien': {
+					curta: '<strong>Megastructure:</strong> more regular dips, and the color of the star does not change.',
+					legenda: '<strong>In this version (megastructure):</strong> the dips come from the giant panels of a "Dyson swarm" passing in front of the star. Since the panels orbit in rings, the dips repeat in a more regular way. And the star dims without changing color, because solid panels block all colors equally. The measurements showed the opposite (blue dropped more than red), so this hypothesis was ruled out.',
+					rotulo: "Pixel art of the alien hypothesis: Tabby's Star surrounded by rings of giant panels passing in front of and behind it, with a brightness graph below"
+				}
+			};
 			function escolher(arte) {
 				tela.setAttribute('data-arte', arte);
 				tela.setAttribute('aria-label', TEXTOS[arte].rotulo);

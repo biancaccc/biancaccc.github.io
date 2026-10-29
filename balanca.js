@@ -10,6 +10,8 @@
 (function () {
 	var raiz = document.getElementById('balanca');
 	if (!raiz) return;
+	/* o texto no idioma da visita (veja idioma.js) */
+	var TR = window.T || function (pt) { return pt; };
 
 	var G_TERRA = 9.81;
 	var PULO_TERRA = 0.5; // metros: um pulo comum na Terra
@@ -39,6 +41,22 @@
 			extra: 'Betelgeuse é tão grande e tão espalhada que, na beirada dela, ela quase não puxa nada.',
 			compara: function (kg) { var n = kg * 1000 / 5; return 'Mais leve que ' + (n < 1.5 ? 'uma folha' : Math.ceil(n) + ' folhas') + ' de papel (cada uma tem uns 5 gramas)!'; } }
 	];
+	// em inglês: os nomes e as frases de cada lugar
+	if (window.IDIOMA === 'en') {
+		var INGLES = {
+			mercurio: { nome: 'Mercury' }, venus: { nome: 'Venus' }, terra: { nome: 'Earth', em: 'on Earth' }, marte: { nome: 'Mars' },
+			jupiter: { nome: 'Jupiter' }, saturno: { nome: 'Saturn' }, urano: { nome: 'Uranus' }, netuno: { nome: 'Neptune' },
+			sol: { nome: 'Sun', em: 'on the Sun', quem: 'the Sun' },
+			'proxima-centauri': { em: 'on Proxima b', extra: 'This is an estimate: scientists know the mass of Proxima b, but not yet its exact size.' },
+			sirius: { em: 'on Sirius B', extra: 'Sirius B is a white dwarf: almost the mass of the Sun squeezed into the size of Earth. That is why it pulls so hard.',
+				compara: function (kg) { var n = kg / 635000; return 'That is the weight of ' + (n < 2 ? 'one Christ the Redeemer statue' : 'about ' + Math.round(n) + ' Christ the Redeemer statues') + ' (each weighs 635 tonnes)!'; } },
+			caranguejo: { nome: 'Neutron star', quem: 'the neutron star', em: 'on the Crab neutron star', extra: 'The neutron star has more mass than the whole Sun in the size of a city: it is the strongest gravity you could "stand" on.',
+				compara: function (kg) { var n = kg / 5e11; return 'More than all the people on Earth together: ' + (n < 2 ? 'about the same as' : 'some ' + Math.round(n) + ' times') + ' the weight of all humanity!'; } },
+			betelgeuse: { em: 'on Betelgeuse', extra: 'Betelgeuse is so big and so spread out that, at its edge, it barely pulls at all.',
+				compara: function (kg) { var n = kg * 1000 / 5; return 'Lighter than ' + (n < 1.5 ? 'a sheet' : Math.ceil(n) + ' sheets') + ' of paper (each weighs about 5 grams)!'; } }
+		};
+		CORPOS.forEach(function (c) { var e = INGLES[c.id]; if (e) for (var k in e) c[k] = e[k]; if (!c.em || !e || !e.em) c.em = 'on ' + c.nome; });
+	}
 	var porId = {};
 	CORPOS.forEach(function (c) { porId[c.id] = c; c.em = c.em || 'em ' + c.nome; });
 	function Em(c) { return c.em.charAt(0).toUpperCase() + c.em.slice(1); }
@@ -53,7 +71,7 @@
 	try { pesoTerra = parseFloat(localStorage.getItem('pesoTerra')) || 50; } catch (e) {}
 
 	function num(v, casas) {
-		return v.toLocaleString('pt-BR', { minimumFractionDigits: casas, maximumFractionDigits: casas });
+		return v.toLocaleString(window.LOCALE || 'pt-BR', { minimumFractionDigits: casas, maximumFractionDigits: casas });
 	}
 	function pesoEm(c) { return pesoTerra * c.g / G_TERRA; }
 
@@ -62,7 +80,7 @@
 
 	// alturas e tempos de qualquer tamanho: de menos que um átomo até quilômetros
 	function alturaTexto(h) {
-		if (h < 1e-10) return 'menos que um átomo';
+		if (h < 1e-10) return TR('menos que um átomo', 'less than an atom');
 		if (h < 1e-3) return num(h * 1e6, h < 1e-5 ? 2 : 0) + ' µm';
 		if (h < 0.01) return num(h * 1000, 1) + ' mm';
 		if (h >= 1000) return num(h / 1000, 1) + ' km';
@@ -70,63 +88,64 @@
 		return num(h * 100, 0) + ' cm';
 	}
 	function tempoTexto(s) {
-		if (s < 0.001) return 'um instantinho';
+		if (s < 0.001) return TR('um instantinho', 'an instant');
 		if (s >= 120) return num(s / 60, 0) + ' min';
 		return num(s, 2) + ' s';
 	}
 	// o peso em gramas, quilos ou toneladas (até bilhões de toneladas)
 	function pesoTexto(kg) {
-		if (kg < 1) return [num(kg * 1000, 0), 'gramas'];
+		if (kg < 1) return [num(kg * 1000, 0), TR('gramas', 'grams')];
 		if (kg < 10000) return [num(kg, kg >= 1000 ? 0 : 1), 'kg'];
 		var t = kg / 1000;
-		if (t < 1e6) return [num(t, 0), 'toneladas'];
-		if (t < 1e9) return [num(t / 1e6, 1), 'milhões de toneladas'];
-		return [num(t / 1e9, 1), 'bilhões de toneladas'];
+		if (t < 1e6) return [num(t, 0), TR('toneladas', 'tonnes')];
+		if (t < 1e9) return [num(t / 1e6, 1), TR('milhões de toneladas', 'million tonnes')];
+		return [num(t / 1e9, 1), TR('bilhões de toneladas', 'billion tonnes')];
 	}
 	function cartaoPulo(corpo) {
 		var h = V0 * V0 / (2 * corpo.g);
 		return '<div class="pulo-cartao pixelado" style="--acento: ' + corpo.chao + '">' +
 			'<h4>' + corpo.nome + '</h4>' +
 			'<dl>' +
-				'<div><dt>Altura do pulo</dt><dd>' + alturaTexto(h) + '</dd></div>' +
-				'<div><dt>Tempo no ar</dt><dd>' + tempoTexto(2 * V0 / corpo.g) + '</dd></div>' +
+				'<div><dt>' + TR('Altura do pulo', 'Jump height') + '</dt><dd>' + alturaTexto(h) + '</dd></div>' +
+				'<div><dt>' + TR('Tempo no ar', 'Time in the air') + '</dt><dd>' + tempoTexto(2 * V0 / corpo.g) + '</dd></div>' +
 			'</dl>' +
 		'</div>';
 	}
 
 	var notaPulo = naTerra
-		? 'Um pulo comum, de quem está parado e pula o mais alto que consegue.'
-		: 'Os dois astronautas pulam com o mesmo impulso: só a gravidade muda.' +
-		  (aqui.solido ? '' : ' ' + aqui.nome + ' não tem chão firme, então aqui imaginamos que tivesse.');
-	notaPulo += '<br>A altura do pulo não depende do seu peso: só da força do impulso e da gravidade do planeta.';
+		? TR('Um pulo comum, de quem está parado e pula o mais alto que consegue.', 'An ordinary jump, standing still and jumping as high as you can.')
+		: TR('Os dois astronautas pulam com o mesmo impulso: só a gravidade muda.', 'Both astronauts jump with the same push: only the gravity changes.') +
+		  (aqui.solido ? '' : ' ' + TR(aqui.nome + ' não tem chão firme, então aqui imaginamos que tivesse.', aqui.nome + ' has no solid ground, so here we imagine it did.'));
+	notaPulo += '<br>' + TR('A altura do pulo não depende do seu peso: só da força do impulso e da gravidade do planeta.', 'The jump height does not depend on your weight: only on the push and on the gravity of the place.');
 
 	raiz.className = 'balanca';
 	raiz.innerHTML =
-		'<h2 class="balanca-titulo">Sua balança espacial</h2>' +
+		'<h2 class="balanca-titulo">' + TR('Sua balança espacial', 'Your space scale') + '</h2>' +
 		'<p class="balanca-intro">' + (naTerra
-			? 'Digite seu peso e veja o que a balança marca aqui na Terra.'
-			: 'Sua massa é a mesma em qualquer lugar, mas ' + (aqui.quem || aqui.nome) + ' te puxa com uma força diferente da Terra. ' +
-			  'Digite seu peso na Terra e veja quanto a balança marcaria ' + aqui.em + '.') + '</p>' +
+			? TR('Digite seu peso e veja o que a balança marca aqui na Terra.', 'Type your weight and see what the scale reads here on Earth.')
+			: TR('Sua massa é a mesma em qualquer lugar, mas ' + (aqui.quem || aqui.nome) + ' te puxa com uma força diferente da Terra. ' +
+			  'Digite seu peso na Terra e veja quanto a balança marcaria ' + aqui.em + '.', 'Your mass is the same everywhere, but ' + (aqui.quem || aqui.nome) + ' pulls on you with a different force than Earth. ' +
+			  'Type your weight on Earth and see what the scale would read ' + aqui.em + '.')) + '</p>' +
 		'<div class="balanca-painel">' +
 			'<div class="balanca-entrada pixelado">' +
-				'<label for="pesoTerra">Seu peso na Terra</label>' +
+				'<label for="pesoTerra">' + TR('Seu peso na Terra', 'Your weight on Earth') + '</label>' +
 				'<div class="entrada-linha">' +
-					'<button type="button" class="passo" data-passo="-1" aria-label="Diminuir 1 kg">−</button>' +
+					'<button type="button" class="passo" data-passo="-1" aria-label="' + TR('Diminuir 1 kg', 'Decrease 1 kg') + '">−</button>' +
 					'<div class="entrada-numero"><input type="number" id="pesoTerra" min="1" max="500" step="1" inputmode="decimal"><span>kg</span></div>' +
-					'<button type="button" class="passo" data-passo="1" aria-label="Aumentar 1 kg">+</button>' +
+					'<button type="button" class="passo" data-passo="1" aria-label="' + TR('Aumentar 1 kg', 'Increase 1 kg') + '">+</button>' +
 				'</div>' +
-				'<input type="range" id="pesoDeslizar" min="10" max="150" step="1" aria-label="Ajustar seu peso na Terra">' +
+				'<input type="range" id="pesoDeslizar" min="10" max="150" step="1" aria-label="' + TR('Ajustar seu peso na Terra', 'Adjust your weight on Earth') + '">' +
 			'</div>' +
 			'<div class="balanca-seta" aria-hidden="true"></div>' +
 			'<div class="aparelho pixelado" aria-live="polite">' +
-				'<div class="aparelho-onde">Balança ' + aqui.em + '</div>' +
+				'<div class="aparelho-onde">' + TR('Balança ' + aqui.em, 'Scale ' + aqui.em) + '</div>' +
 				'<div class="aparelho-visor"><span id="balancaValor">0</span><small id="balancaUnidade">kg</small></div>' +
 				'<div class="aparelho-pes"><i></i><i></i></div>' +
 			'</div>' +
 		'</div>' +
 		'<p class="balanca-nota" id="balancaNota"></p>' +
 		'<div class="pulo">' +
-			'<h3 class="pulo-titulo">' + (naTerra ? 'Um pulo na Terra' : 'Um pulo na Terra e ' + aqui.em) + '</h3>' +
+			'<h3 class="pulo-titulo">' + (naTerra ? TR('Um pulo na Terra', 'A jump on Earth') : TR('Um pulo na Terra e ' + aqui.em, 'A jump on Earth and ' + aqui.em)) + '</h3>' +
 			'<canvas id="puloTela" role="img"></canvas>' +
 			'<div class="pulo-cartoes' + (naTerra ? ' sozinho' : '') + '">' +
 				(naTerra ? cartaoPulo(aqui) : cartaoPulo(porId.terra) + cartaoPulo(aqui)) +
@@ -142,8 +161,8 @@
 
 	var hAqui = V0 * V0 / (2 * aqui.g);
 	tela.setAttribute('aria-label', naTerra
-		? 'Astronauta pulando na Terra: sobe ' + alturaTexto(PULO_TERRA) + '.'
-		: 'Dois astronautas pulando com o mesmo impulso: na Terra sobe ' + alturaTexto(PULO_TERRA) + ', ' + aqui.em + ' sobe ' + alturaTexto(hAqui) + '.');
+		? TR('Astronauta pulando na Terra: sobe ' + alturaTexto(PULO_TERRA) + '.', 'Astronaut jumping on Earth: rises ' + alturaTexto(PULO_TERRA) + '.')
+		: TR('Dois astronautas pulando com o mesmo impulso: na Terra sobe ' + alturaTexto(PULO_TERRA) + ', ' + aqui.em + ' sobe ' + alturaTexto(hAqui) + '.', 'Two astronauts jumping with the same push: on Earth one rises ' + alturaTexto(PULO_TERRA) + ', ' + aqui.em + ' the other rises ' + alturaTexto(hAqui) + '.'));
 
 	// ---------- Balança ----------
 	var mostrado = 0, animacaoNumero = null;
@@ -169,12 +188,12 @@
 		} else { unidade.textContent = 'kg'; animarNumero(kg); }
 		var razao = aqui.g / G_TERRA;
 		nota.innerHTML = (naTerra
-			? 'Na Terra, a balança marca o seu peso de sempre.'
+			? TR('Na Terra, a balança marca o seu peso de sempre.', 'On Earth, the scale shows your usual weight.')
 			: razao < 0.01
-				? Em(aqui) + ' você pesaria só <strong>' + num(razao * 100, 2) + '%</strong> do seu peso na Terra.'
+				? Em(aqui) + TR(' você pesaria só <strong>' + num(razao * 100, 2) + '%</strong> do seu peso na Terra.', ' you would weigh only <strong>' + num(razao * 100, 2) + '%</strong> of your weight on Earth.')
 				: razao < 1
-					? Em(aqui) + ' você pesaria <strong>' + num(razao * 100, 0) + '%</strong> do seu peso na Terra.'
-					: Em(aqui) + ' você pesaria <strong>' + num(razao, razao >= 100 ? 0 : 1).replace(/,0$/, '') + ' vezes</strong> o seu peso na Terra.') +
+					? Em(aqui) + TR(' você pesaria <strong>' + num(razao * 100, 0) + '%</strong> do seu peso na Terra.', ' you would weigh <strong>' + num(razao * 100, 0) + '%</strong> of your weight on Earth.')
+					: Em(aqui) + TR(' você pesaria <strong>' + num(razao, razao >= 100 ? 0 : 1).replace(/,0$/, '') + ' vezes</strong> o seu peso na Terra.', ' you would weigh <strong>' + num(razao, razao >= 100 ? 0 : 1).replace(/\.0$/, '') + ' times</strong> your weight on Earth.')) +
 			(aqui.compara ? ' ' + aqui.compara(kg) : '') + (aqui.extra ? '<br><small>' + aqui.extra + '</small>' : '');
 	}
 
@@ -314,7 +333,7 @@
 		ctx.fillText(corpo.nome, x + 12, 10);
 		ctx.fillStyle = '#b8aed8';
 		ctx.font = '13px "Space Grotesk", sans-serif';
-		ctx.fillText('gravidade ' + num(corpo.g, corpo.g >= 1000 ? 0 : corpo.g < 0.1 ? 4 : 2) + ' m/s²', x + 12, 32);
+		ctx.fillText(TR('gravidade ', 'gravity ') + num(corpo.g, corpo.g >= 1000 ? 0 : corpo.g < 0.1 ? 4 : 2) + ' m/s²', x + 12, 32);
 		ctx.textAlign = 'right';
 		ctx.fillStyle = '#ff8ad8';
 		ctx.fillText(alturaTexto(hMax), x + w - 12, Math.max(52, yTopo - 18));

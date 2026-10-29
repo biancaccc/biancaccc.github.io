@@ -334,6 +334,7 @@
 	"A estrela S2 numa volta de 16 anos: longe do buraco negro ela anda devagar; quando passa perto, dispara a quase 8.000 km/s.": "The star S2 on a 16-year orbit: far from the black hole it moves slowly; when it passes close, it races at almost 8,000 km/s.",
 	"Bruce Balick e Robert Brown encontram uma fonte de ondas de rádio bem no centro da galáxia: Sagittarius A*.": "Bruce Balick and Robert Brown find a source of radio waves right at the center of the galaxy: Sagittarius A*.",
 	"Anos 1990": "The 1990s",
+	"240 a.C.": "240 BC",
 	"As equipes de Reinhard Genzel e Andrea Ghez começam a seguir as estrelas que giram em volta dele.": "The teams of Reinhard Genzel and Andrea Ghez begin following the stars that orbit it.",
 	"A estrela S2 passa no ponto mais perto e mostra que ali existe algo enorme e invisível.": "The star S2 passes its closest point and shows that something huge and invisible is there.",
 	"A S2 passa perto de novo e confirma uma previsão de Einstein sobre a luz e a gravidade.": "S2 passes close again and confirms one of Einstein's predictions about light and gravity.",

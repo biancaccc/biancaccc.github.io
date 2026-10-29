@@ -77,25 +77,35 @@
 		// Junta as linhas do tempo de todas as páginas (visuais-dados.js; a de Urano está escrita na
 		// página dele, então vem copiada aqui), põe em ordem e separa por época.
 		(function () {
-			var V = window.VISUAIS_DADOS || {}, HOJE = new Date().getFullYear();
+			var V = window.VISUAIS_DADOS || {}, HOJE = new Date().getFullYear(), TR = window.T || function (pt) { return pt; };
 			// nome, cor e grupo de cada página (solar = Sistema Solar, galaxia = destinos da Via Láctea)
 			var PAGINAS = {
-				sol: ['Sol', '#ffc04d', 'solar'], mercurio: ['Mercúrio', '#a9b8ff', 'solar'], venus: ['Vênus', '#f5a83c', 'solar'], terra: ['Terra', '#6f9bff', 'solar'],
-				marte: ['Marte', '#e8906c', 'solar'], jupiter: ['Júpiter', '#e6c49a', 'solar'], saturno: ['Saturno', '#e3cc8f', 'solar'], urano: ['Urano', '#a8ecf5', 'solar'],
-				netuno: ['Netuno', '#6b95ff', 'solar'], 'sagitario-a': ['Sagittarius A*', '#ffb347', 'galaxia'], fermi: ['Bolhas de Fermi', '#e070ff', 'galaxia'],
-				orion: ['Nebulosa de Órion', '#ff6fb5', 'galaxia'], pleiades: ['Plêiades', '#8fb8ff', 'galaxia'], helice: ['Nebulosa da Hélice', '#5fd6d0', 'galaxia'],
-				tabby: ['Estrela de Tabby', '#ff9d5c', 'galaxia'], 'omega-centauri': ['Omega Centauri', '#ffe08a', 'galaxia'], betelgeuse: ['Betelgeuse', '#ff6a3d', 'galaxia'],
-				'eta-carinae': ['Eta Carinae', '#c8a0ff', 'galaxia'], sirius: ['Sirius', '#5b8cff', 'galaxia'], caranguejo: ['Nebulosa do Caranguejo', '#9be36a', 'galaxia'],
+				sol: [TR('Sol', 'Sun'), '#ffc04d', 'solar'], mercurio: [TR('Mercúrio', 'Mercury'), '#a9b8ff', 'solar'], venus: [TR('Vênus', 'Venus'), '#f5a83c', 'solar'], terra: [TR('Terra', 'Earth'), '#6f9bff', 'solar'],
+				marte: [TR('Marte', 'Mars'), '#e8906c', 'solar'], jupiter: [TR('Júpiter', 'Jupiter'), '#e6c49a', 'solar'], saturno: [TR('Saturno', 'Saturn'), '#e3cc8f', 'solar'], urano: [TR('Urano', 'Uranus'), '#a8ecf5', 'solar'],
+				netuno: [TR('Netuno', 'Neptune'), '#6b95ff', 'solar'], 'sagitario-a': ['Sagittarius A*', '#ffb347', 'galaxia'], fermi: [TR('Bolhas de Fermi', 'Fermi Bubbles'), '#e070ff', 'galaxia'],
+				orion: [TR('Nebulosa de Órion', 'Orion Nebula'), '#ff6fb5', 'galaxia'], pleiades: [TR('Plêiades', 'Pleiades'), '#8fb8ff', 'galaxia'], helice: [TR('Nebulosa da Hélice', 'Helix Nebula'), '#5fd6d0', 'galaxia'],
+				tabby: [TR("Estrela de Tabby", "Tabby's Star"), '#ff9d5c', 'galaxia'], 'omega-centauri': ['Omega Centauri', '#ffe08a', 'galaxia'], betelgeuse: ['Betelgeuse', '#ff6a3d', 'galaxia'],
+				'eta-carinae': ['Eta Carinae', '#c8a0ff', 'galaxia'], sirius: ['Sirius', '#5b8cff', 'galaxia'], caranguejo: [TR('Nebulosa do Caranguejo', 'Crab Nebula'), '#9be36a', 'galaxia'],
 				'proxima-centauri': ['Proxima Centauri', '#f0505a', 'galaxia']
 			};
-			var URANO = [['1781', 'William Herschel descobre Urano com um telescópio.'], ['1787', 'Herschel encontra as duas primeiras luas: Titânia e Oberon.'],
-				['1851', 'William Lassell descobre Ariel e Umbriel.'], ['1948', 'Gerard Kuiper descobre Miranda, a lua do penhasco gigante.'],
-				['1977', 'Os anéis de Urano são descobertos.'], ['1986', 'A Voyager 2 passa por Urano: a única visita até hoje.'], ['2025', 'Uma nova lua é encontrada, e Urano passa a ter 29.']];
+			var URANO = [['1781', TR('William Herschel descobre Urano com um telescópio.', 'William Herschel discovers Uranus with a telescope.')], ['1787', TR('Herschel encontra as duas primeiras luas: Titânia e Oberon.', 'Herschel finds the first two moons: Titania and Oberon.')],
+				['1851', TR('William Lassell descobre Ariel e Umbriel.', 'William Lassell discovers Ariel and Umbriel.')], ['1948', TR('Gerard Kuiper descobre Miranda, a lua do penhasco gigante.', 'Gerard Kuiper discovers Miranda, the moon with the giant cliff.')],
+				['1977', TR('Os anéis de Urano são descobertos.', 'The rings of Uranus are discovered.')], ['1986', TR('A Voyager 2 passa por Urano: a única visita até hoje.', 'Voyager 2 flies past Uranus: the only visit to this day.')], ['2025', TR('Uma nova lua é encontrada, e Urano passa a ter 29.', 'A new moon is found, and Uranus now has 29.')]];
 			// transforma o rótulo ("1846", "Há uns 3.600 anos", "240 a.C.", "Fim do século 19"…) num ano, para pôr em ordem
 			function numero(s) { return parseFloat(s.replace(/\./g, '').replace(',', '.')); }
 			function mult(s) { return /bilh/.test(s) ? 1e9 : /milh/.test(s) ? 1e6 : /mil/.test(s) ? 1e3 : 1; }
 			function ano(r) {
 				var m;
+				// os rótulos em inglês (en/visuais-dados.js): "240 BC", "About 3,600 years ago", "5 billion years from now"…
+				if (window.IDIOMA === 'en') {
+					var n = function (s) { return parseFloat(s.replace(/,/g, '')); };
+					if ((m = r.match(/^(\d+) BC/))) return -n(m[1]);
+					if ((m = r.match(/^([\d.,]+) .*from now/))) return HOJE + n(m[1]) * mult(r.replace(/thousand/, 'mil').replace(/million/, 'milh').replace(/billion/, 'bilh'));
+					if ((m = r.match(/^(?:About )?([\d.,]+) .*ago/))) return HOJE - n(m[1]) * mult(r.replace(/thousand/, 'mil').replace(/million/, 'milh').replace(/billion/, 'bilh'));
+					if (/^Thousands/.test(r)) return HOJE - 5000;
+					if ((m = r.match(/(\d+)(?:st|nd|rd|th) century/))) return (+m[1] - 1) * 100 + 90;
+					if ((m = r.match(/^Before (\d{4})/))) return +m[1] - 1;
+				}
 				if ((m = r.match(/^(\d+) a\.C\./))) return -numero(m[1]);
 				if ((m = r.match(/^Daqui a ([\d.,]+)/))) return HOJE + numero(m[1]) * mult(r);
 				if ((m = r.match(/^Há (?:uns )?([\d.,]+)/))) return HOJE - numero(m[1]) * mult(r);
@@ -113,16 +123,16 @@
 			todos.sort(function (a, b) { return a.ano - b.ano; });
 			// cada época: id, título, quem entra nela, a ilustração animada (visuais.js) e um resuminho
 			var EPOCAS = [
-				['epoca-1', 'Antes dos telescópios', function (a) { return a < 1600; }, 'era-antiga', 'Pirâmides no Egito à noite, com o rio Nilo refletindo o céu e a estrela Sirius brilhando no horizonte.',
-					'Sem telescópio, só com os olhos: os povos antigos acompanhavam as estrelas para marcar o tempo, as colheitas e as cheias dos rios.'],
-				['epoca-2', 'Os primeiros telescópios (1600 a 1899)', function (a) { return a >= 1600 && a < 1900; }, 'era-telescopio', 'Uma luneta antiga, de latão, apontada para Júpiter, com as quatro luas grandes dando voltas em volta dele.',
-					'Em 1609, Galileu apontou uma luneta para o céu e tudo mudou: luas em volta de Júpiter, montanhas na Lua e estrelas que ninguém tinha visto antes.'],
-				['epoca-3', 'O século 20: foguetes, sondas e telescópios gigantes', function (a) { return a >= 1900 && a < 2000; }, 'era-foguete', 'Um foguete decolando da plataforma, com uma coluna de fogo e fumaça, subindo para o céu estrelado.',
-					'Com os foguetes, saímos da Terra: satélites, gente na Lua, sondas visitando os planetas e o telescópio Hubble lá em cima.'],
-				['epoca-4', 'O século 21: até hoje', function (a) { return a >= 2000 && a <= HOJE; }, 'era-webb', 'O telescópio James Webb flutuando no espaço: o espelho dourado de hexágonos em cima do escudo de proteção roxo, em camadas.',
-					'Robôs passeando em Marte, a primeira foto de um buraco negro e o James Webb, que enxerga a luz infravermelha das primeiras galáxias.'],
-				['epoca-5', 'E no futuro…', function (a) { return a > HOJE; }, 'era-futuro', 'O Sol, daqui a bilhões de anos, inchando até virar uma gigante vermelha e depois soltando as camadas de fora num anel de gás.',
-					'Daqui a bilhões de anos, o Sol vai inchar, soltar as camadas de fora como a Nebulosa da Hélice e virar uma anã branca.']
+				['epoca-1', TR('Antes dos telescópios', 'Before telescopes'), function (a) { return a < 1600; }, 'era-antiga', TR('Pirâmides no Egito à noite, com o rio Nilo refletindo o céu e a estrela Sirius brilhando no horizonte.', 'Pyramids in Egypt at night, with the Nile reflecting the sky and the star Sirius shining on the horizon.'),
+					TR('Sem telescópio, só com os olhos: os povos antigos acompanhavam as estrelas para marcar o tempo, as colheitas e as cheias dos rios.', 'No telescope, just their eyes: ancient peoples followed the stars to keep track of time, harvests and river floods.')],
+				['epoca-2', TR('Os primeiros telescópios (1600 a 1899)', 'The first telescopes (1600 to 1899)'), function (a) { return a >= 1600 && a < 1900; }, 'era-telescopio', TR('Uma luneta antiga, de latão, apontada para Júpiter, com as quatro luas grandes dando voltas em volta dele.', 'An old brass spyglass pointed at Jupiter, with its four big moons circling it.'),
+					TR('Em 1609, Galileu apontou uma luneta para o céu e tudo mudou: luas em volta de Júpiter, montanhas na Lua e estrelas que ninguém tinha visto antes.', 'In 1609, Galileo pointed a spyglass at the sky and everything changed: moons around Jupiter, mountains on the Moon and stars no one had ever seen.')],
+				['epoca-3', TR('O século 20: foguetes, sondas e telescópios gigantes', 'The 20th century: rockets, probes and giant telescopes'), function (a) { return a >= 1900 && a < 2000; }, 'era-foguete', TR('Um foguete decolando da plataforma, com uma coluna de fogo e fumaça, subindo para o céu estrelado.', 'A rocket lifting off the pad, with a column of fire and smoke, rising into the starry sky.'),
+					TR('Com os foguetes, saímos da Terra: satélites, gente na Lua, sondas visitando os planetas e o telescópio Hubble lá em cima.', 'With rockets, we left Earth: satellites, people on the Moon, probes visiting the planets and the Hubble telescope up above.')],
+				['epoca-4', TR('O século 21: até hoje', 'The 21st century: up to today'), function (a) { return a >= 2000 && a <= HOJE; }, 'era-webb', TR('O telescópio James Webb flutuando no espaço: o espelho dourado de hexágonos em cima do escudo de proteção roxo, em camadas.', 'The James Webb telescope floating in space: the golden mirror of hexagons on top of the layered purple sunshield.'),
+					TR('Robôs passeando em Marte, a primeira foto de um buraco negro e o James Webb, que enxerga a luz infravermelha das primeiras galáxias.', 'Robots roving on Mars, the first photo of a black hole and the James Webb, which sees the infrared light of the first galaxies.')],
+				['epoca-5', TR('E no futuro…', 'And in the future…'), function (a) { return a > HOJE; }, 'era-futuro', TR('O Sol, daqui a bilhões de anos, inchando até virar uma gigante vermelha e depois soltando as camadas de fora num anel de gás.', 'The Sun, billions of years from now, swelling into a red giant and then shedding its outer layers in a ring of gas.'),
+					TR('Daqui a bilhões de anos, o Sol vai inchar, soltar as camadas de fora como a Nebulosa da Hélice e virar uma anã branca.', 'Billions of years from now, the Sun will swell, shed its outer layers like the Helix Nebula and become a white dwarf.')]
 			];
 			var conteudo = document.getElementById('conteudo-linha'), fecho = conteudo.querySelector('.fecho'), sumario = document.getElementById('sumario-linha');
 			var regua = document.getElementById('regua-linha');
@@ -132,7 +142,7 @@
 				var s = document.createElement('section');
 				s.className = 'bloco pixelado';
 				s.id = ep[0];
-				s.innerHTML = '<h2>' + ep[1] + ' <small class="epoca-conta">' + itens.length + ' acontecimento' + (itens.length > 1 ? 's' : '') + '</small></h2>' +
+				s.innerHTML = '<h2>' + ep[1] + ' <small class="epoca-conta">' + itens.length + TR(' acontecimento', ' event') + (itens.length > 1 ? 's' : '') + '</small></h2>' +
 					'<figure class="animacao era-figura"><canvas data-animacao="' + ep[3] + '" width="200" height="70" role="img" aria-label="' + ep[4] + '"></canvas></figure>' +
 					'<p class="epoca-resumo">' + ep[5] + '</p>' +
 					'<ol class="linha-tempo">' + itens.map(function (t, i) {
@@ -148,10 +158,10 @@
 					itens.map(function (t, i) { var p = PAGINAS[t.id]; return '<a class="regua-ponto" data-grupo="' + p[2] + '" href="#' + ep[0] + '-' + i + '" style="--cor:' + p[1] + '" title="' + t.rotulo + ' · ' + p[0] + '"></a>'; }).join('') + '</div></div>');
 			});
 			document.getElementById('ficha-linha').innerHTML =
-				'<div><dt>Acontecimentos</dt><dd>' + todos.length + '</dd></div>' +
-				'<div><dt>Lugares</dt><dd>' + Object.keys(PAGINAS).length + '</dd></div>' +
-				'<div><dt>Mais antigo</dt><dd>' + todos[0].rotulo + '</dd></div>' +
-				'<div><dt>Mais novo</dt><dd>' + todos.filter(function (t) { return t.ano <= HOJE; }).pop().rotulo + '</dd></div>';
+				'<div><dt>' + TR('Acontecimentos', 'Events') + '</dt><dd>' + todos.length + '</dd></div>' +
+				'<div><dt>' + TR('Lugares', 'Places') + '</dt><dd>' + Object.keys(PAGINAS).length + '</dd></div>' +
+				'<div><dt>' + TR('Mais antigo', 'Oldest') + '</dt><dd>' + todos[0].rotulo + '</dd></div>' +
+				'<div><dt>' + TR('Mais novo', 'Newest') + '</dt><dd>' + todos.filter(function (t) { return t.ano <= HOJE; }).pop().rotulo + '</dd></div>';
 			// os filtros: tudo, só o Sistema Solar ou só a Via Láctea
 			var botoes = document.querySelectorAll('[data-filtro]');
 			botoes.forEach(function (b) {
