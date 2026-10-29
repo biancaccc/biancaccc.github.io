@@ -57,7 +57,7 @@
 		netuno: { terno: '#2a4ab8', quepe: '#14205a', olho: '#7fa8ff', extra: 'cachecol', fala: 'Bem-vindo a Netuno! Os ventos daqui passam de 2 mil km/h. Segure o quepe!' },
 		// as luas (pousando, como em Mercúrio, Vênus e Marte)
 		lua: { terno: '#5a6078', quepe: '#2a3048', olho: '#cfe4ff', extra: 'crescente', fala: 'Bem-vindo à Lua! Pise com cuidado: as pegadas daqui duram milhões de anos, porque não tem vento nem chuva para apagá-las.' },
-		io: { terno: '#c8a020', quepe: '#7a5a10', olho: '#ff8a3a', extra: 'chamas', fala: 'Bem-vindo a Io! Não ligue para as erupções: aqui tem mais de 400 vulcões ativos. E Júpiter nunca sai do mesmo lugar do céu.' },
+		io: { terno: '#c8a020', quepe: '#7a5a10', olho: '#ff8a3a', extra: 'chamas', fala: 'Bem-vindo a Io! Não ligue para as erupções: aqui tem mais de 400 vulcões ativos, e alguns soltam lava a mais de 1.200 °C.' },
 		europa: { terno: '#2a6aa8', quepe: '#143a6a', olho: '#bfe8ff', extra: 'mergulho', fala: 'Bem-vindo a Europa! Embaixo deste gelo tem um oceano com o dobro da água da Terra. O equipamento de mergulho é por minha conta.' },
 		ganimedes: { terno: '#7a6a54', quepe: '#4a3e30', olho: '#7affc8', extra: 'aurora', fala: 'Bem-vindo a Ganimedes, a maior lua do Sistema Solar! Repare nas auroras: entre todas as luas, só ela tem campo magnético próprio.' },
 		tita: { terno: '#c8742a', quepe: '#7a4010', olho: '#ffd890', extra: 'guardachuva', fala: 'Bem-vindo a Titã! Trouxe guarda-chuva? Aqui chove metano, bem devagarinho. E não esqueça o casaco: faz −179 °C.' },
@@ -104,7 +104,7 @@
 			caranguejo: 'Welcome to the Crab! The pulsar in the middle spins about 30 times a second. Listen: tick-tick-tick.',
 			'proxima-centauri': 'Welcome to the Sun\'s closest neighbor! Light from here takes only 4.2 years to reach Earth. Say hi!',
 			lua: 'Welcome to the Moon! Step carefully: footprints here last millions of years, because there is no wind or rain to erase them.',
-			io: 'Welcome to Io! Never mind the eruptions: there are more than 400 active volcanoes here. And Jupiter never leaves its spot in the sky.',
+			io: 'Welcome to Io! Never mind the eruptions: there are more than 400 active volcanoes here, and some spill lava hotter than 1,200 °C.',
 			europa: 'Welcome to Europa! Under this ice there is an ocean with twice as much water as Earth. The diving gear is on me.',
 			ganimedes: 'Welcome to Ganymede, the largest moon in the Solar System! Look at the auroras: of all the moons, only this one has its own magnetic field.',
 			tita: 'Welcome to Titan! Did you bring an umbrella? It rains methane here, ever so slowly. And do not forget your coat: it is −179 °C.',

@@ -39,6 +39,13 @@ com os destinos, uma página para cada destino, o passaporte espacial e uma cena
 - `destinos.js`: as artes animadas dos destinos da galáxia. `visuais.js` + `visuais-dados.js`: animações,
   quizzes, linhas do tempo e o "céu visto daqui" das páginas. `nave.js`: o modelo 3D da nave.
 - `estilo.css`: todo o estilo. `marca.js`: o símbolo, o selo e o crédito da autora.
+- `idioma.js` + `en/`: a versão em inglês (botão PT | EN; nos scripts, `T('pt', 'en')`; os textos das páginas
+  ficam em `en/<página>.js` e `en/comum.js`). Os letreiros pintados nas cenas ficam em português.
+- **As luas** (`lua`, `io`, `europa`, `ganimedes`, `tita`, `encelado`, `mimas`, `miranda`, `tritao`): uma página
+  cada, no padrão dos planetas, com pouso na chegada (o planeta-pai no céu, no tamanho real visto de lá). As artes
+  `pixel/<lua>.png` foram desenhadas por código (`pixel/sprites.js` tem cópia delas). Para mexer numa lua: a página,
+  `en/<lua>.js`, `visuais-dados.js` (fim do arquivo), `visuais.js` (animações das luas), `radio.js`, `chegada.js`
+  (`AGENTES`, `SOLO_LUAS`, `SUJEIRAS`), `balanca.js`, `passaporte.js` (selos "Volta pelas luas" e "Sabe-tudo das luas").
 - Para **adicionar um destino**, mexa em: a página HTML, `visuais-dados.js`, `visuais.js` (animações, `CICLOS`,
   total de quizzes), `destinos.js` (`ARTES`), `viagem.js` (`DESTINOS`, `CEU`, `ARTE_DO_DESTINO`),
   `passaporte.js` (`DESTINOS`, `ESTILOS`, `ICONES`, totais das conquistas), `radio.js`, `chegada.js`
@@ -73,7 +80,8 @@ Depois de testar, limpe o que os testes guardam no navegador (`localStorage`: `p
 
 ## Ideias combinadas para as próximas sessões
 
-Feito: **o tempo do Sol ao vivo** (`tempo-do-sol.js`).
+Feito: **o tempo do Sol ao vivo** (`tempo-do-sol.js`), **a versão em inglês** e **as luas como destinos**
+(com pouso).
 
 **Encanto**
 - **O céu de verdade na rua da agência:** a lua na fase real do dia e, de vez em quando, a Estação Espacial
@@ -82,7 +90,6 @@ Feito: **o tempo do Sol ao vivo** (`tempo-do-sol.js`).
   "viaja" junto.
 - **Um companheiro na cabine:** escolher o ZÖ-11 ou um robozinho novo para a poltrona do copiloto, comentando
   as chegadas e reagindo aos eventos.
-- Em aberto: pousar nas luas dos gigantes (Tritão, Miranda, Europa, Titã) em vez das estações.
 
 **Experiência (UI/UX)**
 - **Celular:** testar o embarque e as chegadas no celular (em pé e deitado) e deixar os botões fáceis de tocar.

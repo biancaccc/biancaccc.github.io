@@ -1141,4 +1141,8 @@
 			else andar(v);
 		});
 	})(window.VISUAIS_DADOS);
+	// (os plurais iguais ao nome em português, que o dicionário não separa)
+	var V = window.VISUAIS_DADOS || {};
+	if (V.ganimedes) V.ganimedes.comparacao.plural = 'Ganymedes';
+	if (V.mimas) V.mimas.comparacao.plural = 'Mimases';
 })();
