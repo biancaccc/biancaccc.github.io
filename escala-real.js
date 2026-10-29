@@ -332,6 +332,9 @@
 					texto(ctx, v.nome, Math.round(v.x), Math.round(y + Math.max(v.d / 2, 3) + 7 + desce), v.p.id === 'terra' ? '#7fe3ff' : 'rgba(232,226,255,0.85)', 'center');
 				});
 				var ga = Math.max(0, Math.min(1, 1 - grupo * 2));
+				/* quando Júpiter entra na tela, o nome do grupo sai de cena */
+				var jup = vis[7];
+				ga *= 1 - Math.max(0, Math.min(1, (jup.x + jup.d / 2) / 40));
 				if (ga > 0) {
 					ctx.globalAlpha = ga;
 					var g0 = vis[0].x, g1 = vis[3].x, gy = Math.round(y - 10);
