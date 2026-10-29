@@ -1,9 +1,8 @@
 // Página "Escala real": animações em pixel art com tamanhos e distâncias de verdade.
-//  - heroi: a beirada do Sol, a Terra e Júpiter na mesma escala;
-//  - tamanhos: a beirada do Sol e os oito planetas enfileirados;
+//  - heroi: o "Pálido Ponto Azul" da Voyager 1, com a Terra de 1 pixel;
+//  - tamanhos: a câmera se afasta da Terra até o Sol entrar, tudo na mesma escala;
 //  - terra-lua: as 30 Terras entre a Terra e a Lua, e os outros planetas no mesmo espaço;
 //  - luas: cada planeta com as suas luas, visto de cima, em escala (as luas giram devagar e param com o mouse);
-//  - aneis: os anéis de Saturno girando até ficar de lado;
 //  - luz: um raio de luz saindo do Sol, com os planetas nas distâncias de verdade;
 //  - viagem: uma faixa em que a Lua tem 1 pixel, do Sol a Netuno.
 // Todos os números são reais (NASA, diâmetros médios e distâncias médias).
@@ -109,7 +108,7 @@
 		if (!img.complete || !img.naturalWidth) return false;
 		var larg = diam, alt = diam * img.naturalHeight / img.naturalWidth;
 		if (id === 'saturno') { larg = diam / SAT_GLOBO; alt = larg * img.naturalHeight / img.naturalWidth; }
-		ctx.imageSmoothingEnabled = true;
+		ctx.imageSmoothingEnabled = larg < img.naturalWidth;
 		ctx.imageSmoothingQuality = 'high';
 		ctx.drawImage(img, Math.round(x - larg / 2), Math.round(y - alt / 2), Math.round(larg), Math.round(alt));
 		ctx.imageSmoothingEnabled = false;
@@ -182,65 +181,146 @@
 		hud.estacao.style.display = b ? '' : 'none';
 	}
 
-	/* Herói: o Sol entrando pela esquerda; a Terra e Júpiter na mesma escala. */
+	/* Herói: releitura do "Pálido Ponto Azul", a foto que a Voyager 1 tirou em 14/02/1990, a 6 bilhões de km.
+	   Faixas de luz do Sol espalhada na câmera e, dentro de uma delas, a Terra: um pixel só.
+	   A imagem chega linha por linha, como chegaram os dados da sonda. */
 	CENAS.heroi = {
-		L: 360, A: 360, parado: 3,
+		L: 360, A: 360, parado: 20,
 		criar: function (ctx, dados) {
-			var R = 330, cx = 180 - R, cy = 180, k = (2 * R) / KM_SOL;
-			var terra = PLANETAS[2], jup = PLANETAS[4];
-			var dT = terra.d * k, dJ = jup.d * k;
+			/* faixas: x no topo, inclinação, largura, cor */
+			var FAIXAS = [
+				[58, 0.1, 15, [150, 70, 60]],
+				[118, 0.1, 10, [70, 120, 170]],
+				[176, 0.1, 13, [160, 90, 150]],
+				[236, 0.1, 30, [190, 120, 70]]
+			];
+			var TX = 236 + 0.1 * 236, TY = 236; /* a Terra, dentro da faixa marrom da direita */
 			return function (t) {
-				estrelas(dados, 360, 360, t, 5, 70);
-				pintarSol(dados, 360, 360, cx, cy, R, t, 300);
-				ctx.putImageData(dados, 0, 0);
-				/* protuberâncias: laços de plasma subindo e descendo na borda */
-				[[-0.42, 0.9, 2.1], [0.18, 1.4, 3.3], [0.55, 1.1, 0.7]].forEach(function (p, n) {
-					var ang = p[0], alto = 6 + 5 * Math.sin(t * 0.4 * p[1] + p[2]);
-					for (var s = 0; s <= 20; s++) {
-						var u = s / 20, a = ang + (u - 0.5) * 0.07, h = Math.sin(u * Math.PI) * alto;
-						var x = cx + Math.cos(a) * (R + h), y = cy + Math.sin(a) * (R + h);
-						ctx.fillStyle = 'rgba(255,' + (110 + n * 20) + ',40,' + (0.55 + 0.35 * Math.sin(u * Math.PI)) + ')';
-						ctx.fillRect(Math.round(x), Math.round(y), 1, 1);
+				var d = dados.data, chega = calmo ? 999 : t * 110;
+				for (var y = 0; y < 360; y++) {
+					for (var x = 0; x < 360; x++) {
+						var i = (y * 360 + x) * 4;
+						if (y > chega) { d[i] = d[i + 1] = d[i + 2] = 0; d[i + 3] = 255; continue; }
+						/* grão do filme, mudando devagar */
+						var g = hash(x + Math.floor(t * 6) * 977, y) * 10;
+						var r = 6 + g, gg = 4 + g * 0.8, b = 10 + g;
+						for (var f = 0; f < 4; f++) {
+							var F = FAIXAS[f], dx = x - (F[0] + F[1] * y);
+							if (Math.abs(dx) > F[2] * 2) continue;
+							var k = Math.exp(-(dx * dx) / (2 * F[2] * F[2] * 0.35));
+							var onda = 0.6 + 0.25 * ruido(y / 22 + f * 5, t * 0.25 + f) + 0.15 * Math.sin(t * 0.7 + f * 1.9);
+							var listras = 0.85 + 0.15 * ruido(dx / 2 + f * 9, y / 60);
+							k *= onda * listras * 0.55;
+							r += F[3][0] * k; gg += F[3][1] * k; b += F[3][2] * k;
+						}
+						/* a linha que está chegando agora brilha um pouco */
+						if (chega - y < 2) { r += 60; gg += 60; b += 70; }
+						d[i] = Math.min(255, r); d[i + 1] = Math.min(255, gg); d[i + 2] = Math.min(255, b); d[i + 3] = 255;
 					}
-				});
-				var xT = 236, xJ = 306, y = 180, sobe = Math.round(Math.sin(t * 2) * 1.5);
-				planeta(ctx, terra, xT, y, dT);
-				planeta(ctx, jup, xJ, y, dJ);
-				seta(ctx, xT, y - 16 + sobe, '#7fe3ff');
-				texto(ctx, terra.nome.toUpperCase(), xT, y + 10, '#7fe3ff', 'center');
-				texto(ctx, jup.nome.toUpperCase(), xJ, y + dJ / 2 + 6, '#ffd36a', 'center');
-				texto(ctx, T('TUDO NA MESMA ESCALA', 'ALL AT THE SAME SCALE'), 352, 340, 'rgba(232,226,255,0.6)', 'right');
+				}
+				ctx.putImageData(dados, 0, 0);
+				/* poeirinha flutuando nos raios */
+				for (var p = 0; p < 26; p++) {
+					var px = (hash(p, 1) * 360 + t * (2 + hash(p, 2) * 4)) % 360, py = (hash(p, 3) * 360 + Math.sin(t * 0.3 + p) * 6 + 360) % 360;
+					if (py > chega) continue;
+					ctx.fillStyle = 'rgba(255,230,200,' + (0.15 + 0.25 * hash(p, 4)) + ')';
+					ctx.fillRect(Math.floor(px), Math.floor(py), 1, 1);
+				}
+				if (TY > chega) return;
+				/* a Terra: um pixel azul-claro, que pulsa de leve */
+				var pulso = 0.75 + 0.25 * Math.sin(t * 2.2);
+				ctx.fillStyle = 'rgba(205,228,255,' + pulso + ')';
+				ctx.fillRect(Math.round(TX), TY, 1, 1);
+				ctx.fillStyle = 'rgba(160,200,255,' + (0.25 * pulso) + ')';
+				ctx.fillRect(Math.round(TX) - 1, TY, 1, 1); ctx.fillRect(Math.round(TX) + 1, TY, 1, 1);
+				ctx.fillRect(Math.round(TX), TY - 1, 1, 1); ctx.fillRect(Math.round(TX), TY + 1, 1, 1);
+				/* a mira aparece depois que a imagem chega, fechando sobre o pontinho */
+				var m = Math.max(0, Math.min(1, (t - (calmo ? 0 : 4.2)) / 1.2));
+				if (m > 0) {
+					var a = Math.round(26 - 16 * (m * m * (3 - 2 * m))), cx = Math.round(TX), cy = TY;
+					ctx.fillStyle = 'rgba(127,227,255,' + (0.5 + 0.5 * m) + ')';
+					[[-1, -1], [1, -1], [-1, 1], [1, 1]].forEach(function (c) {
+						var x0 = cx + c[0] * a, y0 = cy + c[1] * a;
+						ctx.fillRect(Math.min(x0, x0 - c[0] * 4), y0, 5, 1);
+						ctx.fillRect(x0, Math.min(y0, y0 - c[1] * 4), 1, 5);
+					});
+					if (m >= 1) {
+						var pisca = Math.floor(t * 1.5) % 2 ? 1 : 0.7;
+						ctx.globalAlpha = pisca;
+						ctx.fillRect(cx, cy - 22, 1, 10);
+						texto(ctx, T('VOCÊ ESTÁ AQUI', 'YOU ARE HERE'), cx, cy - 33, '#7fe3ff', 'center');
+						ctx.globalAlpha = 1;
+					}
+				}
+				if (chega > 360 || calmo) {
+					texto(ctx, 'VOYAGER 1 · 14/02/1990', 8, 330, 'rgba(232,226,255,0.6)');
+					texto(ctx, T('A 6 BILHÕES DE KM DA TERRA', '6 BILLION KM FROM EARTH'), 8, 341, 'rgba(232,226,255,0.6)');
+				}
 			};
 		}
 	};
 
-	/* Tamanhos: a beirada do Sol e os oito planetas lado a lado; uma setinha visita cada um. */
+	/* Tamanhos: a câmera começa na Terra e vai se afastando até o Sol, enorme, entrar pela esquerda.
+	   Tudo na mesma escala o tempo todo; só a câmera muda. Posições em "Terras" (12.742 km). */
 	CENAS.tamanhos = {
-		L: 480, A: 240, ciclo: 9 * 3.2, parado: 4 * 3.2 + 1,
+		L: 480, A: 270, ciclo: 32, parado: 25,
 		criar: function (ctx, dados, hud) {
-			var dJ = 70, k = dJ / 139820, R = KM_SOL * k / 2, cx = 46 - R, cy = 120;
-			var X = [56, 66, 78, 89, 136, 260, 362, 400];
-			return function (t) {
-				estrelas(dados, 480, 240, t, 9, 90);
-				pintarSol(dados, 480, 240, cx, cy, R, t, 60);
-				ctx.putImageData(dados, 0, 0);
-				PLANETAS.forEach(function (p, i) { planeta(ctx, p, X[i], cy, p.d * k); });
-				var n = Math.min(8, Math.floor(t / 3.2)), u = (t % 3.2) / 3.2, sobe = Math.round(Math.sin(t * 5) * 1.5);
-				if (n === 0) {
-					seta(ctx, 30, 26 + sobe, '#ffd36a');
-					texto(ctx, T('SOL', 'SUN'), 30, 12, '#ffd36a', 'center');
-					hudTexto(hud, T('Sol', 'Sun'), T('109 Terras de largura', '109 Earths wide'));
-				} else {
-					var p = PLANETAS[n - 1], x = X[n - 1], d = p.d * k, topo = cy - (p.id === 'saturno' ? d * 0.55 : d / 2) - 12;
-					var vezes = p.d / KM_TERRA;
-					seta(ctx, x, topo + sobe, '#7fe3ff');
-					texto(ctx, p.nome.toUpperCase(), Math.min(468, Math.max(12, x)), topo - 12, '#7fe3ff', 'center');
-					var linha = p.id === 'terra' ? T('a nossa medida', 'our yardstick') :
-						num(vezes, vezes < 10 ? 2 : 1) + T(vezes < 2 ? ' Terra de largura' : ' Terras de largura', vezes < 2 ? ' Earths wide' : ' Earths wide');
-					hudTexto(hud, p.nome, linha);
+			var E = KM_TERRA, POR = {};
+			PLANETAS.forEach(function (p) { POR[p.id] = p; });
+			/* da direita para a esquerda: os pequenos, os gigantes de gelo, os gasosos e o Sol */
+			var FILA = [['mercurio', 2.9], ['marte', 2.2], ['venus', 1.25], ['terra', 0], ['netuno', -4.2], ['urano', -8.62], ['saturno', -25], ['jupiter', -42.7]];
+			var SOL_R = KM_SOL / 2 / E, SOL_X = -51.2 - SOL_R;
+			/* quadros-chave da câmera: [centro, largura visível], em Terras */
+			var K = [[1.4, 7], [-3.5, 20], [-22, 54], [-30, 70]];
+			var ETAPAS = [
+				[T('A Terra e as vizinhas', 'Earth and its neighbors'), T('Terra: 12.742 km de largura', 'Earth: 12,742 km across')],
+				[T('Os gigantes de gelo', 'The ice giants'), T('Urano e Netuno: quase 4 Terras', 'Uranus and Neptune: almost 4 Earths')],
+				[T('Os gigantes gasosos', 'The gas giants'), T('Júpiter: 11 Terras de largura', 'Jupiter: 11 Earths across')],
+				[T('O Sol', 'The Sun'), T('109 Terras de largura: nem cabe!', '109 Earths across: it does not even fit!')]
+			];
+			/* [início do zoom, fim do zoom] entre os quadros-chave */
+			var ZOOM = [[4, 7.5], [11.5, 15], [19, 23]];
+			function suave(u) { return u * u * (3 - 2 * u); }
+			function camera(t) {
+				var c = K[0][0], w = K[0][1], etapa = 0;
+				for (var i = 0; i < 3; i++) {
+					var a = ZOOM[i][0], b = ZOOM[i][1];
+					if (t < a) break;
+					var u = suave(Math.min(1, (t - a) / (b - a)));
+					var w0 = K[i][1], w1 = K[i + 1][1];
+					/* zoom em escala logarítmica: a velocidade parece constante */
+					w = w0 * Math.pow(w1 / w0, u);
+					c = K[i][0] + (K[i + 1][0] - K[i][0]) * (w - w0) / (w1 - w0);
+					if (u > 0.5) etapa = i + 1;
 				}
-				if (u < 0.08 && n > 0) { ctx.fillStyle = 'rgba(127,227,255,0.18)'; ctx.fillRect(X[n - 1] - 14, 0, 28, 240); }
-				texto(ctx, T('1 PIXEL = ', '1 PIXEL = ') + num(Math.round(1 / k)) + ' KM', 472, 226, 'rgba(232,226,255,0.55)', 'right');
+				return { c: c, w: w, etapa: etapa };
+			}
+			return function (t) {
+				var cam = camera(t), px = 480 / cam.w, y = 140;
+				function X(e) { return 240 + (e - cam.c) * px; }
+				estrelas(dados, 480, 270, t, 9, 110);
+				var borda = X(SOL_X + SOL_R);
+				if (borda > -60) pintarSol(dados, 480, 270, X(SOL_X), y, SOL_R * px, t, Math.min(480, borda + 80));
+				ctx.putImageData(dados, 0, 0);
+				var ultimo = -99;
+				FILA.slice().reverse().forEach(function (f) {
+					var p = POR[f[0]], x = X(f[1]), d = p.d / E * px;
+					if (x + d * 1.3 < 0 || x - d * 1.3 > 480) return;
+					planeta(ctx, p, x, y, d);
+					/* nome embaixo, quando há espaço; nos pequenininhos, só o mais à esquerda */
+					var nome = p.nome.toUpperCase(), larg = nome.length * 6;
+					if (x - larg / 2 > ultimo + 4 && x + larg / 2 < 478) {
+						texto(ctx, nome, x, y + Math.max(d / 2, 3) + 7, p.id === 'terra' ? '#7fe3ff' : 'rgba(232,226,255,0.8)', 'center');
+						ultimo = x + larg / 2;
+					}
+				});
+				/* a régua da escala, mudando com o zoom */
+				var km = 480 / px * E / 480;
+				texto(ctx, '1 PIXEL = ' + num(Math.round(km / 10) * 10) + ' KM', 472, 256, 'rgba(232,226,255,0.6)', 'right');
+				/* um véu escuro entre uma volta e outra */
+				var veu = t > 29.5 ? (t - 29.5) / 1.2 : (t < 1.2 ? 1 - t / 1.2 : 0);
+				if (veu > 0) { ctx.fillStyle = 'rgba(5,3,12,' + Math.min(1, veu) + ')'; ctx.fillRect(0, 0, 480, 270); }
+				hudTexto(hud, ETAPAS[cam.etapa][0], ETAPAS[cam.etapa][1]);
 			};
 		}
 	};
@@ -309,94 +389,6 @@
 				}
 				texto(ctx, T('TERRA', 'EARTH'), x0, y + 12, '#7fe3ff', 'center');
 				texto(ctx, T('LUA', 'MOON'), x0 + D, y + 8, '#cfcac0', 'center');
-			};
-		}
-	};
-
-	/* Os anéis de Saturno, vistos de 26,7° (o máximo, visto da Terra) até de lado. */
-	CENAS.aneis = {
-		L: 480, A: 200, ciclo: 18, parado: 2,
-		criar: function (ctx, dados, hud) {
-			var cx = 240, cy = 100, Rg = 34, ach = 0.902; /* Saturno é achatado: 9,8% */
-			var KM = Rg / 58232;
-			/* raios dos anéis (km): C, B, divisão de Cassini, A */
-			var FAIXAS = [[74658, 92000, 0.32, [150, 132, 110]], [92000, 117580, 0.95, [226, 206, 160]], [117580, 122170, 0.08, [80, 70, 60]], [122170, 136775, 0.7, [200, 182, 142]]];
-			var GLOBO = [[150, 110, 60], [196, 160, 98], [226, 196, 134], [240, 220, 168]];
-			return function (t) {
-				var u = t / 18, s = (Math.cos(u * Math.PI * 2) + 1) / 2;
-				var B = 26.7 * s; /* inclinação dos anéis para nós */
-				var sb = Math.sin(B * Math.PI / 180);
-				estrelas(dados, 480, 200, t, 21, 80);
-				var d = dados.data;
-				for (var y = 0; y < 200; y++) {
-					for (var x = 0; x < 480; x++) {
-						var dx = x + 0.5 - cx, dy = y + 0.5 - cy, i = (y * 480 + x) * 4;
-						/* anel: ponto no plano dos anéis visto inclinado */
-						var anel = null;
-						if (sb > 0.004) {
-							var ry = dy / sb, rk = Math.sqrt(dx * dx + ry * ry) / KM;
-							for (var f = 0; f < 4; f++) if (rk >= FAIXAS[f][0] && rk < FAIXAS[f][1]) {
-								var listra = 0.82 + 0.18 * Math.sin(rk / 900);
-								anel = [FAIXAS[f][3][0] * listra, FAIXAS[f][3][1] * listra, FAIXAS[f][3][2] * listra, FAIXAS[f][2]];
-							}
-						}
-						var gy = dy / ach, gr = Math.sqrt(dx * dx + gy * gy);
-						var globo = gr < Rg, frente = dy > 0;
-						if (globo) {
-							var mu = Math.sqrt(1 - gr * gr / (Rg * Rg));
-							var banda = 0.5 + 0.5 * Math.sin(gy / Rg * 11 + Math.sin(dx / 9 + t * 0.2) * 0.3);
-							var c = GLOBO[Math.min(3, Math.floor((0.35 + 0.6 * mu) * 3 + banda * 0.6))];
-							var luz = 0.55 + 0.45 * mu;
-							d[i] = c[0] * luz; d[i + 1] = c[1] * luz; d[i + 2] = c[2] * luz;
-						}
-						if (anel && (!globo || frente)) {
-							var a = anel[3];
-							/* sombra do planeta nos anéis, atrás dele */
-							if (!frente && Math.abs(dx) < Rg && dy < 0) a *= 0.25;
-							d[i] = d[i] * (1 - a) + anel[0] * a; d[i + 1] = d[i + 1] * (1 - a) + anel[1] * a; d[i + 2] = d[i + 2] * (1 - a) + anel[2] * a;
-						}
-					}
-				}
-				ctx.putImageData(dados, 0, 0);
-				/* de lado: só um fiozinho apagado que some */
-				if (sb <= 0.03) {
-					var some = Math.max(0, 1 - sb / 0.03);
-					ctx.fillStyle = 'rgba(220,200,150,' + (0.5 * (1 - some * 0.8)) + ')';
-					var meia = 136775 * KM;
-					ctx.fillRect(Math.round(cx - meia), cy, Math.round(meia - Rg), 1);
-					ctx.fillRect(Math.round(cx + Rg), cy, Math.round(meia - Rg), 1);
-					/* a lupa: de perto, os anéis têm a altura de um predinho de três andares */
-					var lx = 340, ly = 118, la = 128, lA = 62, fy = ly + 26;
-					ctx.globalAlpha = Math.min(1, some * 2);
-					ctx.fillStyle = 'rgba(5,3,12,0.94)'; ctx.fillRect(lx, ly, la, lA);
-					ctx.fillStyle = '#ffd36a'; ctx.fillRect(lx, ly, la, 1); ctx.fillRect(lx, ly + lA - 1, la, 1); ctx.fillRect(lx, ly, 1, lA); ctx.fillRect(lx + la - 1, ly, 1, lA);
-					texto(ctx, T('ZOOM NOS ANÉIS', 'RING CLOSE-UP'), lx + la / 2, ly + 5, '#7fe3ff', 'center');
-					/* a fatia do anel: gelo e poeira, 18 px = 10 m */
-					ctx.fillStyle = '#b9a67c'; ctx.fillRect(lx + 1, fy, la - 2, 18);
-					ctx.fillStyle = '#e8d6a8'; ctx.fillRect(lx + 1, fy, la - 2, 1);
-					ctx.fillStyle = '#8a7a5a'; ctx.fillRect(lx + 1, fy + 17, la - 2, 1);
-					for (var g = 0; g < 40; g++) {
-						var gx = (hash(g, 1) * (la - 6) + t * 3 * (0.5 + hash(g, 4))) % (la - 6);
-						ctx.fillStyle = 'rgba(255,255,255,' + (0.3 + hash(g, 3) * 0.6) + ')';
-						ctx.fillRect(lx + 3 + Math.floor(gx), fy + 2 + Math.floor(hash(g, 2) * 14), 1, 1);
-					}
-					/* o predinho, do lado de fora da fatia, com a mesma altura */
-					var px = lx + 14, py = fy;
-					ctx.fillStyle = '#05030c'; ctx.fillRect(px - 2, py - 2, 14, 21);
-					ctx.fillStyle = '#5b4c8a'; ctx.fillRect(px, py, 10, 18);
-					ctx.fillStyle = '#ff6fb5'; ctx.fillRect(px - 1, py - 1, 12, 1);
-					for (var an = 0; an < 3; an++) for (var ja = 0; ja < 3; ja++) {
-						ctx.fillStyle = (Math.floor(t * 1.5) + an * 3 + ja) % 5 ? '#ffd36a' : '#2a2140';
-						ctx.fillRect(px + 2 + ja * 3, py + 2 + an * 6, 1, 2);
-					}
-					/* a medida ao lado */
-					ctx.fillStyle = '#ffd36a';
-					ctx.fillRect(px + 14, py, 3, 1); ctx.fillRect(px + 15, py, 1, 18); ctx.fillRect(px + 14, py + 17, 3, 1);
-					texto(ctx, T('10 M = 3 ANDARES', '10 M = 3 STORIES'), lx + la / 2, fy + 23, '#ffd36a', 'center');
-					ctx.globalAlpha = 1;
-				}
-				texto(ctx, '270.000 KM'.replace('.', EN ? ',' : '.'), cx, 186, 'rgba(232,226,255,0.6)', 'center');
-				hudTexto(hud, T('Inclinação: ', 'Tilt: ') + num(B, 1) + '°', sb <= 0.03 ? T('de lado: quase somem', 'edge-on: nearly gone') : (B > 24 ? T('bem abertos', 'wide open') : ''));
 			};
 		}
 	};
@@ -477,7 +469,7 @@
 		var pausa = document.createElement('button'); pausa.type = 'button'; pausa.className = 'animacao-play';
 		var rodape = document.createElement('div'); rodape.className = 'animacao-controle';
 		rodape.appendChild(pausa); rodape.appendChild(nota);
-		palco.appendChild(svg); palco.appendChild(info);
+		palco.appendChild(info); palco.appendChild(svg);
 		caixa.appendChild(abas); caixa.appendChild(palco); caixa.appendChild(rodape);
 		var atual = null, pontos = [], dia = 0, segPorDia = 1, parado = false, mouse = false, sobre = null;
 
@@ -568,10 +560,11 @@
 				var x = C + Math.cos(ang) * p.R, y = C - Math.sin(ang) * p.R;
 				p.halo.setAttribute('cx', x.toFixed(2)); p.halo.setAttribute('cy', y.toFixed(2));
 				p.ponto.setAttribute('cx', x.toFixed(2)); p.ponto.setAttribute('cy', y.toFixed(2));
-				var dir = x > C + 8;
-				p.nome.setAttribute('x', (x + (dir ? -8 : 8)).toFixed(1));
-				p.nome.setAttribute('y', (y + 4).toFixed(1));
-				p.nome.setAttribute('text-anchor', dir ? 'end' : 'start');
+				/* o nome fica do lado de fora da órbita e escorrega em volta do pontinho, sem pular */
+				if (!p.larg) p.larg = p.nome.getComputedTextLength ? p.nome.getComputedTextLength() : 30;
+				var co = Math.cos(ang), se = Math.sin(ang), afasta = 9;
+				p.nome.setAttribute('x', (x + co * afasta - p.larg * (1 - co) / 2).toFixed(2));
+				p.nome.setAttribute('y', (y - se * afasta + 3.5).toFixed(2));
 			});
 		}
 		function atualizarPausa() {
@@ -597,7 +590,7 @@
 	var viagem = document.getElementById('viagem');
 	if (viagem) montarViagem(viagem);
 	function montarViagem(caixa) {
-		var KM_PX = KM_LUA, SOL_PX = KM_SOL / KM_PX, X_SOL = 40 + SOL_PX / 2, ALT = 240, MEIO = 120;
+		var KM_PX = KM_LUA, SOL_PX = KM_SOL / KM_PX, X_SOL = SOL_PX / 2 - 130, ALT = 240, MEIO = 120;
 		var FIM = X_SOL + 4495.06e6 / KM_PX + 2600;
 		var PX_LUZ = LUZ / KM_PX; /* 86,3 pixels por segundo */
 		caixa.innerHTML =
@@ -670,7 +663,6 @@
 		});
 		var UA = 149.5979e6 / KM_PX;
 		var PLACAS = [
-			[0.12, T('Bem-vindo! Nesta faixa, a Lua tem 1 pixel. Siga para a direita &rarr;', 'Welcome! In this strip, the Moon is 1 pixel wide. Head right &rarr;')],
 			[0.24, T('Ainda nada… O espaço é assim: quase todo vazio.', 'Still nothing… Space is like that: almost entirely empty.')],
 			[0.55, T('Cada pixel que você passa são 3.474 km.', 'Every pixel you pass is 3,474 km.')],
 			[0.86, T('A luz que sai do Sol agora chega aqui em uns 7 minutos.', 'Light leaving the Sun now gets here in about 7 minutes.')],
@@ -684,6 +676,8 @@
 			[19.3, T('Mais de 2 horas e meia de luz desde o Sol. Respira: falta pouco.', 'More than two and a half hours of light from the Sun. Breathe: almost there.')],
 			[25, T('Netuno vem aí. Ele leva 165 anos para dar uma volta no Sol.', 'Neptune is coming. It takes 165 years to go around the Sun once.')]
 		];
+		/* a primeira plaquinha fica logo ao lado do Sol, para quem chega entender a escala */
+		por(T('Aqui o Sistema Solar encolheu até a Lua virar 1 pixel, o menor pontinho da tela. Nessa escala, o Sol, aqui ao lado, tem 400 pixels. Arraste para a direita e viaje até Netuno &rarr;', 'Here the Solar System has shrunk until the Moon is 1 pixel, the tiniest dot on the screen. At this scale, the Sun, right here, is 400 pixels wide. Drag to the right and travel to Neptune &rarr;'), X_SOL + SOL_PX / 2 + 16, 'er-plaquinha er-plaquinha-inicio', 92);
 		PLACAS.forEach(function (pl) { por(pl[1], X_SOL + pl[0] * UA, 'er-plaquinha ' + (pl[2] || ''), pl[2] ? 196 : 40); });
 		por(T('Fim da linha dos planetas. Daqui até a estrela mais próxima, Proxima Centauri, seriam mais 11,6 bilhões de pixels. A Voyager 1, a nave mais distante, já foi mais de 5 vezes mais longe que Netuno.',
 			'End of the line of planets. From here to the nearest star, Proxima Centauri, would be another 11.6 billion pixels. Voyager 1, the most distant spacecraft, has already gone more than 5 times farther than Neptune.'),
