@@ -3,8 +3,8 @@ window.EN = window.EN || { t: {}, a: {} };
 Object.assign(window.EN.t, {
 	"Sistema Solar · Turismo espacial": "Solar System · Space tourism",
 	"Destino: braço de Órion": "Destination: the Orion Arm",
-	"Conheça cada um dos planetas": "Get to know each of the planets",
-	"Passe o mouse em um planeta ou nome para ver o que ele tem de especial.": "Hover over a planet or a name to see what makes it special."
+	"Conheça os planetas e as suas luas": "Get to know the planets and their moons",
+	"Passe o mouse em um planeta, numa lua ou num nome para ver o que tem de especial.": "Hover over a planet, a moon or a name to see what makes it special."
 });
 Object.assign(window.EN.a, {
 	"Júpiter": "Jupiter",

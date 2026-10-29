@@ -4482,3 +4482,13 @@ body.na-galaxia .idioma:hover, body.na-galaxia .idioma:focus-within { opacity: 1
 .planetas.luas { margin-top: 6px; align-items: center; }
 .planetas.luas a { font-size: 15px; padding: 4px 9px; }
 .luas-rotulo { font: 11px/1 Silkscreen, monospace; letter-spacing: 0.12em; text-transform: uppercase; color: var(--suave); margin-right: 4px; }
+/* na página do Sistema Solar: as luas dando voltas nos seus planetas, com as órbitas pontilhadas */
+.sistema > .astro:not(.lua-orbita) { z-index: 2; }
+.lua-orbita { width: 10px; }
+.lua-orbita img { display: block; width: 100%; image-rendering: pixelated; }
+/* (uma área de toque um pouco maior que a luazinha) */
+.lua-orbita::before { content: ""; position: absolute; inset: -7px; }
+.lua-orbita::after { font-size: 14px; transform: translate(-50%, 6px); }
+.orbitas-luas { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; z-index: 0; }
+.orbitas-luas ellipse { fill: none; stroke: rgba(180, 200, 255, 0.42); stroke-width: 1; stroke-dasharray: 3 3; }
+.sistema.focado .orbitas-luas { opacity: 0.35; }

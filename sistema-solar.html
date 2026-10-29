@@ -21,35 +21,46 @@
 		<a class="sol-borda" href="sol.html" data-id="sol" aria-label="Sol: na mesma escala dos planetas, só a beirada dele cabe aqui"><canvas aria-hidden="true"></canvas><span class="sol-borda-nome" aria-hidden="true">Sol</span></a>
 		<p class="hud-rotulo">Destino: braço de Órion</p>
 		<h1>Nosso sistema solar</h1>
-		<p class="subtitulo">Conheça cada um dos planetas</p>
+		<p class="subtitulo">Conheça os planetas e as suas luas</p>
 
 		<!-- Mesma disposição da arte sistematodo.png: posições e tamanhos em % -->
 		<div class="rolagem">
 			<div class="sistema com-sol" id="sistema">
-				<a class="astro" href="mercurio.html" data-id="mercurio" data-nome="Mercúrio" style="--x: 0.468%; --y: 49.63%; --w: 1.426%">
+				<a class="astro" href="mercurio.html" data-id="mercurio" data-nome="Mercúrio" data-en-data-nome="Mercury" style="--x: 0.468%; --y: 49.63%; --w: 1.426%">
 					<img class="planeta" data-planeta="mercurio" src="pixel/mercurio.png" alt="Mercúrio">
 				</a>
-				<a class="astro" href="venus.html" data-id="venus" data-nome="Vênus" style="--x: 3.415%; --y: 45.80%; --w: 3.543%">
+				<a class="astro" href="venus.html" data-id="venus" data-nome="Vênus" data-en-data-nome="Venus" style="--x: 3.415%; --y: 45.80%; --w: 3.543%">
 					<img class="planeta" data-planeta="venus" src="pixel/venus.png" alt="Vênus">
 				</a>
-				<a class="astro" href="terra.html" data-id="terra" data-nome="Terra" style="--x: 7.957%; --y: 45.55%; --w: 3.628%">
+				<a class="astro" href="terra.html" data-id="terra" data-nome="Terra" data-en-data-nome="Earth" style="--x: 7.957%; --y: 45.55%; --w: 3.628%">
 					<img class="planeta" data-planeta="terra" src="pixel/terra.png" alt="Terra">
 				</a>
-				<a class="astro" href="marte.html" data-id="marte" data-nome="Marte" style="--x: 13.181%; --y: 48.41%; --w: 2.011%">
+				<a class="astro" href="marte.html" data-id="marte" data-nome="Marte" data-en-data-nome="Mars" style="--x: 13.181%; --y: 48.41%; --w: 2.011%">
 					<img class="planeta" data-planeta="marte" src="pixel/marte.png" alt="Marte">
 				</a>
-				<a class="astro" href="jupiter.html" data-id="jupiter" data-nome="Júpiter" style="--x: 17.255%; --y: 2.163%; --w: 25.489%">
+				<a class="astro" href="jupiter.html" data-id="jupiter" data-nome="Júpiter" data-en-data-nome="Jupiter" style="--x: 17.255%; --y: 2.163%; --w: 25.489%">
 					<img class="planeta" data-planeta="jupiter" src="pixel/jupiter.png" alt="Júpiter">
 				</a>
-				<a class="astro" href="saturno.html" data-id="saturno" data-nome="Saturno" style="--x: 44.085%; --y: 19.347%; --w: 31.819%">
+				<a class="astro" href="saturno.html" data-id="saturno" data-nome="Saturno" data-en-data-nome="Saturn" style="--x: 44.085%; --y: 19.347%; --w: 31.819%">
 					<img class="planeta" data-planeta="saturno" src="pixel/saturno.png" alt="Saturno">
 				</a>
-				<a class="astro" href="urano.html" data-id="urano" data-nome="Urano" style="--x: 77.691%; --y: 36.939%; --w: 9.787%">
+				<a class="astro" href="urano.html" data-id="urano" data-nome="Urano" data-en-data-nome="Uranus" style="--x: 77.691%; --y: 36.939%; --w: 9.787%">
 					<img class="planeta" data-planeta="urano" src="pixel/urano.png" alt="Urano">
 				</a>
-				<a class="astro" href="netuno.html" data-id="netuno" data-nome="Netuno" style="--x: 89.681%; --y: 36.980%; --w: 9.830%">
+				<a class="astro" href="netuno.html" data-id="netuno" data-nome="Netuno" data-en-data-nome="Neptune" style="--x: 89.681%; --y: 36.980%; --w: 9.830%">
 					<img class="planeta" data-planeta="netuno" src="pixel/netuno.png" alt="Netuno">
 				</a>
+				<!-- as luas, dando voltas nos seus planetas (as órbitas e as posições são calculadas no script lá embaixo) -->
+				<svg class="orbitas-luas" aria-hidden="true"></svg>
+				<a class="astro lua-orbita" href="lua.html" data-id="lua" data-nome="Lua" data-en-data-nome="Moon"><img src="pixel/lua.png" alt="Lua" data-en-alt="Moon"></a>
+				<a class="astro lua-orbita" href="io.html" data-id="io" data-nome="Io" data-en-data-nome="Io"><img src="pixel/io.png" alt="Io" data-en-alt="Io"></a>
+				<a class="astro lua-orbita" href="europa.html" data-id="europa" data-nome="Europa" data-en-data-nome="Europa"><img src="pixel/europa.png" alt="Europa" data-en-alt="Europa"></a>
+				<a class="astro lua-orbita" href="ganimedes.html" data-id="ganimedes" data-nome="Ganimedes" data-en-data-nome="Ganymede"><img src="pixel/ganimedes.png" alt="Ganimedes" data-en-alt="Ganymede"></a>
+				<a class="astro lua-orbita" href="tita.html" data-id="tita" data-nome="Titã" data-en-data-nome="Titan"><img src="pixel/tita.png" alt="Titã" data-en-alt="Titan"></a>
+				<a class="astro lua-orbita" href="encelado.html" data-id="encelado" data-nome="Encélado" data-en-data-nome="Enceladus"><img src="pixel/encelado.png" alt="Encélado" data-en-alt="Enceladus"></a>
+				<a class="astro lua-orbita" href="mimas.html" data-id="mimas" data-nome="Mimas" data-en-data-nome="Mimas"><img src="pixel/mimas.png" alt="Mimas" data-en-alt="Mimas"></a>
+				<a class="astro lua-orbita" href="miranda.html" data-id="miranda" data-nome="Miranda" data-en-data-nome="Miranda"><img src="pixel/miranda.png" alt="Miranda" data-en-alt="Miranda"></a>
+				<a class="astro lua-orbita" href="tritao.html" data-id="tritao" data-nome="Tritão" data-en-data-nome="Triton"><img src="pixel/tritao.png" alt="Tritão" data-en-alt="Triton"></a>
 			</div>
 		</div>
 
@@ -64,20 +75,8 @@
 			<a href="netuno.html" data-id="netuno">Netuno</a>
 			<a href="sol.html" data-id="sol">Sol</a>
 		</nav>
-		<nav class="planetas luas" id="links-luas" aria-label="As luas">
-			<span class="luas-rotulo">Luas</span>
-			<a href="lua.html" data-id="lua">Lua</a>
-			<a href="io.html" data-id="io">Io</a>
-			<a href="europa.html" data-id="europa">Europa</a>
-			<a href="ganimedes.html" data-id="ganimedes">Ganimedes</a>
-			<a href="tita.html" data-id="tita">Titã</a>
-			<a href="encelado.html" data-id="encelado">Encélado</a>
-			<a href="mimas.html" data-id="mimas">Mimas</a>
-			<a href="miranda.html" data-id="miranda">Miranda</a>
-			<a href="tritao.html" data-id="tritao">Tritão</a>
-		</nav>
 		<div class="info-planeta" id="info" aria-live="polite">
-			<p class="info-vazio">Passe o mouse em um planeta ou nome para ver o que ele tem de especial.</p>
+			<p class="info-vazio">Passe o mouse em um planeta, numa lua ou num nome para ver o que tem de especial.</p>
 		</div>
 	</main>
 
@@ -256,6 +255,63 @@
 				faixa.addEventListener('mouseleave', function () { if (sobreSol) { sobreSol = false; faixa.style.cursor = ''; sol.classList.remove('ativo'); destacar(null); } });
 				faixa.addEventListener('click', function (e) { if (noSol(e)) { e.preventDefault(); sol.click(); } });
 			}
+		})();
+	</script>
+	<script>
+		// As luas dando voltas nos seus planetas, na própria imagem do sistema. Cada uma: o planeta,
+		// o tamanho da órbita (em raios do globo do planeta), o achatamento e a inclinação da elipse
+		// (as luas de Urano giram "em pé", como o planeta deitado; Tritão vai inclinado e na contramão),
+		// o tempo de uma volta (em segundos, só para a animação) e o tamanho da lua (em % da largura; bem maior
+		// que o de verdade, para dar para ver e clicar).
+		(function () {
+			var sistema = document.getElementById('sistema'), svg = sistema.querySelector('.orbitas-luas');
+			var calmo = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+			var LUAS = {
+				lua: { pai: 'terra', r: 1.8, ach: 0.42, incl: -8, volta: 28, tam: 1.5, fase: 1.2 },
+				io: { pai: 'jupiter', r: 1.12, ach: 0.42, incl: -8, volta: 10, tam: 1.4, fase: 0.3 },
+				europa: { pai: 'jupiter', r: 1.25, ach: 0.42, incl: -8, volta: 16, tam: 1.3, fase: 2.4 },
+				ganimedes: { pai: 'jupiter', r: 1.38, ach: 0.42, incl: -8, volta: 25, tam: 1.75, fase: 4.4 },
+				mimas: { pai: 'saturno', r: 1.62, ach: 0.36, incl: -4, volta: 11, tam: 1.0, fase: 1.0 },
+				encelado: { pai: 'saturno', r: 1.8, ach: 0.36, incl: -4, volta: 15, tam: 1.1, fase: 3.6 },
+				tita: { pai: 'saturno', r: 2.0, ach: 0.36, incl: -4, volta: 27, tam: 1.7, fase: 5.3 },
+				miranda: { pai: 'urano', r: 1.5, ach: 0.3, incl: 82, volta: 14, tam: 1.1, fase: 0.8 },
+				tritao: { pai: 'netuno', r: 1.45, ach: 0.4, incl: -28, volta: -22, tam: 1.35, fase: 2.0 }
+			};
+			/* o raio do globo, em fração da largura da arte (Saturno é mais largo por causa dos anéis) */
+			var GLOBO = { saturno: 0.265 };
+			var luas = [].slice.call(sistema.querySelectorAll('.lua-orbita')), parado = false;
+			luas.forEach(function (el) {
+				el.addEventListener('mouseenter', function () { parado = true; });
+				el.addEventListener('mouseleave', function () { parado = false; });
+				el.addEventListener('focus', function () { parado = true; });
+				el.addEventListener('blur', function () { parado = false; });
+			});
+			var NS = 'http://www.w3.org/2000/svg', elipses = {};
+			Object.keys(LUAS).forEach(function (id) { var e = document.createElementNS(NS, 'ellipse'); e.setAttribute('class', 'orbita-' + LUAS[id].pai); svg.appendChild(e); elipses[id] = e; });
+			var tempo = 0, antes = performance.now();
+			function quadro(agora) {
+				if (!parado && !calmo) tempo += (agora - antes) / 1000;
+				antes = agora;
+				var rs = sistema.getBoundingClientRect(), W = rs.width;
+				svg.setAttribute('viewBox', '0 0 ' + rs.width + ' ' + rs.height);
+				luas.forEach(function (el) {
+					var id = el.getAttribute('data-id'), L = LUAS[id], pai = sistema.querySelector('.astro[data-id="' + L.pai + '"]');
+					if (!pai) return;
+					var rp = pai.getBoundingClientRect(), cx = rp.left - rs.left + rp.width / 2, cy = rp.top - rs.top + rp.height / 2;
+					var R = rp.width * (GLOBO[L.pai] || 0.5), rx = R * L.r, ry = rx * L.ach, inc = L.incl * Math.PI / 180;
+					var a = L.fase + tempo / L.volta * Math.PI * 2, ex = Math.cos(a) * rx, ey = Math.sin(a) * ry;
+					var x = cx + ex * Math.cos(inc) - ey * Math.sin(inc), y = cy + ex * Math.sin(inc) + ey * Math.cos(inc);
+					var tam = Math.max(12, W * L.tam / 100);
+					el.style.width = tam + 'px'; el.style.left = (x - tam / 2) + 'px'; el.style.top = (y - tam / 2) + 'px';
+					/* na metade de trás da órbita, a lua passa atrás do planeta */
+					el.style.zIndex = Math.sin(a) < 0 ? 1 : 4;
+					var e = elipses[id];
+					e.setAttribute('cx', cx); e.setAttribute('cy', cy); e.setAttribute('rx', rx); e.setAttribute('ry', ry);
+					e.setAttribute('transform', 'rotate(' + L.incl + ' ' + cx + ' ' + cy + ')');
+				});
+				requestAnimationFrame(quadro);
+			}
+			requestAnimationFrame(quadro);
 		})();
 	</script>
 </body>

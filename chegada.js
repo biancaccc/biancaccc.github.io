@@ -1056,6 +1056,13 @@
 	}
 	function roteiro() {
 		SONS.freio();
+		// voltando ao Sistema Solar (a página de onde se escolhe os planetas): uma chegada curta, sem a
+		// alfândega, que já carimbou na primeira vez. A nave sai do salto, o Sol com os planetas vem
+		// chegando e a página abre
+		if (volta && pagina === 'sistema-solar') {
+			depois(function () { irFase('aproxima'); SONS.motor(3); depois(terminar, 3000); }, 700);
+			return;
+		}
 		var temEvento = !!evento;
 		// 1. saindo do salto
 		depois(function () {
