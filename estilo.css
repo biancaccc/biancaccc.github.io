@@ -1775,6 +1775,7 @@ html.em-salto body > :not(.transicao) { visibility: hidden; }
 	background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--cor) 10%, transparent), transparent);
 }
 .fecho::before { content: "\2726  registro final  \2726"; display: block; margin-bottom: 14px; font-family: var(--rotulo); font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--cor); }
+html[lang="en"] .fecho::before { content: "\2726  final entry  \2726"; }
 
 @media (max-width: 640px) {
 	.bloco { grid-template-columns: 56px minmax(0, 1fr); padding: 26px 0 28px; }
@@ -3392,6 +3393,7 @@ html.em-salto body > :not(.transicao) { visibility: hidden; }
 	color: #05030c;
 	background: #7fe3ff;
 }
+html[lang="en"] .doc-scan::after { content: "Reading document"; }
 @keyframes scan-desce {
 	0% { top: 0; opacity: 0; }
 	8% { opacity: 1; }
@@ -4245,6 +4247,7 @@ body.embarcando { overflow: hidden; }
 /* no celular em pé a cena fica pequena: uma dica para deitar o aparelho */
 @media (orientation: portrait) and (max-width: 700px) {
 	.embarque::after { content: "↻ Gire o celular para ver melhor"; position: fixed; left: 0; right: 0; bottom: 18%; text-align: center; font: 11px/1.4 Silkscreen, monospace; color: rgba(205, 246, 255, 0.6); }
+	html[lang="en"] .embarque::after { content: "↻ Turn your phone sideways for a better view"; }
 }
 
 /* o botão para assistir de novo ao embarque: um botão secundário dourado, do lado do "Iniciar viagem"
@@ -4440,3 +4443,30 @@ html.chegando .carimbo-novo { z-index: 160; }
 .idioma button:hover, .idioma button:focus-visible { color: #ffffff; }
 .idioma-sep { color: rgba(205, 246, 255, 0.25); }
 html.em-salto .idioma { visibility: hidden; }
+.idioma-globo { width: 9px; height: 9px; margin-right: 3px; color: rgba(127, 227, 255, 0.55); }
+/* durante o embarque, a escolha fica na tela de início (.emb-idioma) */
+body.embarcando .idioma { display: none; }
+/* na capa: maior, centralizado logo acima do crédito, como uma plaquinha da nave */
+body.viagem:not(.na-galaxia) .idioma {
+	left: 50%;
+	bottom: 22px;
+	transform: translateX(-50%);
+	gap: 4px;
+	padding: 6px 10px;
+	font-size: 13px;
+	background: rgba(8, 14, 34, 0.72);
+	box-shadow: inset 0 0 0 1px rgba(127, 227, 255, 0.28), 0 0 18px rgba(127, 227, 255, 0.08);
+}
+body.viagem:not(.na-galaxia) .idioma button { padding: 4px 8px; color: rgba(205, 246, 255, 0.7); }
+body.viagem:not(.na-galaxia) .idioma button[aria-pressed="true"] { color: #1b1430; background: #ffd36a; }
+body.viagem:not(.na-galaxia) .idioma button:hover:not([aria-pressed="true"]), body.viagem:not(.na-galaxia) .idioma button:focus-visible:not([aria-pressed="true"]) { color: #ffffff; background: rgba(127, 227, 255, 0.14); }
+body.viagem:not(.na-galaxia) .idioma-globo { width: 13px; height: 13px; margin-right: 6px; color: #7fe3ff; }
+body.viagem:not(.na-galaxia) .idioma-sep { display: none; }
+/* na Via Láctea: bem discreto, no canto de baixo, com o globinho apagado */
+body.na-galaxia .idioma { opacity: 0.7; }
+body.na-galaxia .idioma:hover, body.na-galaxia .idioma:focus-within { opacity: 1; }
+/* a escolha do idioma na tela de início do embarque, embaixo de "Começar a viagem" */
+.emb-idioma { position: absolute; z-index: 5; transform: translateX(-50%); display: flex; gap: 1.2cqh; padding: 0.8cqh; background: rgba(10, 14, 40, 0.75); box-shadow: inset 0 0 0 0.2cqh rgba(232, 196, 106, 0.45); }
+.emb-idioma button { padding: 1cqh 2cqh; font: 1.9cqh/1 Silkscreen, monospace; letter-spacing: 0.08em; color: rgba(242, 238, 252, 0.75); background: none; border: 0; cursor: pointer; }
+.emb-idioma button[aria-pressed="true"] { color: #1b1430; background: #e8c46a; }
+.emb-idioma button:hover:not([aria-pressed="true"]), .emb-idioma button:focus-visible:not([aria-pressed="true"]) { color: #ffffff; background: rgba(232, 196, 106, 0.18); outline: none; }

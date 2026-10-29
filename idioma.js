@@ -70,11 +70,23 @@
 		window.porDicionarioAgora = function () { porDicionario(document); };
 	}
 
-	// o seletor PT | EN, discreto, no canto de baixo à esquerda (trocar recarrega a página no outro idioma)
+	// trocar o idioma recarrega a página no outro idioma (o seletor e a tela de início do embarque usam)
+	window.trocarIdioma = function (cod) {
+		if (cod === idioma) return;
+		try { localStorage.setItem('idioma', cod); } catch (e) {}
+		var novo = location.href.replace(/([?&])lang=(pt|en)&?/, '$1').replace(/[?&](#|$)/, '$1');
+		if (novo === location.href) location.reload(); else location.href = novo;
+	};
+	// o seletor PT | EN, embaixo, perto do crédito da autora: maior na capa, discreto no resto
+	// (um globinho em pixel art na frente)
 	var seletor = document.createElement('div');
 	seletor.className = 'idioma';
 	seletor.setAttribute('role', 'group');
 	seletor.setAttribute('aria-label', idioma === 'en' ? 'Language' : 'Idioma');
+	seletor.innerHTML = '<svg class="idioma-globo" viewBox="0 0 9 9" aria-hidden="true" shape-rendering="crispEdges" fill="currentColor">' +
+		'<rect x="3" y="0" width="3" height="1"/><rect x="1" y="1" width="2" height="1"/><rect x="6" y="1" width="2" height="1"/><rect x="0" y="3" width="1" height="3"/><rect x="8" y="3" width="1" height="3"/>' +
+		'<rect x="1" y="7" width="2" height="1"/><rect x="6" y="7" width="2" height="1"/><rect x="3" y="8" width="3" height="1"/><rect x="4" y="1" width="1" height="7"/><rect x="1" y="4" width="7" height="1"/>' +
+		'<rect x="2" y="2" width="1" height="5" opacity="0.6"/><rect x="6" y="2" width="1" height="5" opacity="0.6"/><rect x="0" y="2" width="1" height="1" opacity="0.6"/><rect x="8" y="2" width="1" height="1" opacity="0.6"/><rect x="0" y="6" width="1" height="1" opacity="0.6"/><rect x="8" y="6" width="1" height="1" opacity="0.6"/></svg>';
 	['pt', 'en'].forEach(function (cod, i) {
 		if (i) { var sep = document.createElement('span'); sep.className = 'idioma-sep'; sep.textContent = '|'; sep.setAttribute('aria-hidden', 'true'); seletor.appendChild(sep); }
 		var b = document.createElement('button');
@@ -83,12 +95,7 @@
 		b.lang = cod === 'en' ? 'en' : 'pt-BR';
 		b.setAttribute('aria-label', cod === 'en' ? 'English' : 'Português');
 		b.setAttribute('aria-pressed', cod === idioma ? 'true' : 'false');
-		b.addEventListener('click', function () {
-			if (cod === idioma) return;
-			try { localStorage.setItem('idioma', cod); } catch (e) {}
-			var novo = location.href.replace(/([?&])lang=(pt|en)&?/, '$1').replace(/[?&](#|$)/, '$1');
-			if (novo === location.href) location.reload(); else location.href = novo;
-		});
+		b.addEventListener('click', function () { window.trocarIdioma(cod); });
 		seletor.appendChild(b);
 	});
 	document.body.appendChild(seletor);

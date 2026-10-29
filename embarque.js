@@ -1548,6 +1548,18 @@
 			}
 			depois(function () {
 				botao('&#9654; ' + T('Começar a viagem', 'Begin the journey'), 240, 128, comecar, 'grande');
+				/* embaixo dele, a escolha do idioma (trocar recarrega a página e volta para esta tela) */
+				var esc = document.createElement('div');
+				esc.className = 'emb-idioma'; esc.setAttribute('role', 'group'); esc.setAttribute('aria-label', T('Idioma', 'Language'));
+				pos(esc, 240, 168);
+				[['pt', 'Português'], ['en', 'English']].forEach(function (l) {
+					var bi = document.createElement('button');
+					bi.type = 'button'; bi.textContent = l[1]; bi.lang = l[0] === 'en' ? 'en' : 'pt-BR';
+					bi.setAttribute('aria-pressed', (window.IDIOMA || 'pt') === l[0] ? 'true' : 'false');
+					bi.addEventListener('click', function () { if (window.trocarIdioma) window.trocarIdioma(l[0]); });
+					esc.appendChild(bi);
+				});
+				camada.appendChild(esc);
 			}, calmo || !CREDITOS ? 0 : 5000);
 			function comecar() {
 				iniciarAudio();
