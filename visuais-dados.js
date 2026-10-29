@@ -901,3 +901,5 @@ window.VISUAIS_DADOS = {
 		{ titulo: 'A nebulosa em som', texto: 'A imagem da nebulosa vira música, e um som de sino marca o lugar do pulsar.', url: CHANDRA + 'crab_chandra_nustar.html', fonte: 'NASA · telescópios Chandra e NuSTAR', audio: 'sons/caranguejo.aac', duracao: 40 },
 		{ titulo: 'O pulsar de verdade', texto: 'Os pulsos de rádio do pulsar do Caranguejo, captados por um radiotelescópio e tocados como som: são tão rápidos (30 por segundo) que viram um zumbido.', url: 'https://www.jb.man.ac.uk/pulsar/Education/Sounds/sounds.html', fonte: 'Observatório Jodrell Bank' }];
 })(window.VISUAIS_DADOS);
+// em inglês, o dicionário de en/visuais-dados.js traduz estes dados antes do visuais.js montar a página
+if (window.IDIOMA === 'en') document.write('<script src="en/visuais-dados.js"><\/script>');
