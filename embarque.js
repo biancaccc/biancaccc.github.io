@@ -966,37 +966,105 @@
 	// o: { L, rgb, batida (segundos por batida da cauda), fase, alfa }
 	function baleia(c, hx, hy, t, o) {
 		if (o.alfa <= 0) return;
-		var L = o.L, rgb = o.rgb, alfa = o.alfa;
+		var L = o.L, rgb = o.rgb;
+		/* o holograma tremula de vez em quando, como um projetor falhando por um instante */
+		var alfa = o.alfa * (Math.sin(t * 23 + o.fase * 7) > 0.985 ? 0.5 : 1);
 		var cor = function (a) { return 'rgba(' + rgb[0] + ',' + rgb[1] + ',' + rgb[2] + ',' + (a * alfa) + ')'; };
+		/* (a cor clarinha, quase branca: as nadadeiras peitorais e a barriga da jubarte são brancas) */
+		var claro = function (a) { return 'rgba(' + ((rgb[0] + 510) / 3 | 0) + ',' + ((rgb[1] + 510) / 3 | 0) + ',' + ((rgb[2] + 510) / 3 | 0) + ',' + (a * alfa) + ')'; };
 		var w = Math.PI * 2 / o.batida, ang = t * w + o.fase, R0 = L * 0.12, A = L * 0.05;
 		/* o deslocamento vertical de cada ponto do corpo (u = 0 na cabeça, 1 na cauda) */
 		var onda = function (u) { var k = Math.max(0, (u - 0.4) / 0.6); return Math.sin(ang - u * 2.4) * k * k * A + Math.sin(ang - 0.6) * 0.6; };
-		/* (desenhada em posições quebradas, sem arredondar: o corpo desliza liso) */
-		for (var i = 0; i < L; i += 0.5) {
-			var u = i / L, x = hx + i;
-			var r = u < 0.1 ? R0 * (0.72 + 0.28 * Math.sqrt(u / 0.1)) : u < 0.38 ? R0 : R0 * Math.max(0.2, 1 - Math.pow((u - 0.38) / 0.62, 1.1) * 0.85);
-			var cy = hy + onda(u), y0 = cy - r * 0.82, y1 = cy + r * 0.8;
-			if (u > 0.6 && u < 0.68) y0 -= Math.sin((u - 0.6) / 0.08 * Math.PI) * 1.6; /* a corcova da nadadeira dorsal */
-			c.fillStyle = cor(0.22); c.fillRect(x, y0, 0.5, y1 - y0); /* o corpo translúcido */
-			c.fillStyle = cor(0.6); c.fillRect(x, y0, 0.5, 1); c.fillRect(x, y1 - 1, 0.5, 1); /* o contorno aceso */
-			if (u > 0.05 && u < 0.4) { c.fillStyle = cor(0.22); for (var pg = cy + r * 0.2; pg < y1 - 1.5; pg += 2) c.fillRect(x, pg, 0.5, 1); } /* as pregas da garganta */
-			if (Math.abs(i - L * 0.1) < 0.25) { c.fillStyle = cor(1); c.fillRect(x, cy + r * 0.05 - 0.5, 1, 1); } /* o olho */
-			if (Math.abs(i - L * 0.28) < 0.25) { /* a nadadeira peitoral comprida, remando devagar */
-				var rema = Math.sin(ang * 0.5) * 0.12; c.fillStyle = cor(0.5);
-				for (var k = 0; k < L * 0.22; k += 0.5) c.fillRect(x + k * Math.cos(0.5 + rema), cy + r * 0.75 + k * Math.sin(0.5 + rema), 1.5, 1 + (k < L * 0.1 ? 1 : 0));
+		var raio = function (u) { return u < 0.1 ? R0 * (0.72 + 0.28 * Math.sqrt(u / 0.1)) : u < 0.38 ? R0 : R0 * Math.max(0.2, 1 - Math.pow((u - 0.38) / 0.62, 1.1) * 0.85); };
+		/* a cabeça da jubarte é achatada e pontuda em cima, com a mandíbula grande embaixo */
+		var raioCima = function (u) { return u < 0.24 ? R0 * (0.22 + 0.78 * Math.pow(u / 0.24, 0.75)) : raio(u); };
+		var raioBaixo = function (u) { return u < 0.14 ? R0 * (0.5 + 0.5 * Math.sqrt(u / 0.14)) : raio(u); };
+		var malha = Math.max(4, L * 0.07), scan = (t * 5) % 3;
+		/* uma faixa de luz descendo devagar pelo corpo (a varredura do holograma), só dentro dele */
+		var varreY = hy - R0 + (((t * 0.3) % 1.4) - 0.2) * R0 * 2;
+		/* as nadadeiras peitorais: compridas (um terço do corpo, como na jubarte de verdade), brancas,
+		   com a borda da frente ondulada de calombos, remando devagar; a do outro lado aparece apagadinha */
+		function peitoral(lado) {
+			var ur = 0.27, cyr = hy + onda(ur), rr = raio(ur);
+			var bx = hx + L * ur, by = cyr + rr * 0.55, Lf = L * (lado ? 0.31 : 0.24);
+			var a0 = 0.62 + Math.sin(ang * 0.5 + (lado ? 0 : 0.8)) * 0.14, dx = Math.cos(a0), dy = Math.sin(a0), nx = -dy, ny = dx;
+			var borda = [], tras = [];
+			for (var s2 = 0; s2 <= 1.001; s2 += 0.04) {
+				var larg = R0 * 0.3 * Math.pow(1 - s2, 0.55) + 0.4, calombo = s2 > 0.15 && s2 < 0.95 ? Math.abs(Math.sin(s2 * Math.PI * 7)) * 1.4 : 0;
+				/* (a nadadeira é um pouco curvada, como uma asa) */
+				var curva = s2 * s2 * Lf * 0.12, px0 = bx + dx * s2 * Lf + nx * curva, py0 = by + dy * s2 * Lf + ny * curva;
+				borda.push([px0 - nx * (larg + calombo), py0 - ny * (larg + calombo)]);
+				tras.push([px0 + nx * larg * 0.6, py0 + ny * larg * 0.6]);
 			}
+			c.beginPath(); c.moveTo(borda[0][0], borda[0][1]);
+			borda.forEach(function (p) { c.lineTo(p[0], p[1]); }); for (var j = tras.length - 1; j >= 0; j--) c.lineTo(tras[j][0], tras[j][1]);
+			c.closePath(); c.fillStyle = lado ? claro(0.26) : cor(0.1); c.fill();
+			if (!lado) return;
+			c.fillStyle = claro(0.85); borda.forEach(function (p, j) { if (j > 0) c.fillRect(p[0], p[1], 1, 1); }); /* a borda dos calombos, acesa */
+			c.fillStyle = cor(0.5); tras.forEach(function (p, j) { if (j % 2 && j > 0) c.fillRect(p[0], p[1], 1, 0.5); });
+			c.fillStyle = claro(0.95); c.fillRect(borda[6][0], borda[6][1], 1, 1); c.fillRect(borda[11][0], borda[11][1] + 0.5, 1, 1); /* cracas na borda */
 		}
+		peitoral(0);
+		/* o corpo, coluna por coluna (em posições quebradas, sem arredondar: o corpo desliza liso) */
+		for (var i = 0; i < L; i += 0.5) {
+			var u = i / L, x = hx + i, r = raio(u);
+			var cy = hy + onda(u), y0 = cy - raioCima(u) * 0.82, y1 = cy + raioBaixo(u) * 0.8;
+			/* a nadadeira dorsal pequena, em cima de uma corcova (é a "corcunda" do nome em inglês, humpback) */
+			if (u > 0.58 && u < 0.7) {
+				var fu = (u - 0.58) / 0.12, fh = fu < 0.7 ? Math.sin(fu / 0.7 * Math.PI / 2) * R0 * 0.42 : R0 * 0.42 * (1 - (fu - 0.7) / 0.3) * 0.35;
+				c.fillStyle = cor(0.2); c.fillRect(x, y0 - fh, 0.5, fh); c.fillStyle = cor(0.7); c.fillRect(x, y0 - fh, 0.5, 1);
+			}
+			/* o volume do holograma: o meio mais transparente e as beiradas mais acesas (como um vidro visto de lado) */
+			c.fillStyle = cor(0.12); c.fillRect(x, y0, 0.5, y1 - y0);
+			c.fillStyle = cor(0.12); c.fillRect(x, y0 + 1, 0.5, 2); c.fillRect(x, y1 - 3, 0.5, 2);
+			/* a barriga clarinha (a jubarte tem a barriga branca e as costas escuras) */
+			if (u > 0.04 && u < 0.75) { c.fillStyle = claro(0.08); c.fillRect(x, cy + r * 0.2, 0.5, y1 - cy - r * 0.2); }
+			/* as linhas da varredura, descendo devagar */
+			c.fillStyle = cor(0.07); for (var sy = Math.floor(y0) + 1 + scan; sy < y1 - 1; sy += 3) c.fillRect(x, sy, 0.5, 1);
+			if (varreY > y0 && varreY < y1 - 1.5) { c.fillStyle = cor(0.2); c.fillRect(x, varreY, 0.5, 1.5); }
+			/* a malha do holograma: a linha do lado do corpo e os anéis, de tantos em tantos pixels */
+			c.fillStyle = cor(0.2); c.fillRect(x, cy - r * 0.18, 0.5, 0.5);
+			if (i % malha < 0.5) { c.fillStyle = cor(0.09); c.fillRect(x, y0, 0.5, y1 - y0); }
+			/* o contorno aceso: as costas um pouco mais fortes que a barriga */
+			c.fillStyle = cor(0.7); c.fillRect(x, y0, 0.5, 1); c.fillStyle = claro(0.5); c.fillRect(x, y1 - 1, 0.5, 1);
+			/* as pregas da garganta: listras compridas embaixo, da ponta da boca até o meio da barriga */
+			if (u > 0.03 && u < 0.44) {
+				c.fillStyle = claro(u > 0.36 ? 0.22 * (0.44 - u) / 0.08 : 0.22);
+				for (var pg = cy + r * 0.28; pg < y1 - 1.2; pg += 1.5) c.fillRect(x, pg, 0.5, 0.6);
+			}
+			/* a boca: uma linha que sai da ponta do focinho e desce um pouquinho até embaixo do olho */
+			if (u < 0.2) { c.fillStyle = claro(0.75); c.fillRect(x, cy + R0 * (-0.05 + 0.32 * Math.pow(u / 0.2, 1.5)), 0.5, 1); }
+			/* os calombos da cabeça (os tubérculos, cada um com um pelo sensorial) e os do queixo */
+			if (u > 0.01 && u < 0.17 && i % (L * 0.03) < 0.5) { c.fillStyle = claro(1); c.fillRect(x, y0 - 1, 1, 1); }
+			if (u < 0.06 && i % (L * 0.022) < 0.5) { c.fillStyle = claro(0.7); c.fillRect(x, y1 - 0.4, 0.9, 0.9); }
+			/* o espiráculo (o "nariz" no alto da cabeça) */
+			if (Math.abs(u - 0.2) < 0.003) { c.fillStyle = claro(0.9); c.fillRect(x - 0.5, y0 - 0.6, 1.5, 0.8); }
+			/* os "nós" em cima do pedúnculo, entre a dorsal e a cauda */
+			if (u > 0.72 && u < 0.92 && i % (L * 0.032) < 0.5) { c.fillStyle = cor(0.65); c.fillRect(x, y0 - 0.6, 0.8, 0.8); }
+		}
+		/* o olho, logo acima do canto da boca, com um brilho em volta */
+		var ux = 0.19, ox = hx + L * ux, oy = hy + onda(ux) + R0 * 0.08;
+		c.fillStyle = cor(0.3); c.fillRect(ox - 1, oy - 1, 3, 2.5); c.fillStyle = claro(1); c.fillRect(ox, oy - 0.5, 1, 1);
+		/* cracas no queixo (as jubartes de verdade carregam várias) */
+		c.fillStyle = claro(0.8); c.fillRect(hx + L * 0.025, hy + onda(0.025) + raio(0.025) * 0.55, 1, 1); c.fillRect(hx + L * 0.045, hy + onda(0.045) + raio(0.045) * 0.7, 1, 0.8);
+		peitoral(1);
 		/* a nadadeira da cauda: uma lâmina fina que inclina para cima e para baixo seguindo a batida */
-		/* (vista de lado, a nadadeira abre num leque conforme inclina: fina quando passa reta, larga na ponta da batida) */
+		/* (vista de lado, a nadadeira abre num leque conforme inclina: fina quando passa reta, larga na ponta da batida;
+		   a borda de trás é serrilhada, como a de toda jubarte) */
 		var xe = hx + L, ye = hy + onda(1), incl = (onda(1) - onda(0.94)) / (L * 0.06) * 1.4, lc = L * 0.18, abre = 2 + Math.abs(Math.sin(ang - 2.4)) * L * 0.07;
 		for (var k2 = 0; k2 < lc; k2 += 0.5) {
 			var f2 = k2 / lc, esp = 1.6 + f2 * abre * (f2 < 0.85 ? 1 : 1 - (f2 - 0.85) * 3), meio = ye + k2 * incl;
-			c.fillStyle = cor(0.2); c.fillRect(xe + k2, meio - esp / 2, 0.5, esp);
-			c.fillStyle = cor(0.6); c.fillRect(xe + k2, meio - esp / 2, 0.5, 1); c.fillRect(xe + k2, meio + esp / 2 - 1, 0.5, 1);
+			c.fillStyle = cor(0.18); c.fillRect(xe + k2, meio - esp / 2, 0.5, esp);
+			c.fillStyle = cor(0.65); c.fillRect(xe + k2, meio - esp / 2, 0.5, 1); c.fillStyle = claro(0.5); c.fillRect(xe + k2, meio + esp / 2 - 1, 0.5, 1);
+			if (f2 > 0.3 && k2 % 1 === 0) { c.fillStyle = cor(0.1); c.fillRect(xe + k2, meio - 0.3, 0.5, 0.6); } /* a nervura do meio */
+			if (k2 + 0.5 >= lc) { c.fillStyle = claro(0.8); for (var sz = meio - esp / 2; sz < meio + esp / 2; sz += 1.4) c.fillRect(xe + k2 + ((sz * 1.7 | 0) % 2 ? 0.5 : -0.5), sz, 1, 0.8); }
 		}
-		/* uma faixa de luz descendo devagar pelo corpo (a varredura do holograma) */
-		var varre = ((t * 0.3) % 1.4) - 0.2;
-		c.fillStyle = cor(0.14); c.fillRect(hx, hy - R0 + varre * R0 * 2, L * 0.75, 1.5);
+		/* faíscas do projetor soltando do corpo e subindo devagar, sumindo no ar */
+		for (var n = 0; n < 7; n++) {
+			var vida = (t * 0.25 + n * 0.37 + o.fase) % 1, un = (n * 0.618 + Math.floor(t * 0.25 + n * 0.37 + o.fase) * 0.29) % 0.9;
+			var fx = hx + L * un + vida * 6, fy = hy + onda(un) - raio(un) * 0.8 - vida * 10;
+			c.fillStyle = claro(0.7 * (1 - vida)); c.fillRect(fx, fy, 1, 1);
+		}
 	}
 	// os carros flutuantes da rua (de lado, sem rodas: deslizam sobre os propulsores, com a luz azul
 	// embaixo). Desenhados virados para a direita; com lado = -1 o desenho espelha (a frente vai para a esquerda)
