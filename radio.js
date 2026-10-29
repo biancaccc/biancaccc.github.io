@@ -269,6 +269,36 @@
 	};
 
 	var pagina = (location.pathname.split('/').pop() || 'index.html').replace(/\.html$/, '') || 'index';
+	// em inglês: o nome e a nota de cada estação (e a vírgula da frequência vira ponto)
+	var TR = window.T || function (pt) { return pt; };
+	if (window.IDIOMA === 'en') {
+		var INGLES = {
+			'index': ['Milky Way Radio', 'Music to cross the galaxy'],
+			'sagitario-a': ['Horizon Radio', 'Time runs slower near the black hole'],
+			'fermi': ['Gamma Ray FM', 'Two giant bubbles, one on each side'],
+			'orion': ['Nursery FM', 'A lullaby for newborn stars'],
+			'pleiades': ['Seven Sisters Radio', 'A sung conversation between seven sisters'],
+			'helice': ['Eye of God Radio', 'The death of a star, which becomes a colorful eye in the sky'],
+			'tabby': ['Mystery Signal', 'Aliens or dust? The signal fades now and then…'],
+			'omega-centauri': ['10 Million Radio', 'Ancient stars and the memory of a swallowed galaxy'],
+			'betelgeuse': ['Red Giant Radio', 'A huge star breathing slowly, almost exploding'],
+			'eta-carinae': ['Homunculus Radio', 'Two giant stars talking, and an eruption that still echoes'],
+			'sirius': ['Dog Star Radio', 'The brightest star in the sky, and the companion hidden in its glare'],
+			'caranguejo': ['Pulsar Radio', 'A neutron lighthouse spinning in the remains of a supernova'],
+			'proxima-centauri': ['Neighbor Radio', 'The closest star to the Sun, small, red and full of surprises'],
+			'sistema-solar': ['Sun 1 AU Radio', 'Eight notes, one for each planet'],
+			'sol': ['Plasma Radio', '5,778 degrees at the surface: the Sun roars and bursts'],
+			'mercurio': ['Mercury Radio', 'A year on Mercury lasts only 88 days: everything here rushes'],
+			'venus': ['Venus Radio', 'The Morning Star: lovely from afar, an oven inside, and spinning backwards'],
+			'terra': ['Earth Radio', 'Sea, forest, birds and the radio whistles of Earth itself'],
+			'marte': ['Mars Radio', 'A red desert with a little robot roving around'],
+			'jupiter': ['Jupiter Radio', 'The king of the planets, with storms and radio whistles'],
+			'saturno': ['Rings Radio', 'A waltz for the rings'],
+			'urano': ['Uranus Radio', 'An ice giant that spins on its side'],
+			'netuno': ['Neptune Radio', 'The fastest winds in the Solar System, far from home']
+		};
+		Object.keys(INGLES).forEach(function (k) { var e = ESTACOES[k]; if (e) { e.nome = INGLES[k][0]; e.nota = INGLES[k][1]; e.freq = e.freq.replace(',', '.'); } });
+	}
 	var E = ESTACOES[pagina] || ESTACOES.index;
 	var VOLUME = 0.5;
 
@@ -964,10 +994,10 @@
 		botao.classList.toggle('ligado', ligado && !esperando);
 		botao.classList.toggle('esperando', esperando);
 		var sol = ligado && !esperando && mostraSol && window.TempoDoSol && window.TempoDoSol.dados, bol = null;
-		if (sol && sol.vento) bol = 'Sol ao vivo · ' + Math.round(sol.vento.v) + ' km/s' + (sol.kp ? ' · Kp ' + sol.kp.v.toFixed(1).replace('.', ',') : '');
-		nomeTela.textContent = esperando ? 'Toque para sintonizar' : bol ? bol : ligado ? E.nome : 'Rádio desligado';
-		botao.title = ligado ? E.nome + ' · ' + E.nota + '. Clique para desligar.' : 'Ligar o rádio da nave (' + E.nome + ')';
-		botao.setAttribute('aria-label', ligado ? 'Desligar o rádio: ' + E.nome : 'Ligar o rádio da nave: ' + E.nome);
+		if (sol && sol.vento) bol = TR('Sol ao vivo · ', 'Live Sun · ') + Math.round(sol.vento.v) + ' km/s' + (sol.kp ? ' · Kp ' + TR(sol.kp.v.toFixed(1).replace('.', ','), sol.kp.v.toFixed(1)) : '');
+		nomeTela.textContent = esperando ? TR('Toque para sintonizar', 'Tap to tune in') : bol ? bol : ligado ? E.nome : TR('Rádio desligado', 'Radio off');
+		botao.title = ligado ? E.nome + ' · ' + E.nota + TR('. Clique para desligar.', '. Click to turn off.') : TR('Ligar o rádio da nave (', 'Turn on the ship radio (') + E.nome + ')';
+		botao.setAttribute('aria-label', ligado ? TR('Desligar o rádio: ', 'Turn off the radio: ') + E.nome : TR('Ligar o rádio da nave: ', 'Turn on the ship radio: ') + E.nome);
 		try { sessionStorage.setItem('radio', ligado ? '1' : '0'); } catch (e) {}
 	}
 

@@ -22,6 +22,15 @@
 		pleiades: 'Plêiades', helice: 'Nebulosa da Hélice', tabby: 'Estrela de Tabby', 'omega-centauri': 'Omega Centauri', betelgeuse: 'Betelgeuse',
 		'eta-carinae': 'Eta Carinae', sirius: 'Sirius', caranguejo: 'Nebulosa do Caranguejo', 'proxima-centauri': 'Proxima Centauri'
 	};
+	/* o texto no idioma da visita (veja idioma.js); os letreiros pintados na cena ficam em português */
+	var TR = window.T || function (pt) { return pt; }, INGLES = window.IDIOMA === 'en';
+	var NOME_PT = NOMES[pagina]; /* (para os visores pintados da cabine) */
+	if (INGLES) {
+		var NOMES_EN = { mercurio: 'Mercury', venus: 'Venus', terra: 'Earth', marte: 'Mars', jupiter: 'Jupiter', saturno: 'Saturn', urano: 'Uranus', netuno: 'Neptune',
+			sol: 'the Sun', 'sistema-solar': 'the Solar System', fermi: 'the Fermi Bubbles', orion: 'the Orion Nebula', pleiades: 'the Pleiades', helice: 'the Helix Nebula',
+			tabby: "Tabby's Star", caranguejo: 'the Crab Nebula' };
+		for (var k in NOMES_EN) NOMES[k] = NOMES_EN[k];
+	}
 	if (!NOMES[pagina]) return;
 	var NOME = NOMES[pagina];
 	var POUSO = { mercurio: 1, venus: 1, marte: 1 };
@@ -57,7 +66,33 @@
 		caranguejo: { terno: '#4a8a2a', quepe: '#244a14', olho: '#9be36a', extra: 'pinca', fala: 'Bem-vindo ao Caranguejo! O pulsar do meio gira umas 30 vezes por segundo. Escute: tic-tic-tic.' },
 		'proxima-centauri': { terno: '#a83a3a', quepe: '#5a1414', olho: '#f0505a', extra: 'planetinha', fala: 'Bem-vindo à vizinha mais próxima do Sol! A luz daqui leva só 4,2 anos para chegar à Terra. Mande um oi!' }
 	};
-	var AG = AGENTES[pagina] || { terno: '#1c2a6e', quepe: '#101a4a', olho: '#7fe3ff', extra: '', fala: 'Bem-vindo de volta à Terra!' };
+	if (INGLES) {
+		var FALAS_EN = {
+			mercurio: 'Welcome to Mercury! Here one day, from one sunrise to the next, lasts 176 Earth days.',
+			venus: 'Welcome to Venus! Do not open the window: it rains acid out there, and here the Sun rises in the west.',
+			marte: 'Welcome to Mars! Watch out for the dust: sometimes a storm covers the whole planet.',
+			jupiter: 'Callisto Station, welcome to Jupiter! We stay near the moon Callisto, far from the planet\'s strong radiation.',
+			saturno: 'Welcome to Saturn! The rings are made of ice and pebbles, and most of them are only about ten meters thick.',
+			urano: 'Welcome to Uranus! It spins on its side: each pole gets about 42 years of day and 42 of night.',
+			netuno: 'Welcome to Neptune! The winds here top 2,000 km/h. Hold on to your cap!',
+			sol: 'Solar Shield Station, welcome! Behind the shield it is nice and cool; on the other side, the Sun\'s surface is over 5,500 °C.',
+			'sistema-solar': 'Welcome to the Solar System, our home! Eight planets, one Sun and lots of comet dust.',
+			'sagitario-a': 'Horizon Station, welcome! We go no further: near the black hole, even time runs slower.',
+			fermi: 'Fermi Lighthouse, welcome! The bubbles only show up in gamma rays, so use our special visor.',
+			orion: 'Welcome to the Orion star nursery! Speak softly: stars are being born.',
+			pleiades: 'Welcome to the Pleiades, the Seven Sisters! There are actually more than a thousand, but only about seven can be seen with the naked eye.',
+			helice: 'Welcome to the Eye of God! This is what is left of a star much like the Sun. One day ours will look like this.',
+			tabby: "Welcome to Tabby's Star! Its light dips without warning. Suspect number one: dust. But we keep watching.",
+			'omega-centauri': 'Welcome to Omega Centauri: some ten million stars in a single ball. It may be the core of a galaxy the Milky Way swallowed.',
+			betelgeuse: 'Welcome to Betelgeuse! In place of the Sun, it would swallow even the orbit of Mars. And one day it will explode.',
+			'eta-carinae': 'Welcome to Eta Carinae! In 1843 one of its two stars erupted without dying and became the second brightest in the sky.',
+			sirius: "Welcome to Sirius, the brightest star in Earth's sky! Its companion, Sirius B, is a white dwarf the size of Earth.",
+			caranguejo: 'Welcome to the Crab! The pulsar in the middle spins about 30 times a second. Listen: tick-tick-tick.',
+			'proxima-centauri': 'Welcome to the Sun\'s closest neighbor! Light from here takes only 4.2 years to reach Earth. Say hi!'
+		};
+		for (var f in FALAS_EN) if (AGENTES[f]) AGENTES[f].fala = FALAS_EN[f];
+	}
+	var AG = AGENTES[pagina] || { terno: '#1c2a6e', quepe: '#101a4a', olho: '#7fe3ff', extra: '', fala: TR('Bem-vindo de volta à Terra!', 'Welcome back to Earth!') };
 
 	var calmo = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 	function lerLista(k) { try { return JSON.parse(localStorage.getItem(k)) || []; } catch (e) { return []; } }
@@ -82,9 +117,9 @@
 	medir();
 	var raiz = document.createElement('div');
 	raiz.className = 'chegada';
-	raiz.setAttribute('role', 'dialog'); raiz.setAttribute('aria-label', 'Chegada em ' + NOME);
+	raiz.setAttribute('role', 'dialog'); raiz.setAttribute('aria-label', TR('Chegada em ', 'Arriving at ') + NOME);
 	raiz.innerHTML = '<div class="chegada-palco"><canvas class="chegada-tela"></canvas><div class="chegada-camada"></div><div class="chegada-escuro"></div></div>' +
-		'<button type="button" class="chegada-pular">Pular chegada &#9656;</button>';
+		'<button type="button" class="chegada-pular">' + TR('Pular chegada', 'Skip arrival') + ' &#9656;</button>';
 	document.body.appendChild(raiz);
 	document.documentElement.classList.add('chegando');
 	var palco = raiz.querySelector('.chegada-palco'), tela = raiz.querySelector('canvas'), camada = raiz.querySelector('.chegada-camada'), escuro = raiz.querySelector('.chegada-escuro');
@@ -281,7 +316,7 @@
 			} else if (q.tipo === 'ondas') {
 				for (var b2 = 0; b2 < 12; b2++) { var hb = 3 + Math.abs(Math.sin(t * 3 + b2 * 0.7) * Math.cos(t * 1.3 + b2)) * (q.h - 8); R(c, q.x + 3 + b2 * 4, q.y + q.h - 2 - hb, 3, hb, b2 % 3 ? '#7fe3ff' : '#ffd36a'); }
 			} else {
-				texto3(c, texto1 || 'CHEGANDO', q.x + q.w / 2, q.y + 8, 1, '#7dffa8', true);
+				texto3(c, texto1 || TR('CHEGANDO', 'ARRIVING'), q.x + q.w / 2, q.y + 8, 1, '#7dffa8', true);
 				texto3(c, texto2 || '', q.x + q.w / 2, q.y + 20, 1, '#7fe3ff', true);
 				if (Math.floor(t * 2) % 2) R(c, q.x + 4, q.y + 30, 3, 4, '#7dffa8');
 			}
@@ -377,6 +412,17 @@
 		micrometeorito: 'Tic! Um grãozinho de poeira, menor que um grão de areia, bateu no vidro a dezenas de quilômetros por segundo. Por isso o para-brisa tem várias camadas.',
 		oumuamua: 'Um objeto interestelar, como o ʻOumuamua, que passou pelo Sistema Solar em 2017: comprido, avermelhado, girando devagar, vindo de outra estrela.',
 		errante: 'Um planeta errante: um mundo sem estrela, vagando sozinho no escuro. Só dá para notar porque ele tapa as estrelas de trás. Deve haver bilhões deles na galáxia.'
+	};
+	if (INGLES) FALAS_EVENTO = {
+		meteoros: 'Look down there: a meteor shower! Those are dust grains from a comet\'s trail burning up in Earth\'s atmosphere. Astronauts on the Space Station photograph this from above.',
+		cometa: 'A comet! The Sun is to our left: the blue gas tail always points straight away from it, and the yellowish dust tail curves back along the comet\'s path. The green in the head is glowing carbon.',
+		voyager: 'It is Voyager 1! Launched in 1977, it has run out of power but is still traveling between the stars with the Golden Record, a message from Earth.',
+		raio: 'See that flash? It was a cosmic ray, a very high-energy particle passing through your eye. The Apollo 11 astronauts saw these too.',
+		erupcao: 'Solar flare! The Sun let out a burst of particles. The ship turned its shield toward it until it passed. This same wind lights up the auroras on Earth.',
+		asteroide: 'An asteroid from the belt! In real life they are almost a million kilometers apart, so seeing one up close like this is pure luck.',
+		micrometeorito: 'Tick! A tiny speck of dust, smaller than a grain of sand, hit the glass at tens of kilometers per second. That is why the windshield has several layers.',
+		oumuamua: 'An interstellar object, like ʻOumuamua, which passed through the Solar System in 2017: long, reddish, slowly tumbling, coming from another star.',
+		errante: 'A rogue planet: a world with no star, wandering alone in the dark. You can only notice it because it blocks the stars behind it. There may be billions of them in the galaxy.'
 	};
 	var evento = null;
 	(function () {
@@ -489,9 +535,9 @@
 	// o chão de cada planeta, numa tira alta (o céu em cima, o horizonte e o chão embaixo), e o posto
 	// da alfândega já no lugar onde a nave vai parar
 	var SOLO = {
-		mercurio: { ceu: ['#000000', '#020208', '#04040c'], chao: ['#c8c4bc', '#a8a49c', '#88847c', '#68645e', '#4a4844'], poeira: '#a8a49c', estrelas: true, sol: 3, nota: 'Sem ar nenhum: o céu é preto mesmo de dia, e o Sol parece três vezes maior que na Terra.' },
-		venus: { ceu: ['#5a3a10', '#8a5a1a', '#b8822e', '#d8a848', '#e8c068'], chao: ['#7a5a3a', '#5e4630', '#4a3624', '#3a2a1c', '#2a1e14'], poeira: '#8a6a3a', estrelas: false, sol: 0, nota: 'Casco blindado: lá fora são 465 °C e o ar pesa 92 vezes mais que na Terra. As nuvens de ácido não deixam ver o Sol.' },
-		marte: { ceu: ['#6a4a3a', '#a8785a', '#c89a76', '#dcb48c', '#e8c8a0'], chao: ['#d88a5a', '#c06a3e', '#a0522e', '#7e3e22', '#5a2a16'], poeira: '#c8784a', estrelas: false, sol: 0.6, nota: 'O céu de Marte é cor de caramelo por causa da poeira fina no ar, e o Sol parece menor e mais branco.' }
+		mercurio: { ceu: ['#000000', '#020208', '#04040c'], chao: ['#c8c4bc', '#a8a49c', '#88847c', '#68645e', '#4a4844'], poeira: '#a8a49c', estrelas: true, sol: 3, nota: TR('Sem ar nenhum: o céu é preto mesmo de dia, e o Sol parece três vezes maior que na Terra.', 'No air at all: the sky is black even by day, and the Sun looks three times bigger than from Earth.') },
+		venus: { ceu: ['#5a3a10', '#8a5a1a', '#b8822e', '#d8a848', '#e8c068'], chao: ['#7a5a3a', '#5e4630', '#4a3624', '#3a2a1c', '#2a1e14'], poeira: '#8a6a3a', estrelas: false, sol: 0, nota: TR('Casco blindado: lá fora são 465 °C e o ar pesa 92 vezes mais que na Terra. As nuvens de ácido não deixam ver o Sol.', 'Armored hull: it is 465 °C outside and the air is 92 times heavier than on Earth. The acid clouds hide the Sun.') },
+		marte: { ceu: ['#6a4a3a', '#a8785a', '#c89a76', '#dcb48c', '#e8c8a0'], chao: ['#d88a5a', '#c06a3e', '#a0522e', '#7e3e22', '#5a2a16'], poeira: '#c8784a', estrelas: false, sol: 0.6, nota: TR('O céu de Marte é cor de caramelo por causa da poeira fina no ar, e o Sol parece menor e mais branco.', 'The Martian sky is butterscotch because of the fine dust in the air, and the Sun looks smaller and whiter.') }
 	};
 	var HOR = 330; // o horizonte na tira (a tira tem 2H de altura)
 	function fazerSolo(s) {
@@ -530,14 +576,14 @@
 
 	// ================== O hangar 11 (a volta para casa) ==================
 	var SUJEIRAS = {
-		marte: { cor: '#c0602e', nome: 'a poeira vermelha de Marte' },
-		mercurio: { cor: '#8a867c', nome: 'o pó cinza de Mercúrio' },
-		venus: { cor: '#c8a040', nome: 'as manchas de ácido das nuvens de Vênus' },
-		sol: { cor: '#3a2618', nome: 'a fuligem do calor do Sol' },
-		jupiter: { cor: '#e8f4ff', nome: 'o gelo que grudou perto de Júpiter' }, saturno: { cor: '#eef8ff', nome: 'o gelo dos anéis de Saturno' },
-		urano: { cor: '#d8f4f4', nome: 'o gelo de Urano' }, netuno: { cor: '#d8e8ff', nome: 'o gelo de Netuno' }
+		marte: { cor: '#c0602e', nome: TR('a poeira vermelha de Marte', 'the red dust of Mars') },
+		mercurio: { cor: '#8a867c', nome: TR('o pó cinza de Mercúrio', 'the gray dust of Mercury') },
+		venus: { cor: '#c8a040', nome: TR('as manchas de ácido das nuvens de Vênus', 'the acid stains from the clouds of Venus') },
+		sol: { cor: '#3a2618', nome: TR('a fuligem do calor do Sol', 'the soot from the heat of the Sun') },
+		jupiter: { cor: '#e8f4ff', nome: TR('o gelo que grudou perto de Júpiter', 'the ice that stuck on near Jupiter') }, saturno: { cor: '#eef8ff', nome: TR('o gelo dos anéis de Saturno', 'the ice from the rings of Saturn') },
+		urano: { cor: '#d8f4f4', nome: TR('o gelo de Urano', 'the ice of Uranus') }, netuno: { cor: '#d8e8ff', nome: TR('o gelo de Netuno', 'the ice of Neptune') }
 	};
-	var sujo = sujeira && sujeira !== 'terra' ? (SUJEIRAS[sujeira] || { cor: '#8a7aa0', nome: 'a poeira de estrelas do espaço entre as estrelas' }) : null;
+	var sujo = sujeira && sujeira !== 'terra' ? (SUJEIRAS[sujeira] || { cor: '#8a7aa0', nome: TR('a poeira de estrelas do espaço entre as estrelas', 'the stardust from the space between the stars') }) : null;
 	var naveCasa = null, sujeiraCasa = null, fundoHangar = null;
 	var BAIA = { cx: 240, cy: 136, rx: 196, ry: 121, fundo: 30 };
 	function fazerHangar() {
@@ -872,7 +918,7 @@
 	function botaoFinal() {
 		var b = document.createElement('button');
 		b.type = 'button'; b.className = 'chegada-botao';
-		b.innerHTML = '&#9656; Desembarcar em ' + NOME;
+		b.innerHTML = '&#9656; ' + TR('Desembarcar em ', 'Disembark at ') + NOME;
 		b.addEventListener('click', terminar);
 		camada.appendChild(b);
 		setTimeout(function () { try { b.focus({ preventScroll: true }); } catch (e) {} }, 50);
@@ -881,13 +927,13 @@
 	// o carimbo novo (se este destino ainda não tinha)
 	function alfandega(quem) {
 		var temCarimbo = !!(window.Chegada && window.Chegada.carimbo);
-		balao(tipo === 'terra' ? 'Bem-vindo de volta à Terra! Passaporte, por favor.' : AG.fala, quem, 520).then(function () {
+		balao(tipo === 'terra' ? TR('Bem-vindo de volta à Terra! Passaporte, por favor.', 'Welcome back to Earth! Passport, please.') : AG.fala, quem, 520).then(function () {
 			depois(function () {
-				balao('Passaporte, por favor...', quem, 520).then(function () {
+				balao(TR('Passaporte, por favor...', 'Passport, please...'), quem, 520).then(function () {
 					depois(function () {
 						SONS.carimbo(); carimbouEm = performance.now();
 						if (temCarimbo) { window.Chegada.carimbo(); window.Chegada.carimbo = null; }
-						balao(temCarimbo ? 'Tum! Visto carimbado. Aproveite a visita!' : 'Seu passaporte já tem este visto. Boa visita de novo!', quem, 520).then(function () { depois(botaoFinal, 400); });
+						balao(temCarimbo ? TR('Tum! Visto carimbado. Aproveite a visita!', 'Thump! Visa stamped. Enjoy your visit!') : TR('Seu passaporte já tem este visto. Boa visita de novo!', 'Your passport already has this visa. Enjoy your visit again!'), quem, 520).then(function () { depois(botaoFinal, 400); });
 					}, 500);
 				});
 			}, tipo === 'terra' ? 0 : 1400);
@@ -901,7 +947,7 @@
 			irFase(temEvento ? 'evento' : 'cruzeiro');
 			if (temEvento) {
 				depois(function () { if (evento === 'raio') SONS.raio(); }, evento === 'raio' ? 1200 : 0);
-				depois(function () { balao(FALAS_EVENTO[evento], 'Computador de bordo', 380); }, evento === 'raio' || evento === 'micrometeorito' ? 1700 : 900);
+				depois(function () { balao(FALAS_EVENTO[evento], TR('Computador de bordo', 'Onboard computer'), 380); }, evento === 'raio' || evento === 'micrometeorito' ? 1700 : 900);
 				try { var vs = lerLista('eventosVistos'); if (vs.indexOf(evento) < 0) { vs.push(evento); localStorage.setItem('eventosVistos', JSON.stringify(vs)); } } catch (e) {}
 			}
 			// sem evento no caminho: se o Sol estiver agitado de verdade agora, o computador de bordo avisa
@@ -910,7 +956,7 @@
 			try { jaAvisou = sessionStorage.getItem('avisoSol') === '1'; } catch (e) {}
 			if (avisoSol && !jaAvisou) {
 				try { sessionStorage.setItem('avisoSol', '1'); } catch (e) {}
-				depois(function () { balao(avisoSol, 'Computador de bordo', 380); }, 900);
+				depois(function () { balao(avisoSol, TR('Computador de bordo', 'Onboard computer'), 380); }, 900);
 				depois(aproximar, 8500);
 			} else depois(aproximar, temEvento ? 9000 : 1400);
 		}, 1500);
@@ -919,22 +965,22 @@
 		[].forEach.call(camada.querySelectorAll('.chegada-balao'), function (b) { b.remove(); });
 		irFase('aproxima');
 		SONS.motor(4);
-		var aviso = tipo === 'pouso' ? 'Preparando o pouso em ' + NOME + '.' : tipo === 'terra' ? 'Hangar 11, aqui é a PX-01. Voltando para casa!' : 'Estação Alfândega de ' + NOME + ' à vista. Mantendo distância segura.';
-		balao(aviso, tipo === 'terra' ? 'Você · rádio' : 'Computador de bordo', 380);
+		var aviso = tipo === 'pouso' ? TR('Preparando o pouso em ' + NOME + '.', 'Preparing to land on ' + NOME + '.') : tipo === 'terra' ? TR('Hangar 11, aqui é a PX-01. Voltando para casa!', 'Hangar 11, this is the PX-01. Coming home!') : TR('Estação Alfândega de ' + NOME + ' à vista. Mantendo distância segura.', 'Customs Station of ' + NOME + ' in sight. Keeping a safe distance.');
+		balao(aviso, tipo === 'terra' ? TR('Você · rádio', 'You · radio') : TR('Computador de bordo', 'Onboard computer'), 380);
 		depois(function () {
-			if (tipo === 'estacao') corte('atraca', function () { SONS.motor(3.4); depois(function () { SONS.clunk(); corte('escotilha', function () { depois(function () { SONS.bip(); irFase('escotilhaAberta'); alfandega('Alfândega · ' + NOME); }, 900); }); }, 3600); });
+			if (tipo === 'estacao') corte('atraca', function () { SONS.motor(3.4); depois(function () { SONS.clunk(); corte('escotilha', function () { depois(function () { SONS.bip(); irFase('escotilhaAberta'); alfandega(TR('Alfândega · ', 'Customs · ') + NOME); }, 900); }); }, 3600); });
 			else if (tipo === 'pouso') corte('descida', function () {
 				var s = SOLO[pagina];
-				balao(s.nota, 'Computador de bordo', 380);
+				balao(s.nota, TR('Computador de bordo', 'Onboard computer'), 380);
 				SONS.motor(4.2);
-				depois(function () { SONS.toque(); irFase('pousado'); depois(function () { alfandega('Alfândega · ' + NOME); }, 1800); }, 4200);
+				depois(function () { SONS.toque(); irFase('pousado'); depois(function () { alfandega(TR('Alfândega · ', 'Customs · ') + NOME); }, 1800); }, 4200);
 			});
 			else corte('descidaCasa', function () {
 				SONS.motor(4);
 				depois(function () { SONS.toque(); corte('lavagem', function () {
-					if (sujo) { SONS.agua(7.5); balao('A equipe do hangar 11 já está lavando ' + sujo.nome + ' da PX-01.', 'ZÖ-11 · rádio', 460); }
-					else balao('A PX-01 voltou limpinha! A equipe do hangar 11 só confere tudo.', 'ZÖ-11 · rádio', 460);
-					depois(function () { alfandega('ZÖ-11 · rádio'); }, sujo ? 8000 : 3500);
+					if (sujo) { SONS.agua(7.5); balao(TR('A equipe do hangar 11 já está lavando ' + sujo.nome + ' da PX-01.', 'The hangar 11 crew is already washing ' + sujo.nome + ' off the PX-01.'), TR('ZÖ-11 · rádio', 'ZÖ-11 · radio'), 460); }
+					else balao(TR('A PX-01 voltou limpinha! A equipe do hangar 11 só confere tudo.', 'The PX-01 came back spotless! The hangar 11 crew is just checking everything.'), TR('ZÖ-11 · rádio', 'ZÖ-11 · radio'), 460);
+					depois(function () { alfandega(TR('ZÖ-11 · rádio', 'ZÖ-11 · radio')); }, sujo ? 8000 : 3500);
 				}); }, 4000);
 			});
 		}, 4200);
@@ -947,7 +993,9 @@
 		requestAnimationFrame(quadro);
 		var t = performance.now() / 1000, tf = tFase();
 		ctx.setTransform(1, 0, 0, 1, OX, 0);
-		var texto1 = 'CHEGANDO', texto2 = NOME.length > 12 ? NOME.split(' ').pop() : NOME;
+		/* o nome no visor: em inglês sem o "the", e só a primeira palavra dos nomes compridos */
+		var NOME_EN = NOME.replace(/^the /, '').replace(/'/g, ''), noVisor = INGLES ? (NOME_EN.length > 12 ? NOME_EN.split(' ')[0] : NOME_EN) : NOME_PT.length > 12 ? NOME_PT.split(' ').pop() : NOME_PT;
+		var texto1 = TR('CHEGANDO', 'ARRIVING'), texto2 = noVisor;
 		if (fase === 'salto') desenharEstrelas(ctx, t, Math.max(0, 1 - tf / 1.5));
 		else if (fase === 'evento' || fase === 'cruzeiro') { desenharEstrelas(ctx, t, 0.02); if (fase === 'evento') desenharEvento(ctx, tf); }
 		else if (fase === 'aproxima') {
@@ -960,8 +1008,8 @@
 				desenharEstrelas(ctx, t, 0);
 				desenharDestino(ctx, 124, 240, VIDRO.oy - 10);
 				var ka = suave(tf / 3.6); desenharEstacao(ctx, t, 0.35 + ka * 1.4, 240 + (1 - ka) * 160, VIDRO.oy + 6 - (1 - ka) * 20);
-				texto1 = 'ATRACANDO'; texto2 = Math.max(0, Math.round((1 - ka) * 300)) + ' M';
-			} else { desenharEscotilha(ctx, t, fase === 'escotilhaAberta'); texto1 = 'ATRACADA'; texto2 = 'ALFÂNDEGA'; }
+				texto1 = TR('ATRACANDO', 'DOCKING'); texto2 = Math.max(0, Math.round((1 - ka) * 300)) + ' M';
+			} else { desenharEscotilha(ctx, t, fase === 'escotilhaAberta'); texto1 = TR('ATRACADA', 'DOCKED'); texto2 = TR('ALFÂNDEGA', 'CUSTOMS'); }
 		} else if (fase === 'descida' || fase === 'pousado') {
 			if (!solo) solo = fazerSolo(SOLO[pagina]);
 			var kd = fase === 'pousado' ? 1 : suave(tf / 4.2), oy = Math.round(-HOR + 92 + (1 - kd) * 110 + (fase === 'descida' ? Math.sin(t * 9) * (1 - kd) : 0));
@@ -987,8 +1035,8 @@
 					desenharAgente(ctx, t, ax, ay - 13, 0.36);
 				}
 				if (Math.sin(t * 4) > 0) R(ctx, 334 - 1, HOR + 2 + oy - 22, 2, 2, '#ff4a4a');
-				texto1 = 'POUSADA'; texto2 = NOME;
-			} else { texto1 = 'DESCENDO'; texto2 = Math.round((1 - kd) * 2000) + ' M'; }
+				texto1 = TR('POUSADA', 'LANDED'); texto2 = noVisor;
+			} else { texto1 = TR('DESCENDO', 'DESCENDING'); texto2 = Math.round((1 - kd) * 2000) + ' M'; }
 			// a luz dos motores de pouso refletindo embaixo
 			if (fase === 'descida') brilhoC(ctx, 240, 160, 80, 'rgba(140,210,255,0.6)', 0.4 + kd * 0.4);
 		} else if (fase === 'descidaCasa') {

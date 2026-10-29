@@ -18,7 +18,7 @@
 	window.T = function (pt, en) { return idioma === 'en' && en != null ? en : pt; };
 	window.LOCALE = idioma === 'en' ? 'en-US' : 'pt-BR'; /* para os números: 26.700 vira 26,700 em inglês */
 
-	var ATRIBUTOS = ['aria-label', 'title', 'alt', 'content', 'placeholder'];
+	var ATRIBUTOS = ['aria-label', 'title', 'alt', 'content', 'placeholder', 'data-astro', 'data-planeta', 'data-plural'];
 	function traduzir(raiz) {
 		if (idioma !== 'en') return;
 		[].forEach.call(raiz.querySelectorAll('[data-en]'), function (el) {

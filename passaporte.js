@@ -6,6 +6,8 @@
 // Tudo fica guardado só neste navegador (localStorage).
 (function () {
 	var CHAVE = 'passaporteEspacial';
+	/* o texto no idioma da visita (veja idioma.js; não é T porque o carimbo tem uma variável T) */
+	var TR = window.T || function (pt) { return pt; };
 	var calmo = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 	// Os destinos, na ordem do passeio. "codigo" é a sigla do carimbo (como nos aeroportos)
@@ -298,6 +300,19 @@
 		{ id: 'especialista', nome: 'Sabe-tudo do Sistema Solar', desc: 'Acertou os quizzes dos 8 planetas', falta: 'Acerte o quiz no fim da página de cada planeta', cor: '#3fa8b8', lista: 'quizzes', total: 8, unidade: 'quizzes' },
 		{ id: 'galactico', nome: 'Sabe-tudo da Via Láctea', desc: 'Acertou os quizzes dos 12 destinos da galáxia', falta: 'Acerte o quiz no fim da página de cada destino da galáxia', cor: '#b46be8', lista: 'quizzesGalaxia', total: 12, unidade: 'quizzes' }
 	];
+	// em inglês: os nomes dos destinos e os textos dos selos especiais
+	if (window.IDIOMA === 'en') {
+		var NOMES_EN = { fermi: 'Fermi Bubbles', orion: 'Orion Nebula', pleiades: 'Pleiades', helice: 'Helix Nebula', tabby: "Tabby's Star", caranguejo: 'Crab Nebula', sistema: 'Solar System' };
+		DESTINOS.forEach(function (x) { if (NOMES_EN[x.id]) x.nome = NOMES_EN[x.id]; });
+		var SELOS_EN = {
+			ouvinte: ['Galaxy listener', 'Tuned in to all 23 stations of the ship radio', 'Tune in to all 23 stations of the ship radio', 'stations'],
+			planetas: ['Solar System tour', 'Visited the Sun and the 8 planets', 'Visit the Sun and the 8 planets', 'bodies'],
+			decolagem: ['Liftoff pilot', 'Watched the ship lift off 3 times', 'Watch the ship lift off 3 times', 'liftoffs'],
+			especialista: ['Solar System Know-it-all', 'Aced the quizzes of all 8 planets', 'Ace the quiz at the end of each planet page', 'quizzes'],
+			galactico: ['Milky Way Know-it-all', 'Aced the quizzes of all 12 galaxy destinations', 'Ace the quiz at the end of each galaxy destination page', 'quizzes']
+		};
+		CONQUISTAS.forEach(function (c) { var e = SELOS_EN[c.id]; if (e) { c.nome = e[0]; c.desc = e[1]; c.falta = e[2]; c.unidade = e[3]; } });
+	}
 	var ASTROS = ['sol', 'mercurio', 'venus', 'terra', 'marte', 'jupiter', 'saturno', 'urano', 'netuno'];
 	function progresso(c, d) { return Math.min(c.total, c.contador ? (d[c.contador] || 0) : (d[c.lista] || []).length); }
 
@@ -315,7 +330,7 @@
 	function salvar(d) { try { localStorage.setItem(CHAVE, JSON.stringify(d)); } catch (e) {} }
 	function quantos(d) { return DESTINOS.filter(function (x) { return d.carimbos[x.id]; }).length; }
 	function dataBonita(iso) {
-		try { return new Date(iso).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric' }).replace(/\./g, ''); }
+		try { return new Date(iso).toLocaleDateString(window.LOCALE || 'pt-BR', { day: '2-digit', month: 'short', year: 'numeric' }).replace(/\./g, ''); }
 		catch (e) { return ''; }
 	}
 	function porId(id) { for (var i = 0; i < DESTINOS.length; i++) if (DESTINOS[i].id === id) return DESTINOS[i]; return null; }
@@ -678,13 +693,13 @@
 		aviso.appendChild(novoCarimbo(c, null, ler().conquistas[c.id]));
 		var texto = document.createElement('div');
 		texto.className = 'carimbo-novo-texto';
-		texto.innerHTML = '<p>Selo especial conquistado!</p><strong>' + c.nome + '</strong><span>' + c.desc + '</span>' +
-			'<a href="index.html#conquistas">Ver conquistas &rarr;</a>';
+		texto.innerHTML = '<p>' + TR('Selo especial conquistado!', 'Special seal earned!') + '</p><strong>' + c.nome + '</strong><span>' + c.desc + '</span>' +
+			'<a href="index.html#conquistas">' + TR('Ver conquistas &rarr;', 'See achievements &rarr;') + '</a>';
 		aviso.appendChild(texto);
 		var fechar = document.createElement('button');
 		fechar.type = 'button';
 		fechar.className = 'carimbo-novo-fechar';
-		fechar.setAttribute('aria-label', 'Fechar aviso');
+		fechar.setAttribute('aria-label', TR('Fechar aviso', 'Close notice'));
 		fechar.innerHTML = '&times;';
 		aviso.appendChild(fechar);
 		document.body.appendChild(aviso);
@@ -711,15 +726,15 @@
 		aviso.appendChild(novoCarimbo(destino, null, ler().carimbos[destino.id]));
 		var texto = document.createElement('div');
 		texto.className = 'carimbo-novo-texto';
-		texto.innerHTML = '<p>' + (completo ? 'Passaporte completo!' : 'Carimbo novo no passaporte') + '</p>' +
+		texto.innerHTML = '<p>' + (completo ? TR('Passaporte completo!', 'Passport complete!') : TR('Carimbo novo no passaporte', 'New stamp in your passport')) + '</p>' +
 			'<strong>' + destino.nome.replace('*', '<span class="ast">*</span>') + '</strong>' +
-			'<span>' + (completo ? 'Seu certificado de Turista da Via Láctea está pronto.' : total + ' de ' + DESTINOS.length + ' destinos visitados') + '</span>' +
-			'<a href="index.html#passaporte">Ver passaporte &rarr;</a>';
+			'<span>' + (completo ? TR('Seu certificado de Turista da Via Láctea está pronto.', 'Your Milky Way Tourist certificate is ready.') : total + TR(' de ', ' of ') + DESTINOS.length + TR(' destinos visitados', ' destinations visited')) + '</span>' +
+			'<a href="index.html#passaporte">' + TR('Ver passaporte &rarr;', 'See passport &rarr;') + '</a>';
 		aviso.appendChild(texto);
 		var fechar = document.createElement('button');
 		fechar.type = 'button';
 		fechar.className = 'carimbo-novo-fechar';
-		fechar.setAttribute('aria-label', 'Fechar aviso');
+		fechar.setAttribute('aria-label', TR('Fechar aviso', 'Close notice'));
 		fechar.innerHTML = '&times;';
 		fechar.addEventListener('click', function () { tirar(); });
 		aviso.appendChild(fechar);
@@ -755,10 +770,10 @@
 		}).join('');
 		botao.innerHTML =
 			'<span class="bp-livro" aria-hidden="true"><span class="bp-pagina"><i></i></span><span class="bp-capa"></span></span>' +
-			'<span class="bp-texto"><span class="bp-titulo">Passaporte</span><span class="bp-carimbos" aria-hidden="true">' + pontos + '</span></span>' +
+			'<span class="bp-texto"><span class="bp-titulo">' + TR('Passaporte', 'Passport') + '</span><span class="bp-carimbos" aria-hidden="true">' + pontos + '</span></span>' +
 			'<b class="bp-contagem">' + n + '<small>/' + DESTINOS.length + '</small></b>' +
 			(novos ? '<span class="bp-novo">' + (novos > 1 ? novos + ' novos' : 'novo') + '</span>' : '');
-		botao.setAttribute('aria-label', 'Abrir passaporte: ' + n + ' de ' + DESTINOS.length + ' carimbos' + (novos ? ', ' + novos + ' para carimbar' : ''));
+		botao.setAttribute('aria-label', TR('Abrir passaporte: ' + n + ' de ' + DESTINOS.length + ' carimbos' + (novos ? ', ' + novos + ' para carimbar' : ''), 'Open passport: ' + n + ' of ' + DESTINOS.length + ' stamps' + (novos ? ', ' + novos + ' to stamp' : '')));
 	}
 
 	// ---------- O passaporte aberto ----------
@@ -773,7 +788,7 @@
 		if (!dialogo) {
 			dialogo = document.createElement('dialog');
 			dialogo.className = 'passaporte';
-			dialogo.setAttribute('aria-label', 'Passaporte da Via Láctea');
+			dialogo.setAttribute('aria-label', TR('Passaporte da Via Láctea', 'Milky Way Passport'));
 			// clicar fora: se o passaporte estiver aberto, ele fecha; senão, a aba de documentos fecha
 			dialogo.addEventListener('click', function (e) {
 				if (e.target !== dialogo && !e.target.classList.contains('doc-holo') && !e.target.classList.contains('pp-dica-abrir')) return;
@@ -868,7 +883,7 @@
 		var fechar = document.createElement('button');
 		fechar.type = 'button';
 		fechar.className = 'passaporte-fechar';
-		fechar.innerHTML = 'Fechar &times;';
+		fechar.innerHTML = TR('Fechar', 'Close') + ' &times;';
 		fechar.addEventListener('click', function () { dialogo.close(); });
 		return fechar;
 	}
@@ -1093,7 +1108,7 @@
 				marca.className = 'pp-carimbo';
 				marca.style.setProperty('--giro', giroDe(x) + 'deg');
 				marca.appendChild(novoCarimbo(x, null, d.carimbos[x.id])); // a data vai dentro do carimbo
-				marca.title = x.nome + ': clique para carimbar de novo';
+				marca.title = x.nome + TR(': clique para carimbar de novo', ': click to stamp it again');
 				marca.addEventListener('click', function () { carimbar(vaga, marca, x); });
 				vaga.appendChild(marca);
 				if (mostrados.indexOf(x.id) < 0) { marca.classList.add('esperando'); novos.push({ vaga: vaga, marca: marca, destino: x }); }
@@ -1113,7 +1128,7 @@
 		capa.className = 'pp-capa';
 		var frente = document.createElement('div');
 		frente.className = 'pp-capa-frente';
-		frente.innerHTML = '<p class="pp-capa-agencia">Agência de turismo espacial</p>';
+		frente.innerHTML = '<p class="pp-capa-agencia">' + TR('Agência de turismo espacial', 'Space tourism agency') + '</p>';
 		// o brasão com órbitas douradas em volta, como um planeta gravado na capa
 		var emblema = document.createElement('span');
 		emblema.className = 'pp-capa-emblema';
@@ -1129,22 +1144,22 @@
 		verso.className = 'pp-pagina pp-dados pp-capa-verso';
 		var linhas = linhasDeMaquina(d, datas[0]);
 		verso.innerHTML =
-			'<header class="pp-cabecalho"><span>Passaporte · Passport</span><span>Via Láctea</span></header>' +
+			'<header class="pp-cabecalho"><span>Passaporte · Passport</span><span>' + TR('Via Láctea', 'Milky Way') + '</span></header>' +
 			'<div class="pp-dados-corpo">' +
 				'<div class="pp-foto"><canvas aria-hidden="true"></canvas></div>' +
 				'<dl class="pp-campos">' +
 					'<div class="curto"><dt>Tipo / Type</dt><dd>P</dd></div>' +
 					'<div class="curto"><dt>Código / Code</dt><dd>VLC</dd></div>' +
 					'<div class="curto"><dt>Nº / No.</dt><dd class="pp-numero"></dd></div>' +
-					'<div class="pp-campo-nome"><dt><label for="pp-nome">Nome / Name</label></dt><dd><input id="pp-nome" type="text" maxlength="32" autocomplete="off" placeholder="Escreva seu nome"></dd></div>' +
-					'<div><dt>Nacionalidade / Nationality</dt><dd>Terráquea</dd></div>' +
+					'<div class="pp-campo-nome"><dt><label for="pp-nome">Nome / Name</label></dt><dd><input id="pp-nome" type="text" maxlength="32" autocomplete="off" placeholder="' + TR('Escreva seu nome', 'Write your name') + '"></dd></div>' +
+					'<div><dt>Nacionalidade / Nationality</dt><dd>' + TR('Terráquea', 'Earthling') + '</dd></div>' +
 					'<div><dt>Nave / Ship</dt><dd>PX-01 Millennium Falcon</dd></div>' +
 					'<div><dt>Emissão / Issue</dt><dd>' + (d.embarque || datas[0] ? dataBonita(d.embarque || datas[0]).toUpperCase() : '—') + '</dd></div>' +
-					'<div><dt>Validade / Expiry</dt><dd>Até o fim do universo</dd></div>' +
+					'<div><dt>Validade / Expiry</dt><dd>' + TR('Até o fim do universo', 'Until the end of the universe') + '</dd></div>' +
 				'</dl>' +
 			'</div>' +
 			'<div class="pp-assinatura"><span class="pp-assinatura-nome"></span><small>Assinatura / Signature</small></div>' +
-			'<div class="pp-progresso"><span>Destinos visitados</span><b>' + n + ' de ' + DESTINOS.length + '</b></div>' +
+			'<div class="pp-progresso"><span>' + TR('Destinos visitados', 'Destinations visited') + '</span><b>' + n + TR(' de ', ' of ') + DESTINOS.length + '</b></div>' +
 			'<div class="pp-maquina" aria-hidden="true"><span></span><span></span></div>';
 		verso.querySelector('.pp-numero').textContent = numeroDe(d);
 		desenharFoto(verso.querySelector('.pp-foto canvas'));
@@ -1171,7 +1186,7 @@
 			selo.type = 'button';
 			selo.className = 'pp-selo';
 			selo.innerHTML = '<span class="pp-selo-anel" aria-hidden="true"></span><span class="pp-selo-brilho" aria-hidden="true"></span>' +
-				'<span class="pp-selo-texto"><span>Turista da<br>Via Láctea</span><small>ver certificado</small></span>';
+				'<span class="pp-selo-texto"><span>' + TR('Turista da<br>Via Láctea', 'Milky Way<br>Tourist') + '</span><small>' + TR('ver certificado', 'see certificate') + '</small></span>';
 			selo.addEventListener('click', function () { montarLivro('certificado'); });
 			paralaxe(selo);
 			verso.appendChild(selo);
@@ -1210,9 +1225,9 @@
 			var zerar = document.createElement('button');
 			zerar.type = 'button';
 			zerar.className = 'pp-zerar';
-			zerar.textContent = 'Passaporte novo';
+			zerar.textContent = TR('Passaporte novo', 'New passport');
 			zerar.addEventListener('click', function () {
-				if (!confirm('Apagar todos os carimbos e começar um passaporte novo?')) return;
+				if (!confirm(TR('Apagar todos os carimbos e começar um passaporte novo?', 'Erase all stamps and start a new passport?'))) return;
 				var atual = ler(); atual.carimbos = {}; atual.mostrados = []; salvar(atual); montarLivro('passaporte', true);
 			});
 			vistos.appendChild(zerar);
@@ -1224,8 +1239,8 @@
 		diario.innerHTML = '<header class="pp-cabecalho"><span>Diário de bordo</span><span>Travel log</span></header>' +
 			(visitas.length ? '<ol class="pp-diario-lista">' + visitas.map(function (x) {
 				return '<li style="--cor-carimbo:' + x.cor + '"><i aria-hidden="true"></i><b>' + x.nome.replace('*', '<span class="ast">*</span>') + '</b><span>' + dataBonita(d.carimbos[x.id]) + '</span></li>';
-			}).join('') + '</ol>' : '<p class="pp-diario-vazio">Nenhuma viagem anotada ainda. Escolha um destino na Via Láctea!</p>') +
-			'<p class="pp-diario-falta">' + (n === DESTINOS.length ? 'Todos os destinos visitados!' : 'Faltam ' + (DESTINOS.length - n) + ' destino' + (DESTINOS.length - n > 1 ? 's' : '') + ' para o certificado.') + '</p>' +
+			}).join('') + '</ol>' : '<p class="pp-diario-vazio">' + TR('Nenhuma viagem anotada ainda. Escolha um destino na Via Láctea!', 'No trips logged yet. Choose a destination in the Milky Way!') + '</p>') +
+			'<p class="pp-diario-falta">' + (n === DESTINOS.length ? TR('Todos os destinos visitados!', 'All destinations visited!') : TR('Faltam ' + (DESTINOS.length - n) + ' destino' + (DESTINOS.length - n > 1 ? 's' : '') + ' para o certificado.', (DESTINOS.length - n) + ' more destination' + (DESTINOS.length - n > 1 ? 's' : '') + ' to the certificate.')) + '</p>' +
 			'<footer class="pp-rodape"><span>' + n + ' / ' + DESTINOS.length + '</span><span>5</span></footer>';
 		livro.appendChild(diario);
 		var folha = document.createElement('div');
@@ -1243,12 +1258,12 @@
 		// a capa só abre quando a pessoa clica nela; depois disso, os carimbos novos são batidos um por um
 		frente.setAttribute('role', 'button');
 		frente.setAttribute('tabindex', '0');
-		frente.setAttribute('aria-label', 'Abrir o passaporte');
+		frente.setAttribute('aria-label', TR('Abrir o passaporte', 'Open the passport'));
 		// a dica fica fora do passaporte, embaixo dele, e some quando ele está aberto
 		var dica = document.createElement('p');
 		dica.className = 'pp-dica-abrir';
 		dica.setAttribute('aria-hidden', 'true');
-		dica.textContent = 'Clique no passaporte para abrir';
+		dica.textContent = TR('Clique no passaporte para abrir', 'Click the passport to open it');
 		dialogo.appendChild(dica);
 		var aberto = false, virado = false, celular = function () { return window.innerWidth <= 760; };
 		function carimbarTodos(lista, espera) {
@@ -1325,7 +1340,7 @@
 		pagina.className = 'pp-pagina pp-conquistas';
 		var ganhas = CONQUISTAS.filter(function (c) { return d.conquistas && d.conquistas[c.id]; }).length;
 		pagina.innerHTML = '<header class="pp-cabecalho"><span>Selos especiais</span><span>Special seals</span></header>' +
-			'<p class="conq-intro">Selos ganhos explorando a galáxia <b>' + ganhas + ' de ' + CONQUISTAS.length + '</b></p>';
+			'<p class="conq-intro">' + TR('Selos ganhos explorando a galáxia', 'Seals earned exploring the galaxy') + ' <b>' + ganhas + TR(' de ', ' of ') + CONQUISTAS.length + '</b></p>';
 		var vistas = d.conquistasVistas || [], novas = [];
 		var lista = document.createElement('div');
 		lista.className = 'conq-lista';
@@ -1345,10 +1360,10 @@
 			item.appendChild(vaga);
 			var texto = document.createElement('div');
 			texto.className = 'conq-texto';
-			texto.innerHTML = (ganha ? '<em class="conq-tag">Conquistado</em>' : '') +
+			texto.innerHTML = (ganha ? '<em class="conq-tag">' + TR('Conquistado', 'Earned') + '</em>' : '') +
 				'<strong>' + c.nome + '</strong><span>' + (ganha ? c.desc + ' · ' + dataBonita(ganha) : c.falta) + '</span>' +
 				'<span class="conq-barra" style="--feito:' + (feito / c.total) + ';--total:' + c.total + '"><i></i></span>' +
-				'<small><b>' + feito + '</b> de <b>' + c.total + '</b> ' + c.unidade + '</small>';
+				'<small><b>' + feito + '</b>' + TR(' de ', ' of ') + '<b>' + c.total + '</b> ' + c.unidade + '</small>';
 			item.appendChild(texto);
 			lista.appendChild(item);
 			if (ganha && vistas.indexOf(c.id) < 0) { marca.classList.add('esperando'); novas.push({ vaga: vaga, marca: marca, c: c }); }
@@ -1387,7 +1402,7 @@
 	function abasDocumentos(visao, completo) {
 		var nav = document.createElement('nav');
 		nav.className = 'pp-docs';
-		nav.setAttribute('aria-label', 'Documentos');
+		nav.setAttribute('aria-label', TR('Documentos', 'Documents'));
 		// ícones em pixel (grade 9×9): livrinho, cartão com foto e medalha
 		var ICONES_ABAS = {
 			passaporte: '<rect x="1" y="0" width="7" height="9"/><rect x="2" y="1" width="5" height="7" fill="var(--fundo-aba)"/><rect x="3" y="2" width="3" height="3"/><rect x="3" y="6" width="3" height="1"/>',
@@ -1396,9 +1411,9 @@
 			bilhete: '<rect x="0" y="2" width="9" height="5"/><rect x="1" y="3" width="4" height="3" fill="var(--fundo-aba)"/><rect x="6" y="2" width="1" height="1" fill="var(--fundo-aba)"/><rect x="6" y="4" width="1" height="1" fill="var(--fundo-aba)"/><rect x="6" y="6" width="1" height="1" fill="var(--fundo-aba)"/>',
 			conquistas: '<rect x="4" y="0" width="1" height="2"/><rect x="3" y="2" width="3" height="1"/><rect x="0" y="3" width="9" height="1"/><rect x="1" y="4" width="7" height="1"/><rect x="2" y="5" width="5" height="1"/><rect x="1" y="6" width="3" height="2"/><rect x="5" y="6" width="3" height="2"/><rect x="0" y="8" width="2" height="1"/><rect x="7" y="8" width="2" height="1"/>'
 		};
-		var abas = [['passaporte', 'Passaporte'], ['carteira', 'Carteira de piloto']];
-		if (ler().embarque) abas.push(['bilhete', 'Bilhete']); // (o bilhete de embarque, impresso na agência)
-		abas.push(['certificado', 'Certificado'], ['conquistas', 'Conquistas']);
+		var abas = [['passaporte', TR('Passaporte', 'Passport')], ['carteira', TR('Carteira de piloto', 'Pilot license')]];
+		if (ler().embarque) abas.push(['bilhete', TR('Bilhete', 'Ticket')]); // (o bilhete de embarque, impresso na agência)
+		abas.push(['certificado', TR('Certificado', 'Certificate')], ['conquistas', TR('Conquistas', 'Achievements')]);
 		abas.forEach(function (a) {
 			var b = document.createElement('button');
 			b.type = 'button';
@@ -1406,7 +1421,7 @@
 			b.setAttribute('aria-pressed', a[0] === visao ? 'true' : 'false');
 			if (a[0] === 'certificado' && !completo) {
 				b.disabled = true;
-				b.title = 'Visite os ' + DESTINOS.length + ' destinos para ganhar o certificado';
+				b.title = TR('Visite os ' + DESTINOS.length + ' destinos para ganhar o certificado', 'Visit the ' + DESTINOS.length + ' destinations to earn the certificate');
 				b.insertAdjacentHTML('beforeend', '<span class="pp-docs-cadeado" aria-hidden="true"></span>');
 			}
 			// voltando para o passaporte, ele fica do jeito que estava (aberto ou fechado)
@@ -1488,7 +1503,7 @@
 	}
 
 	function dataPorExtenso(iso) {
-		try { return new Date(iso).toLocaleDateString('pt-BR', { day: 'numeric', month: 'long', year: 'numeric' }); } catch (e) { return ''; }
+		try { return new Date(iso).toLocaleDateString(window.LOCALE || 'pt-BR', { day: 'numeric', month: 'long', year: 'numeric' }); } catch (e) { return ''; }
 	}
 
 	// ---------- Certificado de Turista da Via Láctea ----------
@@ -1508,12 +1523,12 @@
 			}
 			bracos += '<polyline points="' + pts.join(' ') + '" />';
 		}
-		var micro = new Array(9).join('VIA LÁCTEA ✦ PX-01 ✦ ');
+		var micro = new Array(9).join(TR('VIA LÁCTEA ✦ PX-01 ✦ ', 'MILKY WAY ✦ PX-01 ✦ '));
 		return '<div class="cert-holo-faixa" aria-hidden="true"><span>' + micro + '</span></div>' +
 			'<div class="cert-holo-selo" aria-hidden="true">' +
 				'<svg viewBox="-50 -50 100 100"><ellipse rx="44" ry="44" class="holo-anel" />' + bracos +
 				'<ellipse rx="7" ry="4.5" class="holo-nucleo" /></svg>' +
-				'<span class="holo-texto">Autêntico</span>' +
+				'<span class="holo-texto">' + TR('Autêntico', 'Authentic') + '</span>' +
 			'</div>';
 	}
 
@@ -1561,7 +1576,7 @@
 
 	// a nave PX-01 girando, desenhada pelo modelo 3D de nave.js (vai na carteira de piloto)
 	function hologramaDaNave() {
-		return projecao('holo-nave', 'PX-01 · projeção', function (i) {
+		return projecao('holo-nave', TR('PX-01 · projeção', 'PX-01 · projection'), function (i) {
 			var luz = new Float32Array(HOLO_L * HOLO_A);
 			if (!window.Nave || !window.Nave.renderizarModelo) return luz;
 			var r = window.Nave.renderizarModelo({
@@ -1591,7 +1606,7 @@
 			}
 		}
 		var INCL = 58 * Math.PI / 180, CI = Math.cos(INCL), SI = Math.sin(INCL), R = 58;
-		return projecao('holo-galaxia', 'Via Láctea · projeção', function (i) {
+		return projecao('holo-galaxia', TR('Via Láctea · projeção', 'Milky Way · projection'), function (i) {
 			var luz = new Float32Array(HOLO_L * HOLO_A), g = -i / HOLO_QUADROS * Math.PI * 2, cg = Math.cos(g), sg = Math.sin(g);
 			estrelasHolo.forEach(function (e) {
 				var x = e[0] * cg - e[1] * sg, y = e[0] * sg + e[1] * cg;
@@ -1613,24 +1628,24 @@
 				'<span class="cert-canto" aria-hidden="true"></span><span class="cert-canto" aria-hidden="true"></span>' +
 				'<span class="cert-canto" aria-hidden="true"></span><span class="cert-canto" aria-hidden="true"></span>' +
 				'<header class="cert-topo">' +
-					'<p class="cert-orgao">Agência Andarilha · Turismo Espacial</p>' +
-					'<p class="cert-depto">Departamento de Viagens Interestelares</p>' +
+					'<p class="cert-orgao">' + TR('Agência Andarilha · Turismo Espacial', 'Andarilha Agency · Space Tourism') + '</p>' +
+					'<p class="cert-depto">' + TR('Departamento de Viagens Interestelares', 'Department of Interstellar Travel') + '</p>' +
 				'</header>' +
-				'<h2 class="cert-titulo">Certificado</h2>' +
-				'<p class="cert-subtitulo">de Turista da Via Láctea</p>' +
+				'<h2 class="cert-titulo">' + TR('Certificado', 'Certificate') + '</h2>' +
+				'<p class="cert-subtitulo">' + TR('de Turista da Via Láctea', 'of Milky Way Tourist') + '</p>' +
 				'<div class="cert-divisor" aria-hidden="true"><span>&#10022;</span></div>' +
-				'<p class="cert-texto">Certificamos, para os devidos fins, que</p>' +
+				'<p class="cert-texto">' + TR('Certificamos, para os devidos fins, que', 'We hereby certify that') + '</p>' +
 				'<p class="cert-nome"></p>' +
-				'<p class="cert-texto">visitou os ' + DESTINOS.length + ' destinos turísticos da Via Láctea a bordo da nave PX-01, ' +
-					'viajando na velocidade da luz, e faz jus ao título de</p>' +
-				'<p class="cert-honra">Turista da Via Láctea</p>' +
+				'<p class="cert-texto">' + TR('visitou os ' + DESTINOS.length + ' destinos turísticos da Via Láctea a bordo da nave PX-01, ' +
+					'viajando na velocidade da luz, e faz jus ao título de', 'has visited the ' + DESTINOS.length + ' tourist destinations of the Milky Way aboard the PX-01, traveling at the speed of light, and is hereby awarded the title of') + '</p>' +
+				'<p class="cert-honra">' + TR('Turista da Via Láctea', 'Milky Way Tourist') + '</p>' +
 				'<div class="cert-selos"></div>' +
 				'<footer class="cert-rodape">' +
-					'<div class="cert-assina"><span class="cert-assina-nome">L. Andrômeda</span><small>Diretora da Agência</small></div>' +
+					'<div class="cert-assina"><span class="cert-assina-nome">L. Andrômeda</span><small>' + TR('Diretora da Agência', 'Agency Director') + '</small></div>' +
 					'<div class="cert-lacre-base" aria-hidden="true"><span class="cert-fita"></span><span class="cert-fita"></span><div class="cert-lacre">' + lacreSvg() +
 						'<span class="cert-lacre-brilho"></span>' +
-						'<span class="cert-lacre-texto"><i>&#10022; &#10022; &#10022;</i><b>PX-01</b><span>Via Láctea</span></span></div></div>' +
-					'<div class="cert-assina"><span class="cert-assina-nome">C. Órion</span><small>Comandante da nave PX-01</small></div>' +
+						'<span class="cert-lacre-texto"><i>&#10022; &#10022; &#10022;</i><b>PX-01</b><span>' + TR('Via Láctea', 'Milky Way') + '</span></span></div></div>' +
+					'<div class="cert-assina"><span class="cert-assina-nome">C. Órion</span><small>' + TR('Comandante da nave PX-01', 'Captain of the PX-01') + '</small></div>' +
 				'</footer>' +
 				'<p class="cert-local"></p>' +
 			'</div>';
@@ -1640,8 +1655,8 @@
 		else c.querySelector('.cert-moldura').insertBefore(novoCarimbo(BRASAO, 'cert-brasao', null), topo);
 		c.querySelector('.cert-moldura').insertAdjacentHTML('afterbegin', holografiasDoCertificado());
 		c.querySelector('.cert-moldura').appendChild(hologramaDaGalaxia());
-		c.querySelector('.cert-nome').textContent = d.nome || 'Turista sem nome'; // o nome é texto, nunca HTML
-		c.querySelector('.cert-local').textContent = 'Via Láctea, ' + dataPorExtenso(ultima) + '  ·  Registro nº ' + registro;
+		c.querySelector('.cert-nome').textContent = d.nome || TR('Turista sem nome', 'Nameless tourist'); // o nome é texto, nunca HTML
+		c.querySelector('.cert-local').textContent = TR('Via Láctea, ', 'Milky Way, ') + dataPorExtenso(ultima) + TR('  ·  Registro nº ', '  ·  Registration no. ') + registro;
 		paralaxe(c.querySelector('.cert-lacre')); // o selo dourado inclina com o mouse
 		var selos = c.querySelector('.cert-selos');
 		DESTINOS.forEach(function (x) { selos.appendChild(novoCarimbo(x, null, d.carimbos[x.id])); });
@@ -1691,47 +1706,47 @@
 					'<span class="cnh-faixa-holo" aria-hidden="true"></span>' +
 					'<header class="cnh-topo">' +
 						'<span class="cnh-brasao"></span>' +
-						'<div><strong>Carteira de Habilitação Espacial</strong><span>Departamento de Trânsito Interestelar · Agência de Turismo Espacial</span></div>' +
+						'<div><strong>' + TR('Carteira de Habilitação Espacial', 'Space Pilot License') + '</strong><span>' + TR('Departamento de Trânsito Interestelar · Agência de Turismo Espacial', 'Interstellar Traffic Department · Space Tourism Agency') + '</span></div>' +
 						'<b class="cnh-sigla">VLC</b>' +
 					'</header>' +
 					'<div class="cnh-corpo">' +
 						'<div class="cnh-foto"><canvas aria-hidden="true"></canvas></div>' +
 						'<dl class="cnh-campos">' +
-							'<div class="largo"><dt>Nome</dt><dd class="cnh-nome"></dd></div>' +
-							'<div><dt>Nº de registro</dt><dd class="cnh-registro"></dd></div>' +
-							'<div><dt>Categoria</dt><dd>A B C L</dd></div>' +
-							'<div><dt>1ª habilitação</dt><dd>' + emissao + '</dd></div>' +
-							'<div><dt>Validade</dt><dd>Fim do universo</dd></div>' +
-							'<div class="largo"><dt>Nave autorizada</dt><dd>PX-01 Millennium Falcon</dd></div>' +
+							'<div class="largo"><dt>' + TR('Nome', 'Name') + '</dt><dd class="cnh-nome"></dd></div>' +
+							'<div><dt>' + TR('Nº de registro', 'Registration no.') + '</dt><dd class="cnh-registro"></dd></div>' +
+							'<div><dt>' + TR('Categoria', 'Category') + '</dt><dd>A B C L</dd></div>' +
+							'<div><dt>' + TR('1ª habilitação', 'First issued') + '</dt><dd>' + emissao + '</dd></div>' +
+							'<div><dt>' + TR('Validade', 'Expires') + '</dt><dd>' + TR('Fim do universo', 'End of the universe') + '</dd></div>' +
+							'<div class="largo"><dt>' + TR('Nave autorizada', 'Authorized ship') + '</dt><dd>PX-01 Millennium Falcon</dd></div>' +
 						'</dl>' +
 						'<figure class="cnh-modelo"><canvas role="img" aria-label="Foto do modelo da nave em pixel art: a Millennium Falcon vista de frente e de lado, com o disco cinza-claro cheio de placas, as duas garras da frente, a cabine em tubo, a antena parabólica e o anel de acoplamento, sobre um fundo cinza"></canvas>' +
-							'<figcaption><b>Modelo YT-1300</b><span>Cargueiro leve · 34,37 m · Millennium Falcon</span></figcaption></figure>' +
+							'<figcaption><b>' + TR('Modelo YT-1300', 'YT-1300 model') + '</b><span>' + TR('Cargueiro leve · 34,37 m · Millennium Falcon', 'Light freighter · 34.37 m · Millennium Falcon') + '</span></figcaption></figure>' +
 					'</div>' +
-					'<div class="cnh-assinatura"><span class="cnh-assinatura-nome"></span><small>Assinatura do(a) piloto</small></div>' +
+					'<div class="cnh-assinatura"><span class="cnh-assinatura-nome"></span><small>' + TR('Assinatura do(a) piloto', 'Pilot\'s signature') + '</small></div>' +
 					'<span class="cnh-holograma" aria-hidden="true"></span>' +
 					'<span class="cnh-chip" aria-hidden="true"></span>' +
-					'<p class="cnh-micro" aria-hidden="true">' + new Array(9).join('VIA LÁCTEA ✦ PX-01 ✦ PILOTO HABILITADO ✦ ') + '</p>' +
+					'<p class="cnh-micro" aria-hidden="true">' + new Array(9).join(TR('VIA LÁCTEA ✦ PX-01 ✦ PILOTO HABILITADO ✦ ', 'MILKY WAY ✦ PX-01 ✦ LICENSED PILOT ✦ ')) + '</p>' +
 				'</div>' +
 				'<div class="cnh-face cnh-verso">' +
 					'<span class="cnh-orbitas" aria-hidden="true"><i></i><i></i><b></b></span>' +
-					'<p class="cnh-micro" aria-hidden="true">' + new Array(9).join('DEPARTAMENTO DE TRÂNSITO INTERESTELAR ✦ ') + '</p>' +
-					'<header class="cnh-topo cnh-topo-verso"><strong>Categorias</strong><span>Classes de nave que você pode pilotar</span></header>' +
+					'<p class="cnh-micro" aria-hidden="true">' + new Array(9).join(TR('DEPARTAMENTO DE TRÂNSITO INTERESTELAR ✦ ', 'INTERSTELLAR TRAFFIC DEPARTMENT ✦ ')) + '</p>' +
+					'<header class="cnh-topo cnh-topo-verso"><strong>' + TR('Categorias', 'Categories') + '</strong><span>' + TR('Classes de nave que você pode pilotar', 'Ship classes you may fly') + '</span></header>' +
 					'<table class="cnh-categorias">' +
-						'<thead><tr><th>Cat.</th><th>Veículo</th><th>Habilitado(a)</th></tr></thead>' +
+						'<thead><tr><th>Cat.</th><th>' + TR('Veículo', 'Vehicle') + '</th><th>' + TR('Habilitado(a)', 'Licensed') + '</th></tr></thead>' +
 						'<tbody>' +
-							'<tr><td>A</td><td>Cápsulas e módulos de pouso</td><td>Sim</td></tr>' +
-							'<tr><td>B</td><td>Naves de passeio</td><td>Sim</td></tr>' +
-							'<tr><td>C</td><td>Cargueiros leves (YT-1300)</td><td>Sim</td></tr>' +
-							'<tr><td>L</td><td>Saltos na velocidade da luz</td><td>Sim</td></tr>' +
-							'<tr class="nao"><td>X</td><td>Naves de batalha</td><td>Não</td></tr>' +
+							'<tr><td>A</td><td>' + TR('Cápsulas e módulos de pouso', 'Capsules and landers') + '</td><td>' + TR('Sim', 'Yes') + '</td></tr>' +
+							'<tr><td>B</td><td>' + TR('Naves de passeio', 'Pleasure craft') + '</td><td>' + TR('Sim', 'Yes') + '</td></tr>' +
+							'<tr><td>C</td><td>' + TR('Cargueiros leves (YT-1300)', 'Light freighters (YT-1300)') + '</td><td>' + TR('Sim', 'Yes') + '</td></tr>' +
+							'<tr><td>L</td><td>' + TR('Saltos na velocidade da luz', 'Jumps at the speed of light') + '</td><td>' + TR('Sim', 'Yes') + '</td></tr>' +
+							'<tr class="nao"><td>X</td><td>' + TR('Naves de batalha', 'Battleships') + '</td><td>' + TR('Não', 'No') + '</td></tr>' +
 						'</tbody>' +
 					'</table>' +
-					'<p class="cnh-obs"><b>Observações:</b> apto(a) a pilotar em cinturões de asteroides. Proibido estacionar perto de buracos negros. Uso obrigatório do cinto em saltos para o hiperespaço.</p>' +
-					'<div class="cnh-verso-rodape"><span class="cnh-codigo" aria-hidden="true"></span><div class="cnh-autoridade"><span>C. Órion</span><small>Autoridade emissora</small></div></div>' +
+					'<p class="cnh-obs">' + TR('<b>Observações:</b> apto(a) a pilotar em cinturões de asteroides. Proibido estacionar perto de buracos negros. Uso obrigatório do cinto em saltos para o hiperespaço.', '<b>Notes:</b> fit to fly through asteroid belts. No parking near black holes. Seat belt required for jumps to hyperspace.') + '</p>' +
+					'<div class="cnh-verso-rodape"><span class="cnh-codigo" aria-hidden="true"></span><div class="cnh-autoridade"><span>C. Órion</span><small>' + TR('Autoridade emissora', 'Issuing authority') + '</small></div></div>' +
 				'</div>' +
 			'</div>' +
-			'<p class="cnh-dica">Clique na carteira para virar</p>';
-		w.querySelector('.cnh-nome').textContent = d.nome || 'Piloto sem nome';
+			'<p class="cnh-dica">' + TR('Clique na carteira para virar', 'Click the license to flip it') + '</p>';
+		w.querySelector('.cnh-nome').textContent = d.nome || TR('Piloto sem nome', 'Nameless pilot');
 		w.querySelector('.cnh-assinatura-nome').textContent = d.nome || '';
 		w.querySelector('.cnh-registro').textContent = registro;
 		desenharFoto(w.querySelector('.cnh-foto canvas'));
@@ -1804,7 +1819,7 @@
 	function carimboEmbarque(iso) {
 		var visto = document.createElement('span');
 		visto.className = 'pp-embarque';
-		visto.title = 'Embarque aprovado na Agência Andarilha em ' + dataBonita(iso);
+		visto.title = TR('Embarque aprovado na Agência Andarilha em ', 'Boarding approved at the Andarilha Agency on ') + dataBonita(iso);
 		visto.innerHTML = '<svg viewBox="0 0 120 100" aria-hidden="true">' +
 			'<defs><mask id="pp-embarque-faixa"><rect width="120" height="100" fill="#fff"/><rect x="0" y="36" width="120" height="28" fill="#000"/></mask></defs>' +
 			'<g fill="none" stroke="currentColor" mask="url(#pp-embarque-faixa)"><circle cx="60" cy="50" r="46" stroke-width="3"/><circle cx="60" cy="50" r="38" stroke-width="1.5"/></g>' +
@@ -1825,18 +1840,18 @@
 		var data = (d.embarque ? dataBonita(d.embarque) : dataBonita(new Date().toISOString())).toUpperCase();
 		w.innerHTML =
 			'<div class="bilhete-corpo">' +
-				'<header class="bilhete-topo">' + (window.Andarilha ? window.Andarilha.simbolo('bilhete-simbolo') : '') + '<div><strong>Cartão de embarque</strong><span>Boarding pass · Agência Andarilha</span></div><b>PX-01</b></header>' +
-				'<div class="bilhete-rota"><div><small>De</small><b>TER</b><span>Terra · Porto Andarilha</span></div><i aria-hidden="true">✦ ─── ➜</i><div><small>Para</small><b>VLC</b><span>Via Láctea</span></div></div>' +
+				'<header class="bilhete-topo">' + (window.Andarilha ? window.Andarilha.simbolo('bilhete-simbolo') : '') + '<div><strong>' + TR('Cartão de embarque', 'Boarding pass') + '</strong><span>' + TR('Boarding pass · Agência Andarilha', 'Agência Andarilha · Cartão de embarque') + '</span></div><b>PX-01</b></header>' +
+				'<div class="bilhete-rota"><div><small>' + TR('De', 'From') + '</small><b>TER</b><span>' + TR('Terra · Porto Andarilha', 'Earth · Andarilha Port') + '</span></div><i aria-hidden="true">✦ ─── ➜</i><div><small>' + TR('Para', 'To') + '</small><b>VLC</b><span>' + TR('Via Láctea', 'Milky Way') + '</span></div></div>' +
 				'<dl class="bilhete-campos">' +
-					'<div class="largo"><dt>Piloto</dt><dd class="bilhete-nome"></dd></div>' +
-					'<div><dt>Nave</dt><dd>Millennium Falcon</dd></div><div><dt>Hangar</dt><dd>11</dd></div>' +
-					'<div><dt>Portão</dt><dd>11</dd></div><div><dt>Assento</dt><dd>Piloto</dd></div>' +
-					'<div><dt>Data</dt><dd>' + data + '</dd></div><div><dt>Embarque</dt><dd>Agora</dd></div>' +
+					'<div class="largo"><dt>' + TR('Piloto', 'Pilot') + '</dt><dd class="bilhete-nome"></dd></div>' +
+					'<div><dt>' + TR('Nave', 'Ship') + '</dt><dd>Millennium Falcon</dd></div><div><dt>Hangar</dt><dd>11</dd></div>' +
+					'<div><dt>' + TR('Portão', 'Gate') + '</dt><dd>11</dd></div><div><dt>' + TR('Assento', 'Seat') + '</dt><dd>' + TR('Piloto', 'Pilot') + '</dd></div>' +
+					'<div><dt>' + TR('Data', 'Date') + '</dt><dd>' + data + '</dd></div><div><dt>' + TR('Embarque', 'Boarding') + '</dt><dd>' + TR('Agora', 'Now') + '</dd></div>' +
 				'</dl>' +
 				'<span class="bilhete-holo" aria-hidden="true"></span>' +
 			'</div>' +
-			'<div class="bilhete-canhoto"><small>Senha</small><b>011</b><small>Guichê 11</small><span class="bilhete-codigo" aria-hidden="true"></span><small class="bilhete-atendente">Atendente ZÖ-11</small></div>';
-		w.querySelector('.bilhete-nome').textContent = d.nome || 'Piloto sem nome';
+			'<div class="bilhete-canhoto"><small>' + TR('Senha', 'Ticket') + '</small><b>011</b><small>' + TR('Guichê 11', 'Counter 11') + '</small><span class="bilhete-codigo" aria-hidden="true"></span><small class="bilhete-atendente">' + TR('Atendente ZÖ-11', 'Agent ZÖ-11') + '</small></div>';
+		w.querySelector('.bilhete-nome').textContent = d.nome || TR('Piloto sem nome', 'Nameless pilot');
 		var cod = w.querySelector('.bilhete-codigo'), s = hashTexto((d.nome || '') + data);
 		for (var i = 0; i < 30; i++) { var barra = document.createElement('i'); barra.style.width = (sorte(i, 1, s) < 0.5 ? 1 : sorte(i, 2, s) < 0.7 ? 2 : 3) + 'px'; cod.appendChild(barra); }
 		return w;
