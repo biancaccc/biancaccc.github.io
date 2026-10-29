@@ -265,7 +265,86 @@
 		'netuno': { nome: 'Rádio Netuno', freq: '601,9', nota: 'Os ventos mais rápidos do Sistema Solar, bem longe de casa', raiz: 61.74, escala: MENOR,
 			pad: { onda: 'sawtooth', corte: 380, vol: 0.45 }, ruido: { tipo: 'bandpass', corte: 600, vol: 0.32, vento: 0.13 },
 			melodias: [{ inst: 'coro', bpm: 54, oitava: 4, vol: 0.09, padrao: [[0, 3], [2, 1], [3, 2], [4, 2], [3, 4]], pausa: 8 }],
-			eco: 0.65 }
+			eco: 0.65 },
+
+		// ---------- As luas (a frequência é quantos dias cada uma leva para dar uma volta no seu planeta) ----------
+
+		// Lua: prateada, calma e silenciosa (lá não tem ar para levar som). Uma canção de ninar de caixinha
+		// de música e, de vez em quando, os bipes Quindar das conversas da Apollo com a Terra.
+		'lua': { nome: 'Rádio Lua Cheia', freq: '27,3', nota: 'Uma canção de ninar prateada, com os bipes das conversas da Apollo', raiz: 130.81, escala: MAIOR_PENTA,
+			pad: { onda: 'sine', corte: 1200, vol: 0.3 },
+			melodias: [
+				{ inst: 'caixinha', bpm: 60, oitava: 4, vol: 0.06, padrao: [[4, 1], [2, 1], [0, 2], [2, 1], [4, 1], [5, 2], [4, 1], [2, 1], [1, 2], [0, 4]], pausa: 4, variar: 0.3 },
+				{ inst: 'sino', bpm: 60, oitava: 2, vol: 0.04, atraso: 8, padrao: [[0, 4], [3, 4], [2, 8]], pausa: 8 }],
+			eventos: [{ tipo: 'quindar', cada: 11 }], eco: 0.6 },
+
+		// Io: explosiva e quente. Tambores graves em ritmo apressado, metais tensos numa escala
+		// "dramática" e vulcões estourando o tempo todo, com a lava estalando.
+		'io': { nome: 'Rádio Vulcão', freq: '1,77', nota: 'Mais de 400 vulcões, e Júpiter espremendo tudo', raiz: 73.42, escala: MENOR_HARM,
+			pad: { onda: 'sawtooth', corte: 420, vol: 0.4, giro: 0.05 }, sub: { freq: 36.7, vol: 0.25 },
+			bateria: { bpm: 126, bumbo: [0, 0.75, 1.5, 2.5], chimbal: 0.5, vol: 0.4 },
+			melodias: [{ inst: 'metal', bpm: 126, oitava: 2, vol: 0.09, padrao: [[0, 1], [0, 0.5], [2, 0.5], [3, 1], [4, 1], [6, 0.5], [7, 1.5], [null, 1], [6, 0.5], [4, 0.5], [3, 1], [1, 1], [0, 2]], pausa: 2, variar: 0.3 }],
+			eventos: [{ tipo: 'vulcao', cada: 6, vol: 0.28 }, { tipo: 'estalos', cada: 0.4, vol: 0.05 }], eco: 0.3 },
+
+		// Europa: misteriosa e escondida, como o oceano embaixo do gelo. Tudo soa abafado, como ouvido
+		// debaixo d'água: ondas lentas, bolhas subindo das fontes quentes e o gelo rangendo lá em cima.
+		'europa': { nome: 'Rádio Oceano Escondido', freq: '3,55', nota: 'Um oceano inteiro embaixo do gelo, esperando para ser explorado', raiz: 98, escala: DORICO,
+			pad: { onda: 'triangle', corte: 520, vol: 0.4, lfo: 0.08 }, mar: 0.16,
+			melodias: [{ inst: 'sino', bpm: 50, oitava: 2, vol: 0.06, padrao: [[0, 2], [2, 1], [3, 1], [4, 3], [null, 1], [3, 1], [2, 1], [0, 4]], pausa: 6, variar: 0.3 }],
+			eventos: [{ tipo: 'bolhas', cada: 0.9, vol: 0.05 }, { tipo: 'estalos', cada: 2.5, vol: 0.06 }], eco: 0.7 },
+
+		// Ganimedes: a gigante tranquila, com ímã e auroras. Metais largos e majestosos, um teremim
+		// desenhando as auroras e os assobios de rádio que a sonda Galileo gravou em volta dela.
+		'ganimedes': { nome: 'Rádio Aurora Gigante', freq: '7,15', nota: 'A maior lua do Sistema Solar, com ímã próprio e auroras', raiz: 87.31, escala: LIDIO,
+			pad: { onda: 'sawtooth', corte: 700, vol: 0.38, giro: 0.04 },
+			melodias: [
+				{ inst: 'metal', bpm: 56, oitava: 2, vol: 0.08, padrao: [[0, 2], [4, 2], [6, 2], [7, 4], [6, 1], [4, 1], [2, 2], [0, 4]], pausa: 4 },
+				{ inst: 'teremim', bpm: 56, oitava: 4, vol: 0.04, pan: 0.4, atraso: 6, padrao: [[7, 3], [6, 1], [4, 2], [6, 2], [7, 4]], pausa: 10, chance: 0.8 }],
+			eventos: [{ tipo: 'assobio', cada: 7 }], eco: 0.55 },
+
+		// Titã: sonolenta e nebulosa, no meio da névoa laranja. Um coro lento e grave, gotas de metano
+		// caindo devagar (umas seis vezes mais devagar que a chuva daqui) e um vento bem fraquinho.
+		'tita': { nome: 'Rádio Névoa Laranja', freq: '15,95', nota: 'Chuva de metano caindo devagarinho num céu cor de laranja', raiz: 82.41, escala: MENOR,
+			pad: { onda: 'sawtooth', corte: 380, vol: 0.4, lfo: 0.04 }, ruido: { tipo: 'bandpass', corte: 500, vol: 0.06, vento: 0.04 },
+			melodias: [{ inst: 'coro', bpm: 46, oitava: 2, vol: 0.08, padrao: [[0, 3], [2, 2], [3, 3], [2, 2], [0, 4], [null, 2], [-1, 2], [0, 6]], pausa: 6 }],
+			eventos: [{ tipo: 'gotas', cada: 1.6 }], eco: 0.65 },
+
+		// Encélado: branquinha, delicada e cristalina. Sininhos de gelo brilhando, uma caixinha de
+		// música saltitante e, de vez em quando, um gêiser soltando um jato de cristais.
+		'encelado': { nome: 'Rádio Gêiser', freq: '1,37', nota: 'Jatos de gelo brilhando no polo sul de uma lua branquinha', raiz: 196, escala: MAIOR,
+			pad: { onda: 'sine', corte: 2400, vol: 0.26 },
+			melodias: [{ inst: 'caixinha', bpm: 100, oitava: 4, vol: 0.05, padrao: [[0, 0.5], [2, 0.5], [4, 0.5], [7, 0.5], [9, 1], [7, 0.5], [4, 0.5], [5, 1], [4, 1], [2, 2]], pausa: 3, variar: 0.4 }],
+			eventos: [{ tipo: 'geiser', cada: 7, vol: 0.1 }, { tipo: 'brilhos', cada: 5 }], eco: 0.55 },
+
+		// Mimas: pequena, engraçada e com um Pac-Man escondido. Uma musiquinha de videogame antigo,
+		// toda de bipes, e um sino grave que lembra o impacto da cratera gigante.
+		'mimas': { nome: 'Rádio Fliperama', freq: '0,94', nota: 'Uma lua pequena com uma cratera gigante e um Pac-Man escondido', raiz: 130.81, escala: MAIOR,
+			pad: { onda: 'square', corte: 900, vol: 0.12 },
+			bateria: { bpm: 132, bumbo: [0, 2], chimbal: 0.5, vol: 0.2 },
+			melodias: [
+				{ inst: 'beep', bpm: 132, oitava: 4, vol: 0.03, padrao: [[0, 0.5], [7, 0.5], [4, 0.5], [7, 0.5], [2, 0.5], [7, 0.5], [5, 0.5], [7, 0.5], [0, 0.5], [4, 0.5], [7, 0.5], [9, 0.5], [7, 2]], pausa: 2, variar: 0.4 },
+				{ inst: 'beep', bpm: 132, oitava: 2, vol: 0.03, pan: -0.3, padrao: [[0, 1], [0, 1], [3, 1], [4, 1], [5, 1], [4, 1], [3, 1], [0, 1]], pausa: 0 }],
+			eventos: [{ tipo: 'toque', cada: 16, grau: 0, oitava: 1, vol: 0.06 }], eco: 0.25 },
+
+		// Miranda: uma colcha de retalhos. Cada pedaço da música tem um ritmo diferente que não combina
+		// com o outro (como os terrenos dela), e de vez em quando um assobio cai e cai e cai (a queda de
+		// 12 minutos do penhasco).
+		'miranda': { nome: 'Rádio Retalhos', freq: '1,41', nota: 'Uma colcha de retalhos com o penhasco mais alto do Sistema Solar', raiz: 123.47, escala: DORICO,
+			pad: { onda: 'triangle', corte: 900, vol: 0.32 },
+			melodias: [
+				{ inst: 'marimba', bpm: 90, oitava: 2, vol: 0.08, pan: -0.4, padrao: [[0, 1], [2, 1], [4, 1], [2, 1], [5, 1]], pausa: 1 },
+				{ inst: 'caixinha', bpm: 70, oitava: 4, vol: 0.045, pan: 0.4, atraso: 3, padrao: [[7, 1.5], [6, 1], [4, 1.5], [3, 2]], pausa: 3, variar: 0.5 },
+				{ inst: 'pluck', bpm: 112, oitava: 2, vol: 0.06, atraso: 7, chance: 0.7, padrao: [[0, 0.75], [3, 0.75], [1, 0.5], [4, 1]], pausa: 5 }],
+			eventos: [{ tipo: 'assobio', cada: 13 }], eco: 0.45 },
+
+		// Tritão: rebelde e geladíssima, anda na contramão. A melodia toca de trás para a frente (como a
+		// volta dela em Netuno), sobre um vento gelado, e os gêiseres de nitrogênio sopram de vez em quando.
+		'tritao': { nome: 'Rádio Contramão', freq: '5,88', nota: 'Uma lua do contra: gira ao contrário e solta gêiseres de nitrogênio', raiz: 69.3, escala: MENOR,
+			pad: { onda: 'sawtooth', corte: 450, vol: 0.38 }, ruido: { tipo: 'bandpass', corte: 900, vol: 0.12, vento: 0.09 },
+			melodias: [
+				{ inst: 'reverso', bpm: 58, oitava: 4, vol: 0.08, padrao: [[4, 2], [3, 1], [2, 1], [0, 2], [2, 2], [3, 4]], pausa: 5 },
+				{ inst: 'caixinha', bpm: 58, oitava: 4, vol: 0.035, pan: 0.5, atraso: 10, padrao: [[3, 1], [2, 1], [0, 2]], pausa: 12, chance: 0.7 }],
+			eventos: [{ tipo: 'geiser', cada: 10, vol: 0.09, gelo: false }], eco: 0.6 }
 	};
 
 	var pagina = (location.pathname.split('/').pop() || 'index.html').replace(/\.html$/, '') || 'index';
@@ -295,7 +374,16 @@
 			'jupiter': ['Jupiter Radio', 'The king of the planets, with storms and radio whistles'],
 			'saturno': ['Rings Radio', 'A waltz for the rings'],
 			'urano': ['Uranus Radio', 'An ice giant that spins on its side'],
-			'netuno': ['Neptune Radio', 'The fastest winds in the Solar System, far from home']
+			'netuno': ['Neptune Radio', 'The fastest winds in the Solar System, far from home'],
+			'lua': ['Full Moon Radio', 'A silvery lullaby, with the beeps of the Apollo conversations'],
+			'io': ['Volcano Radio', 'More than 400 volcanoes, and Jupiter squeezing it all'],
+			'europa': ['Hidden Ocean Radio', 'A whole ocean under the ice, waiting to be explored'],
+			'ganimedes': ['Giant Aurora Radio', 'The largest moon in the Solar System, with its own magnet and auroras'],
+			'tita': ['Orange Haze Radio', 'Methane rain falling ever so slowly from an orange sky'],
+			'encelado': ['Geyser Radio', 'Jets of ice sparkling at the south pole of a snow-white moon'],
+			'mimas': ['Arcade Radio', 'A small moon with a giant crater and a hidden Pac-Man'],
+			'miranda': ['Patchwork Radio', 'A patchwork quilt with the tallest cliff in the Solar System'],
+			'tritao': ['Wrong-Way Radio', 'A contrary moon: it orbits backwards and blows nitrogen geysers']
 		};
 		Object.keys(INGLES).forEach(function (k) { var e = ESTACOES[k]; if (e) { e.nome = INGLES[k][0]; e.nota = INGLES[k][1]; e.freq = e.freq.replace(',', '.'); } });
 	}
@@ -728,6 +816,34 @@
 			[0, 2, 4, 6].forEach(function (grau, i) { INSTRUMENTOS.caixinha(nota(grau, 8), t + i * 0.12, 0.3, 0.04, saidaPan(-0.6 + i * 0.4, 0, estacao)); });
 		},
 		// explosão solar: o plasma ruge e um acorde brilhante acende
+		// as luas:
+		// um gêiser (Encélado, Tritão): um jato de ruído que sobe do grave para o agudo e se espalha,
+		// com uns cristaizinhos de gelo tilintando no fim
+		geiser: function (e) {
+			var t = ctx.currentTime, s = fonteRuido(), f = filtro('bandpass', 400, 2.5), g = ganho(0), p = saidaPan(Math.random() * 1.2 - 0.6, 0, estacao);
+			f.frequency.setValueAtTime(300, t); f.frequency.exponentialRampToValueAtTime(4200, t + 1.4); f.frequency.exponentialRampToValueAtTime(1800, t + 3);
+			g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(e.vol || 0.12, t + 0.3); g.gain.linearRampToValueAtTime(0, t + 3);
+			s.connect(f); f.connect(g); g.connect(p); g.connect(eco); s.start(t); s.stop(t + 3.1);
+			if (e.gelo !== false) for (var i = 0; i < 6; i++) INSTRUMENTOS.caixinha(nota(Math.floor(Math.random() * 7), 8), t + 1.2 + i * 0.18 + Math.random() * 0.1, 0.2, 0.02, p);
+		},
+		// um vulcão de Io: um estrondo grave que desce, e a lava estalando depois
+		vulcao: function (e) {
+			var t = ctx.currentTime, o = oscilador('sine', 70), g = ganho(0);
+			o.frequency.exponentialRampToValueAtTime(32, t + 1.6);
+			g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(e.vol || 0.3, t + 0.04); g.gain.exponentialRampToValueAtTime(0.0001, t + 1.8);
+			o.connect(g); g.connect(estacao); o.start(t); o.stop(t + 1.9);
+			var s = fonteRuido(), f = filtro('lowpass', 900), g2 = ganho(0);
+			g2.gain.setValueAtTime(0, t); g2.gain.linearRampToValueAtTime((e.vol || 0.3) * 0.5, t + 0.05); g2.gain.exponentialRampToValueAtTime(0.0001, t + 1.2);
+			s.connect(f); f.connect(g2); g2.connect(estacao); s.start(t); s.stop(t + 1.3);
+			for (var i = 0; i < 8; i++) setTimeout(function () { estalo(0.08); }, 900 + Math.random() * 2500);
+		},
+		// os "bipes Quindar" das transmissões da Apollo: dois tons curtos (2.525 Hz para abrir e 2.475 Hz
+		// para fechar), que marcavam o começo e o fim de cada fala entre a Terra e os astronautas
+		quindar: function () {
+			var t = ctx.currentTime, s = saidaPan(0.3, 0, estacao);
+			INSTRUMENTOS.beep(2525, t, 0.25, 0.025, s);
+			INSTRUMENTOS.beep(2475, t + 2.6 + Math.random() * 1.5, 0.25, 0.025, s);
+		},
 		erupcao: function () {
 			var t = ctx.currentTime, s = fonteRuido(), f = filtro('lowpass', 300, 3), g = ganho(0);
 			f.frequency.setValueAtTime(300, t); f.frequency.exponentialRampToValueAtTime(3200, t + 0.8); f.frequency.exponentialRampToValueAtTime(300, t + 2.6);
