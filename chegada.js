@@ -458,6 +458,8 @@
 		if (!FALAS_EVENTO[evento]) evento = null;
 	})();
 	var lascas = [];
+	// quanto tempo (ms) o que passa pela janela leva para sair dela inteiro (o evento não acaba antes)
+	var DURACAO_EVENTO = { asteroide: 15000, oumuamua: 15000, voyager: 14500, errante: 15500 };
 	function desenharEvento(c, t) { // t: segundos desde o começo do evento (dura uns 8 s)
 		if (evento === 'meteoros') {
 			// a Terra de noite lá embaixo, a borda azul da atmosfera, luzes de cidades e os riscos queimando
@@ -508,7 +510,7 @@
 			brilhoC(c, nx, ny, 14, 'rgba(120,255,190,0.9)', 0.55); brilhoC(c, nx, ny, 6, 'rgba(255,255,255,1)', 0.9); R(c, nx - 1, ny - 1, 2, 2, '#ffffff');
 		} else if (evento === 'voyager') {
 			// a sonda: a antena parabólica branca, o corpo de dez lados, as hastes do magnetômetro e do gerador
-			var vx = 110 + t * 22, vy = 88 + Math.sin(t * 0.5) * 3;
+			var vx = 100 + t * 32, vy = 88 + Math.sin(t * 0.5) * 3;
 			c.save(); c.translate(vx, vy); c.scale(2, 2); c.translate(-vx, -vy); // (em dobro: ela passa perto da janela)
 			c.strokeStyle = '#8a8e98'; c.lineWidth = 1;
 			c.beginPath(); c.moveTo(vx, vy + 4); c.lineTo(vx - 26, vy + 14); c.stroke(); // o magnetômetro
@@ -523,7 +525,7 @@
 		} else if (evento === 'asteroide' || evento === 'oumuamua') {
 			// uma rocha girando devagar, iluminada de um lado (o asteroide: batatão cinza; o objeto
 			// interestelar: comprido como um charuto, avermelhado)
-			var ax = 60 + t * 24, ay = 80 + Math.sin(t * 0.4) * 6, giro = t * (evento === 'oumuamua' ? 0.9 : 0.35);
+			var ax = 30 + t * 36, ay = 80 + Math.sin(t * 0.4) * 6, giro = t * (evento === 'oumuamua' ? 0.9 : 0.35);
 			var comp2 = evento === 'oumuamua' ? 26 : 16, alt = evento === 'oumuamua' ? 5 : 12;
 			var CORA = evento === 'oumuamua' ? ['#d89070', '#a85a40', '#6a3424', '#2a140e'] : ['#c8c0b0', '#8a8478', '#5a5650', '#2a2826'];
 			c.save(); c.translate(ax, ay); c.rotate(giro);
@@ -532,7 +534,7 @@
 			c.restore();
 		} else if (evento === 'errante') {
 			// um disco escuro tapando as estrelas de trás, com uma borda avermelhada fraquinha (o calor de dentro)
-			var ex = 380 - t * 18, ey = 70, er = 34;
+			var ex = 360 - t * 32, ey = 70, er = 34;
 			c.fillStyle = '#020206'; c.beginPath(); c.arc(ex, ey, er, 0, Math.PI * 2); c.fill();
 			c.strokeStyle = 'rgba(120,40,30,0.5)'; c.lineWidth = 2; c.beginPath(); c.arc(ex, ey, er, 0, Math.PI * 2); c.stroke();
 		} else if (evento === 'micrometeorito') {
@@ -646,8 +648,16 @@
 			if (pagina === 'ganimedes') for (var ax3 = -OX; ax3 < NUCLEO + OX; ax3++) { var alt3 = 26 + Math.sin(ax3 * 0.03) * 8 + Math.sin(ax3 * 0.11) * 3; for (var ay3 = 0; ay3 < alt3; ay3++) mistura(ax3, HOR - 8 - ay3, ay3 > alt3 - 3 ? '#a8ffd8' : '#3ae8a0', 0.18 * (1 - ay3 / alt3)); }
 			// o Sol (só onde dá para ver)
 			if (s.sol) { var sx = 90, sy = HOR - 46, sr = Math.round(6 * s.sol); elip(sx, sy, sr + 4, sr + 4, function (x, y) { mistura(x, y, '#ffffff', 0.25); return null; }); elip(sx, sy, sr, sr, pagina === 'marte' ? '#f4f0e8' : '#fffbe8'); }
-			// o posto da alfândega: uma cúpula pressurizada com a câmara de ar e a placa
-			var ax = 330, ay = HOR + 30;
+			// (o posto da alfândega é pintado à parte, em fazerPosto, para crescer durante a descida)
+		}));
+	}
+	// o posto da alfândega: uma cúpula pressurizada com a câmara de ar e a placa. Fica numa imagem só
+	// dela (100 x 64, com o pé da cúpula em 50, 40) para começar pequenininho lá embaixo e ir crescendo
+	// enquanto a nave desce; pousada, ela fica no tamanho de verdade, em (330, HOR + 30) do chão
+	var posto = null;
+	function fazerPosto() {
+		return paraCanvas(pintar(new Pintura(100, 64, 0), function () {
+			var ax = 50, ay = 40;
 			elip(ax, ay, 34, 20, function (x, y, u, v) { return v > 0.1 ? null : rampa(['#f4f4f8', '#d8dce6', '#b0b4c2', '#888c9a'], (u + 1) / 2 * 0.7 + (v + 1) / 2 * 0.3, x, y); });
 			ret(ax - 34, ay + 2, 68, 3, '#5a5e6a');
 			for (var j = -3; j <= 3; j++) linha(ax + j * 9, ay + 2, ax + j * 6, ay - 18 + Math.abs(j) * 2, '#a8acb8');
@@ -1028,6 +1038,8 @@
 	}
 	// a alfândega: as boas-vindas do agente do lugar (com uma curiosidade de verdade), o passaporte e
 	// o carimbo novo (se este destino ainda não tinha)
+	// o tempo para terminar de ler uma fala depois que ela acabou de aparecer (cresce com o tamanho dela)
+	function leitura(frase) { return 1400 + (frase || '').length * 26; }
 	function alfandega(quem) {
 		var temCarimbo = !!(window.Chegada && window.Chegada.carimbo);
 		balao(tipo === 'terra' ? TR('Bem-vindo de volta à Terra! Passaporte, por favor.', 'Welcome back to Earth! Passport, please.') : AG.fala, quem, 520).then(function () {
@@ -1039,7 +1051,7 @@
 						balao(temCarimbo ? TR('Tum! Visto carimbado. Aproveite a visita!', 'Thump! Visa stamped. Enjoy your visit!') : TR('Seu passaporte já tem este visto. Boa visita de novo!', 'Your passport already has this visa. Enjoy your visit again!'), quem, 520).then(function () { depois(botaoFinal, 400); });
 					}, 500);
 				});
-			}, tipo === 'terra' ? 0 : 1400);
+			}, tipo === 'terra' ? 0 : leitura(AG.fala));
 		});
 	}
 	function roteiro() {
@@ -1049,8 +1061,12 @@
 		depois(function () {
 			irFase(temEvento ? 'evento' : 'cruzeiro');
 			if (temEvento) {
+				var inicioEvento = performance.now();
 				depois(function () { if (evento === 'raio') SONS.raio(); }, evento === 'raio' ? 1200 : 0);
-				depois(function () { balao(FALAS_EVENTO[evento], TR('Computador de bordo', 'Onboard computer'), 380); }, evento === 'raio' || evento === 'micrometeorito' ? 1700 : 900);
+				/* depois de ler a fala toda e de o asteroide (a sonda, o planeta errante) sair da janela, a cena escurece e segue */
+				depois(function () { balao(FALAS_EVENTO[evento], TR('Computador de bordo', 'Onboard computer'), 380).then(function () {
+					depois(function () { depois(function () { aproximar(true); }, Math.max(0, (DURACAO_EVENTO[evento] || 9000) - (performance.now() - inicioEvento))); }, leitura(FALAS_EVENTO[evento]));
+				}); }, evento === 'raio' || evento === 'micrometeorito' ? 1700 : 900);
 				try { var vs = lerLista('eventosVistos'); if (vs.indexOf(evento) < 0) { vs.push(evento); localStorage.setItem('eventosVistos', JSON.stringify(vs)); } } catch (e) {}
 			}
 			// sem evento no caminho: se o Sol estiver agitado de verdade agora, o computador de bordo avisa
@@ -1059,12 +1075,13 @@
 			try { jaAvisou = sessionStorage.getItem('avisoSol') === '1'; } catch (e) {}
 			if (avisoSol && !jaAvisou) {
 				try { sessionStorage.setItem('avisoSol', '1'); } catch (e) {}
-				depois(function () { balao(avisoSol, TR('Computador de bordo', 'Onboard computer'), 380); }, 900);
-				depois(aproximar, 8500);
-			} else depois(aproximar, temEvento ? 9000 : 1400);
+				depois(function () { balao(avisoSol, TR('Computador de bordo', 'Onboard computer'), 380).then(function () { depois(function () { aproximar(true); }, leitura(avisoSol)); }); }, 900);
+			} else if (!temEvento) depois(aproximar, 1400);
 		}, 1500);
 	}
-	function aproximar() {
+	function aproximar(suave) {
+		/* (vindo de um evento, a cena escurece devagar antes de trocar, sem corte brusco) */
+		if (suave) { [].forEach.call(camada.querySelectorAll('.chegada-balao'), function (b) { b.remove(); }); escurecer(1); depois(function () { aproximar(false); escurecer(0); }, 650); return; }
 		[].forEach.call(camada.querySelectorAll('.chegada-balao'), function (b) { b.remove(); });
 		irFase('aproxima');
 		SONS.motor(4);
@@ -1073,10 +1090,11 @@
 		depois(function () {
 			if (tipo === 'estacao') corte('atraca', function () { SONS.motor(3.4); depois(function () { SONS.clunk(); corte('escotilha', function () { depois(function () { SONS.bip(); irFase('escotilhaAberta'); alfandega(TR('Alfândega · ', 'Customs · ') + NOME); }, 900); }); }, 3600); });
 			else if (tipo === 'pouso') corte('descida', function () {
-				var s = SOLO[pagina];
-				balao(s.nota, TR('Computador de bordo', 'Onboard computer'), 380);
+				var s = SOLO[pagina], leu = false, pousou = false;
+				function seguir() { if (leu && pousou) alfandega(TR('Alfândega · ', 'Customs · ') + NOME); }
+				balao(s.nota, TR('Computador de bordo', 'Onboard computer'), 380).then(function () { depois(function () { leu = true; seguir(); }, leitura(s.nota)); });
 				SONS.motor(4.2);
-				depois(function () { SONS.toque(); irFase('pousado'); depois(function () { alfandega(TR('Alfândega · ', 'Customs · ') + NOME); }, 1800); }, 4200);
+				depois(function () { SONS.toque(); irFase('pousado'); depois(function () { pousou = true; seguir(); }, 1800); }, 4200);
 			});
 			else corte('descidaCasa', function () {
 				SONS.motor(4);
@@ -1118,6 +1136,12 @@
 			var kd = fase === 'pousado' ? 1 : suave(tf / 4.2), oy = Math.round(-HOR + 92 + (1 - kd) * 110 + (fase === 'descida' ? Math.sin(t * 9) * (1 - kd) : 0));
 			// o horizonte vai subindo até a altura dos olhos (a nave descendo de pé)
 			ctx.drawImage(solo, -OX, oy);
+			// o posto da alfândega: lá de cima ele é um pontinho perto do horizonte e vai crescendo até o
+			// tamanho de verdade no toque (a nave desce na frente dele)
+			if (!posto) posto = fazerPosto();
+			var zp = fase === 'pousado' ? 1 : 0.16 + 0.84 * kd * kd, hyp = HOR + oy;
+			var pxp = 240 + (330 - 240) * zp, pyp = hyp + 30 * zp;
+			ctx.drawImage(posto, Math.round(pxp - 50 * zp), Math.round(pyp - 40 * zp), Math.max(1, Math.round(100 * zp)), Math.max(1, Math.round(64 * zp)));
 			if (fase === 'pousado') {
 				// a poeira levantada no toque: no vácuo de Mercúrio ela cai rápido, em Marte fica no ar
 				if (tf < 0.15 && !poeira.length) for (var i = 0; i < 90; i++) poeira.push({ x: 240 + (Math.random() - 0.5) * 60, y: 156, vx: (Math.random() - 0.5) * 160, vy: -Math.random() * 60, r: 1 + Math.random() * 3 });
