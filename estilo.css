@@ -4041,7 +4041,7 @@ body.viagem:not(.na-galaxia) .radio-doca, .galaxia.partindo ~ .radio-doca { disp
 
 /* ---------- Sistema Solar: a beirada do Sol entrando pela esquerda, na escala dos planetas ---------- */
 /* (os planetas vão um pouco para a direita, para sobrar lugar para ela) */
-.sistema.com-sol { width: min(1240px, 82vw, calc((100vh - 440px) * 9400 / 2450 * 0.9)); left: 7vw; }
+.sistema.com-sol { width: min(1340px, 90vw, calc((100vh - 440px) * 9400 / 2450 * 0.95)); left: 3vw; }
 /* o brilho da beirada do Sol: suave e pulsando, como o da página do Sol (sem pontilhado) */
 .sol-borda { overflow: visible; }
 .sol-borda canvas { position: relative; z-index: 1; }
@@ -4483,7 +4483,9 @@ body.na-galaxia .idioma:hover, body.na-galaxia .idioma:focus-within { opacity: 1
 .planetas.luas a { font-size: 15px; padding: 4px 9px; }
 .luas-rotulo { font: 11px/1 Silkscreen, monospace; letter-spacing: 0.12em; text-transform: uppercase; color: var(--suave); margin-right: 4px; }
 /* na página do Sistema Solar: as luas dando voltas nos seus planetas, com as órbitas pontilhadas */
-.sistema > .astro:not(.lua-orbita) { z-index: 2; }
+/* os planetas um pouco menores que a arte (82%, cada um em volta do próprio centro), para sobrar
+   espaço para as órbitas das luas; o Sol, no script da página, acompanha a mesma escala */
+.sistema > .astro:not(.lua-orbita) { z-index: 2; transform: scale(0.82); }
 .lua-orbita { width: 10px; }
 .lua-orbita img { display: block; width: 100%; image-rendering: pixelated; }
 /* (uma área de toque um pouco maior que a luazinha) */
