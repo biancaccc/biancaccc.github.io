@@ -4543,6 +4543,8 @@ html.chegando .escala-link, html.em-salto .escala-link { opacity: 0; pointer-eve
 .er-planeta { filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.45)); }
 .er-nome-planeta { fill: var(--texto); font-size: 10px; text-anchor: middle; letter-spacing: 0.06em; }
 .er-ponto { fill: #d9d3f0; }
+.er-alvo { fill: transparent; pointer-events: all; }
+.er-halo, .er-ponto, .er-nome-lua { pointer-events: none; }
 .er-halo { fill: none; stroke: rgba(217, 211, 240, 0.35); stroke-width: 1; }
 .er-nome-lua { fill: var(--suave); font-size: 9px; letter-spacing: 0.05em; }
 .er-lua.com-pagina .er-ponto { fill: #ffd36a; }
@@ -4555,7 +4557,7 @@ html.chegando .escala-link, html.em-salto .escala-link { opacity: 0; pointer-eve
 .er-lua:focus { outline: none; }
 .er-regua { stroke: var(--cor); stroke-width: 1; fill: none; }
 .er-regua-texto { fill: var(--cor); font-size: 9px; }
-.er-lupa-info { min-height: 4.4em; padding: 8px 12px; font-size: 12px; line-height: 1.45; color: var(--suave); background: rgba(5, 3, 12, 0.78); border-bottom: 1px solid var(--borda); pointer-events: none; }
+.er-lupa-info { height: 5.6em; overflow: hidden; padding: 8px 12px; font-size: 12px; line-height: 1.45; color: var(--suave); background: rgba(5, 3, 12, 0.78); border-bottom: 1px solid var(--borda); pointer-events: none; }
 .er-lupa-info strong { display: block; font-family: var(--rotulo); font-weight: 400; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--cor); }
 .er-lupa-info em { color: #ffd36a; font-style: normal; }
 .escala-luas .er-lupa-nota { margin: 0; font-size: 13px; line-height: 1.45; color: var(--suave); }
@@ -4591,3 +4593,10 @@ i.er-planeta-img { border-radius: 50%; box-shadow: 0 0 4px currentColor; }
 .er-viagem-botoes button:hover, .er-viagem-botoes button:focus-visible { border-color: var(--cor); color: #fff; outline: none; }
 .er-viagem-botoes button[aria-pressed="true"] { color: #1b1430; background: var(--cor); border-color: var(--cor); }
 .viagem-credito { margin-top: 10px; font-size: 13px; color: var(--suave); }
+
+/* botão de recomeçar as animações: uma setinha em volta, em pixel */
+.animacao-recomecar { position: relative; flex: none; display: grid; place-items: center; width: 32px; height: 26px; padding: 0; background: rgba(5, 3, 12, 0.75); border: 1px solid color-mix(in srgb, var(--cor) 45%, transparent); cursor: pointer; }
+.animacao-recomecar svg { display: block; width: 13px; height: 13px; margin: 0 auto; color: var(--cor); shape-rendering: crispEdges; }
+.animacao-recomecar:hover { border-color: var(--cor); background: color-mix(in srgb, var(--cor) 15%, rgba(5, 3, 12, 0.75)); }
+.animacao-recomecar:focus-visible { outline: 2px solid var(--cor); outline-offset: 2px; }
+@media (max-width: 700px) { .er-lupa-info { height: auto; min-height: 6.4em; } }

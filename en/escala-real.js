@@ -28,9 +28,7 @@ Object.assign(window.EN.t, {
 	"Nosso sistema solar": "Our solar system",
 	"Escala real": "Real scale",
 	"O Sistema Solar do tamanho que ele é": "The Solar System as big as it really is",
-	"O espaço é, acima de tudo, vazio. Os planetas são ilhas pequenininhas num oceano enorme, e é isso que torna cada viagem tão especial.": "Space is, above all, empty. The planets are tiny islands in a vast ocean, and that is what makes every journey so special.",
-	"AnteriorNosso sistema solar": "<small>Previous</small>Our solar system",
-	"PróximoMercúrio": "<small>Next</small>Mercury"
+	"O espaço é, acima de tudo, vazio. Os planetas são ilhas pequenininhas num oceano enorme, e é isso que torna cada viagem tão especial.": "Space is, above all, empty. The planets are tiny islands in a vast ocean, and that is what makes every journey so special."
 });
 Object.assign(window.EN.a, {
 	"Animação: a câmera começa perto da Terra e das vizinhas e vai se afastando; entram Netuno e Urano, depois Saturno e Júpiter e, por fim, a beirada do Sol, enorme. Tudo na mesma escala.": "Animation: the camera starts close to Earth and its neighbors and pulls back; Neptune and Uranus come in, then Saturn and Jupiter and, at last, the edge of the huge Sun. All at the same scale.",

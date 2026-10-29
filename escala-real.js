@@ -148,9 +148,15 @@
 		if (figura) {
 			var controle = document.createElement('div');
 			controle.className = 'animacao-controle';
-			controle.innerHTML = '<button type="button" class="animacao-play"></button>';
+			controle.innerHTML = '<button type="button" class="animacao-play"></button>' +
+				(cena.ciclo ? '<button type="button" class="animacao-recomecar"><svg viewBox="0 0 9 9" aria-hidden="true"><path fill="currentColor" d="M2 0h4v1H2zM1 1h1v1H1zM0 2h1v4H0zM1 6h1v1H1zM2 7h4v1H2zM6 6h1v1H6zM7 4h1v2H7zM5 1h4v1H5zM8 0h1v4H8z"/></svg></button>' : '');
 			figura.insertBefore(controle, figura.querySelector('figcaption'));
-			var botao = controle.querySelector('button');
+			var botao = controle.querySelector('.animacao-play'), recomecar = controle.querySelector('.animacao-recomecar');
+			if (recomecar) {
+				recomecar.setAttribute('aria-label', T('Recomeçar a animação', 'Restart the animation'));
+				recomecar.title = T('Recomeçar', 'Restart');
+				recomecar.addEventListener('click', function () { tempo = 0; tocando = true; anterior = performance.now(); atualizar(); desenhar(); });
+			}
 			var atualizar = function () {
 				botao.classList.toggle('pausado', !tocando);
 				botao.setAttribute('aria-label', tocando ? T('Pausar a animação', 'Pause the animation') : T('Continuar a animação', 'Resume the animation'));
@@ -302,18 +308,40 @@
 				var borda = X(SOL_X + SOL_R);
 				if (borda > -60) pintarSol(dados, 480, 270, X(SOL_X), y, SOL_R * px, t, Math.min(480, borda + 80));
 				ctx.putImageData(dados, 0, 0);
-				var ultimo = -99;
-				FILA.slice().reverse().forEach(function (f) {
-					var p = POR[f[0]], x = X(f[1]), d = p.d / E * px;
-					if (x + d * 1.3 < 0 || x - d * 1.3 > 480) return;
-					planeta(ctx, p, x, y, d);
-					/* nome embaixo, quando há espaço; nos pequenininhos, só o mais à esquerda */
-					var nome = p.nome.toUpperCase(), larg = nome.length * 6;
-					if (x - larg / 2 > ultimo + 4 && x + larg / 2 < 478) {
-						texto(ctx, nome, x, y + Math.max(d / 2, 3) + 7, p.id === 'terra' ? '#7fe3ff' : 'rgba(232,226,255,0.8)', 'center');
-						ultimo = x + larg / 2;
-					}
+				/* nomes embaixo: cada um some devagar (sem piscar) quando o vizinho chega perto demais;
+				   quando os quatro pequenos se apertam, aparece um nome só para o grupo */
+				var vis = FILA.map(function (f) {
+					var p = POR[f[0]], nome = p.nome.toUpperCase();
+					return { p: p, x: X(f[1]), d: p.d / E * px, nome: nome, larg: nome.length * 6 };
 				});
+				/* os quatro pequenos: o nome some quando eles se apertam, e entra um nome só para o grupo, em cima */
+				var grupo = 1;
+				for (var i = 0; i < 3; i++) grupo = Math.min(grupo, (vis[i].x - vis[i + 1].x - (vis[i].larg + vis[i + 1].larg) / 2 - 4) / 6);
+				grupo = Math.max(0, Math.min(1, grupo));
+				vis.forEach(function (v) {
+					if (v.x + v.d * 1.3 < 0 || v.x - v.d * 1.3 > 480) return;
+					planeta(ctx, v.p, v.x, y, v.d);
+				});
+				vis.forEach(function (v, i) {
+					var a = 1, desce = 0;
+					if (i < 4) a = Math.max(0, Math.min(1, grupo * 2 - 1));
+					/* Netuno, quando encosta no nome de Urano, escorrega para a linha de baixo */
+					if (v.p.id === 'netuno') desce = 10 * (1 - Math.max(0, Math.min(1, (v.x - vis[5].x - (v.larg + vis[5].larg) / 2 - 4) / 6)));
+					if (a <= 0 || v.x + v.larg / 2 < 0 || v.x - v.larg / 2 > 480) return;
+					ctx.globalAlpha = a;
+					texto(ctx, v.nome, Math.round(v.x), Math.round(y + Math.max(v.d / 2, 3) + 7 + desce), v.p.id === 'terra' ? '#7fe3ff' : 'rgba(232,226,255,0.85)', 'center');
+				});
+				var ga = Math.max(0, Math.min(1, 1 - grupo * 2));
+				if (ga > 0) {
+					ctx.globalAlpha = ga;
+					var g0 = vis[0].x, g1 = vis[3].x, gy = Math.round(y - 10);
+					var gn = T('TERRA E VIZINHAS', 'EARTH AND NEIGHBORS'), gl = gn.length * 6;
+					ctx.fillStyle = 'rgba(127,227,255,0.6)';
+					ctx.fillRect(Math.round(g1) - 2, gy, Math.round(g0 - g1) + 5, 1);
+					ctx.fillRect(Math.round(g1) - 2, gy, 1, 3); ctx.fillRect(Math.round(g0) + 2, gy, 1, 3);
+					texto(ctx, gn, Math.round(Math.min(476 - gl / 2, (g0 + g1) / 2)), gy - 11, '#7fe3ff', 'center');
+				}
+				ctx.globalAlpha = 1;
 				/* a régua da escala, mudando com o zoom */
 				var km = 480 / px * E / 480;
 				texto(ctx, '1 PIXEL = ' + num(Math.round(km / 10) * 10) + ' KM', 472, 256, 'rgba(232,226,255,0.6)', 'right');
@@ -520,6 +548,8 @@
 			pontos = s.luas.map(function (l, n) {
 				var g = el(l[0] ? 'a' : 'g', l[0] ? { href: l[0] + '.html', class: 'er-lua com-pagina' } : { class: 'er-lua' });
 				var rReal = l[2] / 2 * k, r = Math.max(rReal, 2);
+				/* uma área invisível maior em volta, para o mouse não ficar entrando e saindo */
+				var alvo = el('circle', { r: r + 10, class: 'er-alvo' }, g);
 				var halo = el('circle', { r: r + 4, class: 'er-halo' }, g);
 				var ponto = el('circle', { r: r, class: 'er-ponto' }, g);
 				var nome = el('text', { class: 'er-nome-lua' }, g);
@@ -531,7 +561,7 @@
 				g.addEventListener('focus', function () { sobre = l; mostrar(); });
 				g.addEventListener('blur', function () { sobre = null; mostrar(); });
 				/* cada lua começa num ponto diferente da órbita */
-				return { l: l, g: g, halo: halo, ponto: ponto, nome: nome, R: l[3] * k, fase: n * 2.4 + 0.6, ampliada: rReal < 2 };
+				return { l: l, g: g, alvo: alvo, halo: halo, ponto: ponto, nome: nome, R: l[3] * k, fase: n * 2.4 + 0.6, ampliada: rReal < 2 };
 			});
 			regua(k);
 			var ampliadas = pontos.some(function (p) { return p.ampliada; });
@@ -544,14 +574,14 @@
 		function mostrar() {
 			var s = atual, l = sobre;
 			if (l) {
-				info.innerHTML = '<strong>' + l[1] + '</strong>' + num(l[2]) + ' km ' + T('de diâmetro', 'across') + '<br>' +
+				info.innerHTML = '<strong>' + l[1] + '</strong>' + num(l[2]) + ' km ' + T('de diâmetro', 'across') + ' · ' +
 					T('a ', '') + num(l[3]) + ' km ' + T('de ', 'from ') + s.nome + '<br>' + T('uma volta em ', 'one lap in ') + num(Math.abs(l[4]), l[4] < 3 ? 2 : 1) + T(' dias', ' days') +
-					(l[4] < 0 ? '<br><em>' + T('gira ao contrário!', 'orbits backwards!') + '</em>' : '') +
-					(l[0] ? '<br><em>' + T('clique para visitar', 'click to visit') + '</em>' : '');
+					(l[4] < 0 ? ' · <em>' + T('gira ao contrário!', 'orbits backwards!') + '</em>' : '') +
+					(l[0] ? ' · <em>' + T('clique para visitar', 'click to visit') + '</em>' : '');
 			} else {
 				var longe = s.luas[s.luas.length - 1];
 				info.innerHTML = '<strong>' + s.nome + '</strong>' + num(s.d) + ' km ' + T('de diâmetro', 'across') + '<br>' +
-					longe[1] + T(' fica a ', ' is ') + num(longe[3] / s.d, 1) + T(' vezes a largura de ', ' times ') + s.nome + (EN ? '’s width away' : '');
+					longe[1] + T(' fica a ', ' is ') + num(longe[3] / s.d, 1) + T(' vezes a largura de ', ' times ') + s.nome + (EN ? '\u2019s width away' : '');
 			}
 		}
 		function posicionar() {
@@ -559,6 +589,7 @@
 				var per = p.l[4], ang = p.fase + (dia / per) * Math.PI * 2;
 				var x = C + Math.cos(ang) * p.R, y = C - Math.sin(ang) * p.R;
 				p.halo.setAttribute('cx', x.toFixed(2)); p.halo.setAttribute('cy', y.toFixed(2));
+				p.alvo.setAttribute('cx', x.toFixed(2)); p.alvo.setAttribute('cy', y.toFixed(2));
 				p.ponto.setAttribute('cx', x.toFixed(2)); p.ponto.setAttribute('cy', y.toFixed(2));
 				/* o nome fica do lado de fora da órbita e escorrega em volta do pontinho, sem pular */
 				if (!p.larg) p.larg = p.nome.getComputedTextLength ? p.nome.getComputedTextLength() : 30;
