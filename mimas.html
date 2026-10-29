@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+	<meta charset="utf-8">
+	<!-- fundo escuro desde o primeiro instante; vindo de um salto, a página começa coberta pelo último quadro do salto (preso à tela, não à página), para nenhum quadro vazar antes das estrelas -->
+	<script>try{var h=document.documentElement;h.style.backgroundColor="#05030c";if(sessionStorage.getItem("salto")==="1"){var q=sessionStorage.getItem("saltoQuadro");h.className+=" em-salto";if(q){h.style.background="#05030c url("+q+") 0 0/100% 100% no-repeat fixed";h.style.imageRendering="pixelated"}}}catch(e){}</script>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Mimas · Nosso sistema solar</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Silkscreen&family=Space+Grotesk:wght@400;500;700&family=Tiny5&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="estilo.css">
+</head>
+<body data-passaporte="sistema" class="pagina-lua" style="--cor: #c8c8c4; --escala: 0.86">
+
+	<header class="topo">
+		<a class="marca" href="sistema-solar.html">Nosso sistema solar</a>
+		<nav class="menu">
+		<a class="menu-galaxia" href="index.html#galaxia">&larr; Via Láctea</a>
+		<a href="mercurio.html">Mercúrio</a>
+		<a href="venus.html">Vênus</a>
+		<a href="terra.html">Terra</a>
+		<a href="marte.html">Marte</a>
+		<a href="jupiter.html">Júpiter</a>
+		<a href="saturno.html" class="menu-pai">Saturno</a>
+		<a href="urano.html">Urano</a>
+		<a href="netuno.html">Netuno</a>
+		<a href="sol.html">Sol</a>
+		</nav>
+	</header>
+
+	<main>
+		<section class="destaque">
+			<div class="palco">
+				<img class="planeta" data-planeta="mimas" src="pixel/mimas.png" alt="Mimas em pixel art">
+			</div>
+			<div class="destaque-texto">
+				<p class="posicao">Uma lua de Saturno</p>
+				<h1>Mimas</h1>
+				<p class="lema">A lua com uma cratera gigante</p>
+				<dl class="ficha">
+					<div><dt>Tipo</dt><dd>Lua de Saturno</dd></div>
+					<div><dt>Distância de Saturno</dt><dd>Cerca de 186 mil km</dd></div>
+					<div><dt>Uma volta em Saturno</dt><dd>22,6 horas</dd></div>
+					<div><dt>Diâmetro</dt><dd>396 km</dd></div>
+				</dl>
+			</div>
+		</section>
+
+		<div class="leitura" id="leitura">
+		<aside class="sumario" aria-label="Nesta página">
+			<p>Nesta página</p>
+			<ol>
+				<li><a href="#secao-1">Mimas: uma cratera com uma lua em volta</a></li>
+				<li><a href="#secao-2">Quase se partiu</a></li>
+				<li><a href="#secao-3">Um Pac-Man no espaço</a></li>
+				<li><a href="#secao-4">Um oceano escondido?</a></li>
+				<li><a href="#secao-5">Abrindo um vão nos anéis</a></li>
+				<li><a href="#secao-6">Pequena, mas redonda</a></li>
+				<li class="extra"><a href="#balanca">Sua balança espacial</a></li>
+			</ol>
+		</aside>
+
+		<article class="conteudo">
+		<section class="bloco pixelado" id="secao-1">
+			<h2>Mimas: uma cratera com uma lua em volta</h2>
+			<p>Mimas é uma lua pequena de Saturno, com 396 km de diâmetro, descoberta por William Herschel em 1789. O que mais chama atenção nela é a cratera Herschel, com 130 km de largura: um terço da lua inteira. Com ela, Mimas fica parecida com a Estrela da Morte dos filmes Star Wars.</p>
+		</section>
+		<section class="bloco pixelado" id="secao-2">
+			<h2>Quase se partiu</h2>
+			<p>As paredes da cratera Herschel têm uns 5 km de altura, e no meio dela há um pico de uns 6 km, mais alto que o Kilimanjaro. O impacto que abriu essa cratera quase despedaçou Mimas: do outro lado da lua há rachaduras que podem ter sido causadas pelo tremor.</p>
+		</section>
+		<figure class="comparacao">
+			<img class="pixelado" src="pixel/mimas.png" alt="Comparação do tamanho de Mimas">
+		</figure>
+		<section class="bloco pixelado" id="secao-3">
+			<h2>Um Pac-Man no espaço</h2>
+			<p>Em 2010, a sonda Cassini mediu a temperatura de Mimas e encontrou uma surpresa: as partes mais quentes e mais frias formam o desenho de um Pac-Man, o personagem do videogame. Isso acontece porque partículas de Saturno batem com mais força numa parte da lua e deixam o gelo mais duro, que esquenta e esfria de outro jeito.</p>
+		</section>
+		<section class="bloco pixelado" id="secao-4">
+			<h2>Um oceano escondido?</h2>
+			<p>Por fora, Mimas parece uma bola de gelo morta e cheia de crateras. Mas, em 2024, cientistas estudaram o jeito como ela balança na órbita e concluíram que pode existir um oceano jovem embaixo de uns 20 a 30 km de gelo. Ele teria se formado há poucos milhões de anos, rápido demais para marcar a superfície.</p>
+		</section>
+		<section class="bloco pixelado" id="secao-5">
+			<h2>Abrindo um vão nos anéis</h2>
+			<p>A gravidade de Mimas ajuda a esculpir os anéis de Saturno. As partículas que ficam na borda de dentro da Divisão de Cassini dão exatamente duas voltas em Saturno enquanto Mimas dá uma. Esses puxões, sempre no mesmo lugar, ajudam a manter aberto esse vão escuro de uns 4.700 km entre os anéis.</p>
+		</section>
+		<section class="bloco pixelado" id="secao-6">
+			<h2>Pequena, mas redonda</h2>
+			<p>Mimas é um dos menores corpos do Sistema Solar que ficaram redondos por causa da própria gravidade. Mesmo assim, ela não é uma bola perfeita: é um pouquinho achatada, como um ovo, por causa da gravidade de Saturno, que fica pertinho.</p>
+		</section>
+
+		<p class="fecho">Com uma cratera gigante, um Pac-Man escondido e talvez um oceano novinho, Mimas prova que até as luas pequenas guardam surpresas.</p>
+		</article>
+		</div>
+
+		<section id="balanca" data-planeta="mimas"></section>
+
+		<nav class="vizinhos">
+		<a class="anterior" href="encelado.html"><img src="pixel/encelado.png" alt=""><span><small>Anterior</small>Encélado</span></a>
+		<a class="proximo" href="urano.html"><span><small>Próximo</small>Urano</span><img src="pixel/urano.png" alt=""></a>
+		</nav>
+	</main>
+
+	<footer class="rodape">
+		<nav class="rodape-planetas" aria-label="Todos os planetas">
+			<a href="mercurio.html"><img src="pixel/mercurio.png" alt="">Mercúrio</a>
+			<a href="venus.html"><img src="pixel/venus.png" alt="">Vênus</a>
+			<a href="terra.html"><img src="pixel/terra.png" alt="">Terra</a>
+			<a href="marte.html"><img src="pixel/marte.png" alt="">Marte</a>
+			<a href="jupiter.html"><img src="pixel/jupiter.png" alt="">Júpiter</a>
+			<a href="saturno.html"><img src="pixel/saturno.png" alt="">Saturno</a>
+			<a href="urano.html"><img src="pixel/urano.png" alt="">Urano</a>
+			<a href="netuno.html"><img src="pixel/netuno.png" alt="">Netuno</a>
+			<a href="sol.html"><img src="pixel/sol.png" alt="">Sol</a>
+		</nav>
+		<nav class="rodape-planetas rodape-luas" aria-label="As luas">
+			<a href="lua.html"><img src="pixel/lua.png" alt="">Lua</a>
+			<a href="io.html"><img src="pixel/io.png" alt="">Io</a>
+			<a href="europa.html"><img src="pixel/europa.png" alt="">Europa</a>
+			<a href="ganimedes.html"><img src="pixel/ganimedes.png" alt="">Ganimedes</a>
+			<a href="tita.html"><img src="pixel/tita.png" alt="">Titã</a>
+			<a href="encelado.html"><img src="pixel/encelado.png" alt="">Encélado</a>
+			<a href="mimas.html"><img src="pixel/mimas.png" alt="">Mimas</a>
+			<a href="miranda.html"><img src="pixel/miranda.png" alt="">Miranda</a>
+			<a href="tritao.html"><img src="pixel/tritao.png" alt="">Tritão</a>
+		</nav>
+		<p><a href="sistema-solar.html">Nosso sistema solar</a> · <a href="index.html#galaxia">Via Láctea</a> · textos e pixel art feitos à mão</p>
+	</footer>
+
+	<script src="idioma.js"></script>
+	<script src="nave.js"></script>
+	<script src="transicao.js"></script>
+	<script src="tempo-do-sol.js"></script>
+	<script src="radio.js"></script>
+	<script src="cabine.js"></script>
+	<script src="chegada.js"></script>
+	<script src="passaporte.js"></script>
+	<script src="marca.js"></script>
+	<script src="fundo.js"></script>
+	<script src="pixel/sprites.js"></script>
+	<script src="balanco.js"></script>
+	<script src="balanca.js"></script>
+	<script src="visuais-dados.js"></script>
+	<script src="visuais.js"></script>
+	<script src="pagina.js"></script>
+</body>
+</html>

@@ -4470,3 +4470,15 @@ body.na-galaxia .idioma:hover, body.na-galaxia .idioma:focus-within { opacity: 1
 .emb-idioma button { padding: 1cqh 2cqh; font: 1.9cqh/1 Silkscreen, monospace; letter-spacing: 0.08em; color: rgba(242, 238, 252, 0.75); background: none; border: 0; cursor: pointer; }
 .emb-idioma button[aria-pressed="true"] { color: #1b1430; background: #e8c46a; }
 .emb-idioma button:hover:not([aria-pressed="true"]), .emb-idioma button:focus-visible:not([aria-pressed="true"]) { color: #ffffff; background: rgba(232, 196, 106, 0.18); outline: none; }
+
+/* ---------- As luas ---------- */
+/* no menu de cima das páginas das luas, o planeta da lua fica marcado de leve */
+.menu a.menu-pai { box-shadow: inset 0 -2px 0 var(--cor); color: #fff; }
+/* a fileira das luas no rodapé, menorzinha, embaixo da dos planetas */
+.rodape-luas { gap: 4px 14px; margin-top: -8px; }
+.rodape-luas a { font-size: 13px; }
+.rodape-luas img { width: 13px; }
+/* na página do Sistema Solar: a fileira das luas, menor, embaixo dos planetas */
+.planetas.luas { margin-top: 6px; align-items: center; }
+.planetas.luas a { font-size: 15px; padding: 4px 9px; }
+.luas-rotulo { font: 11px/1 Silkscreen, monospace; letter-spacing: 0.12em; text-transform: uppercase; color: var(--suave); margin-right: 4px; }

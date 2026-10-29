@@ -25,7 +25,7 @@ Object.assign(window.EN.t, {
 	"Várias sondas já passaram por Júpiter, e a Juno o estuda desde 2016. Agora, duas novas missões estão a caminho: o JUICE, que vai explorar suas luas geladas, e a Europa Clipper, que vai examinar a lua com mais chances de abrigar vida, ambas com chegada prevista para o início da década de 2030.": "Several probes have flown past Jupiter, and Juno has been studying it since 2016. Now, two new missions are on their way: JUICE, which will explore its icy moons, and Europa Clipper, which will examine the moon most likely to harbor life, both due to arrive in the early 2030s.",
 	"Gigante, veloz e rodeado de luas fascinantes, Júpiter é quase um sistema solar em miniatura e um dos lugares onde a busca por vida fora da Terra pode dar seus próximos passos.": "Giant, fast and surrounded by fascinating moons, Jupiter is almost a miniature solar system and one of the places where the search for life beyond Earth may take its next steps.",
 	"AnteriorMarte": "<small>Previous</small>Mars",
-	"PróximoSaturno": "<small>Next</small>Saturn"
+	"PróximoIo": "<small>Next</small>Io"
 });
 Object.assign(window.EN.a, {
 	"Comparação do tamanho de Júpiter": "Size comparison of Jupiter",

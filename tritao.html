@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+	<meta charset="utf-8">
+	<!-- fundo escuro desde o primeiro instante; vindo de um salto, a página começa coberta pelo último quadro do salto (preso à tela, não à página), para nenhum quadro vazar antes das estrelas -->
+	<script>try{var h=document.documentElement;h.style.backgroundColor="#05030c";if(sessionStorage.getItem("salto")==="1"){var q=sessionStorage.getItem("saltoQuadro");h.className+=" em-salto";if(q){h.style.background="#05030c url("+q+") 0 0/100% 100% no-repeat fixed";h.style.imageRendering="pixelated"}}}catch(e){}</script>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Tritão · Nosso sistema solar</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Silkscreen&family=Space+Grotesk:wght@400;500;700&family=Tiny5&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="estilo.css">
+</head>
+<body data-passaporte="sistema" class="pagina-lua" style="--cor: #e0c8c4; --escala: 0.86">
+
+	<header class="topo">
+		<a class="marca" href="sistema-solar.html">Nosso sistema solar</a>
+		<nav class="menu">
+		<a class="menu-galaxia" href="index.html#galaxia">&larr; Via Láctea</a>
+		<a href="mercurio.html">Mercúrio</a>
+		<a href="venus.html">Vênus</a>
+		<a href="terra.html">Terra</a>
+		<a href="marte.html">Marte</a>
+		<a href="jupiter.html">Júpiter</a>
+		<a href="saturno.html">Saturno</a>
+		<a href="urano.html">Urano</a>
+		<a href="netuno.html" class="menu-pai">Netuno</a>
+		<a href="sol.html">Sol</a>
+		</nav>
+	</header>
+
+	<main>
+		<section class="destaque">
+			<div class="palco">
+				<img class="planeta" data-planeta="tritao" src="pixel/tritao.png" alt="Tritão em pixel art">
+			</div>
+			<div class="destaque-texto">
+				<p class="posicao">Uma lua de Netuno</p>
+				<h1>Tritão</h1>
+				<p class="lema">A lua que anda na contramão</p>
+				<dl class="ficha">
+					<div><dt>Tipo</dt><dd>Lua de Netuno</dd></div>
+					<div><dt>Distância de Netuno</dt><dd>Cerca de 355 mil km</dd></div>
+					<div><dt>Uma volta em Netuno</dt><dd>5,9 dias, ao contrário</dd></div>
+					<div><dt>Diâmetro</dt><dd>2.707 km</dd></div>
+				</dl>
+			</div>
+		</section>
+
+		<div class="leitura" id="leitura">
+		<aside class="sumario" aria-label="Nesta página">
+			<p>Nesta página</p>
+			<ol>
+				<li><a href="#secao-1">Tritão: a lua do contra</a></li>
+				<li><a href="#secao-2">Uma lua capturada</a></li>
+				<li><a href="#secao-3">Um dos lugares mais frios</a></li>
+				<li><a href="#secao-4">Gêiseres de nitrogênio</a></li>
+				<li><a href="#secao-5">Casca de melão</a></li>
+				<li><a href="#secao-6">Um destino em anéis</a></li>
+				<li class="extra"><a href="#balanca">Sua balança espacial</a></li>
+			</ol>
+		</aside>
+
+		<article class="conteudo">
+		<section class="bloco pixelado" id="secao-1">
+			<h2>Tritão: a lua do contra</h2>
+			<p>Tritão é a maior lua de Netuno. Foi descoberta por William Lassell em 1846, só 17 dias depois da descoberta do próprio Netuno. É a única lua grande do Sistema Solar que dá a volta no seu planeta ao contrário, no sentido oposto ao que o planeta gira.</p>
+		</section>
+		<section class="bloco pixelado" id="secao-2">
+			<h2>Uma lua capturada</h2>
+			<p>Uma lua que gira ao contrário provavelmente não nasceu ali. Os cientistas acham que Tritão era um mundo gelado do Cinturão de Kuiper, como Plutão, que passou perto demais de Netuno e foi capturado pela gravidade dele.</p>
+		</section>
+		<figure class="comparacao">
+			<img class="pixelado" src="pixel/tritao.png" alt="Comparação do tamanho de Tritão">
+		</figure>
+		<section class="bloco pixelado" id="secao-3">
+			<h2>Um dos lugares mais frios</h2>
+			<p>Em 1989, a sonda Voyager 2 mediu cerca de −235 °C na superfície de Tritão, um dos lugares mais frios já medidos no Sistema Solar. Nesse frio, até o nitrogênio, que aqui é o gás que mais respiramos, fica congelado e cobre o chão como geada.</p>
+		</section>
+		<section class="bloco pixelado" id="secao-4">
+			<h2>Gêiseres de nitrogênio</h2>
+			<p>A Voyager 2 viu jatos escuros subindo uns 8 km acima de Tritão. Lá no alto, um vento fraco leva a fumaça para o lado e deixa manchas escuras compridas no chão, de até uns 150 km. Os cientistas acham que a luz do Sol aquece o gelo de nitrogênio por baixo da superfície até ele estourar.</p>
+		</section>
+		<section class="bloco pixelado" id="secao-5">
+			<h2>Casca de melão</h2>
+			<p>Uma boa parte de Tritão é coberta por um terreno cheio de covinhas e cristas, que lembra a casca de um melão. Ele não aparece em nenhum outro lugar conhecido. No polo sul, uma capa de gelo rosada guarda as manchas dos gêiseres.</p>
+		</section>
+		<section class="bloco pixelado" id="secao-6">
+			<h2>Um destino em anéis</h2>
+			<p>Por girar ao contrário, Tritão vai perdendo velocidade e se aproximando de Netuno aos pouquinhos. Daqui a uns 3,6 bilhões de anos, ele deve chegar tão perto que a gravidade do planeta vai despedaçá-lo, e Netuno ganhará anéis talvez mais bonitos que os de Saturno.</p>
+		</section>
+
+		<p class="fecho">Capturada, rebelde e geladíssima, Tritão é um visitante de longe que um dia vai virar anel.</p>
+		</article>
+		</div>
+
+		<section id="balanca" data-planeta="tritao"></section>
+
+		<nav class="vizinhos">
+		<a class="anterior" href="netuno.html"><img src="pixel/netuno.png" alt=""><span><small>Anterior</small>Netuno</span></a>
+		<a class="proximo" href="sol.html"><span><small>Próximo</small>Sol</span><img src="pixel/sol.png" alt=""></a>
+		</nav>
+	</main>
+
+	<footer class="rodape">
+		<nav class="rodape-planetas" aria-label="Todos os planetas">
+			<a href="mercurio.html"><img src="pixel/mercurio.png" alt="">Mercúrio</a>
+			<a href="venus.html"><img src="pixel/venus.png" alt="">Vênus</a>
+			<a href="terra.html"><img src="pixel/terra.png" alt="">Terra</a>
+			<a href="marte.html"><img src="pixel/marte.png" alt="">Marte</a>
+			<a href="jupiter.html"><img src="pixel/jupiter.png" alt="">Júpiter</a>
+			<a href="saturno.html"><img src="pixel/saturno.png" alt="">Saturno</a>
+			<a href="urano.html"><img src="pixel/urano.png" alt="">Urano</a>
+			<a href="netuno.html"><img src="pixel/netuno.png" alt="">Netuno</a>
+			<a href="sol.html"><img src="pixel/sol.png" alt="">Sol</a>
+		</nav>
+		<nav class="rodape-planetas rodape-luas" aria-label="As luas">
+			<a href="lua.html"><img src="pixel/lua.png" alt="">Lua</a>
+			<a href="io.html"><img src="pixel/io.png" alt="">Io</a>
+			<a href="europa.html"><img src="pixel/europa.png" alt="">Europa</a>
+			<a href="ganimedes.html"><img src="pixel/ganimedes.png" alt="">Ganimedes</a>
+			<a href="tita.html"><img src="pixel/tita.png" alt="">Titã</a>
+			<a href="encelado.html"><img src="pixel/encelado.png" alt="">Encélado</a>
+			<a href="mimas.html"><img src="pixel/mimas.png" alt="">Mimas</a>
+			<a href="miranda.html"><img src="pixel/miranda.png" alt="">Miranda</a>
+			<a href="tritao.html"><img src="pixel/tritao.png" alt="">Tritão</a>
+		</nav>
+		<p><a href="sistema-solar.html">Nosso sistema solar</a> · <a href="index.html#galaxia">Via Láctea</a> · textos e pixel art feitos à mão</p>
+	</footer>
+
+	<script src="idioma.js"></script>
+	<script src="nave.js"></script>
+	<script src="transicao.js"></script>
+	<script src="tempo-do-sol.js"></script>
+	<script src="radio.js"></script>
+	<script src="cabine.js"></script>
+	<script src="chegada.js"></script>
+	<script src="passaporte.js"></script>
+	<script src="marca.js"></script>
+	<script src="fundo.js"></script>
+	<script src="pixel/sprites.js"></script>
+	<script src="balanco.js"></script>
+	<script src="balanca.js"></script>
+	<script src="visuais-dados.js"></script>
+	<script src="visuais.js"></script>
+	<script src="pagina.js"></script>
+</body>
+</html>

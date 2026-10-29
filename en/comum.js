@@ -56,10 +56,21 @@ Object.assign(window.EN.t, {
 	'Eta Carinae': 'Eta Carinae',
 	'Sirius': 'Sirius',
 	'Nebulosa do Caranguejo': 'Crab Nebula',
-	'Proxima Centauri': 'Proxima Centauri'
+	'Proxima Centauri': 'Proxima Centauri',
+	'Lua': 'Moon',
+	'Ganimedes': 'Ganymede',
+	'Titã': 'Titan',
+	'Encélado': 'Enceladus',
+	'Tritão': 'Triton'
 });
 Object.assign(window.EN.a, {
+	'As luas': 'The moons',
 	'Nesta página': 'On this page',
 	'Próxima viagem': 'Next trip',
-	'Todos os planetas': 'All the planets'
+	'Todos os planetas': 'All the planets',
+	'Lua': 'Moon',
+	'Ganimedes': 'Ganymede',
+	'Titã': 'Titan',
+	'Encélado': 'Enceladus',
+	'Tritão': 'Triton'
 });

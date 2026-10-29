@@ -24,7 +24,7 @@ Object.assign(window.EN.t, {
 	"Em 1990, a sonda Voyager 1, a cerca de 6 bilhões de km de distância, virou sua câmera para trás e fotografou a Terra. Na imagem, ela aparece como um pontinho quase invisível num raio de luz. A foto ficou famosa como \"Pálido Ponto Azul\" e mostra como nosso planeta é pequeno diante da imensidão do espaço.": "In 1990, the Voyager 1 probe, about 6 billion km away, turned its camera around and photographed Earth. In the image, it appears as an almost invisible dot in a ray of light. The photo became famous as the \"Pale Blue Dot\" and shows how small our planet is in the vastness of space.",
 	"Pequena no Universo, mas única até onde sabemos, a Terra é o único lar que conhecemos e o planeta de que mais precisamos cuidar.": "Small in the Universe, but unique as far as we know, Earth is the only home we know and the planet we most need to take care of.",
 	"AnteriorVênus": "<small>Previous</small>Venus",
-	"PróximoMarte": "<small>Next</small>Mars"
+	"PróximoLua": "<small>Next</small>Moon"
 });
 Object.assign(window.EN.a, {
 	"Comparação do tamanho da Terra": "Size comparison of Earth",

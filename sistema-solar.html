@@ -64,6 +64,18 @@
 			<a href="netuno.html" data-id="netuno">Netuno</a>
 			<a href="sol.html" data-id="sol">Sol</a>
 		</nav>
+		<nav class="planetas luas" id="links-luas" aria-label="As luas">
+			<span class="luas-rotulo">Luas</span>
+			<a href="lua.html" data-id="lua">Lua</a>
+			<a href="io.html" data-id="io">Io</a>
+			<a href="europa.html" data-id="europa">Europa</a>
+			<a href="ganimedes.html" data-id="ganimedes">Ganimedes</a>
+			<a href="tita.html" data-id="tita">Titã</a>
+			<a href="encelado.html" data-id="encelado">Encélado</a>
+			<a href="mimas.html" data-id="mimas">Mimas</a>
+			<a href="miranda.html" data-id="miranda">Miranda</a>
+			<a href="tritao.html" data-id="tritao">Tritão</a>
+		</nav>
 		<div class="info-planeta" id="info" aria-live="polite">
 			<p class="info-vazio">Passe o mouse em um planeta ou nome para ver o que ele tem de especial.</p>
 		</div>
@@ -185,17 +197,27 @@
 			var alvos = document.querySelectorAll('[data-id]');
 			var info = document.getElementById('info');
 			var vazio = info.innerHTML;
-			// posição e lema de cada planeta (os lemas vêm do primeiro título de cada página)
+			// posição e lema de cada astro (os lemas vêm do primeiro título de cada página), no idioma da visita
+			var T = window.T || function (pt) { return pt; };
 			var DADOS = {
-				mercurio: ['1º planeta', 'Mercúrio', 'O pequeno mensageiro do Sol', '#a9b8ff'],
-				venus: ['2º planeta', 'Vênus', 'Um astro brilhante', '#f5a83c'],
-				terra: ['3º planeta', 'Terra', 'O planeta azul', '#6f9bff'],
-				marte: ['4º planeta', 'Marte', 'O planeta vermelho', '#e8906c'],
-				jupiter: ['5º planeta', 'Júpiter', 'O rei dos planetas', '#e6c49a'],
-				saturno: ['6º planeta', 'Saturno', 'O senhor dos anéis', '#e3cc8f'],
-				urano: ['7º planeta', 'Urano', 'O planeta deitado', '#a8ecf5'],
-				netuno: ['8º planeta', 'Netuno', 'O planeta encontrado pela matemática', '#6b95ff'],
-				sol: ['A nossa estrela', 'Sol', 'A estrela que nos dá vida', '#ffc04d']
+				mercurio: [T('1º planeta', '1st planet'), T('Mercúrio', 'Mercury'), T('O pequeno mensageiro do Sol', 'The little messenger of the Sun'), '#a9b8ff'],
+				venus: [T('2º planeta', '2nd planet'), T('Vênus', 'Venus'), T('Um astro brilhante', 'A brilliant star'), '#f5a83c'],
+				terra: [T('3º planeta', '3rd planet'), T('Terra', 'Earth'), T('O planeta azul', 'The blue planet'), '#6f9bff'],
+				marte: [T('4º planeta', '4th planet'), T('Marte', 'Mars'), T('O planeta vermelho', 'The red planet'), '#e8906c'],
+				jupiter: [T('5º planeta', '5th planet'), T('Júpiter', 'Jupiter'), T('O rei dos planetas', 'The king of the planets'), '#e6c49a'],
+				saturno: [T('6º planeta', '6th planet'), T('Saturno', 'Saturn'), T('O senhor dos anéis', 'The lord of the rings'), '#e3cc8f'],
+				urano: [T('7º planeta', '7th planet'), T('Urano', 'Uranus'), T('O planeta deitado', 'The planet lying on its side'), '#a8ecf5'],
+				netuno: [T('8º planeta', '8th planet'), T('Netuno', 'Neptune'), T('O planeta encontrado pela matemática', 'The planet found by mathematics'), '#6b95ff'],
+				sol: [T('A nossa estrela', 'Our star'), T('Sol', 'Sun'), T('A estrela que nos dá vida', 'The star that gives us life'), '#ffc04d'],
+				lua: [T('A lua da Terra', 'Earth\'s moon'), T('Lua', 'Moon'), T('A nossa companheira de sempre', 'Our constant companion'), '#cfd3dc'],
+				io: [T('Uma lua de Júpiter', 'A moon of Jupiter'), T('Io', 'Io'), T('O mundo dos vulcões', 'The world of volcanoes'), '#f0d040'],
+				europa: [T('Uma lua de Júpiter', 'A moon of Jupiter'), T('Europa', 'Europa'), T('Um oceano escondido embaixo do gelo', 'An ocean hidden under the ice'), '#e8d8c0'],
+				ganimedes: [T('Uma lua de Júpiter', 'A moon of Jupiter'), T('Ganimedes', 'Ganymede'), T('A maior lua do Sistema Solar', 'The largest moon in the Solar System'), '#c8b8a0'],
+				tita: [T('Uma lua de Saturno', 'A moon of Saturn'), T('Titã', 'Titan'), T('A lua com céu, chuva e mares', 'The moon with sky, rain and seas'), '#e8a850'],
+				encelado: [T('Uma lua de Saturno', 'A moon of Saturn'), T('Encélado', 'Enceladus'), T('A lua dos gêiseres de gelo', 'The moon of icy geysers'), '#e8f4ff'],
+				mimas: [T('Uma lua de Saturno', 'A moon of Saturn'), T('Mimas', 'Mimas'), T('A lua com uma cratera gigante', 'The moon with a giant crater'), '#c8c8c4'],
+				miranda: [T('Uma lua de Urano', 'A moon of Uranus'), T('Miranda', 'Miranda'), T('A colcha de retalhos de Urano', 'The patchwork moon of Uranus'), '#b8b4b8'],
+				tritao: [T('Uma lua de Netuno', 'A moon of Neptune'), T('Tritão', 'Triton'), T('A lua que anda na contramão', 'The moon that goes the wrong way'), '#e0c8c4']
 			};
 			var timer;
 			function destacar(id) {
@@ -205,7 +227,7 @@
 				if (!id) { timer = setTimeout(function () { info.innerHTML = vazio; info.classList.remove('cheio'); }, 400); return; }
 				var d = DADOS[id];
 				info.style.setProperty('--cor-destino', d[3]);
-				info.innerHTML = '<p class="cartao-tipo">' + d[0] + '</p><p class="info-nome">' + d[1] + '</p><p class="info-lema">' + d[2] + '</p><a class="botao-hud" href="' + id + '.html">Visitar &rarr;</a>';
+				info.innerHTML = '<p class="cartao-tipo">' + d[0] + '</p><p class="info-nome">' + d[1] + '</p><p class="info-lema">' + d[2] + '</p><a class="botao-hud" href="' + id + '.html">' + T('Visitar', 'Visit') + ' &rarr;</a>';
 				info.classList.add('cheio');
 			}
 			info.addEventListener('mouseenter', function () { clearTimeout(timer); });

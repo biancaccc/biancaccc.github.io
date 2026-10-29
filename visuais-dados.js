@@ -901,5 +901,337 @@ window.VISUAIS_DADOS = {
 		{ titulo: 'A nebulosa em som', texto: 'A imagem da nebulosa vira música, e um som de sino marca o lugar do pulsar.', url: CHANDRA + 'crab_chandra_nustar.html', fonte: 'NASA · telescópios Chandra e NuSTAR', audio: 'sons/caranguejo.aac', duracao: 40 },
 		{ titulo: 'O pulsar de verdade', texto: 'Os pulsos de rádio do pulsar do Caranguejo, captados por um radiotelescópio e tocados como som: são tão rápidos (30 por segundo) que viram um zumbido.', url: 'https://www.jb.man.ac.uk/pulsar/Education/Sounds/sounds.html', fonte: 'Observatório Jodrell Bank' }];
 })(window.VISUAIS_DADOS);
+// As luas: o mesmo formato dos planetas (quizLua faz o quiz contar para o selo "Sabe-tudo das luas")
+Object.assign(window.VISUAIS_DADOS, {
+	lua: {
+		nome: 'Lua',
+		visores: {
+			1: ['27%', 'do tamanho da Terra'],
+			2: ['27,3 dias', 'para dar uma volta e girar uma vez'],
+			3: ['3 bilhões', 'de anos: a idade dos "mares" de lava'],
+			5: ['3,8 cm', 'por ano: o quanto ela se afasta'],
+			6: ['12', 'pessoas já andaram na Lua']
+		},
+		comparacoes: {
+			3: 'se a Terra fosse uma bola de basquete, a Lua seria uma bola de tênis a uns 7 metros de distância.',
+			5: 'a luz leva só 1,3 segundo para ir da Lua até a Terra.'
+		},
+		animacao: { secao: 4, id: 'lua-theia', hud: ['há 4,5 bilhões de anos', 'Theia se aproxima'],
+			aria: 'Animação: um planeta do tamanho de Marte, Theia, bate na Terra jovem. Os pedaços ficam girando em volta da Terra e se juntam, formando a Lua.',
+			legenda: 'A explicação mais aceita: Theia bateu na Terra jovem, e os pedaços que voaram se juntaram em órbita, formando a Lua.' },
+		animacao2: { secao: 2, id: 'lua-face', hud: ['dia 0 de 27', 'a marquinha sempre virada para a Terra'],
+			aria: 'Animação: a Lua dando a volta na Terra. Uma marquinha vermelha num lado da Lua fica sempre virada para a Terra, porque ela gira uma vez a cada volta.',
+			legenda: 'A Lua gira uma vez a cada volta na Terra. Por isso a marquinha vermelha (o lado que a gente vê) fica sempre virada para cá.' },
+		comparacao: { km: 3474, plural: 'Luas' },
+		linha: [
+			['1609', 'Galileu aponta uma luneta para a Lua e vê montanhas e crateras.'],
+			['1959', 'A sonda soviética Luna 3 fotografa o lado oculto da Lua.'],
+			['1969', 'A Apollo 11 pousa: Neil Armstrong e Buzz Aldrin andam na Lua.'],
+			['1972', 'A Apollo 17 é a última missão a levar pessoas à Lua até hoje.'],
+			['2019', 'A sonda chinesa Chang\'e 4 faz o primeiro pouso no lado oculto.']
+		],
+		calculadoras: {
+			viagem: { destino: 'a Lua', titulo: 'Quanto tempo para chegar à Lua?', km: 384400, nota: 'Da Terra até a Lua: cerca de 384 mil km.',
+				sonda: { anos: 0.008214, frase: 'Como a Apollo 11', nota: ' (ela levou uns 3 dias, em 1969)' } }
+		},
+		quizLua: true,
+		quiz: [
+			['Por que vemos sempre o mesmo lado da Lua?', ['Porque ela não gira', '*Porque gira uma vez a cada volta na Terra', 'Porque o outro lado é escuro']],
+			['O que são os "mares" da Lua?', ['Lagos de água congelada', '*Planícies de lava que esfriou', 'Sombras de montanhas']],
+			['Quem foram os primeiros a andar na Lua?', ['*Neil Armstrong e Buzz Aldrin', 'Yuri Gagarin e Valentina Tereshkova', 'Galileu e Copérnico']]
+		]
+	},
+	io: {
+		nome: 'Io',
+		visores: {
+			1: ['400+', 'vulcões ativos'],
+			2: ['100 m', 'é o quanto o chão sobe e desce'],
+			3: ['300 km', 'de altura: algumas plumas'],
+			4: ['1.200 °C', 'ou mais: a lava de Io'],
+			6: ['1 tonelada', 'de material perdida por segundo']
+		},
+		comparacoes: {
+			3: 'uma pluma de 300 km chegaria quase à altura da Estação Espacial Internacional, que voa a uns 400 km.',
+			4: 'o lago de lava de Loki é maior que o estado de Sergipe.'
+		},
+		animacao: { secao: 3, id: 'io-pluma', hud: ['altura: mais de 300 km', 'sem ar, o material cai em arcos'],
+			aria: 'Animação: um vulcão de Io lançando uma pluma alta. As partículas sobem e caem em arcos, formando um guarda-chuva, e deixam um anel vermelho no chão amarelo. Júpiter aparece no céu.',
+			legenda: 'Sem ar para frear, cada grãozinho sobe e cai num arco perfeito: a pluma vira um guarda-chuva gigante.' },
+		animacao2: { secao: 2, id: 'io-mare', hud: ['Io 1 · Europa 1 · Ganimedes 1', 'longe: Io relaxa'],
+			aria: 'Animação: Io dando a volta em Júpiter numa órbita achatada. Quando passa perto, ela estica na direção de Júpiter e fica vermelha de calor. Europa e Ganimedes, mais longe, dão 2 e 1 voltas enquanto Io dá 4.',
+			legenda: 'Perto de Júpiter, Io estica; longe, relaxa. Esse aperta-e-solta (exagerado aqui) aquece o interior e alimenta os vulcões.' },
+		comparacao: { km: 3643, plural: 'Ios' },
+		linha: [
+			['1610', 'Galileu Galilei descobre Io e as outras três grandes luas de Júpiter.'],
+			['1979', 'A Voyager 1 fotografa os primeiros vulcões ativos vistos fora da Terra.'],
+			['1995', 'A sonda Galileo chega a Júpiter e estuda Io por oito anos.'],
+			['2023', 'A sonda Juno passa a uns 1.500 km de Io e fotografa lagos de lava.']
+		],
+		calculadoras: {
+			viagem: { destino: 'Io', titulo: 'Quanto tempo para chegar a Io?', km: 780000000, nota: 'Da Terra até Júpiter e suas luas: cerca de 780 milhões de km, em média.',
+				sonda: { anos: 5, frase: 'Como a sonda Juno', nota: ' (ela saiu em 2011 e chegou a Júpiter em 2016)' } }
+		},
+		quizLua: true,
+		quiz: [
+			['De onde vem o calor que derrete as rochas de Io?', ['Do Sol, que fica pertinho', '*Do aperto da gravidade de Júpiter', 'De um núcleo de urânio']],
+			['Por que Io é amarela?', ['*Por causa do enxofre dos vulcões', 'Porque é feita de ouro', 'Por causa da luz de Júpiter']],
+			['Por que Io quase não tem crateras?', ['Nenhum asteroide chega lá', '*A lava cobre tudo bem depressa', 'Júpiter apaga com raios']]
+		]
+	},
+	europa: {
+		nome: 'Europa',
+		visores: {
+			1: ['90%', 'do tamanho da nossa Lua'],
+			2: ['2×', 'a água de todos os oceanos da Terra'],
+			3: ['15 a 25 km', 'de gelo por cima do oceano'],
+			6: ['~50', 'passagens da Europa Clipper']
+		},
+		comparacoes: {
+			2: 'se juntássemos toda a água de Europa numa bola, ela seria maior que a bola com toda a água da Terra.',
+			3: 'um bloco de gelo do "terreno de caos" pode ser do tamanho de uma cidade inteira.'
+		},
+		animacao: { secao: 3, id: 'europa-rachaduras', hud: ['volta 1 em Júpiter', 'Júpiter estica, o gelo racha'],
+			aria: 'Animação: Europa dando voltas em Júpiter. A cada volta, a lua estica um pouquinho e uma rachadura nova aparece no gelo, e as linhas avermelhadas vão se acumulando.',
+			legenda: 'A cada volta, a gravidade de Júpiter estica e solta Europa, e o gelo vai rachando. As linhas ficam marrons com os sais que sobem de baixo.' },
+		animacao2: { secao: 2, id: 'europa-oceano', hud: ['gelo: 15 a 25 km', 'a casca rachada por fora'],
+			aria: 'Animação: Europa cortada ao meio. Por fora, uma casca de gelo branca com rachaduras; embaixo, um oceano azul com ondas; no fundo, rocha marrom com fontes quentes soltando bolhas; no centro, um núcleo de metal.',
+			legenda: 'Embaixo do gelo, um oceano inteiro. No fundo, a água quente pode estar passando pelas rochas, como nas fontes do fundo dos mares da Terra.' },
+		comparacao: { km: 3122, plural: 'Europas' },
+		linha: [
+			['1610', 'Galileu Galilei descobre Europa.'],
+			['1979', 'As Voyager 1 e 2 mostram uma superfície lisa e cheia de rachaduras.'],
+			['1998', 'A sonda Galileo encontra sinais de um oceano escondido embaixo do gelo.'],
+			['2024', 'A NASA lança a sonda Europa Clipper.'],
+			['2030', 'A Europa Clipper deve chegar a Júpiter.']
+		],
+		calculadoras: {
+			viagem: { destino: 'Europa', titulo: 'Quanto tempo para chegar a Europa?', km: 780000000, nota: 'Da Terra até Júpiter e suas luas: cerca de 780 milhões de km, em média.',
+				sonda: { anos: 5.5, frase: 'Como a Europa Clipper', nota: ' (ela saiu em 2024 e deve chegar em 2030)' } }
+		},
+		quizLua: true,
+		quiz: [
+			['O que Europa esconde embaixo do gelo?', ['Lava quente', '*Um oceano de água salgada', 'Um planeta pequeno']],
+			['O que são as linhas avermelhadas de Europa?', ['Estradas antigas', 'Rios de lava', '*Rachaduras na casca de gelo']],
+			['Qual sonda foi lançada em 2024 para estudar Europa?', ['Voyager 1', '*Europa Clipper', 'Curiosity']]
+		]
+	},
+	ganimedes: {
+		nome: 'Ganimedes',
+		visores: {
+			1: ['5.268 km', 'de diâmetro: maior que Mercúrio'],
+			2: ['única', 'lua com campo magnético próprio'],
+			4: ['150 km', 'de gelo por cima do oceano'],
+			6: ['2034', 'a JUICE entra na órbita dela']
+		},
+		comparacoes: {
+			1: 'Ganimedes é um pouquinho maior que Mercúrio, que é um planeta!',
+			5: 'a Galileo Regio, com uns 3.200 km, é maior que a distância em linha reta entre o Rio de Janeiro e Manaus.'
+		},
+		animacao: { secao: 3, id: 'ganimedes-aurora', hud: ['sem oceano seria: 6°', 'as auroras balançam com Júpiter'],
+			aria: 'Animação: Ganimedes com dois anéis verdes de aurora perto dos polos, balançando para os lados. Primeiro balançam muito, como seria sem oceano; depois balançam pouco, como o Hubble mediu.',
+			legenda: 'Sem oceano, as auroras balançariam uns 6 graus. O Hubble mediu só 2: um oceano salgado lá dentro segura o balanço.' },
+		animacao2: { secao: 1, id: 'ganimedes-tamanho', hud: ['Lua: 3.474 km', 'todos na mesma escala'],
+			aria: 'Animação: a nossa Lua, Mercúrio, Titã e Ganimedes lado a lado, na mesma escala. Uma setinha aponta um de cada vez, e Ganimedes é o maior.',
+			legenda: 'Na mesma escala: a nossa Lua, Mercúrio, Titã e Ganimedes. A maior lua do Sistema Solar é maior que um planeta!' },
+		comparacao: { km: 5268, plural: 'Ganimedes' },
+		linha: [
+			['1610', 'Galileu Galilei descobre Ganimedes.'],
+			['1996', 'A sonda Galileo descobre o campo magnético de Ganimedes.'],
+			['2015', 'O Hubble usa as auroras para mostrar que existe um oceano escondido.'],
+			['2021', 'A sonda Juno passa a pouco mais de 1.000 km de Ganimedes.'],
+			['2034', 'A sonda JUICE deve entrar na órbita de Ganimedes.']
+		],
+		calculadoras: {
+			viagem: { destino: 'Ganimedes', titulo: 'Quanto tempo para chegar a Ganimedes?', km: 780000000, nota: 'Da Terra até Júpiter e suas luas: cerca de 780 milhões de km, em média.',
+				sonda: { anos: 8, frase: 'Como a sonda JUICE', nota: ' (ela saiu em 2023 e deve chegar a Júpiter em 2031)' } }
+		},
+		quizLua: true,
+		quiz: [
+			['Ganimedes é maior que qual planeta?', ['Terra', '*Mercúrio', 'Marte']],
+			['O que só Ganimedes tem, entre todas as luas?', ['Anéis', '*Campo magnético próprio', 'Vulcões de gelo']],
+			['Como o Hubble descobriu o oceano de Ganimedes?', ['Ouvindo ondas do mar', '*Medindo o balanço das auroras', 'Vendo água jorrar']]
+		]
+	},
+	tita: {
+		nome: 'Titã',
+		visores: {
+			1: ['2ª', 'maior lua do Sistema Solar'],
+			2: ['1,5×', 'a pressão do ar da Terra'],
+			4: ['−179 °C', 'na superfície'],
+			5: ['2 h 27 min', 'de descida da Huygens'],
+			6: ['2034', 'a Dragonfly chega lá']
+		},
+		comparacoes: {
+			2: 'em Titã, uma pessoa de asas presas nos braços conseguiria voar, porque o ar é denso e a gravidade é fraca.',
+			3: 'o Kraken Mare tem mais ou menos o tamanho do mar Cáspio, o maior lago da Terra.'
+		},
+		animacao: { secao: 3, id: 'tita-chuva', hud: ['−179 °C', 'o metano evapora do lago'],
+			aria: 'Animação: uma paisagem de Titã com céu laranja. O metano evapora de um lago escuro, forma nuvens, cai como chuva bem devagar e um rio leva o líquido de volta ao lago.',
+			legenda: 'Em Titã, o metano faz o caminho da água aqui: evapora, vira nuvem, chove devagarinho e corre em rios até os lagos.' },
+		animacao2: { secao: 5, id: 'tita-huygens', hud: ['altitude: 150 km', 'descendo pela névoa (2 h 27 min)'],
+			aria: 'Animação: a sonda Huygens descendo de paraquedas pela névoa laranja de Titã até pousar num chão coberto de pedrinhas de gelo arredondadas.',
+			legenda: 'A Huygens desceu por duas horas e meia até pousar em Titã, em 2005: o pouso mais distante da Terra já feito.' },
+		comparacao: { km: 5150, plural: 'Titãs' },
+		linha: [
+			['1655', 'Christiaan Huygens descobre Titã.'],
+			['1944', 'Gerard Kuiper descobre que Titã tem atmosfera.'],
+			['2004', 'A sonda Cassini chega a Saturno levando a Huygens.'],
+			['2005', 'A Huygens pousa em Titã: o pouso mais distante da Terra.'],
+			['2007', 'A Cassini encontra mares de metano perto do polo norte.']
+		],
+		calculadoras: {
+			viagem: { destino: 'Titã', titulo: 'Quanto tempo para chegar a Titã?', km: 1400000000, nota: 'Da Terra até Saturno e suas luas: cerca de 1,4 bilhão de km, em média.',
+				sonda: { anos: 7, frase: 'Como a Cassini e a Huygens', nota: ' (elas saíram em 1997 e chegaram em 2004)' } }
+		},
+		quizLua: true,
+		quiz: [
+			['O que cai como chuva em Titã?', ['Água', '*Metano', 'Ácido']],
+			['Por que Titã parece uma bola laranja?', ['*Por causa de uma névoa grossa no ar', 'Porque é feita de ferrugem', 'Por causa da luz de Saturno']],
+			['Qual sonda pousou em Titã em 2005?', ['Dragonfly', '*Huygens', 'Voyager 2']]
+		]
+	},
+	encelado: {
+		nome: 'Encélado',
+		visores: {
+			1: ['504 km', 'de diâmetro'],
+			2: ['4', '"listras de tigre" com jatos'],
+			4: ['anel E', 'de Saturno, feito pelos jatos'],
+			6: ['49 km', 'o mergulho mais fundo da Cassini']
+		},
+		comparacoes: {
+			1: 'Encélado é só um pouco mais largo que a distância entre São Paulo e o Rio de Janeiro.',
+			5: 'fósforo, que Encélado tem, também está nos nossos ossos e no nosso DNA.'
+		},
+		animacao: { secao: 2, id: 'encelado-geiser', hud: ['4 listras de tigre', 'jatos de vapor e gelo'],
+			aria: 'Animação: um corte do polo sul de Encélado. Embaixo, o oceano azul; em cima, a casca de gelo com quatro rachaduras soltando jatos brilhantes de vapor e gelo para o espaço. Saturno aparece no céu.',
+			legenda: 'Pelas quatro listras de tigre, a água do oceano escapa em jatos de vapor e gelo que sobem centenas de quilômetros.' },
+		animacao2: { secao: 4, id: 'encelado-anel', hud: ['volta 1', 'o anel E vai se formando'],
+			aria: 'Animação: Encélado dando voltas em Saturno e soltando grãos de gelo, que se espalham pela órbita e formam um anel largo e fininho, o anel E.',
+			legenda: 'Os grãos de gelo que escapam dos jatos se espalham pela órbita de Encélado e formam o anel E de Saturno.' },
+		comparacao: { km: 504, plural: 'Encélados' },
+		linha: [
+			['1789', 'William Herschel descobre Encélado.'],
+			['1981', 'A Voyager 2 mostra uma lua lisa e brilhante.'],
+			['2005', 'A Cassini descobre os jatos do polo sul.'],
+			['2015', 'A Cassini mergulha nos jatos, a 49 km da superfície.'],
+			['2023', 'Cientistas encontram fósforo nos grãos de gelo dos jatos.']
+		],
+		calculadoras: {
+			viagem: { destino: 'Encélado', titulo: 'Quanto tempo para chegar a Encélado?', km: 1400000000, nota: 'Da Terra até Saturno e suas luas: cerca de 1,4 bilhão de km, em média.',
+				sonda: { anos: 7, frase: 'Como a sonda Cassini', nota: ' (ela saiu em 1997 e chegou em 2004)' } }
+		},
+		quizLua: true,
+		quiz: [
+			['O que sai do polo sul de Encélado?', ['Lava', '*Jatos de vapor e gelo', 'Fumaça de fogo']],
+			['Como são chamadas as rachaduras dos jatos?', ['*Listras de tigre', 'Pegadas de leão', 'Manchas de onça']],
+			['Qual anel de Saturno é feito pelos jatos de Encélado?', ['O anel A', 'O anel B', '*O anel E']]
+		]
+	},
+	mimas: {
+		nome: 'Mimas',
+		visores: {
+			1: ['130 km', 'de largura: a cratera Herschel'],
+			2: ['6 km', 'de altura: o pico do meio'],
+			3: ['2010', 'a Cassini vê o "Pac-Man"'],
+			4: ['20 a 30 km', 'de gelo sobre o oceano?']
+		},
+		comparacoes: {
+			1: 'se a Terra tivesse uma cratera do mesmo tamanho, em proporção, ela seria quase da largura do Brasil inteiro.',
+			5: 'a Divisão de Cassini é tão larga que caberia a distância entre o Oiapoque e o Chuí.'
+		},
+		animacao: { secao: 2, id: 'mimas-impacto', hud: ['um asteroide se aproxima', ''],
+			aria: 'Animação: um asteroide bate em Mimas e abre a cratera Herschel. Uma onda de choque atravessa a lua e racha o outro lado.',
+			legenda: 'O impacto que abriu a cratera Herschel quase despedaçou Mimas: o tremor rachou até o outro lado da lua.' },
+		animacao2: { secao: 3, id: 'mimas-pacman', hud: ['Mimas, na luz normal', ''],
+			aria: 'Animação: Mimas na luz normal e, depois, o mapa de calor da Cassini aparecendo: a parte quente, amarela, e a fria, azul, formam um Pac-Man, que vai comer a cratera Herschel como se fosse uma bolinha.',
+			legenda: 'No mapa de calor da Cassini, as partes quentes e frias de Mimas desenham um Pac-Man de verdade.' },
+		comparacao: { km: 396, plural: 'Mimas' },
+		linha: [
+			['1789', 'William Herschel descobre Mimas.'],
+			['1980', 'A Voyager 1 fotografa a cratera gigante, que ganha o nome de Herschel.'],
+			['2010', 'A Cassini descobre o "Pac-Man" no mapa de calor.'],
+			['2024', 'Cientistas anunciam sinais de um oceano jovem escondido em Mimas.']
+		],
+		calculadoras: {
+			viagem: { destino: 'Mimas', titulo: 'Quanto tempo para chegar a Mimas?', km: 1400000000, nota: 'Da Terra até Saturno e suas luas: cerca de 1,4 bilhão de km, em média.',
+				sonda: { anos: 7, frase: 'Como a sonda Cassini', nota: ' (ela saiu em 1997 e chegou em 2004)' } }
+		},
+		quizLua: true,
+		quiz: [
+			['Com o que Mimas é comparada por causa da sua cratera?', ['*A Estrela da Morte, de Star Wars', 'Uma bola de futebol', 'Um donut']],
+			['Que personagem aparece no mapa de calor de Mimas?', ['Mario', '*Pac-Man', 'Sonic']],
+			['Qual vão dos anéis de Saturno Mimas ajuda a abrir?', ['*A Divisão de Cassini', 'O Buraco Negro', 'O Anel de Fogo']]
+		]
+	},
+	miranda: {
+		nome: 'Miranda',
+		visores: {
+			1: ['472 km', 'de diâmetro'],
+			2: ['20 km', 'de altura: Verona Rupes'],
+			3: ['3', 'coroas: Inverness, Arden e Elsinore'],
+			5: ['1 dia', 'de visita: a Voyager 2, em 1986']
+		},
+		comparacoes: {
+			2: 'Verona Rupes pode ser mais de duas vezes mais alto que o Monte Everest.',
+			5: 'metade de Miranda nunca foi vista por ninguém: estava no escuro quando a Voyager 2 passou.'
+		},
+		animacao: { secao: 2, id: 'miranda-penhasco', hud: ['queda: 0 min 0 s', 'na Terra (sem ar): 1 minuto'],
+			aria: 'Animação: uma pedra caindo do alto do penhasco Verona Rupes, bem devagar, com um relógio contando: a queda leva uns 12 minutos. Urano aparece no céu.',
+			legenda: 'Com a gravidade fraca de Miranda, uma pedra solta do alto de Verona Rupes levaria uns 12 minutos para chegar ao chão.' },
+		animacao2: { secao: 4, id: 'miranda-retalhos', hud: ['gelo mais quente sobe de dentro', 'Inverness · Arden · Elsinore'],
+			aria: 'Animação: Miranda com três manchas alaranjadas de gelo mais quente subindo por baixo da superfície, que depois viram as faixas das três coroas.',
+			legenda: 'Uma explicação para a bagunça: gelo mais quente subiu de dentro de Miranda e deformou a superfície, formando as coroas.' },
+		comparacao: { km: 472, plural: 'Mirandas' },
+		linha: [
+			['1948', 'Gerard Kuiper descobre Miranda.'],
+			['1986', 'A Voyager 2 passa por Urano e fotografa Miranda de perto.'],
+			['2024', 'Um estudo sugere que Miranda pode ter tido um oceano embaixo do gelo.']
+		],
+		calculadoras: {
+			viagem: { destino: 'Miranda', titulo: 'Quanto tempo para chegar a Miranda?', km: 2900000000, nota: 'Da Terra até Urano e suas luas: cerca de 2,9 bilhões de km, em média.',
+				sonda: { anos: 8.4, frase: 'Como a sonda Voyager 2', nota: ' (ela saiu em 1977 e chegou a Urano em 1986)' } }
+		},
+		quizLua: true,
+		quiz: [
+			['Com o que a superfície de Miranda é comparada?', ['Um tabuleiro de xadrez', '*Uma colcha de retalhos', 'Uma pizza']],
+			['Quanto tempo uma pedra levaria para cair do alto de Verona Rupes?', ['1 segundo', '*Uns 12 minutos', 'Um dia inteiro']],
+			['De onde vem o nome Miranda?', ['De uma deusa grega', 'De uma cidade', '*De uma peça de Shakespeare']]
+		]
+	},
+	tritao: {
+		nome: 'Tritão',
+		visores: {
+			1: ['17 dias', 'depois de Netuno, foi descoberta'],
+			3: ['−235 °C', 'um dos lugares mais frios'],
+			4: ['8 km', 'de altura: os jatos'],
+			6: ['3,6 bilhões', 'de anos até virar anel']
+		},
+		comparacoes: {
+			3: '−235 °C é tão frio que o ar que respiramos viraria gelo no chão.',
+			4: 'uma mancha escura de 150 km é mais comprida que a distância entre São Paulo e Campinas, que é de uns 90 km.'
+		},
+		animacao: { secao: 4, id: 'tritao-geiser', hud: ['−235 °C', 'o jato sobe 8 km'],
+			aria: 'Animação: um gêiser escuro sobe reto do chão rosado de Tritão, o vento lá no alto leva a fumaça para o lado e a poeira cai formando uma mancha escura comprida. Netuno aparece no céu.',
+			legenda: 'O jato sobe uns 8 km, o vento leva a fumaça para o lado e a poeira deixa uma mancha escura de até 150 km.' },
+		animacao2: { secao: 1, id: 'tritao-contra', hud: ['Netuno e Proteu: para um lado', 'Tritão: para o outro!'],
+			aria: 'Animação: Netuno girando com uma lua pequena, Proteu, dando a volta no mesmo sentido, e Tritão, numa órbita inclinada, dando a volta no sentido contrário.',
+			legenda: 'Netuno e as luas pequenas giram para um lado; Tritão, numa órbita inclinada, vai para o outro. Sinal de que foi capturado.' },
+		comparacao: { km: 2707, plural: 'Tritões' },
+		linha: [
+			['1846', 'William Lassell descobre Tritão, só 17 dias depois de Netuno.'],
+			['1989', 'A Voyager 2 passa por Tritão e vê os gêiseres de nitrogênio.']
+		],
+		calculadoras: {
+			viagem: { destino: 'Tritão', titulo: 'Quanto tempo para chegar a Tritão?', km: 4500000000, nota: 'Da Terra até Netuno e suas luas: cerca de 4,5 bilhões de km, em média.',
+				sonda: { anos: 12, frase: 'Como a sonda Voyager 2', nota: ' (ela saiu em 1977 e chegou em 1989)' } }
+		},
+		quizLua: true,
+		quiz: [
+			['O que Tritão tem de diferente das outras luas grandes?', ['É quadrada', '*Dá a volta no planeta ao contrário', 'Tem anéis']],
+			['O que sai dos gêiseres de Tritão?', ['Água quente', 'Lava', '*Nitrogênio e poeira escura']],
+			['O que deve acontecer com Tritão no futuro?', ['Vai fugir de Netuno', '*Vai se despedaçar e virar anéis', 'Vai virar uma estrela']]
+		]
+	}
+});
 // em inglês, o dicionário de en/visuais-dados.js traduz estes dados antes do visuais.js montar a página
 if (window.IDIOMA === 'en') document.write('<script src="en/visuais-dados.js"><\/script>');

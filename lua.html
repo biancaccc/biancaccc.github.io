@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+	<meta charset="utf-8">
+	<!-- fundo escuro desde o primeiro instante; vindo de um salto, a página começa coberta pelo último quadro do salto (preso à tela, não à página), para nenhum quadro vazar antes das estrelas -->
+	<script>try{var h=document.documentElement;h.style.backgroundColor="#05030c";if(sessionStorage.getItem("salto")==="1"){var q=sessionStorage.getItem("saltoQuadro");h.className+=" em-salto";if(q){h.style.background="#05030c url("+q+") 0 0/100% 100% no-repeat fixed";h.style.imageRendering="pixelated"}}}catch(e){}</script>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Lua · Nosso sistema solar</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Silkscreen&family=Space+Grotesk:wght@400;500;700&family=Tiny5&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="estilo.css">
+</head>
+<body data-passaporte="sistema" class="pagina-lua" style="--cor: #cfd3dc; --escala: 0.86">
+
+	<header class="topo">
+		<a class="marca" href="sistema-solar.html">Nosso sistema solar</a>
+		<nav class="menu">
+		<a class="menu-galaxia" href="index.html#galaxia">&larr; Via Láctea</a>
+		<a href="mercurio.html">Mercúrio</a>
+		<a href="venus.html">Vênus</a>
+		<a href="terra.html" class="menu-pai">Terra</a>
+		<a href="marte.html">Marte</a>
+		<a href="jupiter.html">Júpiter</a>
+		<a href="saturno.html">Saturno</a>
+		<a href="urano.html">Urano</a>
+		<a href="netuno.html">Netuno</a>
+		<a href="sol.html">Sol</a>
+		</nav>
+	</header>
+
+	<main>
+		<section class="destaque">
+			<div class="palco">
+				<img class="planeta" data-planeta="lua" src="pixel/lua.png" alt="Lua em pixel art">
+			</div>
+			<div class="destaque-texto">
+				<p class="posicao">A lua da Terra</p>
+				<h1>Lua</h1>
+				<p class="lema">A nossa companheira de sempre</p>
+				<dl class="ficha">
+					<div><dt>Tipo</dt><dd>Satélite natural da Terra</dd></div>
+					<div><dt>Distância da Terra</dt><dd>Cerca de 384 mil km</dd></div>
+					<div><dt>Uma volta na Terra</dt><dd>27,3 dias</dd></div>
+					<div><dt>Diâmetro</dt><dd>3.474 km</dd></div>
+				</dl>
+			</div>
+		</section>
+
+		<div class="leitura" id="leitura">
+		<aside class="sumario" aria-label="Nesta página">
+			<p>Nesta página</p>
+			<ol>
+				<li><a href="#secao-1">A Lua: nossa vizinha</a></li>
+				<li><a href="#secao-2">Sempre a mesma face</a></li>
+				<li><a href="#secao-3">Mares sem água</a></li>
+				<li><a href="#secao-4">Como a Lua nasceu</a></li>
+				<li><a href="#secao-5">As marés e o dia que cresce</a></li>
+				<li><a href="#secao-6">Pegadas humanas</a></li>
+				<li class="extra"><a href="#balanca">Sua balança espacial</a></li>
+			</ol>
+		</aside>
+
+		<article class="conteudo">
+		<section class="bloco pixelado" id="secao-1">
+			<h2>A Lua: nossa vizinha</h2>
+			<p>A Lua é o único satélite natural da Terra e a quinta maior lua do Sistema Solar. Com 3.474 km de diâmetro, ela tem cerca de um quarto do tamanho da Terra. A Lua não tem luz própria: o brilho que a gente vê é a luz do Sol refletida na sua superfície cinzenta, cheia de poeira e pedras.</p>
+		</section>
+		<section class="bloco pixelado" id="secao-2">
+			<h2>Sempre a mesma face</h2>
+			<p>A Lua leva 27,3 dias para dar uma volta na Terra e exatamente o mesmo tempo para girar em torno de si mesma. Por isso, ela mostra sempre o mesmo lado para nós. O outro lado não é escuro, ele recebe luz do Sol como o nosso; só não dá para vê-lo daqui. Ele foi fotografado pela primeira vez em 1959, pela sonda soviética Luna 3.</p>
+		</section>
+		<figure class="comparacao">
+			<img class="pixelado" src="pixel/lua.png" alt="Comparação do tamanho de Lua">
+		</figure>
+		<section class="bloco pixelado" id="secao-3">
+			<h2>Mares sem água</h2>
+			<p>As manchas escuras da Lua foram chamadas de "mares" pelos astrônomos antigos, mas não têm água: são planícies de lava que esfriou há uns 3 bilhões de anos. As partes claras são terras altas cheias de crateras. Sem ar, chuva ou vento, quase nada se apaga por lá: as pegadas dos astronautas continuam no chão até hoje.</p>
+		</section>
+		<section class="bloco pixelado" id="secao-4">
+			<h2>Como a Lua nasceu</h2>
+			<p>A explicação mais aceita é que, há cerca de 4,5 bilhões de anos, um corpo do tamanho de Marte, chamado Theia, bateu na Terra ainda jovem. Os pedaços arrancados das duas ficaram girando em volta da Terra e se juntaram, formando a Lua. As rochas trazidas pelas missões Apollo ajudaram a contar essa história.</p>
+		</section>
+		<section class="bloco pixelado" id="secao-5">
+			<h2>As marés e o dia que cresce</h2>
+			<p>A gravidade da Lua puxa os oceanos da Terra e faz as marés subirem e descerem duas vezes por dia. Esse puxa-puxa também freia a Terra aos pouquinhos e empurra a Lua para longe: ela se afasta cerca de 3,8 cm por ano. Isso foi medido com espelhos que os astronautas deixaram lá, mirando lasers da Terra.</p>
+		</section>
+		<section class="bloco pixelado" id="secao-6">
+			<h2>Pegadas humanas</h2>
+			<p>Em 20 de julho de 1969, Neil Armstrong e Buzz Aldrin, da missão Apollo 11, foram os primeiros a pisar na Lua. Entre 1969 e 1972, doze astronautas caminharam por lá e trouxeram 382 kg de rochas. Até hoje, a Lua é o único lugar fora da Terra onde pessoas já estiveram, e o programa Artemis, da NASA, quer levar astronautas de volta.</p>
+		</section>
+
+		<p class="fecho">Pertinho, prateada e cheia de histórias, a Lua foi o primeiro passo da humanidade fora de casa, e continua sendo a porta de entrada para o resto do Sistema Solar.</p>
+		</article>
+		</div>
+
+		<section id="balanca" data-planeta="lua"></section>
+
+		<nav class="vizinhos">
+		<a class="anterior" href="terra.html"><img src="pixel/terra.png" alt=""><span><small>Anterior</small>Terra</span></a>
+		<a class="proximo" href="marte.html"><span><small>Próximo</small>Marte</span><img src="pixel/marte.png" alt=""></a>
+		</nav>
+	</main>
+
+	<footer class="rodape">
+		<nav class="rodape-planetas" aria-label="Todos os planetas">
+			<a href="mercurio.html"><img src="pixel/mercurio.png" alt="">Mercúrio</a>
+			<a href="venus.html"><img src="pixel/venus.png" alt="">Vênus</a>
+			<a href="terra.html"><img src="pixel/terra.png" alt="">Terra</a>
+			<a href="marte.html"><img src="pixel/marte.png" alt="">Marte</a>
+			<a href="jupiter.html"><img src="pixel/jupiter.png" alt="">Júpiter</a>
+			<a href="saturno.html"><img src="pixel/saturno.png" alt="">Saturno</a>
+			<a href="urano.html"><img src="pixel/urano.png" alt="">Urano</a>
+			<a href="netuno.html"><img src="pixel/netuno.png" alt="">Netuno</a>
+			<a href="sol.html"><img src="pixel/sol.png" alt="">Sol</a>
+		</nav>
+		<nav class="rodape-planetas rodape-luas" aria-label="As luas">
+			<a href="lua.html"><img src="pixel/lua.png" alt="">Lua</a>
+			<a href="io.html"><img src="pixel/io.png" alt="">Io</a>
+			<a href="europa.html"><img src="pixel/europa.png" alt="">Europa</a>
+			<a href="ganimedes.html"><img src="pixel/ganimedes.png" alt="">Ganimedes</a>
+			<a href="tita.html"><img src="pixel/tita.png" alt="">Titã</a>
+			<a href="encelado.html"><img src="pixel/encelado.png" alt="">Encélado</a>
+			<a href="mimas.html"><img src="pixel/mimas.png" alt="">Mimas</a>
+			<a href="miranda.html"><img src="pixel/miranda.png" alt="">Miranda</a>
+			<a href="tritao.html"><img src="pixel/tritao.png" alt="">Tritão</a>
+		</nav>
+		<p><a href="sistema-solar.html">Nosso sistema solar</a> · <a href="index.html#galaxia">Via Láctea</a> · textos e pixel art feitos à mão</p>
+	</footer>
+
+	<script src="idioma.js"></script>
+	<script src="nave.js"></script>
+	<script src="transicao.js"></script>
+	<script src="tempo-do-sol.js"></script>
+	<script src="radio.js"></script>
+	<script src="cabine.js"></script>
+	<script src="chegada.js"></script>
+	<script src="passaporte.js"></script>
+	<script src="marca.js"></script>
+	<script src="fundo.js"></script>
+	<script src="pixel/sprites.js"></script>
+	<script src="balanco.js"></script>
+	<script src="balanca.js"></script>
+	<script src="visuais-dados.js"></script>
+	<script src="visuais.js"></script>
+	<script src="pagina.js"></script>
+</body>
+</html>

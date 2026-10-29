@@ -288,32 +288,39 @@
 		planetas: { forma: 'hexagono', rotulo: 'PLANETAS', rodape: 'ESPECIAL' },
 		decolagem: { forma: 'oval', rotulo: 'DECOLAGEM', rodape: 'ESPECIAL' },
 		especialista: { forma: 'retangulo', rotulo: 'SABE-TUDO', rodape: 'QUIZ' },
-		galactico: { forma: 'circulo', rotulo: 'SABE-TUDO', rodape: 'GALAXIA' }
+		galactico: { forma: 'circulo', rotulo: 'SABE-TUDO', rodape: 'GALAXIA' },
+		luas: { forma: 'hexagono', rotulo: 'LUAS', rodape: 'ESPECIAL' },
+		selenita: { forma: 'oval', rotulo: 'SABE-TUDO', rodape: 'LUAS' }
 	};
 
 	// Selos especiais (conquistas): ganhos fazendo coisas pelo site, além de visitar os destinos.
 	// "progresso" diz quanto falta: uma lista de coisas diferentes (estações, planetas) ou um contador.
 	var CONQUISTAS = [
-		{ id: 'ouvinte', nome: 'Ouvinte da galáxia', desc: 'Sintonizou as 23 estações do rádio da nave', falta: 'Sintonize as 23 estações do rádio da nave', cor: '#4fd68a', lista: 'estacoes', total: 23, unidade: 'estações' },
+		{ id: 'ouvinte', nome: 'Ouvinte da galáxia', desc: 'Sintonizou as 32 estações do rádio da nave', falta: 'Sintonize as 32 estações do rádio da nave', cor: '#4fd68a', lista: 'estacoes', total: 32, unidade: 'estações' },
 		{ id: 'planetas', nome: 'Volta ao Sistema Solar', desc: 'Visitou o Sol e os 8 planetas', falta: 'Visite o Sol e os 8 planetas', cor: '#f0a830', lista: 'planetas', total: 9, unidade: 'astros' },
 		{ id: 'decolagem', nome: 'Piloto de decolagem', desc: 'Viu a decolagem da nave 3 vezes', falta: 'Veja a decolagem da nave 3 vezes', cor: '#5ab8e8', contador: 'decolagens', total: 3, unidade: 'decolagens' },
 		{ id: 'especialista', nome: 'Sabe-tudo do Sistema Solar', desc: 'Acertou os quizzes dos 8 planetas', falta: 'Acerte o quiz no fim da página de cada planeta', cor: '#3fa8b8', lista: 'quizzes', total: 8, unidade: 'quizzes' },
-		{ id: 'galactico', nome: 'Sabe-tudo da Via Láctea', desc: 'Acertou os quizzes dos 12 destinos da galáxia', falta: 'Acerte o quiz no fim da página de cada destino da galáxia', cor: '#b46be8', lista: 'quizzesGalaxia', total: 12, unidade: 'quizzes' }
+		{ id: 'galactico', nome: 'Sabe-tudo da Via Láctea', desc: 'Acertou os quizzes dos 12 destinos da galáxia', falta: 'Acerte o quiz no fim da página de cada destino da galáxia', cor: '#b46be8', lista: 'quizzesGalaxia', total: 12, unidade: 'quizzes' },
+		{ id: 'luas', nome: 'Volta pelas luas', desc: 'Visitou as 9 luas', falta: 'Visite as 9 luas do Sistema Solar', cor: '#9aa4c8', lista: 'luas', total: 9, unidade: 'luas' },
+		{ id: 'selenita', nome: 'Sabe-tudo das luas', desc: 'Acertou os quizzes das 9 luas', falta: 'Acerte o quiz no fim da página de cada lua', cor: '#5a8ad8', lista: 'quizzesLuas', total: 9, unidade: 'quizzes' }
 	];
 	// em inglês: os nomes dos destinos e os textos dos selos especiais
 	if (window.IDIOMA === 'en') {
 		var NOMES_EN = { fermi: 'Fermi Bubbles', orion: 'Orion Nebula', pleiades: 'Pleiades', helice: 'Helix Nebula', tabby: "Tabby's Star", caranguejo: 'Crab Nebula', sistema: 'Solar System' };
 		DESTINOS.forEach(function (x) { if (NOMES_EN[x.id]) x.nome = NOMES_EN[x.id]; });
 		var SELOS_EN = {
-			ouvinte: ['Galaxy listener', 'Tuned in to all 23 stations of the ship radio', 'Tune in to all 23 stations of the ship radio', 'stations'],
+			ouvinte: ['Galaxy listener', 'Tuned in to all 32 stations of the ship radio', 'Tune in to all 32 stations of the ship radio', 'stations'],
 			planetas: ['Solar System tour', 'Visited the Sun and the 8 planets', 'Visit the Sun and the 8 planets', 'bodies'],
 			decolagem: ['Liftoff pilot', 'Watched the ship lift off 3 times', 'Watch the ship lift off 3 times', 'liftoffs'],
 			especialista: ['Solar System Know-it-all', 'Aced the quizzes of all 8 planets', 'Ace the quiz at the end of each planet page', 'quizzes'],
+			luas: ['Moon tour', 'Visited the 9 moons', 'Visit the 9 moons of the Solar System', 'moons'],
+			selenita: ['Moon Know-it-all', 'Aced the quizzes of all 9 moons', 'Ace the quiz at the end of each moon page', 'quizzes'],
 			galactico: ['Milky Way Know-it-all', 'Aced the quizzes of all 12 galaxy destinations', 'Ace the quiz at the end of each galaxy destination page', 'quizzes']
 		};
 		CONQUISTAS.forEach(function (c) { var e = SELOS_EN[c.id]; if (e) { c.nome = e[0]; c.desc = e[1]; c.falta = e[2]; c.unidade = e[3]; } });
 	}
 	var ASTROS = ['sol', 'mercurio', 'venus', 'terra', 'marte', 'jupiter', 'saturno', 'urano', 'netuno'];
+	var LUAS = ['lua', 'io', 'europa', 'ganimedes', 'tita', 'encelado', 'mimas', 'miranda', 'tritao'];
 	function progresso(c, d) { return Math.min(c.total, c.contador ? (d[c.contador] || 0) : (d[c.lista] || []).length); }
 
 	// ---------- Guardar ----------
@@ -364,6 +371,21 @@
 	// Ícones dos destinos, desenhados com formas simples em 24 x 24.
 	// c(x, y) = tinta cheia; m(x, y) = meio-tom (pontilhado)
 	var ICONES = {
+		// os selos das luas: uma lua crescente com crateras e estrelinhas, e uma lua cheia com um ponto de interrogação
+		luas: function (c, m) {
+			for (var y = 0; y < 24; y++) for (var x = 0; x < 24; x++) {
+				var r1 = Math.hypot(x + 0.5 - 12, y + 0.5 - 12), r2 = Math.hypot(x + 0.5 - 16, y + 0.5 - 9);
+				if (r1 < 9.5 && r2 > 8) { if (Math.hypot(x + 0.5 - 7, y + 0.5 - 15) < 1.6 || Math.hypot(x + 0.5 - 10, y + 0.5 - 19) < 1.2) m(x, y); else c(x, y); }
+			}
+			[[18, 3], [21, 8], [20, 16]].forEach(function (p) { c(p[0], p[1]); m(p[0] - 1, p[1]); m(p[0] + 1, p[1]); m(p[0], p[1] - 1); m(p[0], p[1] + 1); });
+		},
+		selenita: function (c, m) {
+			for (var y = 0; y < 24; y++) for (var x = 0; x < 24; x++) {
+				var r = Math.hypot(x + 0.5 - 12, y + 0.5 - 12);
+				if (Math.abs(r - 10) < 0.6) c(x, y); else if (r < 9.4 && (x + y) % 2 === 0) m(x, y);
+			}
+			[[10, 7], [11, 6], [12, 6], [13, 6], [14, 7], [14, 8], [13, 9], [12, 10], [12, 11], [12, 12], [12, 15], [12, 16]].forEach(function (p) { c(p[0], p[1]); c(p[0] + 1, p[1]); });
+		},
 		// selos especiais: um radinho, o Sol com as órbitas dos planetas e um foguete decolando
 		ouvinte: function (c, m) {
 			c(13, 1); c(14, 2); c(15, 3); c(16, 4); c(17, 5); c(18, 6); // antena
@@ -669,7 +691,7 @@
 		d.conquistas = d.conquistas || {};
 		if (tipo === 'decolagem') d.decolagens = (d.decolagens || 0) + 1;
 		else {
-			var lista = tipo === 'estacao' ? 'estacoes' : tipo === 'quiz' ? 'quizzes' : tipo === 'quizGalaxia' ? 'quizzesGalaxia' : 'planetas';
+			var lista = tipo === 'estacao' ? 'estacoes' : tipo === 'quiz' ? 'quizzes' : tipo === 'quizGalaxia' ? 'quizzesGalaxia' : tipo === 'quizLua' ? 'quizzesLuas' : tipo === 'lua' ? 'luas' : 'planetas';
 			d[lista] = d[lista] || [];
 			if (d[lista].indexOf(valor) >= 0) return;
 			d[lista].push(valor);
@@ -1788,6 +1810,8 @@
 	// páginas do Sol e dos planetas contam para o selo "Volta ao Sistema Solar"
 	var arquivo = (location.pathname.split('/').pop() || '').replace(/\.html$/, '');
 	if (ASTROS.indexOf(arquivo) >= 0) anotar('planeta', arquivo);
+	// e as páginas das luas, para o selo "Volta pelas luas"
+	if (LUAS.indexOf(arquivo) >= 0) anotar('lua', arquivo);
 	var galaxia = document.getElementById('galaxia');
 	if (galaxia) {
 		montarBotao(galaxia);

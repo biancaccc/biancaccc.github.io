@@ -70,8 +70,8 @@ Object.assign(window.EN.t, {
 	"Personagens de teatro": "Characters from plays",
 	"Cientistas famosos": "Famous scientists",
 	"Deitado, gelado e visitado apenas uma vez, Urano é um dos planetas que menos conhecemos e, justamente por isso, um dos que mais têm surpresas a revelar.": "Sideways, frozen and visited only once, Uranus is one of the planets we know least about and, for that very reason, one of those with the most surprises left to reveal.",
-	"AnteriorSaturno": "<small>Previous</small>Saturn",
-	"PróximoNetuno": "<small>Next</small>Neptune"
+	"AnteriorMimas": "<small>Previous</small>Mimas",
+	"PróximoMiranda": "<small>Next</small>Miranda"
 });
 Object.assign(window.EN.a, {
 	"Animação: Urano cortado ao meio, mostrando a atmosfera, a camada de gelos e o núcleo, com diamantes caindo devagar em direção ao centro.": "Animation: Uranus cut in half, showing the atmosphere, the layer of ices and the core, with diamonds slowly falling toward the center.",

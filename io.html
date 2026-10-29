@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+	<meta charset="utf-8">
+	<!-- fundo escuro desde o primeiro instante; vindo de um salto, a página começa coberta pelo último quadro do salto (preso à tela, não à página), para nenhum quadro vazar antes das estrelas -->
+	<script>try{var h=document.documentElement;h.style.backgroundColor="#05030c";if(sessionStorage.getItem("salto")==="1"){var q=sessionStorage.getItem("saltoQuadro");h.className+=" em-salto";if(q){h.style.background="#05030c url("+q+") 0 0/100% 100% no-repeat fixed";h.style.imageRendering="pixelated"}}}catch(e){}</script>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Io · Nosso sistema solar</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Silkscreen&family=Space+Grotesk:wght@400;500;700&family=Tiny5&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="estilo.css">
+</head>
+<body data-passaporte="sistema" class="pagina-lua" style="--cor: #f0d040; --escala: 0.86">
+
+	<header class="topo">
+		<a class="marca" href="sistema-solar.html">Nosso sistema solar</a>
+		<nav class="menu">
+		<a class="menu-galaxia" href="index.html#galaxia">&larr; Via Láctea</a>
+		<a href="mercurio.html">Mercúrio</a>
+		<a href="venus.html">Vênus</a>
+		<a href="terra.html">Terra</a>
+		<a href="marte.html">Marte</a>
+		<a href="jupiter.html" class="menu-pai">Júpiter</a>
+		<a href="saturno.html">Saturno</a>
+		<a href="urano.html">Urano</a>
+		<a href="netuno.html">Netuno</a>
+		<a href="sol.html">Sol</a>
+		</nav>
+	</header>
+
+	<main>
+		<section class="destaque">
+			<div class="palco">
+				<img class="planeta" data-planeta="io" src="pixel/io.png" alt="Io em pixel art">
+			</div>
+			<div class="destaque-texto">
+				<p class="posicao">Uma lua de Júpiter</p>
+				<h1>Io</h1>
+				<p class="lema">O mundo dos vulcões</p>
+				<dl class="ficha">
+					<div><dt>Tipo</dt><dd>Lua de Júpiter</dd></div>
+					<div><dt>Distância de Júpiter</dt><dd>Cerca de 422 mil km</dd></div>
+					<div><dt>Uma volta em Júpiter</dt><dd>1,8 dia</dd></div>
+					<div><dt>Diâmetro</dt><dd>3.643 km</dd></div>
+				</dl>
+			</div>
+		</section>
+
+		<div class="leitura" id="leitura">
+		<aside class="sumario" aria-label="Nesta página">
+			<p>Nesta página</p>
+			<ol>
+				<li><a href="#secao-1">Io: o mundo dos vulcões</a></li>
+				<li><a href="#secao-2">Espremida por Júpiter</a></li>
+				<li><a href="#secao-3">Guarda-chuvas de enxofre</a></li>
+				<li><a href="#secao-4">Lava mais quente que a da Terra</a></li>
+				<li><a href="#secao-5">Uma lua sem crateras</a></li>
+				<li><a href="#secao-6">Um rastro em volta de Júpiter</a></li>
+				<li class="extra"><a href="#balanca">Sua balança espacial</a></li>
+			</ol>
+		</aside>
+
+		<article class="conteudo">
+		<section class="bloco pixelado" id="secao-1">
+			<h2>Io: o mundo dos vulcões</h2>
+			<p>Io é a lua mais perto de Júpiter entre as quatro grandes que Galileu Galilei descobriu em 1610. Um pouco maior que a nossa Lua, ela é o lugar com mais vulcões ativos de todo o Sistema Solar: são mais de 400. Sua superfície é pintada de amarelo, laranja, vermelho e branco pelo enxofre que sai deles.</p>
+		</section>
+		<section class="bloco pixelado" id="secao-2">
+			<h2>Espremida por Júpiter</h2>
+			<p>O calor de Io vem de um puxa-puxa. Sua órbita não é um círculo perfeito, porque Europa e Ganimedes a puxam no ritmo certo: a cada 4 voltas de Io, Europa dá 2 e Ganimedes dá 1. Assim, a gravidade enorme de Júpiter estica e solta Io o tempo todo, e o chão dela sobe e desce até uns 100 metros. Esse aperto aquece o interior e derrete as rochas.</p>
+		</section>
+		<figure class="comparacao">
+			<img class="pixelado" src="pixel/io.png" alt="Comparação do tamanho de Io">
+		</figure>
+		<section class="bloco pixelado" id="secao-3">
+			<h2>Guarda-chuvas de enxofre</h2>
+			<p>Alguns vulcões de Io lançam plumas de gás e poeira a mais de 300 km de altura. Como lá quase não tem ar, o material sobe e cai de volta em arcos perfeitos, formando enormes guarda-chuvas. Ao redor do vulcão Pele, a poeira que cai deixa um anel vermelho do tamanho do Alasca.</p>
+		</section>
+		<section class="bloco pixelado" id="secao-4">
+			<h2>Lava mais quente que a da Terra</h2>
+			<p>Algumas lavas de Io passam de 1.200 °C, mais quentes que quase todas as da Terra de hoje. Loki, o maior vulcão de lá, tem um lago de lava com cerca de 200 km de diâmetro, cuja crosta afunda e se renova de tempos em tempos. Enquanto isso, longe dos vulcões, a superfície fica a uns −130 °C.</p>
+		</section>
+		<section class="bloco pixelado" id="secao-5">
+			<h2>Uma lua sem crateras</h2>
+			<p>Quase todas as luas têm o rosto marcado por crateras de impacto, mas Io não. A lava e a poeira dos vulcões cobrem a superfície tão depressa que as marcas somem antes de envelhecer. É por isso que Io tem a superfície mais jovem do Sistema Solar.</p>
+		</section>
+		<section class="bloco pixelado" id="secao-6">
+			<h2>Um rastro em volta de Júpiter</h2>
+			<p>Io perde cerca de uma tonelada de material por segundo para o espaço. Esse gás vira um anel invisível de partículas elétricas em volta de Júpiter, e uma corrente elétrica liga Io ao planeta, acendendo uma mancha brilhante nas auroras de Júpiter. Os vulcões de Io foram vistos pela primeira vez em 1979, nas fotos da Voyager 1.</p>
+		</section>
+
+		<p class="fecho">Quente por dentro, gelada por fora e sempre em erupção, Io mostra que até uma lua pequena pode ter o coração mais agitado do Sistema Solar.</p>
+		</article>
+		</div>
+
+		<section id="balanca" data-planeta="io"></section>
+
+		<nav class="vizinhos">
+		<a class="anterior" href="jupiter.html"><img src="pixel/jupiter.png" alt=""><span><small>Anterior</small>Júpiter</span></a>
+		<a class="proximo" href="europa.html"><span><small>Próximo</small>Europa</span><img src="pixel/europa.png" alt=""></a>
+		</nav>
+	</main>
+
+	<footer class="rodape">
+		<nav class="rodape-planetas" aria-label="Todos os planetas">
+			<a href="mercurio.html"><img src="pixel/mercurio.png" alt="">Mercúrio</a>
+			<a href="venus.html"><img src="pixel/venus.png" alt="">Vênus</a>
+			<a href="terra.html"><img src="pixel/terra.png" alt="">Terra</a>
+			<a href="marte.html"><img src="pixel/marte.png" alt="">Marte</a>
+			<a href="jupiter.html"><img src="pixel/jupiter.png" alt="">Júpiter</a>
+			<a href="saturno.html"><img src="pixel/saturno.png" alt="">Saturno</a>
+			<a href="urano.html"><img src="pixel/urano.png" alt="">Urano</a>
+			<a href="netuno.html"><img src="pixel/netuno.png" alt="">Netuno</a>
+			<a href="sol.html"><img src="pixel/sol.png" alt="">Sol</a>
+		</nav>
+		<nav class="rodape-planetas rodape-luas" aria-label="As luas">
+			<a href="lua.html"><img src="pixel/lua.png" alt="">Lua</a>
+			<a href="io.html"><img src="pixel/io.png" alt="">Io</a>
+			<a href="europa.html"><img src="pixel/europa.png" alt="">Europa</a>
+			<a href="ganimedes.html"><img src="pixel/ganimedes.png" alt="">Ganimedes</a>
+			<a href="tita.html"><img src="pixel/tita.png" alt="">Titã</a>
+			<a href="encelado.html"><img src="pixel/encelado.png" alt="">Encélado</a>
+			<a href="mimas.html"><img src="pixel/mimas.png" alt="">Mimas</a>
+			<a href="miranda.html"><img src="pixel/miranda.png" alt="">Miranda</a>
+			<a href="tritao.html"><img src="pixel/tritao.png" alt="">Tritão</a>
+		</nav>
+		<p><a href="sistema-solar.html">Nosso sistema solar</a> · <a href="index.html#galaxia">Via Láctea</a> · textos e pixel art feitos à mão</p>
+	</footer>
+
+	<script src="idioma.js"></script>
+	<script src="nave.js"></script>
+	<script src="transicao.js"></script>
+	<script src="tempo-do-sol.js"></script>
+	<script src="radio.js"></script>
+	<script src="cabine.js"></script>
+	<script src="chegada.js"></script>
+	<script src="passaporte.js"></script>
+	<script src="marca.js"></script>
+	<script src="fundo.js"></script>
+	<script src="pixel/sprites.js"></script>
+	<script src="balanco.js"></script>
+	<script src="balanca.js"></script>
+	<script src="visuais-dados.js"></script>
+	<script src="visuais.js"></script>
+	<script src="pagina.js"></script>
+</body>
+</html>

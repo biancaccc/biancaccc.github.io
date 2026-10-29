@@ -27,6 +27,16 @@
 		{ id: 'urano',    nome: 'Urano',    g: 8.87,  chao: '#9fdde6', solido: false },
 		{ id: 'netuno',   nome: 'Netuno',   g: 11.15, chao: '#4a6fd8', solido: false },
 		{ id: 'sol',      nome: 'Sol',      em: 'no Sol', g: 274,   chao: '#ffb43c', solido: false },
+		// as luas (a gravidade na superfície de cada uma, da NASA)
+		{ id: 'lua',       nome: 'Lua',       em: 'na Lua', g: 1.62,  chao: '#b8b8bc', solido: true },
+		{ id: 'io',        nome: 'Io',        g: 1.80,  chao: '#e0c84a', solido: true },
+		{ id: 'europa',    nome: 'Europa',    g: 1.31,  chao: '#e4d8c4', solido: true },
+		{ id: 'ganimedes', nome: 'Ganimedes', g: 1.43,  chao: '#a8987e', solido: true },
+		{ id: 'tita',      nome: 'Titã',      g: 1.35,  chao: '#c8842e', solido: true },
+		{ id: 'encelado',  nome: 'Encélado',  g: 0.113, chao: '#e4ecf2', solido: true },
+		{ id: 'mimas',     nome: 'Mimas',     g: 0.064, chao: '#a8a8a4', solido: true },
+		{ id: 'miranda',   nome: 'Miranda',   g: 0.079, chao: '#9a969a', solido: true },
+		{ id: 'tritao',    nome: 'Tritão',    g: 0.78,  chao: '#d4c0bc', solido: true },
 		// nos destinos da galáxia, os lugares onde a conta fica divertida (a gravidade vem da massa e
 		// do tamanho de cada um: g = G × massa / raio²)
 		{ id: 'proxima-centauri', nome: 'Proxima b', em: 'em Proxima b', g: 10.5, chao: '#b06a54', solido: true,
@@ -47,6 +57,7 @@
 			mercurio: { nome: 'Mercury' }, venus: { nome: 'Venus' }, terra: { nome: 'Earth', em: 'on Earth' }, marte: { nome: 'Mars' },
 			jupiter: { nome: 'Jupiter' }, saturno: { nome: 'Saturn' }, urano: { nome: 'Uranus' }, netuno: { nome: 'Neptune' },
 			sol: { nome: 'Sun', em: 'on the Sun', quem: 'the Sun' },
+			lua: { nome: 'Moon', em: 'on the Moon' }, ganimedes: { nome: 'Ganymede' }, tita: { nome: 'Titan' }, encelado: { nome: 'Enceladus' }, tritao: { nome: 'Triton' },
 			'proxima-centauri': { em: 'on Proxima b', extra: 'This is an estimate: scientists know the mass of Proxima b, but not yet its exact size.' },
 			sirius: { em: 'on Sirius B', extra: 'Sirius B is a white dwarf: almost the mass of the Sun squeezed into the size of Earth. That is why it pulls so hard.',
 				compara: function (kg) { var n = kg / 635000; return 'That is the weight of ' + (n < 2 ? 'one Christ the Redeemer statue' : 'about ' + Math.round(n) + ' Christ the Redeemer statues') + ' (each weighs 635 tonnes)!'; } },
