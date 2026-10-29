@@ -14,6 +14,7 @@
 <body data-passaporte="sistema" class="pagina-inicial">
 
 	<a class="voltar-galaxia" href="index.html#galaxia">&larr; Via Láctea</a>
+	<a class="escala-link" href="escala-real.html" data-en="Real scale &rarr;">Escala real &rarr;</a>
 	<div class="hud-moldura" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
 
 	<main class="inicio">
@@ -263,7 +264,7 @@
 		// As luas dando voltas nos seus planetas, na própria imagem do sistema. Cada uma: o planeta,
 		// o tamanho da órbita (em raios do globo do planeta), o achatamento e a inclinação da elipse
 		// (as luas de Urano giram "em pé", como o planeta deitado; Tritão vai inclinado e na contramão),
-		// o tempo de uma volta (em dias, o de verdade: aqui, cada dia passa em 3 segundos) e o tamanho da lua (em % da largura; bem maior
+		// o tempo de uma volta (em dias, o de verdade: aqui, cada dia passa em 10 segundos) e o tamanho da lua (em % da largura; bem maior
 		// que o de verdade, para dar para ver e clicar).
 		(function () {
 			var sistema = document.getElementById('sistema'), svg = sistema.querySelector('.orbitas-luas');
@@ -284,20 +285,29 @@
 			};
 			/* o raio do globo, em fração da largura da arte (Saturno é mais largo por causa dos anéis) */
 			var GLOBO = { saturno: 0.265 };
-			var SEGUNDOS_POR_DIA = 3;
-			var luas = [].slice.call(sistema.querySelectorAll('.lua-orbita')), parado = false;
+			var SEGUNDOS_POR_DIA = 10;
+			var luas = [].slice.call(sistema.querySelectorAll('.lua-orbita')), parado = null;
+			/* com o mouse perto de um planeta (dentro da maior órbita dele) ou em cima de uma lua, as luas
+			   daquele planeta param, para dar tempo de escolher; cada planeta tem o próprio relógio */
+			var zonas = {}, relogio = {};
+			sistema.addEventListener('mousemove', function (e) {
+				var rs = sistema.getBoundingClientRect(), x = e.clientX - rs.left, y = e.clientY - rs.top; parado = null;
+				Object.keys(zonas).forEach(function (pai) { var z = zonas[pai]; if (Math.abs(x - z.cx) < z.rx + 14 && Math.abs(y - z.cy) < z.ry + 14) parado = pai; });
+			});
+			sistema.addEventListener('mouseleave', function () { parado = null; });
 			luas.forEach(function (el) {
-				el.addEventListener('mouseenter', function () { parado = true; });
-				el.addEventListener('mouseleave', function () { parado = false; });
-				el.addEventListener('focus', function () { parado = true; });
-				el.addEventListener('blur', function () { parado = false; });
+				el.addEventListener('focus', function () { parado = LUAS[el.getAttribute('data-id')].pai; });
+				el.addEventListener('blur', function () { parado = null; });
 			});
 			var NS = 'http://www.w3.org/2000/svg', elipses = {};
 			Object.keys(LUAS).forEach(function (id) { var e = document.createElementNS(NS, 'ellipse'); e.setAttribute('class', 'orbita-' + LUAS[id].pai); svg.appendChild(e); elipses[id] = e; });
-			var tempo = 0, antes = performance.now();
+			var antes = performance.now();
 			function quadro(agora) {
-				if (!parado && !calmo) tempo += (agora - antes) / 1000;
+				var dt = calmo ? 0 : (agora - antes) / 1000;
 				antes = agora;
+				Object.keys(LUAS).forEach(function (id) { var pai = LUAS[id].pai; if (relogio[pai] === undefined) relogio[pai] = 0; });
+				Object.keys(relogio).forEach(function (pai) { if (pai !== parado) relogio[pai] += dt; });
+				var zonasNovas = {};
 				var rs = sistema.getBoundingClientRect(), W = rs.width;
 				svg.setAttribute('viewBox', '0 0 ' + rs.width + ' ' + rs.height);
 				/* o espaço livre de cada planeta até os vizinhos: as órbitas dele encolhem para caber ali,
@@ -307,9 +317,9 @@
 				Object.keys(LUAS).forEach(function (id) {
 					var L = LUAS[id], eu = planetas.filter(function (p) { return p.id === L.pai; })[0]; if (!eu) return;
 					var cx = (eu.l + eu.r) / 2, livre = Infinity;
-					planetas.forEach(function (p) { if (p.id === L.pai) return; var folga = p.w * 0.06; livre = Math.min(livre, p.l + folga > cx ? p.l + folga - cx : cx - (p.r - folga)); });
+					planetas.forEach(function (p) { if (p.id === L.pai) return; livre = Math.min(livre, p.l > cx ? p.l - cx : cx - p.r); });
 					var R = eu.w * (GLOBO[L.pai] || 0.5), inc = L.incl * Math.PI / 180, rx = R * L.r, ry = rx * L.ach;
-					var largura = Math.sqrt(Math.pow(rx * Math.cos(inc), 2) + Math.pow(ry * Math.sin(inc), 2)) + Math.max(W < 700 ? 6 : 12, W * L.tam / 100) / 2 + 3;
+					var largura = Math.sqrt(Math.pow(rx * Math.cos(inc), 2) + Math.pow(ry * Math.sin(inc), 2)) + Math.max(W < 700 ? 6 : 12, W * L.tam / 100) / 2 + (W < 700 ? 5 : 12);
 					escala[L.pai] = Math.min(escala[L.pai] || 1, livre / largura);
 				});
 				luas.forEach(function (el) {
@@ -317,125 +327,23 @@
 					if (!pai) return;
 					var rp = pai.getBoundingClientRect(), cx = rp.left - rs.left + rp.width / 2, cy = rp.top - rs.top + rp.height / 2;
 					var R = rp.width * (GLOBO[L.pai] || 0.5), rx = R * L.r * Math.max(0.4, escala[L.pai] || 1), ry = rx * L.ach, inc = L.incl * Math.PI / 180;
-					var a = L.fase + tempo / (L.dias * SEGUNDOS_POR_DIA) * Math.PI * 2, ex = Math.cos(a) * rx, ey = Math.sin(a) * ry;
+					var a = L.fase + relogio[L.pai] / (L.dias * SEGUNDOS_POR_DIA) * Math.PI * 2, ex = Math.cos(a) * rx, ey = Math.sin(a) * ry;
 					var x = cx + ex * Math.cos(inc) - ey * Math.sin(inc), y = cy + ex * Math.sin(inc) + ey * Math.cos(inc);
 					var tam = Math.max(W < 700 ? 6 : 12, W * L.tam / 100);
 					el.style.width = tam + 'px'; el.style.left = (x - tam / 2) + 'px'; el.style.top = (y - tam / 2) + 'px';
 					/* na metade de trás da órbita, a lua passa atrás do planeta */
 					el.style.zIndex = Math.sin(a) < 0 ? 1 : 4;
+					/* a zona do planeta (a maior órbita dele, inclinada) para a pausa */
+					var zx = Math.abs(rx * Math.cos(inc)) + Math.abs(ry * Math.sin(inc)), zy = Math.abs(rx * Math.sin(inc)) + Math.abs(ry * Math.cos(inc)), zn = zonasNovas[L.pai];
+					zonasNovas[L.pai] = { cx: cx, cy: cy, rx: Math.max(zx, zn ? zn.rx : 0, rp.width / 2), ry: Math.max(zy, zn ? zn.ry : 0, rp.height / 2) };
 					var e = elipses[id];
 					e.setAttribute('cx', cx); e.setAttribute('cy', cy); e.setAttribute('rx', rx); e.setAttribute('ry', ry);
 					e.setAttribute('transform', 'rotate(' + L.incl + ' ' + cx + ' ' + cy + ')');
 				});
+				zonas = zonasNovas;
 				requestAnimationFrame(quadro);
 			}
 			requestAnimationFrame(quadro);
-		})();
-	</script>
-	<script>
-		// A escala real: o botão Ilustrativo | Escala real (o mesmo da Via Láctea). Na escala real, os
-		// planetas ficam nos tamanhos de verdade entre si (com Júpiter como régua; o Sol já estava na
-		// mesma escala) e as luas pequenas saem da imagem: clicando num planeta, abre uma lupa com o
-		// sistema dele visto de cima, com o planeta, as luas e as órbitas todos na mesma escala.
-		(function () {
-			var T = window.T || function (pt) { return pt; }, LOCALE = window.LOCALE || 'pt-BR';
-			var sistema = document.getElementById('sistema'), main = document.querySelector('main.inicio'), info = document.getElementById('info');
-			var calmo = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-			/* quanto cada planeta muda do tamanho da arte para o tamanho de verdade (Júpiter = 1; em Saturno,
-			   conta o globo, porque a arte inclui os anéis) */
-			var REAL = { mercurio: 0.62, venus: 0.62, terra: 0.64, marte: 0.61, jupiter: 1, saturno: 1.26, urano: 0.95, netuno: 0.91 };
-			Object.keys(REAL).forEach(function (id) { var el = sistema.querySelector('.astro[data-id="' + id + '"]'); if (el) el.style.setProperty('--real', REAL[id]); });
-			// os sistemas de luas: diâmetro do planeta e de cada lua (km), distância da órbita (km) e o período (dias)
-			var SIS = {
-				terra: { d: 12742, luas: [['lua', T('Lua', 'Moon'), 3474, 384400, 27.32, '#d4d4d0']] },
-				jupiter: { d: 139820, luas: [['io', 'Io', 3643, 421700, 1.769, '#e8d050'], ['europa', 'Europa', 3122, 671034, 3.551, '#f0e4d0'], ['ganimedes', T('Ganimedes', 'Ganymede'), 5268, 1070412, 7.155, '#b8a890']] },
-				saturno: { d: 116460, aneis: true, luas: [['mimas', 'Mimas', 396, 185539, 0.942, '#d0d0cc'], ['encelado', T('Encélado', 'Enceladus'), 504, 237948, 1.37, '#f4f8ff'], ['tita', T('Titã', 'Titan'), 5150, 1221870, 15.945, '#e8a850']] },
-				urano: { d: 51118, luas: [['miranda', 'Miranda', 472, 129390, 1.413, '#b4b0b4']] },
-				netuno: { d: 49528, luas: [['tritao', T('Tritão', 'Triton'), 2707, 354759, -5.877, '#e8d0cc']] }
-			};
-			var NOMES = { terra: T('Terra', 'Earth'), jupiter: T('Júpiter', 'Jupiter'), saturno: T('Saturno', 'Saturn'), urano: T('Urano', 'Uranus'), netuno: T('Netuno', 'Neptune') };
-			var NOTAS = {
-				terra: T('A Lua fica a uns 30 Terras de distância.', 'The Moon is about 30 Earths away.'),
-				jupiter: T('Io, Europa e Ganimedes dão voltas no ritmo 4 : 2 : 1: enquanto Ganimedes dá uma volta, Europa dá duas e Io, quatro.', 'Io, Europa and Ganymede orbit in a 4 : 2 : 1 rhythm: while Ganymede goes around once, Europa goes twice and Io four times.'),
-				saturno: T('Mimas e Encélado passam pertinho dos anéis; Titã fica bem mais longe.', 'Mimas and Enceladus orbit close to the rings; Titan is much farther out.'),
-				urano: T('Miranda é a mais perto das cinco grandes luas de Urano.', 'Miranda is the closest of the five large moons of Uranus.'),
-				netuno: T('Tritão dá a volta em Netuno na contramão.', 'Triton orbits Neptune the wrong way round.')
-			};
-			// o botão (no canto de cima, à direita)
-			var caixa = document.createElement('div');
-			caixa.className = 'escala escala-sistema';
-			caixa.innerHTML = '<button type="button" class="escala-botao" aria-pressed="false"><span>' + T('Ilustrativo', 'Illustrative') + '</span><span>' + T('Escala real', 'Real scale') + '</span></button>';
-			document.body.appendChild(caixa);
-			var botao = caixa.querySelector('button'), real = false, vazioIlustrativo = info.innerHTML;
-			botao.addEventListener('click', function () {
-				real = !real;
-				botao.setAttribute('aria-pressed', real ? 'true' : 'false');
-				sistema.classList.toggle('escala-real', real);
-				main.classList.toggle('escala-real', real);
-				if (!real) fecharLupa();
-				window.dispatchEvent(new Event('resize'));
-			});
-			// a dica embaixo muda junto
-			var dica = info.querySelector('.info-vazio');
-			var textoIlustrativo = dica ? dica.textContent : '';
-			setInterval(function () { var d = info.querySelector('.info-vazio'); if (d) d.textContent = real ? T('Escala real: planetas nos tamanhos de verdade. Clique na Terra, em Júpiter, Saturno, Urano ou Netuno para ver as luas.', 'Real scale: planets at their true sizes. Click Earth, Jupiter, Saturn, Uranus or Neptune to see their moons.') : textoIlustrativo; }, 300);
-			// a lupa
-			var lupa = document.createElement('div');
-			lupa.className = 'lupa-luas';
-			lupa.setAttribute('role', 'dialog');
-			lupa.hidden = true;
-			document.body.appendChild(lupa);
-			var NS = 'http://www.w3.org/2000/svg', anim = null, aberto = null;
-			function fmtKm(km) { return km >= 1e6 ? (km / 1e6).toLocaleString(LOCALE, { maximumFractionDigits: 2 }) + T(' milhão de km', ' million km') : Math.round(km / 1000).toLocaleString(LOCALE) + T(' mil km', ',000 km'); }
-			function abrirLupa(id) {
-				var S = SIS[id]; if (!S) return;
-				aberto = id;
-				var maior = Math.max.apply(null, S.luas.map(function (l) { return l[3]; })), k = 128 / maior, R = S.d / 2 * k;
-				var svg = '<svg viewBox="0 0 300 300" aria-hidden="true">';
-				S.luas.forEach(function (l) { svg += '<circle class="lupa-orbita" cx="150" cy="150" r="' + (l[3] * k).toFixed(2) + '" />'; });
-				if (S.aneis) {
-					/* os anéis vistos de cima: do C (74.500 km) até o A (136.780 km), com a Divisão de Cassini */
-					var a0 = 74500 * k, a1 = 117580 * k, a2 = 122170 * k, a3 = 136780 * k;
-					svg += '<circle cx="150" cy="150" r="' + ((a0 + a1) / 2).toFixed(2) + '" fill="none" stroke="rgba(232,212,160,0.55)" stroke-width="' + (a1 - a0).toFixed(2) + '" />';
-					svg += '<circle cx="150" cy="150" r="' + ((a2 + a3) / 2).toFixed(2) + '" fill="none" stroke="rgba(214,190,140,0.5)" stroke-width="' + (a3 - a2).toFixed(2) + '" />';
-				}
-				var lado = Math.max(3, R * 2);
-				/* o planeta: a arte dele (Saturno, cuja arte tem os anéis de lado, vira um disco dourado) */
-				if (id === 'saturno') svg += '<circle cx="150" cy="150" r="' + R.toFixed(2) + '" fill="#e3c88a" /><circle cx="150" cy="150" r="' + (R * 0.62).toFixed(2) + '" fill="#f0dca8" />';
-				else svg += '<image href="pixel/' + id + '.png" x="' + (150 - lado / 2).toFixed(2) + '" y="' + (150 - lado / 2).toFixed(2) + '" width="' + lado.toFixed(2) + '" height="' + lado.toFixed(2) + '" preserveAspectRatio="none" style="image-rendering: pixelated" />';
-				S.luas.forEach(function (l, i) { svg += '<g class="lupa-lua" data-i="' + i + '"><circle class="lupa-lua-anel" r="5" stroke="' + l[5] + '" /><circle r="' + Math.max(1.6, l[2] / 2 * k).toFixed(2) + '" fill="' + l[5] + '" /><text x="7" y="-5">' + l[1] + '</text></g>'; /* (o anelzinho em volta é só para achar a lua: ela mesma é o pontinho do meio) */ });
-				/* a régua */
-				var passo = [10000, 50000, 100000, 250000, 500000, 1000000].filter(function (v) { return v * k >= 40; })[0] || 1000000;
-				svg += '<g class="lupa-regua"><line x1="16" y1="282" x2="' + (16 + passo * k).toFixed(1) + '" y2="282" /><text x="16" y="275">' + fmtKm(passo) + '</text></g></svg>';
-				var lista = S.luas.map(function (l) { return '<a href="' + l[0] + '.html"><i style="background:' + l[5] + '"></i><b>' + l[1] + '</b> ' + fmtKm(l[3]) + '</a>'; }).join('');
-				lupa.innerHTML = '<button type="button" class="lupa-fechar" aria-label="' + T('Fechar', 'Close') + '">&times;</button>' +
-					'<p class="lupa-titulo">' + T(NOMES[id] + ' e as suas luas', NOMES[id] + ' and its moons') + ' <small>' + T('escala real, vista de cima', 'real scale, seen from above') + '</small></p>' +
-					'<div class="lupa-mapa">' + svg + '</div>' +
-					'<p class="lupa-legenda">' + NOTAS[id] + ' ' + T('O planeta, as luas e as órbitas estão na mesma escala; as luas menores que um pixel aparecem como um pontinho.', 'The planet, the moons and the orbits are at the same scale; moons smaller than a pixel show up as a tiny dot.') + '</p>' +
-					'<nav class="lupa-lista">' + lista + '<a class="lupa-visitar" href="' + id + '.html">' + T('Visitar ', 'Visit ') + NOMES[id] + ' &rarr;</a></nav>';
-				lupa.setAttribute('aria-label', T(NOMES[id] + ' e as suas luas em escala real', NOMES[id] + ' and its moons at real scale'));
-				lupa.hidden = false;
-				lupa.querySelector('.lupa-fechar').addEventListener('click', fecharLupa);
-				var grupos = [].slice.call(lupa.querySelectorAll('.lupa-lua')), t0 = performance.now();
-				cancelAnimationFrame(anim);
-				(function girar(agora) {
-					var dias = calmo ? 0 : (agora - t0) / 1000 / 3; /* (1 dia = 3 segundos, como na imagem de cima) */
-					grupos.forEach(function (g, i) {
-						var l = S.luas[i], a = 1 + i * 2.1 + dias / l[4] * Math.PI * 2, r = l[3] * k, x = 150 + Math.cos(a) * r, txt = g.querySelector('text');
-						g.setAttribute('transform', 'translate(' + x.toFixed(2) + ' ' + (150 + Math.sin(a) * r).toFixed(2) + ')');
-						/* perto da beirada direita, o nome passa para o lado esquerdo da lua */
-						var esq = x > 205; txt.setAttribute('x', esq ? -7 : 7); txt.setAttribute('text-anchor', esq ? 'end' : 'start');
-					});
-					anim = requestAnimationFrame(girar);
-				})(t0);
-			}
-			function fecharLupa() { lupa.hidden = true; aberto = null; cancelAnimationFrame(anim); }
-			document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && aberto) fecharLupa(); });
-			// na escala real, clicar num planeta com luas abre a lupa (em vez de ir para a página dele)
-			Object.keys(SIS).forEach(function (id) {
-				var el = sistema.querySelector('.astro[data-id="' + id + '"]');
-				if (el) el.addEventListener('click', function (e) { if (!real) return; e.preventDefault(); e.stopImmediatePropagation(); abrirLupa(id); }, true);
-			});
 		})();
 	</script>
 </body>

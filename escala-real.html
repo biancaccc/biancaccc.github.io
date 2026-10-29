@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+	<meta charset="utf-8">
+	<!-- fundo escuro desde o primeiro instante; vindo de um salto, a página começa coberta pelo último quadro do salto (preso à tela, não à página), para nenhum quadro vazar antes das estrelas -->
+	<script>try{var h=document.documentElement;h.style.backgroundColor="#05030c";if(sessionStorage.getItem("salto")==="1"){var q=sessionStorage.getItem("saltoQuadro");h.className+=" em-salto";if(q){h.style.background="#05030c url("+q+") 0 0/100% 100% no-repeat fixed";h.style.imageRendering="pixelated"}}}catch(e){}</script>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Escala real · Nosso sistema solar</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Silkscreen&family=Space+Grotesk:wght@400;500;700&family=Tiny5&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="estilo.css">
+</head>
+<body data-passaporte="sistema" class="pagina-escala" style="--cor: #ffd36a">
+
+	<header class="topo">
+		<a class="marca" href="sistema-solar.html">Nosso sistema solar</a>
+		<nav class="menu">
+		<a class="menu-galaxia" href="index.html#galaxia">&larr; Via Láctea</a>
+		<a href="mercurio.html">Mercúrio</a>
+		<a href="venus.html">Vênus</a>
+		<a href="terra.html">Terra</a>
+		<a href="marte.html">Marte</a>
+		<a href="jupiter.html">Júpiter</a>
+		<a href="saturno.html">Saturno</a>
+		<a href="urano.html">Urano</a>
+		<a href="netuno.html">Netuno</a>
+		<a href="sol.html">Sol</a>
+		</nav>
+	</header>
+
+	<main>
+		<section class="destaque">
+			<div class="palco">
+				<canvas class="planeta escala-heroi" data-escala="heroi" role="img" aria-label="O Sol enorme, entrando pela esquerda, e, ao lado dele, a Terra como um pontinho azul e Júpiter, na mesma escala."></canvas>
+			</div>
+			<div class="destaque-texto">
+				<p class="posicao">Nosso sistema solar</p>
+				<h1>Escala real</h1>
+				<p class="lema">O Sistema Solar do tamanho que ele é</p>
+				<dl class="ficha">
+					<div><dt>Sol</dt><dd>109 Terras de largura</dd></div>
+					<div><dt>Da Terra à Lua</dt><dd>30 Terras enfileiradas</dd></div>
+					<div><dt>Anéis de Saturno</dt><dd>Uns 10 m de espessura</dd></div>
+					<div><dt>Luz até Netuno</dt><dd>4 horas e 10 minutos</dd></div>
+				</dl>
+			</div>
+		</section>
+
+		<div class="leitura" id="leitura">
+		<aside class="sumario" aria-label="Nesta página">
+			<p>Nesta página</p>
+			<ol>
+				<li><a href="#secao-1">Por que as imagens enganam</a></li>
+				<li><a href="#secao-2">Tamanhos de verdade</a></li>
+				<li><a href="#secao-3">Da Terra à Lua</a></li>
+				<li><a href="#secao-4">As luas e as órbitas</a></li>
+				<li><a href="#secao-5">Os anéis de Saturno</a></li>
+				<li><a href="#secao-6">As distâncias e a luz</a></li>
+				<li><a href="#secao-7">Viagem em escala real</a></li>
+			</ol>
+		</aside>
+
+		<article class="conteudo">
+		<section class="bloco pixelado" id="secao-1">
+			<h2>Por que as imagens enganam</h2>
+			<p>Quase todas as imagens do Sistema Solar, inclusive a da página anterior, mostram os planetas pertinho uns dos outros e as luas coladas neles. Não é por mal: em escala real, os planetas ficariam tão pequenos e tão longe que a imagem pareceria vazia. Nesta página, tudo aparece do tamanho e na distância de verdade.</p>
+		</section>
+		<section class="bloco pixelado" id="secao-2">
+			<h2>Tamanhos de verdade</h2>
+			<p>O Sol é tão grande que caberiam 109 Terras enfileiradas de um lado ao outro dele, e cerca de 1,3 milhão de Terras dentro. Júpiter, o maior planeta, tem 11 vezes a largura da Terra, e dentro dele caberiam umas 1.300 Terras. Mercúrio, o menor, é só um pouco maior que a nossa Lua.</p>
+			<figure class="animacao escala-fig"><canvas data-escala="tamanhos" role="img" aria-label="Animação: a beirada do Sol à esquerda e os oito planetas enfileirados ao lado dele, todos na mesma escala. Uma setinha passa por cada um."></canvas>
+				<div class="animacao-hud" aria-hidden="true"><span data-hud="ano"></span><span data-hud="estacao"></span></div>
+				<figcaption>Na mesma escala: a beirada do Sol e os oito planetas. A Terra é aquele pontinho azul.</figcaption></figure>
+		</section>
+		<section class="bloco pixelado" id="secao-3">
+			<h2>Da Terra à Lua</h2>
+			<p>A Lua parece pertinho, mas fica a cerca de 384 mil km: daria para enfileirar 30 Terras entre as duas. E mais: na distância média, medindo de centro a centro, todos os outros planetas do Sistema Solar, lado a lado, cabem nesse espaço, com uns 4 mil km de sobra. A luz faz esse caminho em 1,3 segundo.</p>
+			<figure class="animacao escala-fig"><canvas data-escala="terra-lua" role="img" aria-label="Animação: a Terra à esquerda e a Lua à direita, na distância de verdade. Primeiro, 30 Terras aparecem enfileiradas entre as duas; depois, os outros sete planetas, lado a lado, ocupam o mesmo espaço."></canvas>
+				<div class="animacao-hud" aria-hidden="true"><span data-hud="ano"></span><span data-hud="estacao"></span></div>
+				<figcaption>A Terra e a Lua na distância de verdade: cabem 30 Terras, ou todos os outros planetas em fila.</figcaption></figure>
+		</section>
+		<section class="bloco pixelado" id="secao-4">
+			<h2>As luas e as órbitas</h2>
+			<p>Cada planeta com as suas luas, visto de cima e em escala real: o planeta, as luas e as órbitas na mesma medida. Repare como Titã fica longe de Saturno e como Io, Europa e Ganimedes giram no ritmo 4 : 2 : 1. Escolha um planeta:</p>
+			<div class="escala-luas" id="escala-luas"></div>
+		</section>
+		<section class="bloco pixelado" id="secao-5">
+			<h2>Os anéis de Saturno</h2>
+			<p>Os anéis principais de Saturno têm cerca de 270 mil km de uma ponta à outra, mais de 21 Terras enfileiradas. Mas, na maior parte, eles têm só uns 10 metros de espessura, a altura de um prédio de três andares. Se os anéis tivessem a largura de um campo de futebol, seriam uns 25 vezes mais finos que uma folha de papel. Por isso, quando ficam de lado para nós, como em 2025, eles quase somem.</p>
+			<figure class="animacao escala-fig"><canvas data-escala="aneis" role="img" aria-label="Animação: Saturno com os anéis vistos de um pouco acima, que vão girando até ficar de lado e quase sumir, de tão finos."></canvas>
+				<div class="animacao-hud" aria-hidden="true"><span data-hud="ano"></span><span data-hud="estacao"></span></div>
+				<figcaption>Vistos de lado, os anéis de Saturno quase desaparecem: eles são enormes de largura, mas finíssimos.</figcaption></figure>
+		</section>
+		<section class="bloco pixelado" id="secao-6">
+			<h2>As distâncias e a luz</h2>
+			<p>A luz é a coisa mais rápida que existe: quase 300 mil km por segundo. Mesmo assim, a luz do Sol leva 8 minutos e 20 segundos para chegar à Terra, 43 minutos até Júpiter e mais de 4 horas até Netuno. Um carro a 100 km/h levaria uns 170 anos para ir da Terra ao Sol.</p>
+			<figure class="animacao escala-fig"><canvas data-escala="luz" role="img" aria-label="Animação: o Sol à esquerda e os oito planetas numa linha, nas distâncias de verdade. Um raio de luz sai do Sol e um relógio mostra quanto tempo ele leva para chegar a cada planeta."></canvas>
+				<div class="animacao-hud" aria-hidden="true"><span data-hud="ano"></span><span data-hud="estacao"></span></div>
+				<figcaption>Um raio de luz saindo do Sol, com os planetas nas distâncias de verdade. Os quatro primeiros ficam todos espremidos perto do Sol.</figcaption></figure>
+		</section>
+		<section class="bloco pixelado" id="secao-7">
+			<h2>Viagem em escala real</h2>
+			<p>Nesta faixa, a Lua tem 1 pixel. Nessa escala, o Sol tem 400 pixels, a Terra fica a 43 mil pixels dele e Netuno, a 1,3 milhão. Role para o lado (ou use as setas) para viajar. O botão "velocidade da luz" leva você no ritmo da luz de verdade: até Netuno, são 4 horas!</p>
+			<div class="viagem" id="viagem"></div>
+			<p class="viagem-credito">Inspirada em "If the Moon Were Only 1 Pixel", de Josh Worth.</p>
+		</section>
+
+		<p class="fecho">O espaço é, acima de tudo, vazio. Os planetas são ilhas pequenininhas num oceano enorme, e é isso que torna cada viagem tão especial.</p>
+		</article>
+		</div>
+
+		<nav class="vizinhos">
+		<a class="anterior" href="sistema-solar.html"><img src="pixel/sol.png" alt=""><span><small>Anterior</small>Nosso sistema solar</span></a>
+		<a class="proximo" href="mercurio.html"><span><small>Próximo</small>Mercúrio</span><img src="pixel/mercurio.png" alt=""></a>
+		</nav>
+	</main>
+
+	<footer class="rodape">
+		<nav class="rodape-planetas" aria-label="Todos os planetas">
+			<a href="mercurio.html"><img src="pixel/mercurio.png" alt="">Mercúrio</a>
+			<a href="venus.html"><img src="pixel/venus.png" alt="">Vênus</a>
+			<a href="terra.html"><img src="pixel/terra.png" alt="">Terra</a>
+			<a href="marte.html"><img src="pixel/marte.png" alt="">Marte</a>
+			<a href="jupiter.html"><img src="pixel/jupiter.png" alt="">Júpiter</a>
+			<a href="saturno.html"><img src="pixel/saturno.png" alt="">Saturno</a>
+			<a href="urano.html"><img src="pixel/urano.png" alt="">Urano</a>
+			<a href="netuno.html"><img src="pixel/netuno.png" alt="">Netuno</a>
+			<a href="sol.html"><img src="pixel/sol.png" alt="">Sol</a>
+		</nav>
+		<nav class="rodape-planetas rodape-luas" aria-label="As luas">
+			<a href="lua.html"><img src="pixel/lua.png" alt="">Lua</a>
+			<a href="io.html"><img src="pixel/io.png" alt="">Io</a>
+			<a href="europa.html"><img src="pixel/europa.png" alt="">Europa</a>
+			<a href="ganimedes.html"><img src="pixel/ganimedes.png" alt="">Ganimedes</a>
+			<a href="tita.html"><img src="pixel/tita.png" alt="">Titã</a>
+			<a href="encelado.html"><img src="pixel/encelado.png" alt="">Encélado</a>
+			<a href="mimas.html"><img src="pixel/mimas.png" alt="">Mimas</a>
+			<a href="miranda.html"><img src="pixel/miranda.png" alt="">Miranda</a>
+			<a href="tritao.html"><img src="pixel/tritao.png" alt="">Tritão</a>
+		</nav>
+		<p><a href="sistema-solar.html">Nosso sistema solar</a> · <a href="index.html#galaxia">Via Láctea</a> · textos e pixel art feitos à mão</p>
+	</footer>
+
+	<script src="idioma.js"></script>
+	<script src="nave.js"></script>
+	<script src="transicao.js"></script>
+	<script src="tempo-do-sol.js"></script>
+	<script src="radio.js"></script>
+	<script src="passaporte.js"></script>
+	<script src="marca.js"></script>
+	<script src="fundo.js"></script>
+	<script src="escala-real.js"></script>
+	<script src="pagina.js"></script>
+</body>
+</html>
