@@ -1775,6 +1775,7 @@ html.em-salto body > :not(.transicao) { visibility: hidden; }
 	background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--cor) 10%, transparent), transparent);
 }
 .fecho::before { content: "\2726  registro final  \2726"; display: block; margin-bottom: 14px; font-family: var(--rotulo); font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--cor); }
+html[lang="en"] .fecho::before { content: "\2726  final entry  \2726"; }
 
 @media (max-width: 640px) {
 	.bloco { grid-template-columns: 56px minmax(0, 1fr); padding: 26px 0 28px; }
@@ -3392,6 +3393,7 @@ html.em-salto body > :not(.transicao) { visibility: hidden; }
 	color: #05030c;
 	background: #7fe3ff;
 }
+html[lang="en"] .doc-scan::after { content: "Reading document"; }
 @keyframes scan-desce {
 	0% { top: 0; opacity: 0; }
 	8% { opacity: 1; }
@@ -4039,7 +4041,7 @@ body.viagem:not(.na-galaxia) .radio-doca, .galaxia.partindo ~ .radio-doca { disp
 
 /* ---------- Sistema Solar: a beirada do Sol entrando pela esquerda, na escala dos planetas ---------- */
 /* (os planetas vão um pouco para a direita, para sobrar lugar para ela) */
-.sistema.com-sol { width: min(1240px, 82vw, calc((100vh - 440px) * 9400 / 2450 * 0.9)); left: 7vw; }
+.sistema.com-sol { width: min(1340px, 90vw, calc((100vh - 440px) * 9400 / 2450 * 0.95)); left: 3vw; }
 /* o brilho da beirada do Sol: suave e pulsando, como o da página do Sol (sem pontilhado) */
 .sol-borda { overflow: visible; }
 .sol-borda canvas { position: relative; z-index: 1; }
@@ -4245,21 +4247,43 @@ body.embarcando { overflow: hidden; }
 /* no celular em pé a cena fica pequena: uma dica para deitar o aparelho */
 @media (orientation: portrait) and (max-width: 700px) {
 	.embarque::after { content: "↻ Gire o celular para ver melhor"; position: fixed; left: 0; right: 0; bottom: 18%; text-align: center; font: 11px/1.4 Silkscreen, monospace; color: rgba(205, 246, 255, 0.6); }
+	html[lang="en"] .embarque::after { content: "↻ Turn your phone sideways for a better view"; }
 }
 
-/* o link para assistir de novo, embaixo do botão de iniciar */
-.intro-embarque { position: relative; }
+/* o botão para assistir de novo ao embarque: um botão secundário dourado, do lado do "Iniciar viagem"
+   (no celular, embaixo dele), longe da nave */
+.intro-embarque .intro-botao { margin-top: 0; }
 .rever-embarque {
-	position: absolute;
-	left: 50%;
-	top: calc(100% + 10px);
-	transform: translateX(-50%);
-	font: 10px/1 Silkscreen, monospace;
-	letter-spacing: 0.06em;
-	color: rgba(205, 246, 255, 0.55);
+	display: inline-flex;
+	align-items: center;
+	gap: 10px;
+	padding: 15px 20px;
+	font-family: var(--titulo);
+	font-size: 12px;
+	line-height: 1;
+	letter-spacing: 0.16em;
+	text-transform: uppercase;
+	text-decoration: none;
 	white-space: nowrap;
+	color: #ffe6a0;
+	background: rgba(232, 196, 106, 0.08);
+	border: 1px solid rgba(232, 196, 106, 0.55);
+	transition: color 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
 }
-.rever-embarque:hover, .rever-embarque:focus-visible { color: #ffd36a; }
+.rever-seta { /* o "voltar" em pixel: o mesmo triângulo do botão de iniciar, virado */
+	width: 8px;
+	height: 10px;
+	background: currentColor;
+	transform: scaleX(-1);
+	clip-path: polygon(0 0, 25% 0, 25% 10%, 50% 10%, 50% 20%, 75% 20%, 75% 40%, 100% 40%, 100% 60%, 75% 60%, 75% 80%, 50% 80%, 50% 90%, 25% 90%, 25% 100%, 0 100%);
+}
+.rever-embarque:hover { color: #05030c; background: #e8c46a; box-shadow: 0 0 20px rgba(232, 196, 106, 0.4); }
+.rever-embarque:focus-visible { outline: 2px solid var(--rosa); outline-offset: 4px; }
+@media (max-width: 620px) {
+	.intro-embarque { flex-direction: column; gap: 12px; }
+	.intro-embarque::before, .intro-embarque::after { display: none; }
+	.rever-embarque { padding: 12px 18px; font-size: 11px; }
+}
 
 /* o carimbo verde de embarque aprovado, do lado esquerdo da assinatura (embaixo da foto), sem cobrir o nome */
 .pp-embarque {
@@ -4400,3 +4424,181 @@ html.chegando .carimbo-novo { z-index: 160; }
 .emb-retrato figcaption span { font: 1.5cqh/1 Silkscreen, monospace; color: #cfe4ff; letter-spacing: 0.08em; text-transform: uppercase; }
 .emb-retrato button { padding: 0.9cqh 2.2cqh; font: 1.7cqh/1 Silkscreen, monospace; letter-spacing: 0.08em; color: #101a4a; background: #e8c46a; border: 0; cursor: pointer; }
 .emb-retrato button:hover, .emb-retrato button:focus-visible { background: #ffe6a0; outline: none; }
+
+/* ---------- O seletor de idioma (idioma.js): PT | EN, discreto, embaixo, do lado do crédito da autora ---------- */
+.idioma {
+	position: fixed;
+	left: calc(50% + 80px);
+	bottom: 1px;
+	z-index: 60;
+	display: flex;
+	align-items: center;
+	gap: 2px;
+	padding: 2px 4px;
+	font: 9px/1 Silkscreen, monospace;
+	letter-spacing: 0.08em;
+}
+.idioma button { padding: 2px 4px; font: inherit; letter-spacing: inherit; color: rgba(205, 246, 255, 0.5); background: none; border: 0; cursor: pointer; }
+.idioma button[aria-pressed="true"] { color: #ffd36a; }
+.idioma button:hover, .idioma button:focus-visible { color: #ffffff; }
+.idioma-sep { color: rgba(205, 246, 255, 0.25); }
+html.em-salto .idioma { visibility: hidden; }
+.idioma-globo { width: 9px; height: 9px; margin-right: 3px; color: rgba(127, 227, 255, 0.55); }
+/* durante o embarque, a escolha fica na tela de início (.emb-idioma) */
+body.embarcando .idioma { display: none; }
+/* na capa: maior, centralizado logo acima do crédito, como uma plaquinha da nave */
+body.viagem:not(.na-galaxia) .idioma {
+	left: 50%;
+	bottom: 22px;
+	transform: translateX(-50%);
+	gap: 4px;
+	padding: 6px 10px;
+	font-size: 13px;
+	background: rgba(8, 14, 34, 0.72);
+	box-shadow: inset 0 0 0 1px rgba(127, 227, 255, 0.28), 0 0 18px rgba(127, 227, 255, 0.08);
+}
+body.viagem:not(.na-galaxia) .idioma button { padding: 4px 8px; color: rgba(205, 246, 255, 0.7); }
+body.viagem:not(.na-galaxia) .idioma button[aria-pressed="true"] { color: #1b1430; background: #ffd36a; }
+body.viagem:not(.na-galaxia) .idioma button:hover:not([aria-pressed="true"]), body.viagem:not(.na-galaxia) .idioma button:focus-visible:not([aria-pressed="true"]) { color: #ffffff; background: rgba(127, 227, 255, 0.14); }
+body.viagem:not(.na-galaxia) .idioma-globo { width: 13px; height: 13px; margin-right: 6px; color: #7fe3ff; }
+body.viagem:not(.na-galaxia) .idioma-sep { display: none; }
+/* na Via Láctea: bem discreto, no canto de baixo, com o globinho apagado */
+body.na-galaxia .idioma { opacity: 0.7; }
+body.na-galaxia .idioma:hover, body.na-galaxia .idioma:focus-within { opacity: 1; }
+/* a escolha do idioma na tela de início do embarque, embaixo de "Começar a viagem" */
+.emb-idioma { position: absolute; z-index: 5; transform: translateX(-50%); display: flex; gap: 1.2cqh; padding: 0.8cqh; background: rgba(10, 14, 40, 0.75); box-shadow: inset 0 0 0 0.2cqh rgba(232, 196, 106, 0.45); }
+.emb-idioma button { padding: 1cqh 2cqh; font: 1.9cqh/1 Silkscreen, monospace; letter-spacing: 0.08em; color: rgba(242, 238, 252, 0.75); background: none; border: 0; cursor: pointer; }
+.emb-idioma button[aria-pressed="true"] { color: #1b1430; background: #e8c46a; }
+.emb-idioma button:hover:not([aria-pressed="true"]), .emb-idioma button:focus-visible:not([aria-pressed="true"]) { color: #ffffff; background: rgba(232, 196, 106, 0.18); outline: none; }
+
+/* ---------- As luas ---------- */
+/* no menu de cima das páginas das luas, o planeta da lua fica marcado de leve */
+.menu a.menu-pai { box-shadow: inset 0 -2px 0 var(--cor); color: #fff; }
+/* a fileira das luas no rodapé, menorzinha, embaixo da dos planetas */
+.rodape-luas { gap: 4px 14px; margin-top: -8px; }
+.rodape-luas a { font-size: 13px; }
+.rodape-luas img { width: 13px; }
+/* na página do Sistema Solar: a fileira das luas, menor, embaixo dos planetas */
+.planetas.luas { margin-top: 6px; align-items: center; }
+.planetas.luas a { font-size: 15px; padding: 4px 9px; }
+.luas-rotulo { font: 11px/1 Silkscreen, monospace; letter-spacing: 0.12em; text-transform: uppercase; color: var(--suave); margin-right: 4px; }
+/* na página do Sistema Solar: as luas dando voltas nos seus planetas, com as órbitas pontilhadas */
+/* os planetas um pouco menores que a arte (82%, cada um em volta do próprio centro), para sobrar
+   espaço para as órbitas das luas; o Sol, no script da página, acompanha a mesma escala */
+.sistema > .astro:not(.lua-orbita) { z-index: 2; transform: scale(0.82); }
+.lua-orbita { width: 10px; }
+.lua-orbita img { display: block; width: 100%; image-rendering: pixelated; }
+/* (uma área de toque um pouco maior que a luazinha) */
+.lua-orbita::before { content: ""; position: absolute; inset: -7px; }
+.lua-orbita::after { font-size: 14px; transform: translate(-50%, 6px); }
+.orbitas-luas { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; z-index: 0; }
+.orbitas-luas ellipse { fill: none; stroke: rgba(180, 200, 255, 0.42); stroke-width: 1; stroke-dasharray: 3 3; }
+.sistema.focado .orbitas-luas { opacity: 0.35; }
+/* a escala real no Sistema Solar: o botão embaixo do subtítulo, os planetas nos tamanhos de verdade
+   (--real, em relação a Júpiter) e a lupa com o sistema de luas de cada um */
+.escala.escala-sistema { position: fixed; z-index: 20; left: auto; right: 44px; top: 34px; bottom: auto; opacity: 1; visibility: visible; transition: opacity 0.4s ease; }
+html.chegando .escala-sistema, html.em-salto .escala-sistema { opacity: 0; pointer-events: none; }
+@media (max-width: 700px) { .escala.escala-sistema { right: 12px; top: 64px; } }
+.sistema > .astro:not(.lua-orbita) { transition: transform 0.7s cubic-bezier(0.5, 0, 0.2, 1), opacity 0.3s ease, filter 0.3s ease; }
+.sistema.escala-real > .astro:not(.lua-orbita) { transform: scale(calc(0.82 * var(--real, 1))); }
+.lua-orbita, .orbitas-luas { transition: opacity 0.5s ease; }
+.sistema.escala-real .lua-orbita, .sistema.escala-real .orbitas-luas { opacity: 0; pointer-events: none; }
+.lupa-luas { position: fixed; z-index: 30; left: 50%; top: 50%; transform: translate(-50%, -50%); width: min(380px, 92vw); max-height: 92vh; overflow: auto; padding: 14px 16px 12px; background: rgba(8, 6, 20, 0.92); border: 1px solid rgba(255, 211, 106, 0.45); box-shadow: 0 18px 60px rgba(0, 0, 0, 0.6); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
+.lupa-luas[hidden] { display: none; }
+.lupa-luas .lupa-titulo { color: #ffd36a; padding-right: 28px; }
+.lupa-luas .lupa-titulo small { color: rgba(255, 211, 106, 0.6); }
+.lupa-fechar { position: absolute; right: 8px; top: 6px; width: 28px; height: 28px; font-size: 20px; line-height: 1; color: #fff; background: none; border: 0; cursor: pointer; }
+.lupa-luas .lupa-mapa svg { overflow: visible; }
+.lupa-luas .lupa-orbita { fill: none; stroke: rgba(180, 200, 255, 0.35); stroke-width: 0.8; stroke-dasharray: 2 3; }
+.lupa-luas .lupa-lua-anel { fill: none; stroke-width: 0.8; opacity: 0.6; }
+.lupa-luas .lupa-lua text { font-family: var(--rotulo); font-size: 9px; fill: #f2eefc; }
+.lupa-regua line { stroke: rgba(255, 211, 106, 0.8); stroke-width: 1.5; }
+.lupa-regua text { font-family: var(--rotulo); font-size: 9px; fill: rgba(255, 211, 106, 0.8); }
+.lupa-luas .lupa-legenda { margin: 6px 0 8px; font-size: 13px; line-height: 1.45; color: var(--suave); }
+.lupa-lista { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 13px; }
+.lupa-lista a { display: inline-flex; align-items: center; gap: 6px; color: #f2eefc; text-decoration: none; }
+.lupa-lista a:hover { color: #ffd36a; }
+.lupa-lista i { width: 8px; height: 8px; border-radius: 50%; }
+.lupa-lista .lupa-visitar { margin-left: auto; color: #ffd36a; font-family: var(--rotulo); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; }
+/* o botão que leva para a página da escala real, no canto de cima, à direita */
+.escala-link { position: fixed; z-index: 20; right: 44px; top: 34px; padding: 9px 14px 10px; font-family: var(--rotulo); font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: #1b1430; background: #ffd36a; text-decoration: none; box-shadow: 0 0 0 1px rgba(255, 211, 106, 0.5), 0 0 18px rgba(255, 211, 106, 0.35); transition: background 0.2s ease, opacity 0.4s ease; }
+.escala-link:hover, .escala-link:focus-visible { background: #fff0b8; outline: none; }
+html.chegando .escala-link, html.em-salto .escala-link { opacity: 0; pointer-events: none; }
+@media (max-width: 700px) { .escala-link { right: 12px; top: 64px; } }
+
+/* ---------- Página "Escala real" ---------- */
+.pagina-escala .palco { --proporcao: 1; }
+.escala-luas { margin-top: 18px; }
+.er-abas { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+.er-abas button { display: inline-flex; align-items: center; gap: 7px; padding: 6px 11px 7px; font-family: var(--rotulo); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--suave); background: rgba(5, 3, 12, 0.6); border: 1px solid var(--borda); cursor: pointer; transition: color 0.2s, border-color 0.2s, background 0.2s; }
+.er-abas button img { width: 16px; height: auto; image-rendering: pixelated; }
+.er-abas button:hover, .er-abas button:focus-visible { color: #fff; border-color: var(--cor); outline: none; }
+.er-abas button.ativa { color: #1b1430; background: var(--cor); border-color: var(--cor); }
+.er-lupa { position: relative; border: 1px solid var(--borda); background: radial-gradient(circle at 50% 50%, rgba(255, 211, 106, 0.05), rgba(5, 3, 12, 0.85) 70%); }
+.er-lupa svg { display: block; width: 100%; height: auto; max-height: 72vh; margin: 0 auto; font-family: var(--rotulo); }
+.er-lupa.parada::after { content: "II"; position: absolute; right: 12px; top: 10px; font-family: var(--rotulo); font-size: 11px; color: var(--cor); opacity: 0.8; }
+.er-lupa-fundo { fill: none; stroke: rgba(127, 227, 255, 0.08); stroke-dasharray: 2 4; }
+.er-orbita { fill: none; stroke: rgba(219, 201, 255, 0.22); stroke-width: 0.7; }
+.er-orbita.com-pagina { stroke: rgba(255, 211, 106, 0.38); }
+.er-planeta { filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.45)); }
+.er-nome-planeta { fill: var(--texto); font-size: 10px; text-anchor: middle; letter-spacing: 0.06em; }
+.er-ponto { fill: #d9d3f0; }
+.er-alvo { fill: transparent; pointer-events: all; }
+.er-halo, .er-ponto, .er-nome-lua { pointer-events: none; }
+.er-halo { fill: none; stroke: rgba(217, 211, 240, 0.35); stroke-width: 1; }
+.er-nome-lua { fill: var(--suave); font-size: 9px; letter-spacing: 0.05em; }
+.er-lua.com-pagina .er-ponto { fill: #ffd36a; }
+.er-lua.com-pagina .er-halo { stroke: rgba(255, 211, 106, 0.55); }
+.er-lua.com-pagina .er-nome-lua { fill: #ffd36a; }
+.er-lua { cursor: default; }
+.er-lua.com-pagina { cursor: pointer; }
+.er-lua:hover .er-halo, .er-lua:focus .er-halo { stroke: #fff; stroke-width: 1.6; }
+.er-lua:hover .er-nome-lua, .er-lua:focus .er-nome-lua { fill: #fff; }
+.er-lua:focus { outline: none; }
+.er-regua { stroke: var(--cor); stroke-width: 1; fill: none; }
+.er-regua-texto { fill: var(--cor); font-size: 9px; }
+.er-lupa-info { height: 5.6em; overflow: hidden; padding: 8px 12px; font-size: 12px; line-height: 1.45; color: var(--suave); background: rgba(5, 3, 12, 0.78); border-bottom: 1px solid var(--borda); pointer-events: none; }
+.er-lupa-info strong { display: block; font-family: var(--rotulo); font-weight: 400; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--cor); }
+.er-lupa-info em { color: #ffd36a; font-style: normal; }
+.escala-luas .er-lupa-nota { margin: 0; font-size: 13px; line-height: 1.45; color: var(--suave); }
+
+.viagem { position: relative; margin-top: 18px; --cor: #ffd36a; }
+.er-trilho { overflow-x: auto; overflow-y: hidden; border: 1px solid var(--borda); background: #05030c; scrollbar-color: var(--cor) rgba(5, 3, 12, 0.8); outline: none; }
+.er-trilho:focus-visible { border-color: var(--cor); }
+.er-faixa { position: relative; background-repeat: repeat-x; }
+.er-sol { position: absolute; image-rendering: pixelated; filter: drop-shadow(0 0 30px rgba(255, 170, 60, 0.6)); }
+.er-planeta-img { position: absolute; height: auto; image-rendering: auto; filter: drop-shadow(0 0 3px rgba(255, 255, 255, 0.5)); }
+i.er-planeta-img { border-radius: 50%; box-shadow: 0 0 4px currentColor; }
+.er-mira { position: absolute; width: 18px; height: 18px; margin-left: -9px; border: 1px solid rgba(127, 227, 255, 0.5); clip-path: polygon(0 0, 30% 0, 30% 1px, 1px 1px, 1px 30%, 0 30%, 0 70%, 1px 70%, 1px calc(100% - 1px), 30% calc(100% - 1px), 30% 100%, 70% 100%, 70% calc(100% - 1px), calc(100% - 1px) calc(100% - 1px), calc(100% - 1px) 70%, 100% 70%, 100% 30%, calc(100% - 1px) 30%, calc(100% - 1px) 1px, 70% 1px, 70% 0); animation: mira 2.4s ease-in-out infinite; }
+@keyframes mira { 50% { transform: scale(1.25); border-color: rgba(127, 227, 255, 0.9); } }
+@media (prefers-reduced-motion: reduce) { .er-mira { animation: none; } }
+.er-lua-px { position: absolute; width: 1px; height: 1px; background: #d8d2c4; box-shadow: 0 0 3px rgba(255, 255, 255, 0.6); }
+.er-rotulo { position: absolute; transform: translateX(-50%); width: max-content; max-width: 230px; font-size: 12px; line-height: 1.4; text-align: center; color: var(--suave); }
+.er-rotulo b { display: block; font-family: var(--rotulo); font-weight: 400; font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: #fff; }
+.er-rotulo-sol { transform: none; text-align: left; }
+.er-rotulo-sol b { color: #ffd36a; }
+.er-plaquinha { position: absolute; width: 230px; padding: 7px 10px; font-family: var(--rotulo); font-size: 10px; line-height: 1.5; letter-spacing: 0.04em; color: #cdf6ff; background: rgba(12, 8, 30, 0.8); border: 1px solid rgba(127, 227, 255, 0.35); box-shadow: 3px 3px 0 rgba(127, 227, 255, 0.12); }
+.er-plaquinha::after { content: ""; position: absolute; left: 14px; top: 100%; width: 1px; height: 46px; background: linear-gradient(rgba(127, 227, 255, 0.4), transparent); }
+.er-plaquinha-lua { width: auto; padding: 2px 6px; transform: translateX(-50%); font-size: 9px; color: #d8d2c4; border-color: rgba(216, 210, 196, 0.3); }
+.er-plaquinha-lua::after, .er-pichacao::after, .er-plaquinha-inicio::after { display: none; }
+.er-plaquinha-inicio { width: 210px; color: #ffe9a8; border-color: rgba(255, 211, 106, 0.45); }
+.er-plaquinha-fim { width: 300px; color: #ffd36a; border-color: rgba(255, 211, 106, 0.45); }
+.er-pichacao { width: auto; padding: 0; font-size: 11px; color: #ff6fb5; background: none; border: 0; box-shadow: none; transform: rotate(-6deg); text-shadow: 0 0 6px rgba(255, 111, 181, 0.6); opacity: 0.75; }
+.er-marco { position: absolute; transform: translateX(-50%); padding-top: 4px; font-family: var(--rotulo); font-size: 8px; letter-spacing: 0.05em; color: rgba(219, 201, 255, 0.35); border-top: 1px solid rgba(219, 201, 255, 0.2); white-space: nowrap; }
+.er-viagem-hud { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 6px 14px; margin-bottom: 8px; font-family: var(--rotulo); font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--cor); }
+.er-viagem-hud span { padding: 3px 8px; background: rgba(5, 3, 12, 0.75); border: 1px solid color-mix(in srgb, var(--cor) 35%, transparent); }
+.viagem.na-luz .er-viagem-hud span { box-shadow: 0 0 12px rgba(255, 211, 106, 0.35); }
+.er-viagem-botoes { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+.er-viagem-botoes button { min-height: 40px; padding: 8px 13px 9px; font-family: var(--rotulo); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--texto); background: rgba(5, 3, 12, 0.7); border: 1px solid var(--borda); cursor: pointer; transition: color 0.2s, background 0.2s, border-color 0.2s; }
+.er-viagem-botoes button:hover, .er-viagem-botoes button:focus-visible { border-color: var(--cor); color: #fff; outline: none; }
+.er-viagem-botoes button[aria-pressed="true"] { color: #1b1430; background: var(--cor); border-color: var(--cor); }
+.viagem-credito { margin-top: 10px; font-size: 13px; color: var(--suave); }
+
+/* botão de recomeçar as animações: uma setinha em volta, em pixel */
+.animacao-recomecar { display: inline-flex; align-items: center; gap: 7px; flex: none; height: 26px; padding: 0 10px 0 9px; font-family: var(--rotulo); font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--cor); background: rgba(5, 3, 12, 0.75); border: 1px solid color-mix(in srgb, var(--cor) 45%, transparent); cursor: pointer; transition: color 0.2s, background 0.2s, border-color 0.2s; }
+.animacao-recomecar svg { display: block; width: 13px; height: 11px; shape-rendering: crispEdges; transition: transform 0.4s ease; }
+.animacao-recomecar:hover, .animacao-recomecar:focus-visible { color: #fff; border-color: var(--cor); background: color-mix(in srgb, var(--cor) 15%, rgba(5, 3, 12, 0.75)); outline: none; }
+.animacao-recomecar:hover svg { transform: rotate(-90deg); }
+.animacao-recomecar:active svg { transform: rotate(-360deg); transition-duration: 0.2s; }
+.animacao-recomecar:focus-visible { outline: 2px solid var(--cor); outline-offset: 2px; }
+@media (max-width: 700px) { .er-lupa-info { height: auto; min-height: 6.4em; } }

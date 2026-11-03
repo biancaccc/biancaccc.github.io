@@ -1,0 +1,29 @@
+// Os textos da página omega-centauri.html em inglês (veja idioma.js e en/comum.js).
+window.EN = window.EN || { t: {}, a: {} };
+Object.assign(window.EN.t, {
+	"Omega Centauri · Turismo espacial": "Omega Centauri · Space tourism",
+	"Halo da Via Láctea": "Halo of the Milky Way",
+	"Uma cidade de 10 milhões de estrelas": "A city of 10 million stars",
+	"Aglomerado globular": "Globular cluster",
+	"Cerca de 17.000 anos-luz": "About 17,000 light-years",
+	"Cerca de 10 milhões": "About 10 million",
+	"Cerca de 12 bilhões de anos": "About 12 billion years",
+	"Omega Centauri: a maior bola de estrelas": "Omega Centauri: the biggest ball of stars",
+	"Uma estrela que não era estrela": "A star that was not a star",
+	"Estrelas bem apertadinhas": "Stars packed tight",
+	"Estrelas muito antigas": "Very old stars",
+	"Os restos de uma galáxia engolida": "The remains of a swallowed galaxy",
+	"Um buraco negro escondido": "A hidden black hole",
+	"Na contramão da galáxia": "Going against the galactic traffic",
+	"Omega Centauri é um aglomerado globular, uma bola gigante de estrelas presas umas às outras pela gravidade. É o maior e mais brilhante da Via Láctea: reúne cerca de 10 milhões de estrelas num espaço de uns 150 anos-luz de diâmetro, a cerca de 17.000 anos-luz da Terra.": "Omega Centauri is a globular cluster, a giant ball of stars held together by gravity. It is the largest and brightest in the Milky Way: it gathers about 10 million stars in a space some 150 light-years across, about 17,000 light-years from Earth.",
+	"Para quem vive no Brasil, Omega Centauri é fácil de achar: ele fica na constelação do Centauro, perto do Cruzeiro do Sul, e aparece a olho nu como uma \"estrela\" meio embaçada. Há quase 1.900 anos, o astrônomo Ptolomeu o anotou como uma estrela comum, e em 1603 ele ganhou o nome de uma estrela, com a letra grega ômega. Só em 1677 o inglês Edmond Halley percebeu que aquilo não era uma estrela só.": "From the Southern Hemisphere, Omega Centauri is easy to find: it lies in the constellation Centaurus, near the Southern Cross, and appears to the naked eye as a slightly fuzzy \"star\". Almost 1,900 years ago, the astronomer Ptolemy noted it down as an ordinary star, and in 1603 it got a star's name, with the Greek letter omega. Only in 1677 did the Englishman Edmond Halley realize that it was not a single star.",
+	"No miolo do aglomerado, as estrelas ficam tão próximas que a distância entre elas é de mais ou menos um décimo de ano-luz, cerca de 40 vezes menos do que a distância entre o Sol e a estrela mais próxima dele. Se a Terra ficasse ali, o céu noturno teria milhares de estrelas mais brilhantes do que qualquer uma que vemos daqui.": "At the core of the cluster, the stars are so close together that the distance between them is about a tenth of a light-year, some 40 times less than the distance between the Sun and its nearest star. If Earth were there, the night sky would have thousands of stars brighter than any we see from here.",
+	"As estrelas de Omega Centauri têm cerca de 12 bilhões de anos, quase a idade do próprio Universo, que tem 13,8 bilhões. Por isso, a maioria já é velhinha, com tons amarelos, laranjas e avermelhados, como na pixel art. Estudar essas estrelas é como olhar para o passado da Via Láctea.": "The stars of Omega Centauri are about 12 billion years old, almost the age of the Universe itself, which is 13.8 billion. That is why most of them are already old, in shades of yellow, orange and red, as in the pixel art. Studying these stars is like looking into the Milky Way's past.",
+	"Omega Centauri é estranho para um aglomerado: é grande demais e tem estrelas de várias gerações, quando o normal seria todas terem nascido juntas. A explicação mais aceita é que ele seja o núcleo de uma pequena galáxia que foi engolida pela Via Láctea há bilhões de anos e perdeu suas estrelas de fora pelo caminho.": "Omega Centauri is strange for a cluster: it is too big and has stars from several generations, when normally they would all have been born together. The most accepted explanation is that it is the core of a small galaxy that was swallowed by the Milky Way billions of years ago and lost its outer stars along the way.",
+	"Em 2024, cientistas analisaram mais de 20 anos de imagens do telescópio Hubble e encontraram sete estrelas se movendo rápido demais no centro do aglomerado. A melhor explicação é um buraco negro com pelo menos 8.200 vezes a massa do Sol. Ele seria um \"elo perdido\" entre os buracos negros pequenos, que nascem de uma única estrela, e os gigantes como Sagittarius A*.": "In 2024, scientists analyzed more than 20 years of Hubble telescope images and found seven stars moving too fast at the center of the cluster. The best explanation is a black hole with at least 8,200 times the mass of the Sun. It would be a \"missing link\" between small black holes, born from a single star, and giants like Sagittarius A*.",
+	"Omega Centauri não fica no disco da galáxia, onde estão o Sol e a maioria das estrelas, e sim no halo, a região em volta dele. E ele gira em torno do centro da Via Láctea no sentido contrário ao da maioria das estrelas, mais uma pista de que veio de fora.": "Omega Centauri is not in the galaxy's disk, where the Sun and most stars are, but in the halo, the region around it. And it orbits the center of the Milky Way in the opposite direction to most stars, another clue that it came from outside.",
+	"Velho, gigante e cheio de segredos, Omega Centauri pode ser tudo o que restou de uma galáxia inteira, agora girando em volta da nossa.": "Old, gigantic and full of secrets, Omega Centauri may be all that is left of an entire galaxy, now circling ours."
+});
+Object.assign(window.EN.a, {
+	"Pixel art de Omega Centauri: milhares de estrelas douradas e alaranjadas apertadas numa bola, piscando": "Pixel art of Omega Centauri: thousands of golden and orange stars packed into a twinkling ball"
+});

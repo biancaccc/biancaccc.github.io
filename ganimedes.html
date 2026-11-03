@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+	<meta charset="utf-8">
+	<!-- fundo escuro desde o primeiro instante; vindo de um salto, a página começa coberta pelo último quadro do salto (preso à tela, não à página), para nenhum quadro vazar antes das estrelas -->
+	<script>try{var h=document.documentElement;h.style.backgroundColor="#05030c";if(sessionStorage.getItem("salto")==="1"){var q=sessionStorage.getItem("saltoQuadro");h.className+=" em-salto";if(q){h.style.background="#05030c url("+q+") 0 0/100% 100% no-repeat fixed";h.style.imageRendering="pixelated"}}}catch(e){}</script>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Ganimedes · Nosso sistema solar</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Silkscreen&family=Space+Grotesk:wght@400;500;700&family=Tiny5&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="estilo.css">
+</head>
+<body data-passaporte="sistema" class="pagina-lua" style="--cor: #c8b8a0; --escala: 0.86">
+
+	<header class="topo">
+		<a class="marca" href="sistema-solar.html">Nosso sistema solar</a>
+		<nav class="menu">
+		<a class="menu-galaxia" href="index.html#galaxia">&larr; Via Láctea</a>
+		<a href="mercurio.html">Mercúrio</a>
+		<a href="venus.html">Vênus</a>
+		<a href="terra.html">Terra</a>
+		<a href="marte.html">Marte</a>
+		<a href="jupiter.html" class="menu-pai">Júpiter</a>
+		<a href="saturno.html">Saturno</a>
+		<a href="urano.html">Urano</a>
+		<a href="netuno.html">Netuno</a>
+		<a href="sol.html">Sol</a>
+		</nav>
+	</header>
+
+	<main>
+		<section class="destaque">
+			<div class="palco">
+				<img class="planeta" data-planeta="ganimedes" src="pixel/ganimedes.png" alt="Ganimedes em pixel art">
+			</div>
+			<div class="destaque-texto">
+				<p class="posicao">Uma lua de Júpiter</p>
+				<h1>Ganimedes</h1>
+				<p class="lema">A maior lua do Sistema Solar</p>
+				<dl class="ficha">
+					<div><dt>Tipo</dt><dd>Lua de Júpiter</dd></div>
+					<div><dt>Distância de Júpiter</dt><dd>Cerca de 1,07 milhão de km</dd></div>
+					<div><dt>Uma volta em Júpiter</dt><dd>7,2 dias</dd></div>
+					<div><dt>Diâmetro</dt><dd>5.268 km</dd></div>
+				</dl>
+			</div>
+		</section>
+
+		<div class="leitura" id="leitura">
+		<aside class="sumario" aria-label="Nesta página">
+			<p>Nesta página</p>
+			<ol>
+				<li><a href="#secao-1">Ganimedes: a maior lua</a></li>
+				<li><a href="#secao-2">Uma lua com ímã</a></li>
+				<li><a href="#secao-3">Auroras que contam segredos</a></li>
+				<li><a href="#secao-4">Um oceano bem fundo</a></li>
+				<li><a href="#secao-5">Claros e escuros</a></li>
+				<li><a href="#secao-6">A sonda JUICE</a></li>
+				<li class="extra"><a href="#balanca">Sua balança espacial</a></li>
+			</ol>
+		</aside>
+
+		<article class="conteudo">
+		<section class="bloco pixelado" id="secao-1">
+			<h2>Ganimedes: a maior lua</h2>
+			<p>Ganimedes é a maior lua do Sistema Solar. Com 5.268 km de diâmetro, ela é maior até que o planeta Mercúrio e que Plutão. Mas é feita de rocha e gelo, mais leve que a rocha e o ferro de Mercúrio, e por isso tem só metade da massa dele. Foi descoberta por Galileu em 1610.</p>
+		</section>
+		<section class="bloco pixelado" id="secao-2">
+			<h2>Uma lua com ímã</h2>
+			<p>Ganimedes é a única lua conhecida com campo magnético próprio, como o da Terra. Ele é criado por um núcleo de ferro derretido que se mexe lá dentro. A descoberta foi feita pela sonda Galileo, em 1996. O campo de Ganimedes fica dentro do campo gigante de Júpiter, como uma bolha dentro de outra.</p>
+		</section>
+		<figure class="comparacao">
+			<img class="pixelado" src="pixel/ganimedes.png" alt="Comparação do tamanho de Ganimedes">
+		</figure>
+		<section class="bloco pixelado" id="secao-3">
+			<h2>Auroras que contam segredos</h2>
+			<p>Por causa do campo magnético, Ganimedes tem auroras em volta dos polos. Elas balançam conforme Júpiter gira. Em 2015, o telescópio Hubble mediu esse balanço e viu que ele era menor do que deveria: algo lá dentro freava as auroras. A melhor explicação é um oceano de água salgada, que conduz eletricidade.</p>
+		</section>
+		<section class="bloco pixelado" id="secao-4">
+			<h2>Um oceano bem fundo</h2>
+			<p>Esse oceano fica escondido embaixo de uns 150 km de gelo e pode ter mais água que todos os oceanos da Terra juntos. Ganimedes parece um sanduíche: camadas de gelo e de água empilhadas por cima de um interior de rocha e ferro.</p>
+		</section>
+		<section class="bloco pixelado" id="secao-5">
+			<h2>Claros e escuros</h2>
+			<p>A superfície tem dois tipos de terreno. As regiões escuras são muito antigas e cheias de crateras; a maior delas, Galileo Regio, tem cerca de 3.200 km. As faixas claras são mais jovens e cobertas de sulcos compridos, que mostram que a casca de gelo já foi esticada e rachada.</p>
+		</section>
+		<section class="bloco pixelado" id="secao-6">
+			<h2>A sonda JUICE</h2>
+			<p>A sonda JUICE, da Agência Espacial Europeia, foi lançada em 2023 e deve entrar na órbita de Ganimedes em 2034. Será a primeira vez que uma sonda vai orbitar uma lua que não é a nossa. Antes, em 2021, a sonda Juno, da NASA, passou a pouco mais de 1.000 km de Ganimedes.</p>
+		</section>
+
+		<p class="fecho">Maior que um planeta, com ímã, auroras e um oceano escondido, Ganimedes é a gigante discreta das luas.</p>
+		</article>
+		</div>
+
+		<section id="balanca" data-planeta="ganimedes"></section>
+
+		<nav class="vizinhos">
+		<a class="anterior" href="europa.html"><img src="pixel/europa.png" alt=""><span><small>Anterior</small>Europa</span></a>
+		<a class="proximo" href="saturno.html"><span><small>Próximo</small>Saturno</span><img src="pixel/saturno.png" alt=""></a>
+		</nav>
+	</main>
+
+	<footer class="rodape">
+		<nav class="rodape-planetas" aria-label="Todos os planetas">
+			<a href="mercurio.html"><img src="pixel/mercurio.png" alt="">Mercúrio</a>
+			<a href="venus.html"><img src="pixel/venus.png" alt="">Vênus</a>
+			<a href="terra.html"><img src="pixel/terra.png" alt="">Terra</a>
+			<a href="marte.html"><img src="pixel/marte.png" alt="">Marte</a>
+			<a href="jupiter.html"><img src="pixel/jupiter.png" alt="">Júpiter</a>
+			<a href="saturno.html"><img src="pixel/saturno.png" alt="">Saturno</a>
+			<a href="urano.html"><img src="pixel/urano.png" alt="">Urano</a>
+			<a href="netuno.html"><img src="pixel/netuno.png" alt="">Netuno</a>
+			<a href="sol.html"><img src="pixel/sol.png" alt="">Sol</a>
+		</nav>
+		<nav class="rodape-planetas rodape-luas" aria-label="As luas">
+			<a href="lua.html"><img src="pixel/lua.png" alt="">Lua</a>
+			<a href="io.html"><img src="pixel/io.png" alt="">Io</a>
+			<a href="europa.html"><img src="pixel/europa.png" alt="">Europa</a>
+			<a href="ganimedes.html"><img src="pixel/ganimedes.png" alt="">Ganimedes</a>
+			<a href="tita.html"><img src="pixel/tita.png" alt="">Titã</a>
+			<a href="encelado.html"><img src="pixel/encelado.png" alt="">Encélado</a>
+			<a href="mimas.html"><img src="pixel/mimas.png" alt="">Mimas</a>
+			<a href="miranda.html"><img src="pixel/miranda.png" alt="">Miranda</a>
+			<a href="tritao.html"><img src="pixel/tritao.png" alt="">Tritão</a>
+		</nav>
+		<p><a href="sistema-solar.html">Nosso sistema solar</a> · <a href="index.html#galaxia">Via Láctea</a> · textos e pixel art feitos à mão</p>
+	</footer>
+
+	<script src="idioma.js"></script>
+	<script src="nave.js"></script>
+	<script src="transicao.js"></script>
+	<script src="tempo-do-sol.js"></script>
+	<script src="radio.js"></script>
+	<script src="cabine.js"></script>
+	<script src="chegada.js"></script>
+	<script src="passaporte.js"></script>
+	<script src="marca.js"></script>
+	<script src="fundo.js"></script>
+	<script src="pixel/sprites.js"></script>
+	<script src="balanco.js"></script>
+	<script src="balanca.js"></script>
+	<script src="visuais-dados.js"></script>
+	<script src="visuais.js"></script>
+	<script src="pagina.js"></script>
+</body>
+</html>

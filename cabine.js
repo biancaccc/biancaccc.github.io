@@ -214,9 +214,11 @@
 		poli([[-OX - 2, 222], [30, 228], [44, 270], [-OX - 2, 270]], function (xx, yy) { return rampa(['#ecd0a4', '#d8b482', '#c09864', '#a07a4a', '#7a5a36'], 0.2 + (yy - 222) / 48 * 0.5 + Math.max(0, xx - 20) / 24 * 0.3, xx, yy); });
 		linha(-OX, 221, 30, 227, '#c8ccd6'); linha(-OX, 222, 30, 228, '#8a8e98'); linha(30, 228, 44, 270, '#5a4028');
 		for (var cb = 0; cb < 4; cb++) linha(-OX + 4, 234 + cb * 9, 28 + cb * 3, 236 + cb * 9, '#b08a58'); // os gomos
-		// 9. a plaquinha do fabricante, com a assinatura da autora
-		ret(296, 256, 92, 10, '#8a6a2a'); ret(297, 257, 90, 8, function (xx, yy) { return rampa(['#f0d48a', '#d8b460', '#b8923e'], (yy - 257) / 8, xx, yy); });
-		letras('PX-01 · BIANCA CARDADOR', 342, 259, '#4a3410', true);
+		// 9. a plaquinha do fabricante (só o nome da nave) e a assinatura da autora gravada bem de leve no
+		// painel escuro, embaixo à esquerda, para quem reparar
+		ret(324, 256, 36, 10, '#8a6a2a'); ret(325, 257, 34, 8, function (xx, yy) { return rampa(['#f0d48a', '#d8b460', '#b8923e'], (yy - 257) / 8, xx, yy); });
+		letras('PX-01', 342, 259, '#4a3410', true);
+		letras('BIANCA CARDADOR', 92, 262, '#26282f', true);
 		// 10. a profundidade: o que está perto de nós fica na penumbra; o tampo junto do vidro pega a luz de fora
 		for (var vy = 0; vy < H; vy++) for (var vx = -OX; vx < NUCLEO + OX; vx++) {
 			if (!buf[vy * BW + vx + DX]) continue;

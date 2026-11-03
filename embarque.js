@@ -33,7 +33,7 @@
 	var raiz = document.createElement('div');
 	raiz.className = 'embarque';
 	raiz.setAttribute('role', 'dialog');
-	raiz.setAttribute('aria-label', 'Embarque na Agência Andarilha');
+	raiz.setAttribute('aria-label', T('Embarque na Agência Andarilha', 'Boarding at the Andarilha Agency'));
 	raiz.innerHTML =
 		'<div class="emb-palco">' +
 			'<canvas class="emb-tela" aria-hidden="true"></canvas>' +
@@ -43,8 +43,8 @@
 			'<div class="emb-escuro"></div>' +
 			'<div class="emb-camada"></div>' +
 		'</div>' +
-		'<div class="emb-topo"><button type="button" class="emb-som" aria-pressed="true" title="Som ligado">&#9835; Som</button>' +
-		'<button type="button" class="emb-pular">Pular embarque &#9656;</button></div>';
+		'<div class="emb-topo"><button type="button" class="emb-som" aria-pressed="true" title="' + T('Som ligado', 'Sound on') + '">&#9835; ' + T('Som', 'Sound') + '</button>' +
+		'<button type="button" class="emb-pular">' + T('Pular embarque', 'Skip boarding') + ' &#9656;</button></div>';
 	document.body.appendChild(raiz);
 	document.body.classList.add('embarcando');
 	var palco = raiz.querySelector('.emb-palco');
@@ -663,7 +663,7 @@
 	}
 
 	// o primeiro nome do piloto, para o ZÖ-11 chamar pelo nome
-	function primeiroNome() { var n = (nomePiloto || '').trim().split(/\s+/)[0]; return n ? n.charAt(0).toUpperCase() + n.slice(1) : 'piloto'; }
+	function primeiroNome() { var n = (nomePiloto || '').trim().split(/\s+/)[0]; return n ? n.charAt(0).toUpperCase() + n.slice(1) : T('piloto', 'pilot'); }
 	// o título de capítulo que aparece num canto no começo de cada parte, como num filme
 	var capEl = document.createElement('div'); capEl.className = 'emb-capitulo'; palco.appendChild(capEl);
 	function capitulo(numero, nome) {
@@ -786,7 +786,7 @@
 	function escreverNome(s) {
 		if (!docs) return;
 		docs.assinatura.textContent = s; docs.campoNome.value = s;
-		docs.cnhNome.textContent = s || 'Piloto sem nome'; docs.cnhAssinatura.textContent = s;
+		docs.cnhNome.textContent = s || T('Piloto sem nome', 'Unnamed pilot'); docs.cnhAssinatura.textContent = s;
 	}
 
 	// ================== As pessoas e os robôs ==================
@@ -966,37 +966,105 @@
 	// o: { L, rgb, batida (segundos por batida da cauda), fase, alfa }
 	function baleia(c, hx, hy, t, o) {
 		if (o.alfa <= 0) return;
-		var L = o.L, rgb = o.rgb, alfa = o.alfa;
+		var L = o.L, rgb = o.rgb;
+		/* o holograma tremula de vez em quando, como um projetor falhando por um instante */
+		var alfa = o.alfa * (Math.sin(t * 23 + o.fase * 7) > 0.985 ? 0.5 : 1);
 		var cor = function (a) { return 'rgba(' + rgb[0] + ',' + rgb[1] + ',' + rgb[2] + ',' + (a * alfa) + ')'; };
+		/* (a cor clarinha, quase branca: as nadadeiras peitorais e a barriga da jubarte são brancas) */
+		var claro = function (a) { return 'rgba(' + ((rgb[0] + 510) / 3 | 0) + ',' + ((rgb[1] + 510) / 3 | 0) + ',' + ((rgb[2] + 510) / 3 | 0) + ',' + (a * alfa) + ')'; };
 		var w = Math.PI * 2 / o.batida, ang = t * w + o.fase, R0 = L * 0.12, A = L * 0.05;
 		/* o deslocamento vertical de cada ponto do corpo (u = 0 na cabeça, 1 na cauda) */
 		var onda = function (u) { var k = Math.max(0, (u - 0.4) / 0.6); return Math.sin(ang - u * 2.4) * k * k * A + Math.sin(ang - 0.6) * 0.6; };
-		/* (desenhada em posições quebradas, sem arredondar: o corpo desliza liso) */
-		for (var i = 0; i < L; i += 0.5) {
-			var u = i / L, x = hx + i;
-			var r = u < 0.1 ? R0 * (0.72 + 0.28 * Math.sqrt(u / 0.1)) : u < 0.38 ? R0 : R0 * Math.max(0.2, 1 - Math.pow((u - 0.38) / 0.62, 1.1) * 0.85);
-			var cy = hy + onda(u), y0 = cy - r * 0.82, y1 = cy + r * 0.8;
-			if (u > 0.6 && u < 0.68) y0 -= Math.sin((u - 0.6) / 0.08 * Math.PI) * 1.6; /* a corcova da nadadeira dorsal */
-			c.fillStyle = cor(0.22); c.fillRect(x, y0, 0.5, y1 - y0); /* o corpo translúcido */
-			c.fillStyle = cor(0.6); c.fillRect(x, y0, 0.5, 1); c.fillRect(x, y1 - 1, 0.5, 1); /* o contorno aceso */
-			if (u > 0.05 && u < 0.4) { c.fillStyle = cor(0.22); for (var pg = cy + r * 0.2; pg < y1 - 1.5; pg += 2) c.fillRect(x, pg, 0.5, 1); } /* as pregas da garganta */
-			if (Math.abs(i - L * 0.1) < 0.25) { c.fillStyle = cor(1); c.fillRect(x, cy + r * 0.05 - 0.5, 1, 1); } /* o olho */
-			if (Math.abs(i - L * 0.28) < 0.25) { /* a nadadeira peitoral comprida, remando devagar */
-				var rema = Math.sin(ang * 0.5) * 0.12; c.fillStyle = cor(0.5);
-				for (var k = 0; k < L * 0.22; k += 0.5) c.fillRect(x + k * Math.cos(0.5 + rema), cy + r * 0.75 + k * Math.sin(0.5 + rema), 1.5, 1 + (k < L * 0.1 ? 1 : 0));
+		var raio = function (u) { return u < 0.1 ? R0 * (0.72 + 0.28 * Math.sqrt(u / 0.1)) : u < 0.38 ? R0 : R0 * Math.max(0.2, 1 - Math.pow((u - 0.38) / 0.62, 1.1) * 0.85); };
+		/* a cabeça da jubarte é achatada e pontuda em cima, com a mandíbula grande embaixo */
+		var raioCima = function (u) { return u < 0.24 ? R0 * (0.22 + 0.78 * Math.pow(u / 0.24, 0.75)) : raio(u); };
+		var raioBaixo = function (u) { return u < 0.14 ? R0 * (0.5 + 0.5 * Math.sqrt(u / 0.14)) : raio(u); };
+		var malha = Math.max(4, L * 0.07), scan = (t * 5) % 3;
+		/* uma faixa de luz descendo devagar pelo corpo (a varredura do holograma), só dentro dele */
+		var varreY = hy - R0 + (((t * 0.3) % 1.4) - 0.2) * R0 * 2;
+		/* as nadadeiras peitorais: compridas (um terço do corpo, como na jubarte de verdade), brancas,
+		   com a borda da frente ondulada de calombos, remando devagar; a do outro lado aparece apagadinha */
+		function peitoral(lado) {
+			var ur = 0.27, cyr = hy + onda(ur), rr = raio(ur);
+			var bx = hx + L * ur, by = cyr + rr * 0.55, Lf = L * (lado ? 0.31 : 0.24);
+			var a0 = 0.62 + Math.sin(ang * 0.5 + (lado ? 0 : 0.8)) * 0.14, dx = Math.cos(a0), dy = Math.sin(a0), nx = -dy, ny = dx;
+			var borda = [], tras = [];
+			for (var s2 = 0; s2 <= 1.001; s2 += 0.04) {
+				var larg = R0 * 0.3 * Math.pow(1 - s2, 0.55) + 0.4, calombo = s2 > 0.15 && s2 < 0.95 ? Math.abs(Math.sin(s2 * Math.PI * 7)) * 1.4 : 0;
+				/* (a nadadeira é um pouco curvada, como uma asa) */
+				var curva = s2 * s2 * Lf * 0.12, px0 = bx + dx * s2 * Lf + nx * curva, py0 = by + dy * s2 * Lf + ny * curva;
+				borda.push([px0 - nx * (larg + calombo), py0 - ny * (larg + calombo)]);
+				tras.push([px0 + nx * larg * 0.6, py0 + ny * larg * 0.6]);
 			}
+			c.beginPath(); c.moveTo(borda[0][0], borda[0][1]);
+			borda.forEach(function (p) { c.lineTo(p[0], p[1]); }); for (var j = tras.length - 1; j >= 0; j--) c.lineTo(tras[j][0], tras[j][1]);
+			c.closePath(); c.fillStyle = lado ? claro(0.26) : cor(0.1); c.fill();
+			if (!lado) return;
+			c.fillStyle = claro(0.85); borda.forEach(function (p, j) { if (j > 0) c.fillRect(p[0], p[1], 1, 1); }); /* a borda dos calombos, acesa */
+			c.fillStyle = cor(0.5); tras.forEach(function (p, j) { if (j % 2 && j > 0) c.fillRect(p[0], p[1], 1, 0.5); });
+			c.fillStyle = claro(0.95); c.fillRect(borda[6][0], borda[6][1], 1, 1); c.fillRect(borda[11][0], borda[11][1] + 0.5, 1, 1); /* cracas na borda */
 		}
+		peitoral(0);
+		/* o corpo, coluna por coluna (em posições quebradas, sem arredondar: o corpo desliza liso) */
+		for (var i = 0; i < L; i += 0.5) {
+			var u = i / L, x = hx + i, r = raio(u);
+			var cy = hy + onda(u), y0 = cy - raioCima(u) * 0.82, y1 = cy + raioBaixo(u) * 0.8;
+			/* a nadadeira dorsal pequena, em cima de uma corcova (é a "corcunda" do nome em inglês, humpback) */
+			if (u > 0.58 && u < 0.7) {
+				var fu = (u - 0.58) / 0.12, fh = fu < 0.7 ? Math.sin(fu / 0.7 * Math.PI / 2) * R0 * 0.42 : R0 * 0.42 * (1 - (fu - 0.7) / 0.3) * 0.35;
+				c.fillStyle = cor(0.2); c.fillRect(x, y0 - fh, 0.5, fh); c.fillStyle = cor(0.7); c.fillRect(x, y0 - fh, 0.5, 1);
+			}
+			/* o volume do holograma: o meio mais transparente e as beiradas mais acesas (como um vidro visto de lado) */
+			c.fillStyle = cor(0.12); c.fillRect(x, y0, 0.5, y1 - y0);
+			c.fillStyle = cor(0.12); c.fillRect(x, y0 + 1, 0.5, 2); c.fillRect(x, y1 - 3, 0.5, 2);
+			/* a barriga clarinha (a jubarte tem a barriga branca e as costas escuras) */
+			if (u > 0.04 && u < 0.75) { c.fillStyle = claro(0.08); c.fillRect(x, cy + r * 0.2, 0.5, y1 - cy - r * 0.2); }
+			/* as linhas da varredura, descendo devagar */
+			c.fillStyle = cor(0.07); for (var sy = Math.floor(y0) + 1 + scan; sy < y1 - 1; sy += 3) c.fillRect(x, sy, 0.5, 1);
+			if (varreY > y0 && varreY < y1 - 1.5) { c.fillStyle = cor(0.2); c.fillRect(x, varreY, 0.5, 1.5); }
+			/* a malha do holograma: a linha do lado do corpo e os anéis, de tantos em tantos pixels */
+			c.fillStyle = cor(0.2); c.fillRect(x, cy - r * 0.18, 0.5, 0.5);
+			if (i % malha < 0.5) { c.fillStyle = cor(0.09); c.fillRect(x, y0, 0.5, y1 - y0); }
+			/* o contorno aceso: as costas um pouco mais fortes que a barriga */
+			c.fillStyle = cor(0.7); c.fillRect(x, y0, 0.5, 1); c.fillStyle = claro(0.5); c.fillRect(x, y1 - 1, 0.5, 1);
+			/* as pregas da garganta: listras compridas embaixo, da ponta da boca até o meio da barriga */
+			if (u > 0.03 && u < 0.44) {
+				c.fillStyle = claro(u > 0.36 ? 0.22 * (0.44 - u) / 0.08 : 0.22);
+				for (var pg = cy + r * 0.28; pg < y1 - 1.2; pg += 1.5) c.fillRect(x, pg, 0.5, 0.6);
+			}
+			/* a boca: uma linha que sai da ponta do focinho e desce um pouquinho até embaixo do olho */
+			if (u < 0.2) { c.fillStyle = claro(0.75); c.fillRect(x, cy + R0 * (-0.05 + 0.32 * Math.pow(u / 0.2, 1.5)), 0.5, 1); }
+			/* os calombos da cabeça (os tubérculos, cada um com um pelo sensorial) e os do queixo */
+			if (u > 0.01 && u < 0.17 && i % (L * 0.03) < 0.5) { c.fillStyle = claro(1); c.fillRect(x, y0 - 1, 1, 1); }
+			if (u < 0.06 && i % (L * 0.022) < 0.5) { c.fillStyle = claro(0.7); c.fillRect(x, y1 - 0.4, 0.9, 0.9); }
+			/* o espiráculo (o "nariz" no alto da cabeça) */
+			if (Math.abs(u - 0.2) < 0.003) { c.fillStyle = claro(0.9); c.fillRect(x - 0.5, y0 - 0.6, 1.5, 0.8); }
+			/* os "nós" em cima do pedúnculo, entre a dorsal e a cauda */
+			if (u > 0.72 && u < 0.92 && i % (L * 0.032) < 0.5) { c.fillStyle = cor(0.65); c.fillRect(x, y0 - 0.6, 0.8, 0.8); }
+		}
+		/* o olho, logo acima do canto da boca, com um brilho em volta */
+		var ux = 0.19, ox = hx + L * ux, oy = hy + onda(ux) + R0 * 0.08;
+		c.fillStyle = cor(0.3); c.fillRect(ox - 1, oy - 1, 3, 2.5); c.fillStyle = claro(1); c.fillRect(ox, oy - 0.5, 1, 1);
+		/* cracas no queixo (as jubartes de verdade carregam várias) */
+		c.fillStyle = claro(0.8); c.fillRect(hx + L * 0.025, hy + onda(0.025) + raio(0.025) * 0.55, 1, 1); c.fillRect(hx + L * 0.045, hy + onda(0.045) + raio(0.045) * 0.7, 1, 0.8);
+		peitoral(1);
 		/* a nadadeira da cauda: uma lâmina fina que inclina para cima e para baixo seguindo a batida */
-		/* (vista de lado, a nadadeira abre num leque conforme inclina: fina quando passa reta, larga na ponta da batida) */
+		/* (vista de lado, a nadadeira abre num leque conforme inclina: fina quando passa reta, larga na ponta da batida;
+		   a borda de trás é serrilhada, como a de toda jubarte) */
 		var xe = hx + L, ye = hy + onda(1), incl = (onda(1) - onda(0.94)) / (L * 0.06) * 1.4, lc = L * 0.18, abre = 2 + Math.abs(Math.sin(ang - 2.4)) * L * 0.07;
 		for (var k2 = 0; k2 < lc; k2 += 0.5) {
 			var f2 = k2 / lc, esp = 1.6 + f2 * abre * (f2 < 0.85 ? 1 : 1 - (f2 - 0.85) * 3), meio = ye + k2 * incl;
-			c.fillStyle = cor(0.2); c.fillRect(xe + k2, meio - esp / 2, 0.5, esp);
-			c.fillStyle = cor(0.6); c.fillRect(xe + k2, meio - esp / 2, 0.5, 1); c.fillRect(xe + k2, meio + esp / 2 - 1, 0.5, 1);
+			c.fillStyle = cor(0.18); c.fillRect(xe + k2, meio - esp / 2, 0.5, esp);
+			c.fillStyle = cor(0.65); c.fillRect(xe + k2, meio - esp / 2, 0.5, 1); c.fillStyle = claro(0.5); c.fillRect(xe + k2, meio + esp / 2 - 1, 0.5, 1);
+			if (f2 > 0.3 && k2 % 1 === 0) { c.fillStyle = cor(0.1); c.fillRect(xe + k2, meio - 0.3, 0.5, 0.6); } /* a nervura do meio */
+			if (k2 + 0.5 >= lc) { c.fillStyle = claro(0.8); for (var sz = meio - esp / 2; sz < meio + esp / 2; sz += 1.4) c.fillRect(xe + k2 + ((sz * 1.7 | 0) % 2 ? 0.5 : -0.5), sz, 1, 0.8); }
 		}
-		/* uma faixa de luz descendo devagar pelo corpo (a varredura do holograma) */
-		var varre = ((t * 0.3) % 1.4) - 0.2;
-		c.fillStyle = cor(0.14); c.fillRect(hx, hy - R0 + varre * R0 * 2, L * 0.75, 1.5);
+		/* faíscas do projetor soltando do corpo e subindo devagar, sumindo no ar */
+		for (var n = 0; n < 7; n++) {
+			var vida = (t * 0.25 + n * 0.37 + o.fase) % 1, un = (n * 0.618 + Math.floor(t * 0.25 + n * 0.37 + o.fase) * 0.29) % 0.9;
+			var fx = hx + L * un + vida * 6, fy = hy + onda(un) - raio(un) * 0.8 - vida * 10;
+			c.fillStyle = claro(0.7 * (1 - vida)); c.fillRect(fx, fy, 1, 1);
+		}
 	}
 	// os carros flutuantes da rua (de lado, sem rodas: deslizam sobre os propulsores, com a luz azul
 	// embaixo). Desenhados virados para a direita; com lado = -1 o desenho espelha (a frente vai para a esquerda)
@@ -1104,6 +1172,8 @@
 						// um telão gigante em algumas torres do meio
 						if (cam === 1 && bw > 22 && ruido(bx, 77) > 0.3 && TELAS.length < 7 && (bx + bw < 140 || bx > 340)) { // (nunca atrás da agência nem dos prédios da frente)
 							var ty = topo + 8 + Math.floor(ruido(bx, 78) * 20), lim = bx + bw < 140 ? 84 : 94, th = Math.min(46, bh - 30, lim - ty);
+							/* (o anúncio do retrato precisa de pelo menos 34 px de altura: a tela sobe um pouco no prédio) */
+							if (TELAS.length % 3 === 0 && th < 34 && ty - (34 - th) > topo + 3) { ty -= 34 - th; th = 34; }
 							if (th > 12) TELAS.push({ x: bx + 3, y: ty, w: bw - 7, h: th, tipo: TELAS.length % 3 });
 						}
 						bx += bw + (cam === 0 ? 0 : Math.floor(ruido(bx, 9) * 6));
@@ -1201,19 +1271,52 @@
 				});
 				ret(334, 150, 6, 3, '#2a2c34'); ret(338, 151, 3, 2, '#5a5e6a'); px(339, 152, '#ff3a3a');
 				ret(270, 176, 5, 9, '#14141e'); ret(271, 177, 3, 3, '#7fe3ff'); for (var ib = 0; ib < 3; ib++) px(271 + ib, 182, '#5a5e6a');
-				// as vitrines da agência, com luz quente e os guichês azuis lá dentro
-				[[172, 210], [270, 308]].forEach(function (q) {
+				// as vitrines da agência: lá dentro, a mesma recepção (a vitrine do porto no alto, o friso dourado,
+				// a faixa azul e a parede branca); na da esquerda, o guichê com o robô atendente; na da direita,
+				// a horta hidropônica, o totem de senhas e o robô-garçom (que flutua, desenhado a cada quadro)
+				function salaPelaVitrine(x0, x1, y0) {
+					ret(x0, y0, x1 - x0, 212 - y0, function (x2, y2) { return rampa(['#f6f8fb', '#eceff4', '#e0e4ea', '#d4d8e0'], (y2 - y0) / (212 - y0) * 0.8, x2, y2); });
+					ret(x0, y0, x1 - x0, 10, function (x2, y2) { return ruido(x2 * 3, y2 * 5) > 0.93 ? '#ffffff' : y2 > y0 + 7 ? (ruido(x2, 9) > 0.6 ? '#ffd890' : '#161838') : rampa(['#0e0c2e', '#1c1446', '#3a1a5a'], (y2 - y0) / 8, x2, y2); });
+					ret(x0, y0 + 10, x1 - x0, 1, '#e8c46a'); ret(x0, y0 + 11, x1 - x0, 2, '#1c2a6e');
+				}
+				[[172, 210], [270, 308]].forEach(function (q, iv) {
 					ret(q[0] - 2, 156, q[1] - q[0] + 4, 56, '#c8a040');
-					ret(q[0], 158, q[1] - q[0], 54, function (x2, y2) { return rampa(['#fff0c8', '#ffe0a0', '#f0c878', '#d8a858'], (y2 - 158) / 54 * 0.8, x2, y2); });
-					ret(q[0] + 4, 184, 14, 22, '#2f62b6'); ret(q[0] + 4, 182, 14, 3, '#f2f4f8'); ret(q[0] + 8, 172, 8, 8, '#a8acc4'); ret(q[0] + 9, 174, 6, 3, '#0a1424');
-					ret(q[0] + 22, 194, 12, 12, '#2a66d8'); ret(q[0] + 22, 194, 12, 2, '#6fa4ff');
+					salaPelaVitrine(q[0], q[1], 158);
+					if (iv === 0) {
+						/* o robô atendente atrás do balcão: cabeça de metal, visor com os olhos, antena, uniforme azul */
+						var rx = q[0] + 13;
+						ret(rx + 3, 176, 1, 3, '#8a8ea8'); px(rx + 3, 175, '#ff8ad8');
+						ret(rx, 179, 8, 7, '#c8ccdc'); ret(rx, 179, 8, 1, '#eef0f8'); ret(rx + 7, 180, 1, 6, '#8a8ea8'); ret(rx + 1, 181, 6, 3, '#0a1424');
+						ret(rx + 3, 186, 2, 1, '#8a8ea8'); ret(rx - 3, 187, 14, 5, '#24357e'); ret(rx + 2, 187, 4, 2, '#f2eefc'); px(rx + 4, 189, '#e8c46a'); px(rx + 4, 190, '#e8c46a');
+						/* o monitor (de costas) e o balcão azul de tampo branco, com o friso dourado e o selo */
+						ret(q[0] + 25, 184, 9, 7, '#2a2c34'); ret(q[0] + 28, 191, 3, 1, '#2a2c34');
+						ret(q[0] + 1, 192, q[1] - q[0] - 2, 2, '#ffffff'); ret(q[0] + 1, 194, q[1] - q[0] - 2, 18, function (x2, y2) { return rampa(['#4a84dc', '#3a70c8', '#2c5cb0', '#224a92'], (y2 - 194) / 18, x2, y2); });
+						ret(q[0] + 1, 195, q[1] - q[0] - 2, 1, '#e8c46a'); elip(q[0] + 19, 202, 2, 2, '#c8a040'); px(q[0] + 19, 202, '#e8905a');
+						/* a plaquinha do guichê pendurada */
+						ret(q[0] + 4, 171, 1, 3, '#8a90a0'); ret(q[0] + 2, 174, 6, 4, '#1c2a6e'); ret(q[0] + 2, 174, 6, 1, '#e8c46a'); px(q[0] + 4, 176, '#ffffff'); px(q[0] + 5, 176, '#ffffff');
+					} else {
+						/* a horta hidropônica: dois tubos de vidro com folhas e a luz rosa em cima */
+						[q[0] + 3, q[0] + 8].forEach(function (tx) {
+							ret(tx, 176, 3, 32, '#d8e8f4'); ret(tx, 175, 3, 1, '#ff6ad8'); ret(tx - 1, 208, 5, 4, '#3a3d48');
+							for (var fo = 0; fo < 6; fo++) { px(tx + (fo % 2 ? 2 : 0), 178 + fo * 5, '#4aa85a'); px(tx + 1, 179 + fo * 5, '#7ad86a'); }
+						});
+						/* o totem de senhas: branco, topo azul-marinho, a telinha ciano e o selo dourado */
+						var tx2 = q[0] + 16;
+						ret(tx2, 180, 7, 32, '#f2f4f8'); ret(tx2 + 6, 180, 1, 32, '#c4c8d4'); ret(tx2, 180, 7, 3, '#1c2a6e'); ret(tx2 + 1, 186, 5, 4, '#7fe3ff'); px(tx2 + 3, 184, '#e8c46a'); ret(tx2 + 2, 193, 3, 1, '#1a1b20');
+						/* uma cadeira de espera azul */
+						ret(q[0] + 26, 198, 10, 6, '#3a70c8'); ret(q[0] + 26, 198, 10, 1, '#6fa4ff'); ret(q[0] + 26, 204, 10, 2, '#2c5cb0'); ret(q[0] + 28, 206, 1, 6, '#5a5e6a'); ret(q[0] + 34, 206, 1, 6, '#5a5e6a');
+					}
 					for (var rf = 0; rf < 10; rf++) mistura(q[0] + 2 + rf * 3, 160 + rf * 4, '#ffffff', 0.3);
 				});
 				// a marquise dourada e a porta (que desliza; desenhada a cada quadro)
 				poli([[204, 150], [276, 150], [282, 157], [198, 157]], function (x2, y2) { return rampa(['#f0d480', '#c8a040', '#8a6a20'], (y2 - 150) / 7, x2, y2); });
 				ret(PORTA_F.x0 - 3, PORTA_F.y0 - 3, PORTA_F.x1 - PORTA_F.x0 + 6, PORTA_F.y1 - PORTA_F.y0 + 3, '#c8a040');
 				ret(PORTA_F.x0, PORTA_F.y0, PORTA_F.x1 - PORTA_F.x0, PORTA_F.y1 - PORTA_F.y0, function (x2, y2) { return rampa(['#fff4d0', '#ffe8b0', '#f0d090'], (y2 - PORTA_F.y0) / 52, x2, y2); });
-				ret(PORTA_F.x0 + 8, PORTA_F.y0 + 18, 10, 26, '#2f62b6'); ret(PORTA_F.x0 + 28, PORTA_F.y0 + 20, 10, 24, '#a8acc4');
+				/* pela porta: a recepção lá dentro, com o painel de senhas em holograma e a fileira de cadeiras azuis */
+				salaPelaVitrine(PORTA_F.x0, PORTA_F.x1, PORTA_F.y0);
+				ret(PORTA_F.x0 + 14, PORTA_F.y0 + 17, 20, 8, '#1a5a8a'); ret(PORTA_F.x0 + 14, PORTA_F.y0 + 17, 20, 1, '#3ae0ff'); letras('011', PORTA_F.x0 + 24, PORTA_F.y0 + 19, 1, '#ffffff', true);
+				for (var cd = 0; cd < 4; cd++) { var cdx = PORTA_F.x0 + 3 + cd * 11; ret(cdx, PORTA_F.y0 + 36, 9, 6, '#3a70c8'); ret(cdx, PORTA_F.y0 + 36, 9, 1, '#6fa4ff'); ret(cdx, PORTA_F.y0 + 42, 9, 2, '#2c5cb0'); ret(cdx + 4, PORTA_F.y0 + 44, 1, 8, '#5a5e6a'); }
+				ret(PORTA_F.x0, PORTA_F.y0 + 50, PORTA_F.x1 - PORTA_F.x0, 2, '#c8ccd6');
 				// o bar de lámen, à esquerda: lanternas vermelhas, cortina de pano, balcão com banquinhos
 				ret(16, 150, 112, 62, '#1a0c10'); ret(16, 150, 112, 3, '#c83a2a');
 				ret(20, 156, 104, 30, function (x2, y2) { return rampa(['#ffb070', '#e8783a', '#a84a22'], (y2 - 156) / 30, x2, y2); });
@@ -1316,15 +1419,7 @@
 				c.save(); c.beginPath(); c.rect(tl.x, tl.y, tl.w, tl.h); c.clip();
 				if (tl.tipo === 'agencia') telaoAgencia(c, tl, t);
 				else if (tl.tipo === 'gueixa') telaoGueixa(c, tl, t);
-				else if (tl.tipo === 0) { // um rosto de anúncio, em blocos de cor (como os telões de Blade Runner)
-					R(c, tl.x, tl.y, tl.w, tl.h, '#2a0a3a');
-					var mx = tl.x + tl.w / 2, my = tl.y + tl.h * 0.55, pisc = (t + i) % 4 > 3.8;
-					c.fillStyle = '#ff5a8a'; c.beginPath(); c.ellipse(mx, my, tl.w * 0.32, tl.h * 0.36, 0, 0, Math.PI * 2); c.fill();
-					c.fillStyle = '#f2d0c0'; c.beginPath(); c.ellipse(mx, my + 2, tl.w * 0.24, tl.h * 0.28, 0, 0, Math.PI * 2); c.fill();
-					R(c, mx - tl.w * 0.32, my - tl.h * 0.36, tl.w * 0.64, tl.h * 0.18, '#1a0a2a'); // a franja
-					if (!pisc) { R(c, mx - 6, my - 2, 4, 2, '#1a0a2a'); R(c, mx + 2, my - 2, 4, 2, '#1a0a2a'); }
-					R(c, mx - 2, my + 6, 4, 1, '#c83a5a');
-					for (var sl = tl.y; sl < tl.y + tl.h; sl += 2) { c.globalAlpha = 0.2; R(c, tl.x, sl, tl.w, 1, '#000000'); } c.globalAlpha = 1;
+				else if (tl.tipo === 0) { anuncioIris(c, tl, t, i); /* o anúncio das lentes ÍRIS 9 */
 				} else if (tl.tipo === 1) { // um letreiro correndo
 					R(c, tl.x, tl.y, tl.w, tl.h, '#0a1a3a');
 					var msg = 'VIAJE PARA SATURNO · ANDARILHA 2077 · ', off = Math.floor(t * 18) % (msg.length * 4 * 2);
@@ -1515,12 +1610,24 @@
 			if (CREDITOS) {
 				var cred = document.createElement('div');
 				cred.className = 'emb-creditos';
-				cred.innerHTML = '<small>feito por</small><strong>Bianca Cardador</strong><i aria-hidden="true">✦</i>';
+				cred.innerHTML = '<small>' + T('feito por', 'made by') + '</small><strong>Bianca Cardador</strong><i aria-hidden="true">✦</i>';
 				palco.appendChild(cred);
 				depois(function () { cred.remove(); }, calmo ? 0 : 5200);
 			}
 			depois(function () {
-				botao('&#9654; Começar a viagem', 240, 128, comecar, 'grande');
+				botao('&#9654; ' + T('Começar a viagem', 'Begin the journey'), 240, 128, comecar, 'grande');
+				/* embaixo dele, a escolha do idioma (trocar recarrega a página e volta para esta tela) */
+				var esc = document.createElement('div');
+				esc.className = 'emb-idioma'; esc.setAttribute('role', 'group'); esc.setAttribute('aria-label', T('Idioma', 'Language'));
+				pos(esc, 240, 168);
+				[['pt', 'Português'], ['en', 'English']].forEach(function (l) {
+					var bi = document.createElement('button');
+					bi.type = 'button'; bi.textContent = l[1]; bi.lang = l[0] === 'en' ? 'en' : 'pt-BR';
+					bi.setAttribute('aria-pressed', (window.IDIOMA || 'pt') === l[0] ? 'true' : 'false');
+					bi.addEventListener('click', function () { if (window.trocarIdioma) window.trocarIdioma(l[0]); });
+					esc.appendChild(bi);
+				});
+				camada.appendChild(esc);
 			}, calmo || !CREDITOS ? 0 : 5000);
 			function comecar() {
 				iniciarAudio();
@@ -1531,9 +1638,9 @@
 				if (audio && audio.state === 'suspended') audio.resume();
 				ligarAmbienteChuva();
 				limpar(); escuro.style.transition = 'opacity ' + ESCURO_CINE + 's ease-in-out'; aplicarCine(cameraCine(0)); escurecer(0);
-				cena0.cine = performance.now(); raiz.classList.add('cinema'); moverFaixas(9, 0.8); depois(function () { capitulo('I', 'A rua da agência'); }, 1200);
+				cena0.cine = performance.now(); raiz.classList.add('cinema'); moverFaixas(9, 0.8); depois(function () { capitulo('I', T('A rua da agência', 'The agency street')); }, 1200);
 				// um clique durante o passeio da câmera pula direto para o final
-				var pular = alvoClicavel(-OX, 0, W, H, 'Pular a apresentação', function () { cena0.cine = performance.now() - CINE_FIM * 1000; });
+				var pular = alvoClicavel(-OX, 0, W, H, T('Pular a apresentação', 'Skip the intro'), function () { cena0.cine = performance.now() - CINE_FIM * 1000; });
 				pular.classList.add('emb-alvo-cheio');
 				depois(function () { mostrarEntrar(cena0); }, CINE_FIM * 1000);
 			}
@@ -1572,7 +1679,7 @@
 		limpar(); escuro.style.transition = ''; aplicarCine({ x: 240, y: 135, z: 1 }); escurecer(0);
 		/* as faixas pretas de cinema recolhem devagar */
 		raiz.classList.remove('cinema'); if (faixaAlvo !== 0) moverFaixas(0, 2.8); /* (se pulou a apresentação) */
-		botao('&#9654; Entrar na agência', 240, 232, function () {
+		botao('&#9654; ' + T('Entrar na agência', 'Enter the agency'), 240, 232, function () {
 			limpar(); cena0.abrindo = performance.now(); SONS.portaVidro(); depois(SONS.passos, 300);
 			depois(function () { irPara('recepcao'); }, 900);
 		}, 'grande');
@@ -1580,6 +1687,46 @@
 	// o telão gigante da gueixa (uma homenagem aos anúncios de Blade Runner): penteado alto com grampos
 	// dourados e flores, rosto claro, lábios vermelhos, quimono vermelho; ela pisca, sorri e toma chá
 	var BALEIA_DESL = 0; /* acerta as baleias para o segundo plano da apresentação pegar as duas nadando no meio do céu */
+	// o anúncio das lentes de contato com luz ÍRIS 9 (um retrato de moda, como os telões de Blade Runner):
+	// uma moça de cabelo chanel com mecha ciano, um olho normal e o outro com a lente acesa, que pisca,
+	// solta um anel de varredura e muda de cor; atrás, o halo e a grade; embaixo, a marca e o slogan
+	function anuncioIris(c, tl, t, i) {
+		var x = tl.x, y = tl.y, w = tl.w, h = tl.h, faixa = 8;
+		var fundo = c.createLinearGradient(0, y, 0, y + h); fundo.addColorStop(0, '#3a0a4a'); fundo.addColorStop(1, '#0a1a4a'); c.fillStyle = fundo; c.fillRect(x, y, w, h);
+		c.globalAlpha = 0.25; for (var gx = x + ((t * 4) % 6); gx < x + w; gx += 6) R(c, gx, y, 1, h - faixa, '#b05aff'); c.globalAlpha = 1; /* a grade correndo */
+		var ox = Math.round(x + w / 2 - 10), oy = Math.round(y + Math.max(1, (h - faixa - 26) / 2));
+		var lente = ['#7fe3ff', '#ff6ad8', '#ffd36a'][Math.floor((t + i) / 3) % 3];
+		c.save(); c.globalCompositeOperation = 'lighter'; c.globalAlpha = 0.25 + Math.sin(t * 2) * 0.08; c.fillStyle = lente; c.beginPath(); c.arc(ox + 10, oy + 12, 12, 0, Math.PI * 2); c.fill(); c.restore(); c.globalAlpha = 1;
+		function Q(a, b, cw, ch, cor) { R(c, ox + a, oy + b, cw, ch, cor); }
+		/* os ombros, a jaqueta com a gola de neon e o pescoço */
+		Q(2, 22, 16, 4, '#2a1a4a'); Q(4, 21, 12, 1, '#2a1a4a'); Q(7, 21, 6, 1, '#ff3ab8'); Q(8, 19, 4, 3, '#d8a088');
+		/* o cabelo chanel atrás do rosto, com a mecha ciano */
+		Q(4, 0, 12, 1, '#1a0a2a'); Q(2, 1, 16, 2, '#1a0a2a'); Q(1, 3, 18, 15, '#1a0a2a'); Q(2, 18, 4, 2, '#1a0a2a'); Q(14, 18, 4, 2, '#1a0a2a');
+		[[3, 3], [3, 4], [2, 5], [2, 6], [2, 7], [2, 8], [3, 9]].forEach(function (m) { Q(m[0], m[1], 1, 1, '#3ae0ff'); }); Q(7, 1, 4, 1, '#3a2a5a');
+		/* o rosto, com a franja de lado */
+		Q(5, 5, 10, 11, '#f2c8b0'); Q(6, 16, 8, 1, '#f2c8b0'); Q(7, 17, 6, 1, '#e8b8a0'); Q(14, 7, 1, 9, '#d8a088'); Q(13, 16, 1, 1, '#d8a088');
+		Q(4, 3, 12, 2, '#1a0a2a'); Q(4, 5, 5, 1, '#1a0a2a'); Q(4, 6, 3, 1, '#1a0a2a'); Q(4, 7, 1, 1, '#1a0a2a');
+		/* as sobrancelhas, o olho normal (que pisca) e o olho com a lente ÍRIS acesa */
+		Q(6, 8, 3, 1, '#3a1a2a'); Q(11, 8, 3, 1, '#3a1a2a');
+		if ((t + i * 1.7) % 4.2 > 0.14) { Q(6, 9, 3, 1, '#1a0a2a'); Q(6, 10, 3, 1, '#ffffff'); Q(7, 10, 1, 1, '#3a1a2a'); }
+		else Q(6, 10, 3, 1, '#3a1a2a');
+		Q(11, 9, 3, 1, '#1a0a2a'); Q(11, 10, 3, 1, '#ffffff'); Q(12, 10, 1, 1, lente);
+		c.save(); c.globalCompositeOperation = 'lighter'; c.globalAlpha = 0.6; Q(11, 10, 3, 1, lente); c.restore(); c.globalAlpha = 1;
+		var anel = (t * 0.7 + i * 0.3) % 1; /* o anel de varredura saindo da lente */
+		c.globalAlpha = (1 - anel) * 0.8; c.strokeStyle = lente; c.lineWidth = 1; c.beginPath(); c.arc(ox + 12.5, oy + 10.5, 1 + anel * 7, 0, Math.PI * 2); c.stroke(); c.globalAlpha = 1;
+		Q(15, 10, 1, 1, lente); Q(15, 12, 1, 1, lente); Q(14, 11, 1, 1, '#5ab8d8'); /* o implante na têmpora */
+		/* o nariz, as bochechas, a boca e o brinco */
+		Q(10, 12, 1, 1, '#d8a088'); Q(6, 13, 1, 1, '#f08aa0'); Q(13, 13, 1, 1, '#f08aa0');
+		Q(8, 14, 4, 1, '#e8306a'); Q(9, 15, 2, 1, '#c82050'); Q(9, 14, 1, 1, '#ff7a9a');
+		Q(4, 12, 1, 1, '#ffd36a'); Q(4, 13, 1, 2, Math.sin(t * 3 + i) > 0 ? '#ffd36a' : '#c8a040');
+		/* a faixa de baixo: a marca e o slogan, se revezando */
+		R(c, x, y + h - faixa, w, faixa, '#0a0418'); R(c, x, y + h - faixa, w, 1, lente);
+		c.save(); c.beginPath(); c.rect(x, y + h - faixa + 1, w, faixa - 1); c.clip();
+		var msg = 'ÍRIS 9 · LENTES DE LUZ · ', passo = msg.length * 4;
+		texto3(c, msg + msg, x + 1 - (Math.floor(t * 10 + i * 7) % passo), y + h - faixa + 2, 1, '#ffffff');
+		c.restore();
+		for (var sl = y; sl < y + h; sl += 2) { c.globalAlpha = 0.12; R(c, x, sl, w, 1, '#000000'); } c.globalAlpha = 1;
+	}
 	var GUEIXA_DESL = 0; /* acerta o relógio da gueixa para o primeiro plano da apresentação pegar o ciclo inteiro */
 	function telaoGueixa(c, tl, t) {
 		var x = tl.x, y = tl.y, w = tl.w, h = tl.h, cx = x + w / 2, ciclo = (((t - GUEIXA_DESL) % 9) + 9) % 9, levanta = ciclo > 5.1 && ciclo < 6.9, sorri = ciclo > 7.6 && ciclo < 8.9; // (levanta = o gole, com a tigela na boca; sorri = o "hum!" depois)
@@ -2199,8 +2346,8 @@
 		var j = document.createElement('div');
 		j.className = 'emb-jornal';
 		j.innerHTML =
-			'<article class="emb-jornal-folha" role="dialog" aria-label="Gazeta Estelar, primeira página">' +
-				'<header><span>Ano LI · nº 2077</span><h2>Gazeta Estelar</h2><span>Porto Andarilha · 1 crédito</span></header>' +
+			'<article class="emb-jornal-folha" role="dialog" aria-label="' + T('Gazeta Estelar, primeira página', 'Stellar Gazette, front page') + '">' +
+				T('<header><span>Ano LI · nº 2077</span><h2>Gazeta Estelar</h2><span>Porto Andarilha · 1 crédito</span></header>' +
 				'<h3>A Agência Andarilha abre as portas</h3>' +
 				'<p class="emb-jornal-linha-fina">A primeira agência de turismo espacial em pixel art da galáxia abre as portas com fila, senha, guichê 11 e um robô atendente muito educado</p>' +
 				'<figure><figcaption>A fundadora no dia da inauguração</figcaption></figure>' +
@@ -2209,7 +2356,17 @@
 					'<p>O atendente ZÖ-11 recebeu o primeiro piloto com um aceno e um café. "Ele não bebe, mas gosta de oferecer", explicou a fundadora. A nave da casa, a PX-01, espera no hangar 11 com o tanque cheio.</p>' +
 					'<p><b>Previsão do tempo:</b> chuva ácida leve na rua, céu limpo acima da atmosfera. <b>Classificados:</b> vende-se capacete usado, pouco orbitado.</p>' +
 				'</div>' +
-				'<button type="button" class="emb-jornal-fechar">Dobrar o jornal</button>' +
+				'<button type="button" class="emb-jornal-fechar">Dobrar o jornal</button>',
+				'<header><span>Year LI · No. 2077</span><h2>Stellar Gazette</h2><span>Andarilha Port · 1 credit</span></header>' +
+				'<h3>The Andarilha Agency opens its doors</h3>' +
+				'<p class="emb-jornal-linha-fina">The first pixel art space tourism agency in the galaxy opens its doors with a queue, ticket numbers, desk 11 and a very polite robot clerk</p>' +
+				'<figure><figcaption>The founder on opening day</figcaption></figure>' +
+				'<div class="emb-jornal-colunas">' +
+					'<p>ANDARILHA PORT — Anyone who walked down the agency street last night, in the rain, saw the line wrap around the corner. The founder cut the golden ribbon at 8 p.m. local time and promised "the whole galaxy, one stamp at a time".</p>' +
+					'<p>The clerk ZÖ-11 welcomed the first pilot with a wave and a coffee. "He doesn\'t drink it, but he likes to offer", the founder explained. The house ship, the PX-01, waits in hangar 11 with a full tank.</p>' +
+					'<p><b>Weather:</b> light acid rain on the street, clear skies above the atmosphere. <b>Classifieds:</b> used helmet for sale, barely orbited.</p>' +
+				'</div>' +
+				'<button type="button" class="emb-jornal-fechar">Fold the newspaper</button>') +
 			'</article>';
 		var foto = paraCanvas(retratoFundadora(false)); foto.className = 'emb-jornal-foto';
 		var fig = j.querySelector('figure'); fig.insertBefore(foto, fig.firstChild);
@@ -2392,24 +2549,24 @@
 		},
 		entrar: function () {
 			var cena1 = this; cena1.ultimaChamada = -1; cena1.senha = 0; cena1.chamada = 0;
-			ligarAmbiente('recepcao'); capitulo('II', 'A recepção');
+			ligarAmbiente('recepcao'); capitulo('II', T('A recepção', 'The reception'));
 			var C = CAM_REC, Tt = TOTEM, ta = C(Tt.x0, Tt.h + 0.1, Tt.z0), tb = C(Tt.x1, 0, Tt.z0);
-			var leg = legenda('Pegue sua senha no <b>totem</b>', 12, 236);
+			var leg = legenda(T('Pegue sua senha no <b>totem</b>', 'Take a ticket number at the <b>kiosk</b>'), 12, 236);
 			// (o jornal da senhora da frente: escondido, sem seta, só para quem reparar)
 			var aj = areaJornal(C);
-			var alvoJornal = alvoClicavel(aj[0], aj[1], aj[2], aj[3], 'Ler o jornal caído no chão', abrirJornal);
+			var alvoJornal = alvoClicavel(aj[0], aj[1], aj[2], aj[3], T('Ler o jornal caído no chão', 'Read the newspaper on the floor'), abrirJornal);
 			alvoJornal.classList.add('discreto');
 			// 1. pegar a senha: o totem imprime o papelzinho "011"
-			var alvoTotem = alvoClicavel(ta[0] - 6, ta[1] - 16, tb[0] - ta[0] + 12, tb[1] - ta[1] + 18, 'Pegar a senha no totem', function () {
+			var alvoTotem = alvoClicavel(ta[0] - 6, ta[1] - 16, tb[0] - ta[0] + 12, tb[1] - ta[1] + 18, T('Pegar a senha no totem', 'Take a ticket number at the kiosk'), function () {
 				alvoTotem.remove(); leg.remove(); SONS.impressora();
 				cena1.senha = (performance.now() - inicioCena) / 1000;
 				// 2. o painel chama a nossa senha, com o "ding" e o alto-falante
 				depois(function () {
 					cena1.chamada = (performance.now() - inicioCena) / 1000;
 					SONS.ding(); SONS.anuncio();
-					legenda('Senha <b>011</b>: vá até o <b>guichê 11</b>', 12, 236);
+					legenda(T('Senha <b>011</b>: vá até o <b>guichê 11</b>', 'Number <b>011</b>: go to <b>desk 11</b>'), 12, 236);
 					var cx = guicheX(2) + GL / 2 + 0.1, a = C(cx, 1.3, 5.05), b = C(cx, 0, 5.05), s = 300 / b[2];
-					alvoClicavel(b[0] - 0.45 * s, a[1] - 0.3 * s, 0.9 * s, b[1] - a[1] + 0.4 * s, 'Sentar na cadeira do guichê 11', function () { SONS.passos(); depois(SONS.cadeira, 1300); depois(function () { irPara('mesa'); }, 1100); });
+					alvoClicavel(b[0] - 0.45 * s, a[1] - 0.3 * s, 0.9 * s, b[1] - a[1] + 0.4 * s, T('Sentar na cadeira do guichê 11', 'Sit in the chair at desk 11'), function () { SONS.passos(); depois(SONS.cadeira, 1300); depois(function () { irPara('mesa'); }, 1100); });
 				}, 1600);
 			});
 		}
@@ -2614,11 +2771,11 @@
 		},
 		entrar: function () {
 			var cenaMesa = this; cenaMesa.seta = false; cenaMesa.feliz = false;
-			ligarAmbiente('mesa'); capitulo('III', 'O guichê 11');
+			ligarAmbiente('mesa'); capitulo('III', T('O guichê 11', 'Desk 11'));
 			depois(function () {
-				falar('Olá, piloto! Documentos, por favor.', 460).then(function () {
+				falar(T('Olá, piloto! Documentos, por favor.', 'Hello, pilot! Documents, please.'), 460).then(function () {
 					cenaMesa.seta = true;
-					botao('Dar documentos', 240, 236, function () { irPara('entrega'); }, 'pulsa');
+					botao(T('Dar documentos', 'Hand over documents'), 240, 236, function () { irPara('entrega'); }, 'pulsa');
 				});
 			}, 500);
 		}
@@ -2892,7 +3049,7 @@
 			depois(function () { SONS.papel('livro'); pousar(docs.pp, LUGAR.pp, PP_ESC, 860, 602, 0.9); }, 150);
 			depois(function () { SONS.papel('cartao'); pousar(docs.cnh, LUGAR.cnh, CNH_ESC, 600, 400, 0.9); }, 550);
 			depois(SONS.bipLeitor, 1300);
-			depois(function () { falar('Obrigado! Um momento…', 460).then(function () { depois(function () { irPara('assinar'); }, 600); }); }, 1500);
+			depois(function () { falar(T('Obrigado! Um momento…', 'Thank you! One moment…'), 460).then(function () { depois(function () { irPara('assinar'); }, 600); }); }, 1500);
 		}
 	};
 	// 4. ASSINAR: o atendente endireita e abre o passaporte (a mesma animação da capa do jogo)
@@ -2904,10 +3061,10 @@
 			depois(function () { SONS.folha(); docs.livro.classList.add('aberto'); }, 700);
 			depois(function () {
 				docs.dados.classList.add('emb-chama-assinatura');
-				falar('Assine aqui, por gentileza.', 460).then(function () {
-					legenda('Clique na linha da assinatura', 12, 248);
+				falar(T('Assine aqui, por gentileza.', 'Please sign here.'), 460).then(function () {
+					legenda(T('Clique na linha da assinatura', 'Click the signature line'), 12, 248);
 					var r = retanguloNaTela(docs.dados.querySelector('.pp-assinatura'));
-					alvoClicavel(r.x - 6, r.y - 18, r.w + 12, r.h + 26, 'Assinar o passaporte', function () { docs.dados.classList.remove('emb-chama-assinatura'); irPara('nome'); });
+					alvoClicavel(r.x - 6, r.y - 18, r.w + 12, r.h + 26, T('Assinar o passaporte', 'Sign the passport'), function () { docs.dados.classList.remove('emb-chama-assinatura'); irPara('nome'); });
 				});
 			}, 2000);
 		}
@@ -2930,8 +3087,8 @@
 				var caixa = document.createElement('form');
 				caixa.className = 'emb-nome';
 				pos(caixa, 150, 226, 180);
-				caixa.innerHTML = '<label class="emb-nome-rotulo" for="emb-nome">Digite seu nome para assinar</label>' +
-					'<input id="emb-nome" type="text" maxlength="32" autocomplete="off" spellcheck="false" placeholder="seu nome">' +
+				caixa.innerHTML = '<label class="emb-nome-rotulo" for="emb-nome">' + T('Digite seu nome para assinar', 'Type your name to sign') + '</label>' +
+					'<input id="emb-nome" type="text" maxlength="32" autocomplete="off" spellcheck="false" placeholder="' + T('seu nome', 'your name') + '">' +
 					'<button type="submit" class="emb-botao emb-ok">OK</button>';
 				camada.appendChild(caixa);
 				var campo = caixa.querySelector('input');
@@ -2983,12 +3140,12 @@
 				} catch (e) {}
 				SONS.aprovado();
 				if (docs.holo) docs.holo.classList.remove('desligada');
-				falar('Tudo certo, ' + primeiroNome() + '! Boa viagem!', 520).then(function () {
+				falar(T('Tudo certo, ' + primeiroNome() + '! Boa viagem!', 'All set, ' + primeiroNome() + '! Have a good trip!'), 520).then(function () {
 					apontar(1000, 660, 1.1, 1.2);
 					depois(imprimirBilhete, 500);
 					depois(function () {
 						limpar();
-						falar('E aqui está o seu cartão de embarque. Hangar 11!', 460).then(function () { depois(function () { irPara('retirar'); }, 1200); });
+						falar(T('E aqui está o seu cartão de embarque. Hangar 11!', 'And here is your boarding pass. Hangar 11!'), 460).then(function () { depois(function () { irPara('retirar'); }, 1200); });
 					}, 2400);
 				});
 			}, 2900);
@@ -3003,9 +3160,9 @@
 			depois(function () { SONS.folha(); docs.livro.classList.remove('aberto'); }, 200);
 			depois(function () { SONS.papel('livro'); pousar(docs.pp, LUGAR.pp, PP_ESC, 860, 602, 0.9); }, 1100);
 			depois(function () {
-				falar('Pode retirar os documentos, ' + primeiroNome() + '.', 460).then(function () {
-					legenda('Clique nos documentos para pegar', 12, 248);
-					alvoClicavel(110, 80, 260, 160, 'Pegar os documentos', function () {
+				falar(T('Pode retirar os documentos, ' + primeiroNome() + '.', 'You can take your documents, ' + primeiroNome() + '.'), 460).then(function () {
+					legenda(T('Clique nos documentos para pegar', 'Click the documents to take them'), 12, 248);
+					alvoClicavel(110, 80, 260, 160, T('Pegar os documentos', 'Take the documents'), function () {
 						limpar(); SONS.whoosh();
 						mundo.classList.add('ventania');
 						pousar(docs.pp, { x: LUGAR.pp.x + 100, y: LUGAR.pp.y + 1100, giro: -2 }, PP_ESC * 1.6, 860, 602, 0.7);
@@ -3203,8 +3360,8 @@
 			for (var i = 0; i < 30; i++) { var px2 = (ruido(i, 81) * W + t * (6 + ruido(i, 82) * 8)) % W - OX, py2 = ruido(i, 83) * 220 + Math.sin(t + i) * 4; P(c, px2, py2, 'rgba(255,240,200,0.55)'); }
 		},
 		entrar: function () {
-			ligarAmbiente('hangar'); capitulo('IV', 'O hangar'); depois(SONS.fanfarra, 500);
-			legenda('Hangar 11 · <b>PX-01 Millennium Falcon</b>, sua nave', 12, 248);
+			ligarAmbiente('hangar'); capitulo('IV', T('O hangar', 'The hangar')); depois(SONS.fanfarra, 500);
+			legenda(T('Hangar 11 · <b>PX-01 Millennium Falcon</b>, sua nave', 'Hangar 11 · <b>PX-01 Millennium Falcon</b>, your ship'), 12, 248);
 			depois(function () { irPara('porta'); }, 7000);
 		}
 	};
@@ -3320,9 +3477,9 @@
 		},
 		entrar: function () {
 			var cena9 = this; cena9.abrindo = 0; cena9.vapor = [];
-			ligarAmbiente('nave'); capitulo('V', 'A nave');
-			legenda('Clique na porta para embarcar', 12, 248);
-			alvoClicavel(182, 34, 116, 204, 'Entrar na nave', function () {
+			ligarAmbiente('nave'); capitulo('V', T('A nave', 'The ship'));
+			legenda(T('Clique na porta para embarcar', 'Click the door to board'), 12, 248);
+			alvoClicavel(182, 34, 116, 204, T('Entrar na nave', 'Board the ship'), function () {
 				limpar(); cena9.abrindo = performance.now(); SONS.porta();
 				depois(function () { irPara('cabine'); }, 3800);
 			});
@@ -3550,6 +3707,11 @@
 					c.strokeStyle = 'rgba(125,255,168,0.35)'; c.lineWidth = 1; [6, 11, 15].forEach(function (r) { c.beginPath(); c.arc(cx + 0.5, cy + 0.5, r, 0, Math.PI * 2); c.stroke(); });
 					for (var w2 = 0; w2 < 8; w2++) { c.globalAlpha = 0.5 - w2 * 0.06; linhaGrossa(c, [cx, cy], [cx + Math.cos(a - w2 * 0.08) * 15, cy + Math.sin(a - w2 * 0.08) * 15], 1, '#7dffa8'); }
 					c.globalAlpha = 1; [[8, -5], [-10, 4], [3, 9]].forEach(function (b, j) { if (Math.sin(t * 2 + j * 2) > 0) R(c, cx + b[0], cy + b[1], 2, 2, '#dfffe8'); });
+				} else if (q.tipo === 'ondas' && window.TempoDoSol) {
+					/* o tempo do Sol ao vivo (dados da NOAA), com a moldura piscando em vermelho no alerta */
+					var vs = window.TempoDoSol.visor(t);
+					vs.linhas.forEach(function (l, il) { texto3(c, l[0], Math.round(q.x + q.w / 2 - (l[0].length * 4 - 1) / 2), q.y + 4 + il * 9, 1, l[1]); });
+					if (vs.alerta && Math.floor(t * 3) % 2) { R(c, q.x, q.y, q.w, 1, '#ff6a5a'); R(c, q.x, q.y + q.h - 1, q.w, 1, '#ff6a5a'); R(c, q.x, q.y, 1, q.h, '#ff6a5a'); R(c, q.x + q.w - 1, q.y, 1, q.h, '#ff6a5a'); }
 				} else if (q.tipo === 'ondas') {
 					for (var b2 = 0; b2 < 12; b2++) { var hb = 3 + Math.abs(Math.sin(t * 3 + b2 * 0.7) * Math.cos(t * 1.3 + b2)) * (q.h - 8); R(c, q.x + 3 + b2 * 4, q.y + q.h - 2 - hb, 3, hb, b2 % 3 ? '#7fe3ff' : '#ffd36a'); }
 				} else {
@@ -3598,20 +3760,24 @@
 		},
 		entrar: function () {
 			var cena10 = this; cena10.ligada = 0; cena10.contagem = 0; cena10.subida = 0; cena10.apontado = 'ignicao';
-			ligarAmbiente('nave'); capitulo('VI', 'A decolagem');
-			legenda('Aperte o botão de <b>ignição</b> para ligar a nave', 12, 248);
-			alvoClicavel(292, 178, 34, 36, 'Apertar o botão de ignição', function () {
+			ligarAmbiente('nave'); capitulo('VI', T('A decolagem', 'The takeoff'));
+			legenda(T('Aperte o botão de <b>ignição</b> para ligar a nave', 'Press the <b>ignition</b> button to start the ship'), 12, 248);
+			alvoClicavel(292, 178, 34, 36, T('Apertar o botão de ignição', 'Press the ignition button'), function () {
 				limpar(); cena10.apontado = null; cena10.ligada = tempoCena(); SONS.ligar();
 				depois(function () { ligarAmbiente('cabine'); }, 1200);
 				depois(function () {
 					SONS.radio();
-					falar('PX-01, aqui é a torre do hangar 11. Na escuta, ' + primeiroNome() + '?', 460, 'ZÖ-11 · rádio').then(function () {
+					falar(T('PX-01, aqui é a torre do hangar 11. Na escuta, ' + primeiroNome() + '?', 'PX-01, this is hangar 11 tower. Do you copy, ' + primeiroNome() + '?'), 460, T('ZÖ-11 · rádio', 'ZÖ-11 · radio')).then(function () {
 						depois(function () {
 							limpar(); SONS.radio();
-							falar('Céu limpo lá em cima. PX-01, liberada para decolar!', 460, 'ZÖ-11 · rádio').then(function () {
+							/* a torre conta o tempo do Sol de verdade (dados da NOAA), quando eles chegaram */
+							var sol = window.TempoDoSol, avisoS = sol && sol.aviso(), bol = sol && sol.boletim();
+							var liberada = avisoS ? T('Atenção, PX-01: ' + avisoS.replace('Atenção: o Sol', 'o Sol') + ' Liberada para decolar, com cuidado!', 'Heads up, PX-01: ' + avisoS.replace('Attention: the Sun', 'the Sun') + ' Cleared for takeoff, carefully!')
+								: bol ? T('Tempo do Sol calmo: ' + bol + '. PX-01, liberada para decolar!', 'Calm solar weather: ' + bol + '. PX-01, cleared for takeoff!') : T('Céu limpo lá em cima. PX-01, liberada para decolar!', 'Clear skies up there. PX-01, cleared for takeoff!');
+							falar(liberada, 460, T('ZÖ-11 · rádio', 'ZÖ-11 · radio')).then(function () {
 								cena10.apontado = 'alavanca';
-								legenda('Empurre as <b>alavancas</b> de potência para decolar', 12, 248);
-								alvoClicavel(218, 226, 44, 44, 'Empurrar as alavancas de potência e decolar', function () {
+								legenda(T('Empurre as <b>alavancas</b> de potência para decolar', 'Push the power <b>levers</b> to take off'), 12, 248);
+								alvoClicavel(218, 226, 44, 44, T('Empurrar as alavancas de potência e decolar', 'Push the power levers and take off'), function () {
 									limpar(); cena10.apontado = null; cena10.contagem = tempoCena(); tocarMusica('decolagem');
 									[0, 1, 2].forEach(function (n) { depois(function () { SONS.contagem(false); }, n * 1000); });
 									depois(function () { SONS.contagem(true); SONS.motor(); cena10.subida = tempoCena(); }, 3000);

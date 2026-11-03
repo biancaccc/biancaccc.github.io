@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+	<meta charset="utf-8">
+	<!-- fundo escuro desde o primeiro instante; vindo de um salto, a página começa coberta pelo último quadro do salto (preso à tela, não à página), para nenhum quadro vazar antes das estrelas -->
+	<script>try{var h=document.documentElement;h.style.backgroundColor="#05030c";if(sessionStorage.getItem("salto")==="1"){var q=sessionStorage.getItem("saltoQuadro");h.className+=" em-salto";if(q){h.style.background="#05030c url("+q+") 0 0/100% 100% no-repeat fixed";h.style.imageRendering="pixelated"}}}catch(e){}</script>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Encélado · Nosso sistema solar</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Silkscreen&family=Space+Grotesk:wght@400;500;700&family=Tiny5&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="estilo.css">
+</head>
+<body data-passaporte="sistema" class="pagina-lua" style="--cor: #e8f4ff; --escala: 0.86">
+
+	<header class="topo">
+		<a class="marca" href="sistema-solar.html">Nosso sistema solar</a>
+		<nav class="menu">
+		<a class="menu-galaxia" href="index.html#galaxia">&larr; Via Láctea</a>
+		<a href="mercurio.html">Mercúrio</a>
+		<a href="venus.html">Vênus</a>
+		<a href="terra.html">Terra</a>
+		<a href="marte.html">Marte</a>
+		<a href="jupiter.html">Júpiter</a>
+		<a href="saturno.html" class="menu-pai">Saturno</a>
+		<a href="urano.html">Urano</a>
+		<a href="netuno.html">Netuno</a>
+		<a href="sol.html">Sol</a>
+		</nav>
+	</header>
+
+	<main>
+		<section class="destaque">
+			<div class="palco">
+				<img class="planeta" data-planeta="encelado" src="pixel/encelado.png" alt="Encélado em pixel art">
+			</div>
+			<div class="destaque-texto">
+				<p class="posicao">Uma lua de Saturno</p>
+				<h1>Encélado</h1>
+				<p class="lema">A lua dos gêiseres de gelo</p>
+				<dl class="ficha">
+					<div><dt>Tipo</dt><dd>Lua de Saturno</dd></div>
+					<div><dt>Distância de Saturno</dt><dd>Cerca de 238 mil km</dd></div>
+					<div><dt>Uma volta em Saturno</dt><dd>1,4 dia</dd></div>
+					<div><dt>Diâmetro</dt><dd>504 km</dd></div>
+				</dl>
+			</div>
+		</section>
+
+		<div class="leitura" id="leitura">
+		<aside class="sumario" aria-label="Nesta página">
+			<p>Nesta página</p>
+			<ol>
+				<li><a href="#secao-1">Encélado: uma bola de neve</a></li>
+				<li><a href="#secao-2">Gêiseres no polo sul</a></li>
+				<li><a href="#secao-3">Um oceano salgado</a></li>
+				<li><a href="#secao-4">Alimentando um anel</a></li>
+				<li><a href="#secao-5">Os ingredientes da vida</a></li>
+				<li><a href="#secao-6">Mergulho nos jatos</a></li>
+				<li class="extra"><a href="#balanca">Sua balança espacial</a></li>
+			</ol>
+		</aside>
+
+		<article class="conteudo">
+		<section class="bloco pixelado" id="secao-1">
+			<h2>Encélado: uma bola de neve</h2>
+			<p>Encélado é uma lua pequena de Saturno, com só 504 km de diâmetro. Foi descoberta por William Herschel em 1789. Coberta de gelo fresquinho, ela reflete quase toda a luz do Sol que recebe e é um dos objetos mais brancos de todo o Sistema Solar.</p>
+		</section>
+		<section class="bloco pixelado" id="secao-2">
+			<h2>Gêiseres no polo sul</h2>
+			<p>Em 2005, a sonda Cassini descobriu jatos de vapor d'água e grãos de gelo saindo do polo sul de Encélado. Eles escapam por quatro rachaduras compridas, apelidadas de "listras de tigre", e sobem centenas de quilômetros no espaço.</p>
+		</section>
+		<figure class="comparacao">
+			<img class="pixelado" src="pixel/encelado.png" alt="Comparação do tamanho de Encélado">
+		</figure>
+		<section class="bloco pixelado" id="secao-3">
+			<h2>Um oceano salgado</h2>
+			<p>Os jatos vêm de um oceano de água salgada que cobre a lua inteira, embaixo do gelo. Ele fica aquecido porque a gravidade de Saturno aperta e solta Encélado a cada volta. No fundo do oceano, a água quente pode estar passando por rochas, como nas fontes hidrotermais do fundo dos mares da Terra.</p>
+		</section>
+		<section class="bloco pixelado" id="secao-4">
+			<h2>Alimentando um anel</h2>
+			<p>Parte do gelo dos jatos não cai de volta: ele se espalha pela órbita de Encélado e forma o anel E de Saturno, um anel largo e bem fininho, feito de grãos de gelo menores que um grão de poeira.</p>
+		</section>
+		<section class="bloco pixelado" id="secao-5">
+			<h2>Os ingredientes da vida</h2>
+			<p>A Cassini atravessou os jatos várias vezes e provou o que tem neles: água, sal, moléculas orgânicas e hidrogênio, que pode servir de alimento para micróbios. Em 2023, cientistas encontraram fósforo nos grãos de gelo, um elemento essencial para a vida. Encélado tem quase todos os ingredientes que conhecemos.</p>
+		</section>
+		<section class="bloco pixelado" id="secao-6">
+			<h2>Mergulho nos jatos</h2>
+			<p>Em outubro de 2015, a Cassini fez seu mergulho mais fundo nos jatos, passando a só 49 km da superfície de Encélado. A sonda funcionou até 2017, quando mergulhou em Saturno para não correr o risco de cair numa lua que pode ter vida.</p>
+		</section>
+
+		<p class="fecho">Pequena, branquinha e soltando jatos de um oceano escondido, Encélado é uma das maiores surpresas que o Sistema Solar já nos deu.</p>
+		</article>
+		</div>
+
+		<section id="balanca" data-planeta="encelado"></section>
+
+		<nav class="vizinhos">
+		<a class="anterior" href="tita.html"><img src="pixel/tita.png" alt=""><span><small>Anterior</small>Titã</span></a>
+		<a class="proximo" href="mimas.html"><span><small>Próximo</small>Mimas</span><img src="pixel/mimas.png" alt=""></a>
+		</nav>
+	</main>
+
+	<footer class="rodape">
+		<nav class="rodape-planetas" aria-label="Todos os planetas">
+			<a href="mercurio.html"><img src="pixel/mercurio.png" alt="">Mercúrio</a>
+			<a href="venus.html"><img src="pixel/venus.png" alt="">Vênus</a>
+			<a href="terra.html"><img src="pixel/terra.png" alt="">Terra</a>
+			<a href="marte.html"><img src="pixel/marte.png" alt="">Marte</a>
+			<a href="jupiter.html"><img src="pixel/jupiter.png" alt="">Júpiter</a>
+			<a href="saturno.html"><img src="pixel/saturno.png" alt="">Saturno</a>
+			<a href="urano.html"><img src="pixel/urano.png" alt="">Urano</a>
+			<a href="netuno.html"><img src="pixel/netuno.png" alt="">Netuno</a>
+			<a href="sol.html"><img src="pixel/sol.png" alt="">Sol</a>
+		</nav>
+		<nav class="rodape-planetas rodape-luas" aria-label="As luas">
+			<a href="lua.html"><img src="pixel/lua.png" alt="">Lua</a>
+			<a href="io.html"><img src="pixel/io.png" alt="">Io</a>
+			<a href="europa.html"><img src="pixel/europa.png" alt="">Europa</a>
+			<a href="ganimedes.html"><img src="pixel/ganimedes.png" alt="">Ganimedes</a>
+			<a href="tita.html"><img src="pixel/tita.png" alt="">Titã</a>
+			<a href="encelado.html"><img src="pixel/encelado.png" alt="">Encélado</a>
+			<a href="mimas.html"><img src="pixel/mimas.png" alt="">Mimas</a>
+			<a href="miranda.html"><img src="pixel/miranda.png" alt="">Miranda</a>
+			<a href="tritao.html"><img src="pixel/tritao.png" alt="">Tritão</a>
+		</nav>
+		<p><a href="sistema-solar.html">Nosso sistema solar</a> · <a href="index.html#galaxia">Via Láctea</a> · textos e pixel art feitos à mão</p>
+	</footer>
+
+	<script src="idioma.js"></script>
+	<script src="nave.js"></script>
+	<script src="transicao.js"></script>
+	<script src="tempo-do-sol.js"></script>
+	<script src="radio.js"></script>
+	<script src="cabine.js"></script>
+	<script src="chegada.js"></script>
+	<script src="passaporte.js"></script>
+	<script src="marca.js"></script>
+	<script src="fundo.js"></script>
+	<script src="pixel/sprites.js"></script>
+	<script src="balanco.js"></script>
+	<script src="balanca.js"></script>
+	<script src="visuais-dados.js"></script>
+	<script src="visuais.js"></script>
+	<script src="pagina.js"></script>
+</body>
+</html>

@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+	<meta charset="utf-8">
+	<!-- fundo escuro desde o primeiro instante; vindo de um salto, a página começa coberta pelo último quadro do salto (preso à tela, não à página), para nenhum quadro vazar antes das estrelas -->
+	<script>try{var h=document.documentElement;h.style.backgroundColor="#05030c";if(sessionStorage.getItem("salto")==="1"){var q=sessionStorage.getItem("saltoQuadro");h.className+=" em-salto";if(q){h.style.background="#05030c url("+q+") 0 0/100% 100% no-repeat fixed";h.style.imageRendering="pixelated"}}}catch(e){}</script>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Europa · Nosso sistema solar</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Silkscreen&family=Space+Grotesk:wght@400;500;700&family=Tiny5&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="estilo.css">
+</head>
+<body data-passaporte="sistema" class="pagina-lua" style="--cor: #e8d8c0; --escala: 0.86">
+
+	<header class="topo">
+		<a class="marca" href="sistema-solar.html">Nosso sistema solar</a>
+		<nav class="menu">
+		<a class="menu-galaxia" href="index.html#galaxia">&larr; Via Láctea</a>
+		<a href="mercurio.html">Mercúrio</a>
+		<a href="venus.html">Vênus</a>
+		<a href="terra.html">Terra</a>
+		<a href="marte.html">Marte</a>
+		<a href="jupiter.html" class="menu-pai">Júpiter</a>
+		<a href="saturno.html">Saturno</a>
+		<a href="urano.html">Urano</a>
+		<a href="netuno.html">Netuno</a>
+		<a href="sol.html">Sol</a>
+		</nav>
+	</header>
+
+	<main>
+		<section class="destaque">
+			<div class="palco">
+				<img class="planeta" data-planeta="europa" src="pixel/europa.png" alt="Europa em pixel art">
+			</div>
+			<div class="destaque-texto">
+				<p class="posicao">Uma lua de Júpiter</p>
+				<h1>Europa</h1>
+				<p class="lema">Um oceano escondido embaixo do gelo</p>
+				<dl class="ficha">
+					<div><dt>Tipo</dt><dd>Lua de Júpiter</dd></div>
+					<div><dt>Distância de Júpiter</dt><dd>Cerca de 671 mil km</dd></div>
+					<div><dt>Uma volta em Júpiter</dt><dd>3,6 dias</dd></div>
+					<div><dt>Diâmetro</dt><dd>3.122 km</dd></div>
+				</dl>
+			</div>
+		</section>
+
+		<div class="leitura" id="leitura">
+		<aside class="sumario" aria-label="Nesta página">
+			<p>Nesta página</p>
+			<ol>
+				<li><a href="#secao-1">Europa: o oceano escondido</a></li>
+				<li><a href="#secao-2">Mais água que a Terra</a></li>
+				<li><a href="#secao-3">Rachaduras no gelo</a></li>
+				<li><a href="#secao-4">Terreno de caos</a></li>
+				<li><a href="#secao-5">Um bom lugar para procurar vida</a></li>
+				<li><a href="#secao-6">A sonda Europa Clipper</a></li>
+				<li class="extra"><a href="#balanca">Sua balança espacial</a></li>
+			</ol>
+		</aside>
+
+		<article class="conteudo">
+		<section class="bloco pixelado" id="secao-1">
+			<h2>Europa: o oceano escondido</h2>
+			<p>Europa é uma das quatro luas que Galileu descobriu em Júpiter, em 1610. É um pouquinho menor que a nossa Lua, e sua superfície de gelo é uma das mais lisas do Sistema Solar: quase não tem montanhas nem crateras grandes, só um emaranhado de rachaduras.</p>
+		</section>
+		<section class="bloco pixelado" id="secao-2">
+			<h2>Mais água que a Terra</h2>
+			<p>Embaixo de uma casca de gelo que deve ter de 15 a 25 km de espessura, Europa esconde um oceano de água salgada que pode ter de 60 a 150 km de profundidade. Se for isso mesmo, ele guarda cerca do dobro de toda a água dos oceanos da Terra.</p>
+		</section>
+		<figure class="comparacao">
+			<img class="pixelado" src="pixel/europa.png" alt="Comparação do tamanho de Europa">
+		</figure>
+		<section class="bloco pixelado" id="secao-3">
+			<h2>Rachaduras no gelo</h2>
+			<p>As linhas avermelhadas que riscam Europa são rachaduras na casca de gelo. A gravidade de Júpiter estica e solta a lua a cada volta, e o gelo trinca. A cor vem de sais e outras substâncias que sobem lá de baixo, talvez do próprio oceano, e ficam marrons com a radiação de Júpiter.</p>
+		</section>
+		<section class="bloco pixelado" id="secao-4">
+			<h2>Terreno de caos</h2>
+			<p>Em alguns lugares, a superfície parece um quebra-cabeça desmontado: blocos de gelo do tamanho de cidades, tortos e virados, presos numa mistura que congelou de novo. Os cientistas chamam isso de "terreno de caos". Ele pode ter se formado onde água ou gelo mais quente subiu e derreteu a casca por baixo.</p>
+		</section>
+		<section class="bloco pixelado" id="secao-5">
+			<h2>Um bom lugar para procurar vida</h2>
+			<p>Para a vida como a conhecemos, são necessários água líquida, os elementos químicos certos e uma fonte de energia. Europa parece ter os três. Por isso ela é um dos lugares mais promissores do Sistema Solar para procurar vida, talvez microscópica, no fundo do seu oceano.</p>
+		</section>
+		<section class="bloco pixelado" id="secao-6">
+			<h2>A sonda Europa Clipper</h2>
+			<p>A sonda Europa Clipper, da NASA, foi lançada em outubro de 2024 e deve chegar a Júpiter em 2030. Ela vai passar perto de Europa cerca de 50 vezes, medindo a espessura do gelo e o sal do oceano. A sonda JUICE, da Agência Espacial Europeia, também vai visitar Europa a caminho de Ganimedes.</p>
+		</section>
+
+		<p class="fecho">Lisa por fora e cheia de água por dentro, Europa é uma das maiores promessas da busca por vida fora da Terra.</p>
+		</article>
+		</div>
+
+		<section id="balanca" data-planeta="europa"></section>
+
+		<nav class="vizinhos">
+		<a class="anterior" href="io.html"><img src="pixel/io.png" alt=""><span><small>Anterior</small>Io</span></a>
+		<a class="proximo" href="ganimedes.html"><span><small>Próximo</small>Ganimedes</span><img src="pixel/ganimedes.png" alt=""></a>
+		</nav>
+	</main>
+
+	<footer class="rodape">
+		<nav class="rodape-planetas" aria-label="Todos os planetas">
+			<a href="mercurio.html"><img src="pixel/mercurio.png" alt="">Mercúrio</a>
+			<a href="venus.html"><img src="pixel/venus.png" alt="">Vênus</a>
+			<a href="terra.html"><img src="pixel/terra.png" alt="">Terra</a>
+			<a href="marte.html"><img src="pixel/marte.png" alt="">Marte</a>
+			<a href="jupiter.html"><img src="pixel/jupiter.png" alt="">Júpiter</a>
+			<a href="saturno.html"><img src="pixel/saturno.png" alt="">Saturno</a>
+			<a href="urano.html"><img src="pixel/urano.png" alt="">Urano</a>
+			<a href="netuno.html"><img src="pixel/netuno.png" alt="">Netuno</a>
+			<a href="sol.html"><img src="pixel/sol.png" alt="">Sol</a>
+		</nav>
+		<nav class="rodape-planetas rodape-luas" aria-label="As luas">
+			<a href="lua.html"><img src="pixel/lua.png" alt="">Lua</a>
+			<a href="io.html"><img src="pixel/io.png" alt="">Io</a>
+			<a href="europa.html"><img src="pixel/europa.png" alt="">Europa</a>
+			<a href="ganimedes.html"><img src="pixel/ganimedes.png" alt="">Ganimedes</a>
+			<a href="tita.html"><img src="pixel/tita.png" alt="">Titã</a>
+			<a href="encelado.html"><img src="pixel/encelado.png" alt="">Encélado</a>
+			<a href="mimas.html"><img src="pixel/mimas.png" alt="">Mimas</a>
+			<a href="miranda.html"><img src="pixel/miranda.png" alt="">Miranda</a>
+			<a href="tritao.html"><img src="pixel/tritao.png" alt="">Tritão</a>
+		</nav>
+		<p><a href="sistema-solar.html">Nosso sistema solar</a> · <a href="index.html#galaxia">Via Láctea</a> · textos e pixel art feitos à mão</p>
+	</footer>
+
+	<script src="idioma.js"></script>
+	<script src="nave.js"></script>
+	<script src="transicao.js"></script>
+	<script src="tempo-do-sol.js"></script>
+	<script src="radio.js"></script>
+	<script src="cabine.js"></script>
+	<script src="chegada.js"></script>
+	<script src="passaporte.js"></script>
+	<script src="marca.js"></script>
+	<script src="fundo.js"></script>
+	<script src="pixel/sprites.js"></script>
+	<script src="balanco.js"></script>
+	<script src="balanca.js"></script>
+	<script src="visuais-dados.js"></script>
+	<script src="visuais.js"></script>
+	<script src="pagina.js"></script>
+</body>
+</html>

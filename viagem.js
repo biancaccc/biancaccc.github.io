@@ -171,73 +171,73 @@
 	var sol = noPlano(SOL.r, SOL.a);
 	var DESTINOS = [
 		{
-			id: 'sagitario', nome: 'Sagittarius A*', tipo: 'Buraco negro supermassivo', distancia: '26.700 anos-luz da Terra',
-			texto: 'O gigante escondido no coração da Via Láctea, com a massa de 4 milhões de sóis.',
+			id: 'sagitario', nome: 'Sagittarius A*', tipo: T('Buraco negro supermassivo', 'Supermassive black hole'), distancia: T('26.700 anos-luz da Terra', '26,700 light-years from Earth'),
+			texto: T('O gigante escondido no coração da Via Láctea, com a massa de 4 milhões de sóis.', 'The hidden giant at the heart of the Milky Way, with the mass of 4 million suns.'),
 			href: 'sagitario-a.html', cor: '#ffb347', pos: [0, 0, 0]
 		},
 		{
-			id: 'orion', nome: 'Nebulosa de Órion', tipo: 'Berçário de estrelas', distancia: '1.344 anos-luz da Terra',
-			texto: 'Uma nuvem colorida de gás e poeira onde milhares de estrelas estão nascendo agora mesmo.',
+			id: 'orion', nome: T('Nebulosa de Órion', 'Orion Nebula'), tipo: T('Berçário de estrelas', 'Stellar nursery'), distancia: T('1.344 anos-luz da Terra', '1,344 light-years from Earth'),
+			texto: T('Uma nuvem colorida de gás e poeira onde milhares de estrelas estão nascendo agora mesmo.', 'A colorful cloud of gas and dust where thousands of stars are being born right now.'),
 			href: 'orion.html', cor: '#ff6fb5', pos: [sol[0] - 0.13, sol[1] - 0.12, 0], esquerda: true
 		},
 		{
-			id: 'omega', nome: 'Omega Centauri', tipo: 'Aglomerado globular', distancia: '17.000 anos-luz da Terra',
-			texto: 'Cerca de 10 milhões de estrelas antigas apertadas numa bola. Talvez o coração de uma galáxia engolida.',
+			id: 'omega', nome: 'Omega Centauri', tipo: T('Aglomerado globular', 'Globular cluster'), distancia: T('17.000 anos-luz da Terra', '17,000 light-years from Earth'),
+			texto: T('Cerca de 10 milhões de estrelas antigas apertadas numa bola. Talvez o coração de uma galáxia engolida.', 'About 10 million ancient stars packed into a ball. Perhaps the heart of a swallowed galaxy.'),
 			href: 'omega-centauri.html', cor: '#ffe08a', pos: noPlano(0.42, SOL.a + 0.9).concat([0.4])
 		},
 		{
-			id: 'sistema', nome: 'Sistema Solar', tipo: 'Nossa casa · você está aqui', distancia: 'A 26.700 anos-luz do centro da galáxia',
-			texto: 'O Sol, oito planetas e todos nós, num dos braços menores da Via Láctea.',
+			id: 'sistema', nome: T('Sistema Solar', 'Solar System'), tipo: T('Nossa casa · você está aqui', 'Our home · you are here'), distancia: T('A 26.700 anos-luz do centro da galáxia', '26,700 light-years from the center of the galaxy'),
+			texto: T('O Sol, oito planetas e todos nós, num dos braços menores da Via Láctea.', 'The Sun, eight planets and all of us, in one of the smaller arms of the Milky Way.'),
 			href: 'sistema-solar.html', cor: '#7fe3ff', pos: [sol[0], sol[1], 0]
 		},
 		{
-			id: 'pleiades', nome: 'Plêiades', tipo: 'Aglomerado de estrelas jovens', distancia: '444 anos-luz da Terra',
-			texto: 'As Sete Irmãs: uma família de mais de mil estrelas azuis que nasceram juntas.',
+			id: 'pleiades', nome: T('Plêiades', 'Pleiades'), tipo: T('Aglomerado de estrelas jovens', 'Cluster of young stars'), distancia: T('444 anos-luz da Terra', '444 light-years from Earth'),
+			texto: T('As Sete Irmãs: uma família de mais de mil estrelas azuis que nasceram juntas.', 'The Seven Sisters: a family of more than a thousand blue stars born together.'),
 			href: 'pleiades.html', cor: '#8fb8ff', pos: [sol[0] + 0.2, sol[1] + 0.2, 0]
 		},
 		{
-			id: 'helice', nome: 'Nebulosa da Hélice', tipo: 'Nebulosa planetária', distancia: '650 anos-luz da Terra',
-			texto: 'O "Olho de Deus": o que sobrou de uma estrela como o Sol no fim da vida.',
+			id: 'helice', nome: T('Nebulosa da Hélice', 'Helix Nebula'), tipo: T('Nebulosa planetária', 'Planetary nebula'), distancia: T('650 anos-luz da Terra', '650 light-years from Earth'),
+			texto: T('O "Olho de Deus": o que sobrou de uma estrela como o Sol no fim da vida.', 'The "Eye of God": what is left of a star like the Sun at the end of its life.'),
 			href: 'helice.html', cor: '#5fd6d0', pos: [sol[0] + 0.32, sol[1] - 0.15, 0]
 		},
 		{
-			id: 'tabby', nome: 'Estrela de Tabby', tipo: 'A estrela mais misteriosa', distancia: '1.470 anos-luz da Terra',
-			texto: 'O brilho dela cai de um jeito estranho. Extraterrestres ou poeira? Venha descobrir.',
+			id: 'tabby', nome: T('Estrela de Tabby', "Tabby's Star"), tipo: T('A estrela mais misteriosa', 'The most mysterious star'), distancia: T('1.470 anos-luz da Terra', '1,470 light-years from Earth'),
+			texto: T('O brilho dela cai de um jeito estranho. Extraterrestres ou poeira? Venha descobrir.', 'Its light dims in a strange way. Aliens or dust? Come and find out.'),
 			href: 'tabby.html', cor: '#ff9d5c', pos: [sol[0] - 0.12, sol[1] + 0.28, 0], esquerda: true
 		},
 		{
 			// as bolhas saem do centro para cima do disco: o marcador fica acima de Sagittarius A*
-			id: 'fermi', nome: 'Bolhas de Fermi', tipo: 'Bolhas gigantes de raios gama', distancia: '26.700 anos-luz da Terra',
-			texto: 'Duas bolhas invisíveis do tamanho de meia galáxia, sopradas pelo centro da Via Láctea.',
+			id: 'fermi', nome: T('Bolhas de Fermi', 'Fermi Bubbles'), tipo: T('Bolhas gigantes de raios gama', 'Giant gamma-ray bubbles'), distancia: T('26.700 anos-luz da Terra', '26,700 light-years from Earth'),
+			texto: T('Duas bolhas invisíveis do tamanho de meia galáxia, sopradas pelo centro da Via Láctea.', 'Two invisible bubbles the size of half a galaxy, blown out by the center of the Milky Way.'),
 			href: 'fermi.html', cor: '#e070ff', pos: [0, 0, 0.32], esquerda: true
 		},
 		// (os novos entram no fim da lista: o Sistema Solar é o 4º e as Bolhas de Fermi, o 8º)
 		{
-			id: 'betelgeuse', nome: 'Betelgeuse', tipo: 'Supergigante vermelha', distancia: '550 anos-luz da Terra',
-			texto: 'Uma estrela tão grande que, no lugar do Sol, passaria da órbita de Marte. Um dia ela vai explodir.',
+			id: 'betelgeuse', nome: 'Betelgeuse', tipo: T('Supergigante vermelha', 'Red supergiant'), distancia: T('550 anos-luz da Terra', '550 light-years from Earth'),
+			texto: T('Uma estrela tão grande que, no lugar do Sol, passaria da órbita de Marte. Um dia ela vai explodir.', 'A star so big that, in place of the Sun, it would reach past the orbit of Mars. One day it will explode.'),
 			href: 'betelgeuse.html', cor: '#ff6a3d', pos: [sol[0] - 0.23, sol[1] + 0.07, 0], esquerda: true
 		},
 		{
-			id: 'eta', nome: 'Eta Carinae', tipo: 'Par de estrelas gigantes', distancia: '7.500 anos-luz da Terra',
-			texto: 'Duas estrelas enormes e uma nuvem em forma de ampulheta, que sobrou de uma erupção gigante.',
+			id: 'eta', nome: 'Eta Carinae', tipo: T('Par de estrelas gigantes', 'A pair of giant stars'), distancia: T('7.500 anos-luz da Terra', '7,500 light-years from Earth'),
+			texto: T('Duas estrelas enormes e uma nuvem em forma de ampulheta, que sobrou de uma erupção gigante.', 'Two huge stars and an hourglass-shaped cloud left over from a giant eruption.'),
 			href: 'eta-carinae.html', cor: '#c8a0ff', pos: [0.3, -0.35, 0] // num canto livre do mapa ilustrativo
 		},
 		{
 			// pertinho do Sol de verdade (8,6 anos-luz): no mapa ilustrativo fica logo abaixo dele
-			id: 'sirius', nome: 'Sirius', tipo: 'Par de estrelas · a mais brilhante do céu', distancia: '8,6 anos-luz da Terra',
-			texto: 'A estrela mais brilhante do céu, e uma companheira do tamanho da Terra escondida no clarão dela.',
+			id: 'sirius', nome: 'Sirius', tipo: T('Par de estrelas · a mais brilhante do céu', 'A pair of stars · the brightest in the sky'), distancia: T('8,6 anos-luz da Terra', '8.6 light-years from Earth'),
+			texto: T('A estrela mais brilhante do céu, e uma companheira do tamanho da Terra escondida no clarão dela.', 'The brightest star in the sky, with an Earth-sized companion hidden in its glare.'),
 			href: 'sirius.html', cor: '#5b8cff', pos: [sol[0] + 0.07, sol[1] + 0.36, 0]
 		},
 		{
 			// no mapa ilustrativo, num pedaço livre do braço, à esquerda e acima do Sol
-			id: 'caranguejo', nome: 'Nebulosa do Caranguejo', tipo: 'Resto de supernova · um farol girando', distancia: '6.500 anos-luz da Terra',
-			texto: 'O que sobrou de uma estrela que explodiu em 1054, com um pulsar no meio que gira 30 vezes por segundo.',
+			id: 'caranguejo', nome: T('Nebulosa do Caranguejo', 'Crab Nebula'), tipo: T('Resto de supernova · um farol girando', 'Supernova remnant · a spinning lighthouse'), distancia: T('6.500 anos-luz da Terra', '6,500 light-years from Earth'),
+			texto: T('O que sobrou de uma estrela que explodiu em 1054, com um pulsar no meio que gira 30 vezes por segundo.', 'What is left of a star that exploded in 1054, with a pulsar at its center spinning 30 times per second.'),
 			href: 'caranguejo.html', cor: '#9be36a', pos: [sol[0] - 0.37, sol[1] - 0.48, 0]
 		},
 		{
 			// a estrela mais perto do Sol (4,2 anos-luz): no mapa ilustrativo, logo acima dele
-			id: 'proxima', nome: 'Proxima Centauri', tipo: 'Anã vermelha · a estrela mais perto', distancia: '4,2 anos-luz da Terra',
-			texto: 'A estrela mais perto do Sol, pequena e vermelha, com um planeta do tamanho da Terra que pode ter água.',
+			id: 'proxima', nome: 'Proxima Centauri', tipo: T('Anã vermelha · a estrela mais perto', 'Red dwarf · the nearest star'), distancia: T('4,2 anos-luz da Terra', '4.2 light-years from Earth'),
+			texto: T('A estrela mais perto do Sol, pequena e vermelha, com um planeta do tamanho da Terra que pode ter água.', 'The nearest star to the Sun, small and red, with an Earth-sized planet that may have water.'),
 			href: 'proxima-centauri.html', cor: '#f0505a', pos: [sol[0] - 0.02, sol[1] - 0.265, 0], esquerda: true
 		}
 	];
@@ -265,9 +265,9 @@
 	// no mapa, toda distância é contada a partir do centro da galáxia (e não da Terra)
 	function anosLuzDoCentro(p) { return Math.round(Math.sqrt(p[0] * p[0] + p[1] * p[1] + p[2] * p[2]) * ANOS_LUZ / 100) * 100; }
 	DESTINOS.forEach(function (d) {
-		d.distancia = d.id === 'sagitario' ? 'Bem no centro da galáxia'
-			: d.id === 'fermi' ? 'Saem do centro da galáxia e sobem até 25.000 anos-luz'
-			: 'A ' + anosLuzDoCentro(d.real).toLocaleString('pt-BR') + ' anos-luz do centro da galáxia';
+		d.distancia = d.id === 'sagitario' ? T('Bem no centro da galáxia', 'Right at the center of the galaxy')
+			: d.id === 'fermi' ? T('Saem do centro da galáxia e sobem até 25.000 anos-luz', 'They rise from the center of the galaxy up to 25,000 light-years')
+			: T('A ' + anosLuzDoCentro(d.real).toLocaleString('pt-BR') + ' anos-luz do centro da galáxia', anosLuzDoCentro(d.real).toLocaleString('en-US') + ' light-years from the center of the galaxy');
 	});
 	var escalaReal = false, kReal = 0; // kReal vai de 0 (ilustrativo) a 1 (real), para os marcadores deslizarem
 	function posAtual(d) {
@@ -575,8 +575,8 @@
 			'<p class="cartao-distancia">' + d.distancia + '</p>';
 		// no computador, sem botão (quem viaja é o clique no destino); no celular, o botão
 		cartaoCorpo.innerHTML = '<p class="cartao-texto">' + d.texto + '</p>' + (ponteiro === 'touch'
-			? '<a class="botao-hud" href="' + d.href + '">Viajar para lá &rarr;</a>'
-			: '<p class="cartao-dica">Clique no destino para viajar</p>');
+			? '<a class="botao-hud" href="' + d.href + '">' + T('Viajar para lá', 'Travel there') + ' &rarr;</a>'
+			: '<p class="cartao-dica">' + T('Clique no destino para viajar', 'Click the destination to travel') + '</p>');
 		cartao.classList.add('aberto');
 		var ir = cartaoCorpo.querySelector('a');
 		if (ir) ir.addEventListener('click', function (ev) {
@@ -657,8 +657,8 @@
 	escalaCaixa.className = 'escala';
 	escalaCaixa.innerHTML =
 		'<button type="button" class="escala-botao" aria-pressed="false">' +
-		'<span>Ilustrativo</span><span>Escala real</span></button>' +
-		'<span class="escala-regua" aria-hidden="true"><i></i>10.000 anos-luz</span>';
+		'<span>' + T('Ilustrativo', 'Illustrative') + '</span><span>' + T('Escala real', 'Real scale') + '</span></button>' +
+		'<span class="escala-regua" aria-hidden="true"><i></i>' + T('10.000 anos-luz', '10,000 light-years') + '</span>';
 	galaxia.appendChild(escalaCaixa);
 	var botaoEscala = escalaCaixa.querySelector('button'), regua = escalaCaixa.querySelector('.escala-regua i');
 
@@ -670,16 +670,16 @@
 	lupa.className = 'lupa-sol';
 	function raioLupa(anosLuz) { return 8 + Math.log(Math.max(1, anosLuz)) / Math.LN10 * 32; } // 10 → 40, 100 → 72, 1.000 → 104
 	var svg = '';
-	[[10, '10'], [100, '100'], [1000, '1.000 anos-luz']].forEach(function (a) {
+	[[10, '10'], [100, '100'], [1000, T('1.000 anos-luz', '1,000 light-years')]].forEach(function (a) {
 		var rc = raioLupa(a[0]);
 		svg += '<circle cx="150" cy="150" r="' + rc + '" /><text x="153" y="' + (150 - rc - 3) + '">' + a[1] + '</text>';
 	});
 	lupa.innerHTML =
-		'<p class="lupa-titulo">Vizinhos do Sol</p>' +
+		'<p class="lupa-titulo">' + T('Vizinhos do Sol', 'Neighbors of the Sun') + '</p>' +
 		'<div class="lupa-mapa"><svg viewBox="0 0 300 300" aria-hidden="true"><path d="M150 6 l-5 8 h10 z" class="lupa-seta" />' + svg + '</svg>' +
-		'<span class="lupa-centro" aria-hidden="true">rumo ao centro da galáxia</span>' +
-		'<span class="lupa-sol-ponto" aria-hidden="true">Sol</span></div>' +
-		'<p class="lupa-legenda">Vista de cima, com o Sol no meio. Cada anel fica 10 vezes mais longe que o anterior. No mapa grande, estes destinos quase encostam no Sol.</p>';
+		'<span class="lupa-centro" aria-hidden="true">' + T('rumo ao centro da galáxia', 'toward the center of the galaxy') + '</span>' +
+		'<span class="lupa-sol-ponto" aria-hidden="true">' + T('Sol', 'Sun') + '</span></div>' +
+		'<p class="lupa-legenda">' + T('Vista de cima, com o Sol no meio. Cada anel fica 10 vezes mais longe que o anterior. No mapa grande, estes destinos quase encostam no Sol.', 'Seen from above, with the Sun in the middle. Each ring is 10 times farther than the one before. On the big map, these destinations almost touch the Sun.') + '</p>';
 	var lupaMapa = lupa.querySelector('.lupa-mapa');
 	// de que lado do ponto fica o nome, para nenhum encostar no outro
 	var LADO_LUPA = { orion: 'abaixo', betelgeuse: 'acima', tabby: 'esq', sirius: 'esq', proxima: 'esq' };
@@ -692,9 +692,9 @@
 		b.style.setProperty('--cor-destino', d.cor);
 		b.style.left = (150 + Math.sin(l) * r) / 300 * 100 + '%';
 		b.style.top = (150 - Math.cos(l) * r) / 300 * 100 + '%';
-		var al = d.ceu[0] < 20 ? (Math.round(d.ceu[0] * 10) / 10).toLocaleString('pt-BR') : Math.round(d.ceu[0]).toLocaleString('pt-BR');
-		b.innerHTML = '<i></i><span><b>' + d.nome.replace('Nebulosa d', 'N. d').replace('Estrela de ', '').replace(' Centauri', '') + '</b><small>' + al + ' anos-luz</small></span>';
-		b.setAttribute('aria-label', d.nome + ': ' + al + ' anos-luz do Sol');
+		var al = d.ceu[0] < 20 ? (Math.round(d.ceu[0] * 10) / 10).toLocaleString(LOCALE) : Math.round(d.ceu[0]).toLocaleString(LOCALE);
+		b.innerHTML = '<i></i><span><b>' + d.nome.replace('Nebulosa d', 'N. d').replace('Estrela de ', '').replace(' Centauri', '').replace(' Nebula', '').replace("'s Star", '') + '</b><small>' + al + T(' anos-luz', ' light-years') + '</small></span>';
+		b.setAttribute('aria-label', d.nome + ': ' + al + T(' anos-luz do Sol', ' light-years from the Sun'));
 		ligarEscolha(b, d);
 		lupaMapa.appendChild(b);
 	});
@@ -706,7 +706,7 @@
 		botaoEscala.setAttribute('aria-pressed', escalaReal ? 'true' : 'false');
 		galaxia.classList.toggle('escala-real', escalaReal);
 		notaMapa.textContent = escalaReal
-			? 'Escala real: posições aproximadas, vistas de cima.'
+			? T('Escala real: posições aproximadas, vistas de cima.', 'Real scale: approximate positions, seen from above.')
 			: TEXTO_ILUSTRATIVO;
 		posicionarMarcadores();
 	});
@@ -806,7 +806,7 @@
 			if (agora - ultimoHud > 100) {
 				ultimoHud = agora;
 				var c = cena === 'salto' ? Math.min(1, 0.02 + Math.pow(Math.min(1, tc / 2.4), 3) * 0.98) : 0.02;
-				velocidadeTexto.textContent = c >= 0.999 ? 'VELOCIDADE DA LUZ' : c.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' c';
+				velocidadeTexto.textContent = c >= 0.999 ? T('VELOCIDADE DA LUZ', 'SPEED OF LIGHT') : c.toLocaleString(LOCALE, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' c';
 			}
 		} else {
 			if (!calmo) giro += dt * (2 * Math.PI / 480); // uma volta a cada 8 minutos

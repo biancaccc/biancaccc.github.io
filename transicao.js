@@ -62,7 +62,7 @@
 	var semPoeira = false;
 	function vaiPraGalaxia(endereco) { try { var p = new URL(endereco, location.href).pathname; return /(\/|index\.html)$/.test(p); } catch (e) { return false; } }
 	// indo de um planeta a outro (dentro do Sistema Solar) também não tem nebulosa no caminho
-	function noSistemaSolar(endereco) { try { return /(sistema-solar|sol|mercurio|venus|terra|marte|jupiter|saturno|urano|netuno)\.html$/.test(new URL(endereco, location.href).pathname); } catch (e) { return false; } }
+	function noSistemaSolar(endereco) { try { return /(sistema-solar|sol|mercurio|venus|terra|marte|jupiter|saturno|urano|netuno|lua|io|europa|ganimedes|tita|encelado|mimas|miranda|tritao)\.html$/.test(new URL(endereco, location.href).pathname); } catch (e) { return false; } }
 	// desenha a poeira em buf (W x H); viajado = quanto já andamos; forca de 0 (nada) a 1
 	function poeiraCosmica(buf, W, H, viajado, forca, centroY, claroAqui) {
 		if (forca <= 0.02) { buf.fill(FUNDO); return; }

@@ -33,9 +33,19 @@ com os destinos, uma página para cada destino, o passaporte espacial e uma cena
   Mexa só aqui para mudar a cabine; carregue antes de `embarque.js` e `chegada.js`.
 - `passaporte.js`: o passaporte espacial (carimbos, selos, bilhete de embarque, certificado).
 - `transicao.js`: o salto na velocidade da luz entre as páginas. `radio.js`: o rádio da nave.
+- `tempo-do-sol.js`: o tempo do Sol ao vivo (dados reais da NOAA/SWPC, lidos pelo navegador de quem visita):
+  o visor da direita da cabine, a fala da torre na decolagem, o aviso do computador de bordo nas chegadas
+  e o boletim no rádio. Sem resposta da NOAA, os visores dizem "sem sinal" (nunca inventa dado).
 - `destinos.js`: as artes animadas dos destinos da galáxia. `visuais.js` + `visuais-dados.js`: animações,
   quizzes, linhas do tempo e o "céu visto daqui" das páginas. `nave.js`: o modelo 3D da nave.
 - `estilo.css`: todo o estilo. `marca.js`: o símbolo, o selo e o crédito da autora.
+- `idioma.js` + `en/`: a versão em inglês (botão PT | EN; nos scripts, `T('pt', 'en')`; os textos das páginas
+  ficam em `en/<página>.js` e `en/comum.js`). Os letreiros pintados nas cenas ficam em português.
+- **As luas** (`lua`, `io`, `europa`, `ganimedes`, `tita`, `encelado`, `mimas`, `miranda`, `tritao`): uma página
+  cada, no padrão dos planetas, com pouso na chegada (o planeta-pai no céu, no tamanho real visto de lá). As artes
+  `pixel/<lua>.png` foram desenhadas por código (`pixel/sprites.js` tem cópia delas). Para mexer numa lua: a página,
+  `en/<lua>.js`, `visuais-dados.js` (fim do arquivo), `visuais.js` (animações das luas), `radio.js`, `chegada.js`
+  (`AGENTES`, `SOLO_LUAS`, `SUJEIRAS`), `balanca.js`, `passaporte.js` (selos "Volta pelas luas" e "Sabe-tudo das luas").
 - Para **adicionar um destino**, mexa em: a página HTML, `visuais-dados.js`, `visuais.js` (animações, `CICLOS`,
   total de quizzes), `destinos.js` (`ARTES`), `viagem.js` (`DESTINOS`, `CEU`, `ARTE_DO_DESTINO`),
   `passaporte.js` (`DESTINOS`, `ESTILOS`, `ICONES`, totais das conquistas), `radio.js`, `chegada.js`
@@ -58,7 +68,7 @@ python3 -m http.server 8765
 ```
 
 Depois de testar, limpe o que os testes guardam no navegador (`localStorage`: `passaporteEspacial`,
-`embarqueFeito`, `chegadas`, `naveSujeira`, `eventosVistos`).
+`embarqueFeito`, `chegadas`, `naveSujeira`, `eventosVistos`, `tempoDoSol`; e no `sessionStorage`, `avisoSol`).
 
 ## Publicar e trabalhar em mais de um computador
 
@@ -70,10 +80,26 @@ Depois de testar, limpe o que os testes guardam no navegador (`localStorage`: `p
 
 ## Ideias combinadas para as próximas sessões
 
-- **O tempo do Sol ao vivo:** dados reais da NOAA (vento solar, manchas, alerta de aurora) no painel da cabine e
-  no rádio; se o Sol estiver agitado de verdade, o computador de bordo avisa.
+Feito: **o tempo do Sol ao vivo** (`tempo-do-sol.js`), **a versão em inglês** e **as luas como destinos**
+(com pouso).
+
+**Encanto**
+- **O céu de verdade na rua da agência:** a lua na fase real do dia e, de vez em quando, a Estação Espacial
+  Internacional passando no céu no horário em que passaria de verdade.
 - **O Disco de Ouro da PX-01:** a pessoa grava uma mensagem curta, que vira um disco dourado no passaporte e
   "viaja" junto.
 - **Um companheiro na cabine:** escolher o ZÖ-11 ou um robozinho novo para a poltrona do copiloto, comentando
   as chegadas e reagindo aos eventos.
-- Em aberto: pousar nas luas dos gigantes (Tritão, Miranda, Europa, Titã) em vez das estações.
+
+**Experiência (UI/UX)**
+- **Celular:** testar o embarque e as chegadas no celular (em pé e deitado) e deixar os botões fáceis de tocar.
+  Prioridade: num portfólio, o site costuma ser aberto primeiro no celular.
+- **Primeira carga:** a rua e a recepção são pintadas pixel a pixel antes de aparecer; num computador fraco
+  fica um tempo de tela preta. Uma telinha de carregamento no estilo da agência ("emitindo seu bilhete…").
+- **Acessibilidade:** textos alternativos para leitor de tela, legendas para os sons importantes (o "ding" da
+  senha, o alto-falante) e contraste nos textos pequenos (o modo "movimento reduzido" já existe).
+
+**Portfólio**
+- **Página "bastidores":** o processo do projeto (rascunhos, as escolhas como o DETRAN do futuro, as baleias e
+  a gueixa, antes e depois, a paleta de cores). Combina com o crédito "feito por Bianca Cardador", que volta
+  no fim do projeto (`CREDITOS = true` em `embarque.js`).

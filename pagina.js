@@ -13,7 +13,7 @@
 		var rolar = document.createElement('a');
 		rolar.className = 'rolar';
 		rolar.href = '#leitura';
-		rolar.textContent = 'Role para explorar';
+		rolar.textContent = window.T ? T('Role para explorar', 'Scroll to explore') : 'Role para explorar';
 		destaque.appendChild(rolar);
 	}
 
@@ -32,7 +32,7 @@
 	var links = document.querySelectorAll('.sumario a');
 	if (!sumario || !links.length) return;
 	var titulo = sumario.querySelector('p');
-	if (titulo) titulo.textContent = 'Diário de bordo';
+	if (titulo) titulo.textContent = window.T ? T('Diário de bordo', 'Logbook') : 'Diário de bordo';
 	var barra = document.createElement('div');
 	barra.className = 'barra-leitura';
 	barra.innerHTML = '<i></i>';
