@@ -4595,8 +4595,10 @@ i.er-planeta-img { border-radius: 50%; box-shadow: 0 0 4px currentColor; }
 .viagem-credito { margin-top: 10px; font-size: 13px; color: var(--suave); }
 
 /* botão de recomeçar as animações: uma setinha em volta, em pixel */
-.animacao-recomecar { position: relative; flex: none; display: grid; place-items: center; width: 32px; height: 26px; padding: 0; background: rgba(5, 3, 12, 0.75); border: 1px solid color-mix(in srgb, var(--cor) 45%, transparent); cursor: pointer; }
-.animacao-recomecar svg { display: block; width: 13px; height: 13px; margin: 0 auto; color: var(--cor); shape-rendering: crispEdges; }
-.animacao-recomecar:hover { border-color: var(--cor); background: color-mix(in srgb, var(--cor) 15%, rgba(5, 3, 12, 0.75)); }
+.animacao-recomecar { display: inline-flex; align-items: center; gap: 7px; flex: none; height: 26px; padding: 0 10px 0 9px; font-family: var(--rotulo); font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--cor); background: rgba(5, 3, 12, 0.75); border: 1px solid color-mix(in srgb, var(--cor) 45%, transparent); cursor: pointer; transition: color 0.2s, background 0.2s, border-color 0.2s; }
+.animacao-recomecar svg { display: block; width: 13px; height: 11px; shape-rendering: crispEdges; transition: transform 0.4s ease; }
+.animacao-recomecar:hover, .animacao-recomecar:focus-visible { color: #fff; border-color: var(--cor); background: color-mix(in srgb, var(--cor) 15%, rgba(5, 3, 12, 0.75)); outline: none; }
+.animacao-recomecar:hover svg { transform: rotate(-90deg); }
+.animacao-recomecar:active svg { transform: rotate(-360deg); transition-duration: 0.2s; }
 .animacao-recomecar:focus-visible { outline: 2px solid var(--cor); outline-offset: 2px; }
 @media (max-width: 700px) { .er-lupa-info { height: auto; min-height: 6.4em; } }

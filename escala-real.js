@@ -149,13 +149,12 @@
 			var controle = document.createElement('div');
 			controle.className = 'animacao-controle';
 			controle.innerHTML = '<button type="button" class="animacao-play"></button>' +
-				(cena.ciclo ? '<button type="button" class="animacao-recomecar"><svg viewBox="0 0 9 9" aria-hidden="true"><path fill="currentColor" d="M2 0h4v1H2zM1 1h1v1H1zM0 2h1v4H0zM1 6h1v1H1zM2 7h4v1H2zM6 6h1v1H6zM7 4h1v2H7zM5 1h4v1H5zM8 0h1v4H8z"/></svg></button>' : '');
+				(cena.ciclo ? '<button type="button" class="animacao-recomecar"><svg viewBox=\"0 0 13 11\" aria-hidden=\"true\"><path fill=\"currentColor\" d=\"M3 0h4v1H3zM2 1h5v1H2zM9 1h2v1H9zM1 2h2v1H1zM8 2h4v1H8zM0 3h2v1H0zM7 3h6v1H7zM0 4h2v1H0zM9 4h2v1H9zM0 5h2v1H0zM9 5h2v1H9zM0 6h2v1H0zM9 6h2v1H9zM1 7h2v1H1zM8 7h2v1H8zM2 8h2v1H2zM7 8h3v1H7zM3 9h6v1H3zM4 10h4v1H4z\"/></svg><span>' + T('Recomeçar', 'Restart') + '</span></button>' : '');
 			figura.insertBefore(controle, figura.querySelector('figcaption'));
 			var botao = controle.querySelector('.animacao-play'), recomecar = controle.querySelector('.animacao-recomecar');
 			if (recomecar) {
 				recomecar.setAttribute('aria-label', T('Recomeçar a animação', 'Restart the animation'));
-				recomecar.title = T('Recomeçar', 'Restart');
-				recomecar.addEventListener('click', function () { tempo = 0; tocando = true; anterior = performance.now(); atualizar(); desenhar(); });
+								recomecar.addEventListener('click', function () { tempo = 0; tocando = true; anterior = performance.now(); atualizar(); desenhar(); });
 			}
 			var atualizar = function () {
 				botao.classList.toggle('pausado', !tocando);
