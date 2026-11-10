@@ -4636,4 +4636,5 @@ html.aproximando, html.aproximando body { overflow: hidden; }
    (e voltam quando o cartão fecha) */
 .radio-doca { transition: opacity 0.3s ease; }
 .botao-linha { transition: transform 0.25s ease, border-color 0.25s ease, opacity 0.3s ease; }
-.radio-doca.sob-cartao, .botao-linha.sob-cartao { opacity: 0; pointer-events: none; }
+.radio-doca.sob-cartao, .botao-linha.sob-cartao { opacity: 0; visibility: hidden; pointer-events: none; }
+/* (o botão da linha do tempo tem a animação de surgir, que segura a opacidade: por isso o visibility) */
