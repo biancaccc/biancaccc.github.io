@@ -3011,6 +3011,10 @@ html[lang="en"] .fecho::before { content: "\2726  final entry  \2726"; }
 /* passaporte aberto: clicar nas páginas fecha de volta */
 .pp-livro.aberto .pp-pagina { cursor: pointer; }
 .pp-livro.aberto .pp-pagina input { cursor: text; }
+/* a setinha do mouse mostra para que lado a página vai virar (esquerda: volta, até a capa; direita: avança) */
+.pp-livro.aberto[data-lado="esquerda"] .pp-pagina { cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='18' height='18' shape-rendering='crispEdges'><polygon points='2,9 9,2 9,6 16,6 16,12 9,12 9,16' fill='%23ffd36a' stroke='%231b1430' stroke-width='1.5' stroke-linejoin='miter'/></svg>") 9 9, w-resize; }
+.pp-livro.aberto[data-lado="direita"] .pp-pagina { cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='18' height='18' shape-rendering='crispEdges'><polygon points='16,9 9,2 9,6 2,6 2,12 9,12 9,16' fill='%23ffd36a' stroke='%231b1430' stroke-width='1.5' stroke-linejoin='miter'/></svg>") 9 9, e-resize; }
+.pp-livro.aberto:not([data-lado]) .pp-pagina { cursor: default; }
 
 /* ---------- Carteira de piloto, versão espacial ---------- */
 /* fundo de espaço: degradê azul-arroxeado, nebulosas suaves, estrelinhas e borda dourada */

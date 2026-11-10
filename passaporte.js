@@ -1340,13 +1340,29 @@
 			}, espera);
 			return true;
 		}
-		// clicando no passaporte aberto, a página vira; clicando de novo, ela volta. Os campos, os
-		// carimbos e os botões continuam funcionando normalmente
+		// como um livro de verdade: clicando na página da direita, a folha vira para a frente;
+		// clicando na página da esquerda, volta uma (e, na primeira, o passaporte fecha na capa).
+		// Os campos, os carimbos e os botões continuam funcionando normalmente
+		function ladoDoClique(e) {
+			var r = livro.getBoundingClientRect();
+			return e.clientX < r.left + r.width / 2 ? 'esquerda' : 'direita';
+		}
 		livro.addEventListener('click', function (e) {
 			if (!aberto || frente.contains(e.target)) return;
 			if (e.target.closest('input, button, a, .pp-carimbo')) return;
-			if (!celular()) virar(!virado);
+			if (celular()) return;
+			if (ladoDoClique(e) === 'direita') { if (!virado) virar(true); }
+			else if (virado) virar(false);
+			else fecharCapa();
 		});
+		/* a setinha do mouse mostra para que lado a página vai virar */
+		livro.addEventListener('mousemove', function (e) {
+			if (!aberto || celular()) { livro.removeAttribute('data-lado'); return; }
+			var lado = ladoDoClique(e);
+			if (lado === 'direita' && virado) livro.removeAttribute('data-lado');
+			else livro.setAttribute('data-lado', lado);
+		});
+		livro.addEventListener('mouseleave', function () { livro.removeAttribute('data-lado'); });
 		// clicando fora do passaporte: primeiro ele fecha; com ele já fechado, a aba de documentos fecha
 		aoClicarFora = fecharCapa;
 		frente.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); abrirCapa(); } });
