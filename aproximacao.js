@@ -73,6 +73,8 @@
 		var planeta = el('a', 'aprox-planeta', palco);
 		planeta.href = id + '.html';
 		planeta.setAttribute('aria-label', T('Visitar ', 'Visit ') + nomeP);
+		/* o brilho em volta do planeta, igual ao da página dele */
+		el('span', 'aprox-brilho', planeta);
 		var img = el('img', '', planeta);
 		img.src = 'pixel/' + id + '.png'; img.alt = '';
 		var rotP = el('span', 'aprox-rotulo', planeta);
@@ -209,19 +211,6 @@
 			var s = agora / 1000, rp = palco.getBoundingClientRect();
 			var cx = (rp.left + medida.cx) / CP, cy = (rp.top + medida.cy) / CP, R = medida.rg / CP;
 			cbuf.fill(px(5, 3, 12));
-			/* o halo: anéis pontilhados na cor do planeta, que pulsam devagar (a atmosfera vista de longe) */
-			var pulso = calmo ? 1 : 0.82 + 0.18 * Math.sin(s * 1.3), ext = 1.85;
-			var x0 = Math.max(0, Math.floor(cx - R * ext)), x1 = Math.min(CW - 1, Math.ceil(cx + R * ext));
-			var y0 = Math.max(0, Math.floor(cy - R * ext)), y1 = Math.min(CH - 1, Math.ceil(cy + R * ext));
-			for (var y = y0; y <= y1; y++) for (var x = x0; x <= x1; x++) {
-				var d = Math.hypot(x + 0.5 - cx, y + 0.5 - cy) / R;
-				if (d < 0.98 || d > ext) continue;
-				var dens = Math.pow((ext - d) / (ext - 0.98), 1.7) * pulso;
-				var nivel = Math.min(3, Math.floor(dens * 3 + LIMIAR[(x & 3) + ((y & 3) << 2)] - 0.15));
-				if (nivel <= 0) continue;
-				var f = [0, 0.13, 0.24, 0.38][nivel];
-				cbuf[y * CW + x] = px(5 + corP[0] * f, 3 + corP[1] * f, 12 + corP[2] * f);
-			}
 			/* as estrelas; na chegada, elas passam riscando para fora, como a nave freando */
 			var u = calmo ? 1 : Math.min(1, (agora - chegada) / 1600), risco = (1 - u) * (1 - u) * 90 / CP;
 			for (var i = 0; i < estrelas.length; i++) {

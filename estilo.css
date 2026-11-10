@@ -4679,3 +4679,5 @@ html.aproximando, html.aproximando body { overflow: hidden; }
 .aprox-lua.atras .aprox-rotulo { opacity: 0 !important; }
 /* no celular não existe "passar o mouse": a mira não fica presa no que foi tocado */
 @media (hover: none) { .aprox-planeta.ativo::after, .aprox-lua.ativo::after { opacity: 0; } }
+/* o brilho do planeta na aproximação: o mesmo da página do planeta (.palco::before) */
+.aprox-brilho { position: absolute; inset: -18%; z-index: -1; pointer-events: none; background: radial-gradient(closest-side, color-mix(in srgb, var(--cor-destino) 32%, transparent), transparent); filter: blur(8px); }
