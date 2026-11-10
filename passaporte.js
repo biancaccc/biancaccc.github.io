@@ -1130,8 +1130,7 @@
 				marca.className = 'pp-carimbo';
 				marca.style.setProperty('--giro', giroDe(x) + 'deg');
 				marca.appendChild(novoCarimbo(x, null, d.carimbos[x.id])); // a data vai dentro do carimbo
-				marca.title = x.nome + TR(': clique para carimbar de novo', ': click to stamp it again');
-				marca.addEventListener('click', function () { carimbar(vaga, marca, x); });
+				marca.title = x.nome;
 				vaga.appendChild(marca);
 				if (mostrados.indexOf(x.id) < 0) { marca.classList.add('esperando'); novos.push({ vaga: vaga, marca: marca, destino: x }); }
 			} else {
@@ -1349,7 +1348,8 @@
 		}
 		livro.addEventListener('click', function (e) {
 			if (!aberto || frente.contains(e.target)) return;
-			if (e.target.closest('input, button, a, .pp-carimbo')) return;
+			/* em cima dos carimbos também vira: só os campos, os botões e os links ficam de fora */
+			if (e.target.closest('input, button, a')) return;
 			if (celular()) return;
 			if (ladoDoClique(e) === 'direita') { if (!virado) virar(true); }
 			else if (virado) virar(false);

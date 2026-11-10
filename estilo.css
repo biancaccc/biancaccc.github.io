@@ -2625,7 +2625,7 @@ html[lang="en"] .fecho::before { content: "\2726  final entry  \2726"; }
 /* página de vistos: os carimbos espalhados */
 .pp-carimbos { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: repeat(4, 1fr); height: calc(100% - 60px); padding-top: 4px; }
 .pp-vaga { position: relative; display: grid; place-items: center; transform: translate(var(--dx), var(--dy)); }
-.pp-carimbo { position: relative; display: grid; justify-items: center; cursor: pointer; transform: rotate(var(--giro)); }
+.pp-carimbo { position: relative; display: grid; justify-items: center; transform: rotate(var(--giro)); }
 .pp-carimbo .carimbo-tela {
 	width: calc(var(--pagina) * 0.26);
 	height: auto;
