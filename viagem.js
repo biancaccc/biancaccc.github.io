@@ -1084,7 +1084,9 @@
 	// Quem volta de um destino (ou já fez a viagem nesta visita) cai direto na galáxia
 	var jaViajou = false;
 	try { jaViajou = sessionStorage.getItem('jaViajou') === '1'; } catch (e) {}
-	if (location.hash === '#galaxia' || jaViajou && location.hash !== '#inicio') {
+	/* (com o embarque passando, a viagem começa do início: as alavancas da cabine fazem o salto até a galáxia) */
+	var comEmbarque = /[?&]embarque/.test(location.search) || document.body.classList.contains('embarcando');
+	if (!comEmbarque && (location.hash === '#galaxia' || jaViajou && location.hash !== '#inicio')) {
 		chegarNaGalaxia();
 		inicioCena -= 1200; // chega quase sem zoom
 	} else {
