@@ -672,7 +672,7 @@
 		{ ly: 0, rotulo: T('Galáxia', 'Galaxy'), titulo: T('A Via Láctea inteira', 'The whole Milky Way'),
 			texto: T('Uns 100 mil anos-luz de uma ponta à outra e mais de 100 bilhões de estrelas. O Sol é uma delas, a 26.700 anos-luz do centro.', 'About 100,000 light-years from end to end and more than 100 billion stars. The Sun is one of them, 26,700 light-years from the center.') }
 	];
-	var potArranjo = 0;
+	var potArranjo = 0, potCentro = null;
 	var pot = null; /* { de: {lv, m}, para: {lv, m}, inicio, dur, passo, saindo } */
 	var potCaixa = document.createElement('div');
 	potCaixa.className = 'potencias';
@@ -749,7 +749,7 @@
 		potBotoes.forEach(function (b, j) { b.setAttribute('aria-pressed', j === i ? 'true' : 'false'); });
 		potTitulo.textContent = PASSOS[i].titulo;
 		potTexto.textContent = PASSOS[i].texto;
-		potLista.textContent = ''; potLista.removeAttribute('data-chave');
+		potCaixa.classList.add('em-movimento');
 	}
 	/* chamada a cada quadro (veja quadro()): a câmera, o véu, o círculo e os nomes */
 	function potQuadro(agora) {
@@ -757,8 +757,14 @@
 		cam.zoom = ladoDaVista() / V * ANOS_LUZ / (P * escalaGalaxia());
 		var Sm = escalaGalaxia() * cam.zoom, ps = projetar(sol[0], sol[1], 0);
 		/* no meio da área livre, o Sol (m = 0) ou o centro da galáxia (m = 1); com c = 1, o mapa do jeito de sempre */
-		var al = areaLivre(), ty = ((al.topo + al.h / 2) / P) * (1 - e.c) + H * 0.54 * e.c;
-		var tx = ((al.esq + al.w / 2) / P) * (1 - e.c) + W / 2 * e.c;
+		/* o centro da área livre muda quando o painel muda de tamanho: o centro da vista vai até lá
+		   deslizando, em vez de pular */
+		var al = areaLivre(), alvoX = al.esq + al.w / 2, alvoY = al.topo + al.h / 2;
+		if (!potCentro) potCentro = { x: alvoX, y: alvoY, t: agora };
+		var passo = Math.min(1, (agora - potCentro.t) / 1000 * 5);
+		potCentro.x += (alvoX - potCentro.x) * passo; potCentro.y += (alvoY - potCentro.y) * passo; potCentro.t = agora;
+		var ty = (potCentro.y / P) * (1 - e.c) + H * 0.54 * e.c;
+		var tx = (potCentro.x / P) * (1 - e.c) + W / 2 * e.c;
 		cam.x = ps[2] * (1 - e.m) - (tx - W / 2) / Sm;
 		cam.y = ps[3] * (1 - e.m) - (ty - H * 0.54) / Sm;
 		if (e.u < 1) ultimaGalaxia = 0;
@@ -767,7 +773,7 @@
 		potVeu.style.opacity = veu.toFixed(3);
 		potLargura.textContent = '↔ ' + (V < 100 ? Math.round(V) : Math.round(V / (V < 1e4 ? 10 : 100)) * (V < 1e4 ? 10 : 100)).toLocaleString(LOCALE) + T(' anos-luz', ' light-years');
 		/* o círculo do passo anterior, no plano da galáxia, em volta do Sol */
-		var ant = pot.passo > 0 ? (PASSOS[pot.passo - 1].ly) : 0, sx = ps[0] * P, sy = ps[1] * P, rp0 = potCaixa.querySelector('.pot-painel').getBoundingClientRect();
+		var ant = pot.passo > 0 && pot.passo < PASSOS.length - 1 ? (PASSOS[pot.passo - 1].ly) : 0, sx = ps[0] * P, sy = ps[1] * P, rp0 = potCaixa.querySelector('.pot-painel').getBoundingClientRect();
 		var solTela = projetar(sol[0], sol[1], 0); sx = solTela[0] * P; sy = solTela[1] * P;
 		if (ant) {
 			var rx = ant / 2 / ANOS_LUZ * Sm * P;
@@ -776,7 +782,7 @@
 			potAnelTexto.setAttribute('x', sx.toFixed(1)); potAnelTexto.setAttribute('y', (sy - rx * TILT - 6).toFixed(1));
 			potAnelTexto.textContent = PASSOS[pot.passo - 1].titulo;
 			var cabe = rx > 14 && rx < window.innerWidth * 0.45 && sy + rx * TILT < rp0.top - 8;
-			potAnel.style.opacity = cabe ? (e.u >= 1 ? 1 : 0.35) : 0;
+			potAnel.style.opacity = cabe && e.u >= 1 ? 1 : 0;
 		} else potAnel.style.opacity = 0;
 		/* os pontos: todos aparecem; o nome só quando há espaço (os mais longe do Sol têm preferência) */
 		var ocup = [], vistos = [], lado = ladoDaVista(), qx = sx, qy = sy;
@@ -792,16 +798,18 @@
 		   dos outros (primeiro tentam o outro lado do ponto; se não der, o nome some e fica o pontinho) */
 		var rp = potCaixa.querySelector('.pot-painel').getBoundingClientRect();
 		/* (os nomes se rearrumam 10 vezes por segundo: medir tudo a cada quadro pesaria) */
-		var arrumar = agora - potArranjo > 100;
+		var parado = e.u >= 1;
+		var arrumar = parado && agora - potArranjo > 100;
 		if (arrumar) potArranjo = agora;
+		if (parado && potCaixa.classList.contains('em-movimento')) potCaixa.classList.remove('em-movimento');
 		function cruza(a, b, m) { return a.right > b.left - m && a.left < b.right + m && a.bottom > b.top - m && a.top < b.bottom + m; }
 		function atrasDoPainel(r) { return cruza(r, rp, 8); }
 		var obstaculos = [rp];
-		['.galaxia-topo', '.escala', '.botao-passaporte', '.radio-doca'].forEach(function (sel) {
+		if (arrumar) ['.galaxia-topo', '.escala', '.botao-passaporte', '.radio-doca'].forEach(function (sel) {
 			var el = document.querySelector(sel);
 			if (el && getComputedStyle(el).visibility !== 'hidden') { var r = el.getBoundingClientRect(); if (r.width) obstaculos.push(r); }
 		});
-		if (potAnel.style.opacity !== '0') { var rt = potAnelTexto.getBoundingClientRect(); if (rt.width) obstaculos.push(rt); }
+		if (arrumar && potAnel.style.opacity !== '0') { var rt = potAnelTexto.getBoundingClientRect(); if (rt.width) obstaculos.push(rt); }
 		lista.forEach(function (o) {
 			var dentro = o.x > -20 && o.x < window.innerWidth + 20 && o.y > -20 && o.y < window.innerHeight + 20;
 			o.it.el.style.transform = 'translate(' + o.x.toFixed(1) + 'px,' + o.y.toFixed(1) + 'px)';
@@ -829,7 +837,9 @@
 			var chave = vistos.map(function (it) { return it.nome; }).join('|');
 			if (potLista.getAttribute('data-chave') !== chave) {
 				potLista.setAttribute('data-chave', chave);
-				potLista.innerHTML = vistos.length
+				potLista.innerHTML = vistos.length === potItens.length - 1
+					? '<span class="pot-lista-titulo">' + T('Nesta vista: todos os destinos da Andarilha', 'In this view: every Andarilha destination') + '</span>'
+					: vistos.length
 					? '<span class="pot-lista-titulo">' + T('Nesta vista', 'In this view') + '</span>' + vistos.map(function (it) { return '<span class="pot-etiqueta" style="--cor-destino:' + it.cor + '">' + nomeHtml(it.nome) + '</span>'; }).join('')
 					: '<span class="pot-lista-titulo">' + T('Nenhum outro destino da Andarilha cabe aqui', 'No other Andarilha destination fits here') + '</span>';
 			}
@@ -840,6 +850,7 @@
 	function potLayout() { galaxia.classList.toggle('pot-lateral', window.innerHeight < 520 && window.innerWidth > window.innerHeight); }
 	window.addEventListener('resize', potLayout);
 	function potEntrar() {
+		potCentro = null;
 		potLayout();
 		esconderCartao();
 		galaxia.classList.add('potencias-on');

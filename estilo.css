@@ -4662,3 +4662,10 @@ html.aproximando, html.aproximando body { overflow: hidden; }
 .galaxia.pot-lateral .pot-texto { font-size: 13px; }
 .galaxia.pot-lateral .pot-etiqueta { font-size: 11px; padding: 2px 6px 3px; }
 .galaxia.pot-lateral .pot-lista { gap: 4px; margin-top: 6px; }
+/* durante o zoom entre um passo e outro: os nomes dos destinos somem (ficam só os pontinhos) e a lista
+   do painel fica apagadinha; na chegada, tudo volta, já arrumado */
+.pot-ponto > span { transition: opacity 0.25s ease; }
+.potencias.em-movimento .pot-ponto > span { opacity: 0; }
+.pot-lista { transition: opacity 0.25s ease; }
+.potencias.em-movimento .pot-lista { opacity: 0.25; }
+.pot-anel { transition: opacity 0.35s ease; }
