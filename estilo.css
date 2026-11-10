@@ -2932,13 +2932,7 @@ html[lang="en"] .fecho::before { content: "\2726  final entry  \2726"; }
 	position: relative;
 	width: min(600px, calc(100vw - 24px));
 	aspect-ratio: 1.586;
-	perspective: 1600px;
-	cursor: pointer;
-	transform-style: preserve-3d;
-	transition: transform 0.8s cubic-bezier(0.5, 0.05, 0.3, 1);
 }
-.cnh-cartao.virada { transform: rotateY(180deg); }
-.cnh-cartao:focus-visible { outline: 2px solid #e8c46a; outline-offset: 6px; border-radius: 16px; }
 .cnh-face {
 	position: absolute;
 	inset: 0;
@@ -2957,7 +2951,6 @@ html[lang="en"] .fecho::before { content: "\2726  final entry  \2726"; }
 		linear-gradient(160deg, #e3f3ea, #cfe6dc);
 	box-shadow: 0 20px 50px rgba(0, 0, 0, 0.55), inset 0 0 0 1px rgba(20, 60, 50, 0.2);
 }
-.cnh-verso { transform: rotateY(180deg); }
 .cnh-topo { display: flex; align-items: center; gap: 10px; padding: 1.6% 2.4%; margin: -3.2% -3.6% 2.4%; color: #f2f7f4; background: linear-gradient(90deg, #0f4a46, #1f2a78); }
 .cnh-topo strong { display: block; font-family: "Cinzel", serif; font-weight: 800; font-size: clamp(11px, 2.4vw, 16px); letter-spacing: 0.08em; text-transform: uppercase; }
 .cnh-topo span { display: block; font-size: clamp(8px, 1.5vw, 10px); letter-spacing: 0.04em; opacity: 0.8; }
@@ -2992,20 +2985,6 @@ html[lang="en"] .fecho::before { content: "\2726  final entry  \2726"; }
 	-webkit-mask: radial-gradient(circle, transparent 30%, #000 31% 46%, transparent 47% 58%, #000 59%);
 	animation: holograma 6s linear infinite;
 }
-.cnh-topo-verso { display: block; }
-.cnh-categorias { width: 100%; border-collapse: collapse; font-size: clamp(8px, 1.7vw, 12px); }
-.cnh-categorias th { text-align: left; font-size: clamp(7px, 1.3vw, 9px); letter-spacing: 0.06em; text-transform: uppercase; color: #2f6a5e; padding: 0 6px 4px; border-bottom: 1px solid rgba(20, 60, 50, 0.35); }
-.cnh-categorias td { padding: 3px 6px; border-bottom: 1px dashed rgba(20, 60, 50, 0.2); font-family: "Courier New", monospace; font-weight: 700; color: #10201c; }
-.cnh-categorias td:first-child { font-family: var(--titulo); font-weight: 400; font-size: 1.2em; color: #1f2a78; }
-.cnh-categorias tr.nao td { color: #8a4a5a; }
-.cnh-obs { margin: 2.4% 0 0; font-size: clamp(8px, 1.6vw, 11px); line-height: 1.4; color: #14322e; }
-.cnh-verso-rodape { position: absolute; left: 3.6%; right: 3.6%; bottom: 5%; display: flex; justify-content: space-between; align-items: end; }
-.cnh-codigo { display: flex; gap: 1px; height: clamp(20px, 5vw, 30px); }
-.cnh-codigo i { background: #10201c; }
-.cnh-autoridade { display: grid; justify-items: center; min-width: 30%; }
-.cnh-autoridade span { font-family: "Mrs Saint Delafield", "Segoe Script", cursive; font-size: clamp(20px, 4.4vw, 30px); line-height: 1; color: #1f2a78; }
-.cnh-autoridade small { width: 100%; padding-top: 2px; text-align: center; border-top: 1px solid rgba(20, 60, 50, 0.45); font-size: clamp(7px, 1.3vw, 9px); text-transform: uppercase; color: #2f6a5e; }
-.cnh-dica { margin: 0; font-family: var(--rotulo); font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--suave); }
 @media (prefers-reduced-motion: reduce) { .cnh-cartao { transition: none; } .cnh-holograma { animation: none; } }
 
 /* passaporte aberto: clicar nas páginas fecha de volta */
@@ -3121,18 +3100,6 @@ html[lang="en"] .fecho::before { content: "\2726  final entry  \2726"; }
 }
 .cnh-holograma { z-index: 1; }
 /* verso */
-.cnh-categorias th { color: #8fd8ff; border-bottom-color: rgba(232, 196, 106, 0.5); }
-.cnh-categorias td { color: #ffffff; border-bottom-color: rgba(143, 216, 255, 0.2); position: relative; z-index: 1; }
-.cnh-categorias td:first-child { color: #1a1430; }
-.cnh-categorias td:first-child::before { content: ""; position: absolute; left: 3px; top: 50%; width: 1.5em; height: 1.5em; transform: translateY(-50%); border-radius: 50%; background: radial-gradient(circle at 35% 35%, #fbe6a2, #d9a640 60%, #9a6c1e); z-index: -1; }
-.cnh-categorias td:first-child { padding-left: 9px; }
-.cnh-categorias tr.nao td { color: #ff9fb6; }
-.cnh-categorias tr.nao td:first-child::before { background: radial-gradient(circle at 35% 35%, #ffc0cc, #c86a7e 60%, #6a2a3a); }
-.cnh-obs { color: #dfe8ff; position: relative; z-index: 1; }
-.cnh-obs b { color: #f3d98a; }
-.cnh-codigo i { background: #eef3ff; }
-.cnh-autoridade span { color: #dfe8ff; }
-.cnh-autoridade small { color: #8fd8ff; border-top-color: rgba(201, 214, 255, 0.55); }
 @media (prefers-reduced-motion: reduce) { .cnh-orbitas b, .cnh-faixa-holo { animation: none; } }
 
 /* ---------- Selo de Turista: parallax ao passar o mouse ---------- */
@@ -4148,7 +4115,6 @@ body.embarcando { overflow: hidden; }
 .emb-pp .pp-dados input { pointer-events: none; }
 .emb-cnh .cnh { display: block; }
 .emb-cnh .cnh-cartao { width: 600px; }
-.emb-cnh .cnh-dica { display: none; }
 .emb-cnh .cnh-topo strong { font-size: 16px; }
 .emb-cnh .cnh-topo span, .emb-cnh .cnh-campos dt, .emb-cnh .cnh-modelo figcaption { font-size: 9px; }
 .emb-cnh .cnh-campos dd { font-size: 13px; }
