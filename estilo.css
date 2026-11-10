@@ -4629,3 +4629,36 @@ html.aproximando, html.aproximando body { overflow: hidden; }
 .galaxia.pot-lateral .pot-passos { margin-top: 8px; gap: 4px; }
 .galaxia.pot-lateral .pot-passos i { display: none; }
 .galaxia.pot-lateral .pot-passos button { min-height: 30px; padding: 5px 7px; font-size: 10px; }
+
+/* ---- Potências de 10: leitura mais fácil ---- */
+/* os nomes dos destinos numa plaquinha escura, com a cor do destino na borda (dá para ler em cima da galáxia) */
+.pot-ponto > span { gap: 2px; padding: 4px 8px 5px; background: rgba(8, 6, 20, 0.86); border-left: 2px solid var(--cor-destino); text-shadow: none; }
+.pot-ponto.esq > span { border-left: 0; border-right: 2px solid var(--cor-destino); }
+.pot-ponto b { font-family: var(--titulo); font-size: 14px; letter-spacing: 0.05em; text-transform: none; color: #fff; }
+.pot-ponto small { font-family: var(--corpo); font-size: 12px; letter-spacing: 0; color: #d6d0f0; }
+.pot-ponto.sol > span { border-color: #ffd36a; }
+.pot-ponto.sol b { color: #ffe9a8; }
+.pot-ponto i { width: 9px; height: 9px; }
+/* o nome do círculo do passo anterior */
+.pot-anel text { font-size: 12px; fill: #ffe9a8; paint-order: stroke; stroke: #05030c; stroke-width: 4px; stroke-linejoin: round; }
+/* o painel: contraste maior e textos maiores */
+.pot-painel { background: rgba(8, 6, 20, 0.92); }
+.pot-largura { font-size: 12px; color: #9eeaff; }
+.pot-texto { font-size: 16px; line-height: 1.5; color: #f3efff; }
+.pot-lista { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; margin-top: 10px; font-size: 13px; color: #d6d0f0; }
+.pot-lista-titulo { flex-basis: 100%; font-family: var(--rotulo); font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: #b8aed8; }
+.pot-etiqueta { display: inline-flex; align-items: center; gap: 6px; padding: 3px 9px 4px; font-size: 13px; color: #fff; background: rgba(255, 255, 255, 0.06); border: 1px solid color-mix(in srgb, var(--cor-destino) 55%, transparent); }
+.pot-etiqueta::before { content: ""; width: 7px; height: 7px; flex: none; background: var(--cor-destino); box-shadow: 0 0 6px var(--cor-destino); }
+.pot-passos { gap: 6px; }
+.pot-passos i { font-size: 10px; color: rgba(255, 211, 106, 0.7); }
+.pot-passos button { min-height: 38px; padding: 7px 12px 8px; font-size: 12px; }
+@media (max-width: 700px) {
+	.pot-ponto b { font-size: 12px; }
+	.pot-ponto small { font-size: 11px; }
+	.pot-texto { font-size: 14px; }
+	.pot-etiqueta { font-size: 12px; padding: 2px 7px 3px; }
+	.pot-passos button { padding: 7px 9px 8px; font-size: 11px; }
+}
+.galaxia.pot-lateral .pot-texto { font-size: 13px; }
+.galaxia.pot-lateral .pot-etiqueta { font-size: 11px; padding: 2px 6px 3px; }
+.galaxia.pot-lateral .pot-lista { gap: 4px; margin-top: 6px; }

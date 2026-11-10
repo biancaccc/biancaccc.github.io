@@ -749,7 +749,7 @@
 		potBotoes.forEach(function (b, j) { b.setAttribute('aria-pressed', j === i ? 'true' : 'false'); });
 		potTitulo.textContent = PASSOS[i].titulo;
 		potTexto.textContent = PASSOS[i].texto;
-		potLista.textContent = '';
+		potLista.textContent = ''; potLista.removeAttribute('data-chave');
 	}
 	/* chamada a cada quadro (veja quadro()): a câmera, o véu, o círculo e os nomes */
 	function potQuadro(agora) {
@@ -808,7 +808,7 @@
 			if (dentro && atrasDoPainel(o.it.el.querySelector('i').getBoundingClientRect())) dentro = false;
 			o.it.el.style.visibility = dentro ? 'visible' : 'hidden';
 			if (!dentro) return;
-			if (!o.it.sol && Math.abs(o.x - qx) < lado / 2 && Math.abs(o.y - qy) < lado / 2) vistos.push(o.it.nome);
+			if (!o.it.sol && Math.abs(o.x - qx) < lado / 2 && Math.abs(o.y - qy) < lado / 2) vistos.push(o.it);
 			if (!arrumar) return;
 			var nome = o.it.el.querySelector('span'), livre = false;
 			[false, true].some(function (esq) {
@@ -823,9 +823,16 @@
 			/* os pontinhos também não ficam embaixo dos nomes dos outros */
 			ocup.push(o.it.el.querySelector('i').getBoundingClientRect());
 		});
+		/* a lista do que cabe na vista: uma etiqueta colorida por destino, do mais perto ao mais longe do Sol */
 		if (e.u >= 1) {
-			var txt = vistos.length ? T('Nesta vista: ', 'In this view: ') + vistos.join(', ') + '.' : T('Nenhum outro destino da Andarilha cabe aqui.', 'No other Andarilha destination fits here.');
-			if (potLista.textContent !== txt) potLista.textContent = txt;
+			vistos.sort(function (a, b) { return (a.dist || 1e9) - (b.dist || 1e9); });
+			var chave = vistos.map(function (it) { return it.nome; }).join('|');
+			if (potLista.getAttribute('data-chave') !== chave) {
+				potLista.setAttribute('data-chave', chave);
+				potLista.innerHTML = vistos.length
+					? '<span class="pot-lista-titulo">' + T('Nesta vista', 'In this view') + '</span>' + vistos.map(function (it) { return '<span class="pot-etiqueta" style="--cor-destino:' + it.cor + '">' + nomeHtml(it.nome) + '</span>'; }).join('')
+					: '<span class="pot-lista-titulo">' + T('Nenhum outro destino da Andarilha cabe aqui', 'No other Andarilha destination fits here') + '</span>';
+			}
 		}
 		if (pot.saindo && e.u >= 1) potFim();
 	}
