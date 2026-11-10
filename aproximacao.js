@@ -169,9 +169,16 @@
 				x.a.style.left = (X - tam / 2) + 'px';
 				x.a.style.top = (Y - tam / 2) + 'px';
 				/* na metade de trás da órbita, a lua passa atrás do planeta */
-				x.a.style.zIndex = Math.sin(ang) < 0 ? 1 : 3;
+				/* na metade de trás da órbita, ela só passa atrás do planeta quando está em cima do desenho
+				   dele (o globo e, em Saturno, os anéis); nas laterais ela fica na frente da caixa do planeta,
+				   que é quadrada, para continuar clicável */
+				var dx = X - m.cx, dy = Y - m.cy, rl = tam / 2;
+				var sobreGlobo = Math.hypot(dx, dy) < m.rg + rl * 0.6;
+				var sobreAneis = S.globo && Math.abs(dx) < m.largura / 2 + rl * 0.3 && Math.abs(dy) < m.largura * 0.13 + rl * 0.3;
+				var atras = Math.sin(ang) < 0 && (sobreGlobo || sobreAneis);
+				x.a.style.zIndex = atras ? 1 : 3;
 				/* atrás do planeta, o nome dela some (senão aparece cortado pela borda do planeta) */
-				x.a.classList.toggle('atras', Math.sin(ang) < 0 && Math.abs(X - m.cx) < m.largura / 2 + tam);
+				x.a.classList.toggle('atras', atras);
 			});
 		}
 		function quadro(agora) {

@@ -4680,4 +4680,8 @@ html.aproximando, html.aproximando body { overflow: hidden; }
 /* no celular não existe "passar o mouse": a mira não fica presa no que foi tocado */
 @media (hover: none) { .aprox-planeta.ativo::after, .aprox-lua.ativo::after { opacity: 0; } }
 /* o brilho do planeta na aproximação: o mesmo da página do planeta (.palco::before) */
-.aprox-brilho { position: absolute; inset: -18%; z-index: -1; pointer-events: none; background: radial-gradient(closest-side, color-mix(in srgb, var(--cor-destino) 32%, transparent), transparent); filter: blur(8px); }
+/* (na aproximação o planeta fica menor que na página dele: o brilho vai um pouco mais longe, para aparecer do mesmo jeito) */
+.aprox-brilho { position: absolute; inset: -42%; z-index: -1; pointer-events: none; background: radial-gradient(closest-side, color-mix(in srgb, var(--cor-destino) 34%, transparent) 55%, transparent); filter: blur(10px); }
+/* a caixa do planeta não rouba o clique das luas: só a arte dele é clicável */
+.aprox-planeta { pointer-events: none; }
+.aprox-planeta img { pointer-events: auto; }
