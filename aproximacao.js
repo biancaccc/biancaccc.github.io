@@ -53,7 +53,8 @@
 
 	function aproximar(id) {
 		if (estado) return;
-		var S = SISTEMAS[id], origem = sistema.querySelector('.astro[data-id="' + id + '"] img');
+		/* (o planeta pequeno do sistema pode ser a imagem ou a animação que entra no lugar dela: balanco.js) */
+		var S = SISTEMAS[id], origem = sistema.querySelector('.astro[data-id="' + id + '"] .planeta');
 		var nomeP = NOMES[id];
 		camada = el('div', 'aprox');
 		camada.setAttribute('role', 'dialog');
@@ -277,13 +278,18 @@
 
 	function afastar() {
 		if (!estado || !camada) return;
-		var c = camada, origem = estado.origem, id = estado.id;
+		var c = camada, id = estado.id, origem = sistema.querySelector('.astro[data-id="' + id + '"] .planeta');
 		estado = null;
 		c.classList.remove('chegou');
 		c.classList.add('saindo');
 		var planeta = c.querySelector('.aprox-planeta'), img = planeta.querySelector('img');
 		if (origem && !calmo) {
 			var de = origem.getBoundingClientRect(), para = img.getBoundingClientRect();
+			/* a volta é rápida e já sai andando (a ida começa devagar, a volta não): o planeta encolhe de
+			   volta para o lugar dele no sistema, o brilho apaga, e no fim ele some em cima do de verdade */
+			planeta.style.transition = 'transform 0.55s cubic-bezier(0.2, 0.6, 0.3, 1), opacity 0.15s ease 0.45s';
+			planeta.style.opacity = '0';
+			planeta.classList.add('voltando');
 			planeta.style.transform = 'translate(' + (de.left + de.width / 2 - (para.left + para.width / 2)) + 'px,' + (de.top + de.height / 2 - (para.top + para.height / 2)) + 'px) scale(' + (de.width / para.width) + ')';
 		}
 		c.classList.remove('aberta');
@@ -293,7 +299,7 @@
 			document.documentElement.classList.remove('aproximando');
 			var volta = sistema.querySelector('.astro[data-id="' + id + '"]');
 			if (volta) volta.focus({ preventScroll: true });
-		}, calmo ? 0 : 900);
+		}, calmo ? 0 : 620);
 	}
 
 	document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && estado) afastar(); });

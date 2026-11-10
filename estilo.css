@@ -4685,3 +4685,5 @@ html.aproximando, html.aproximando body { overflow: hidden; }
 /* a caixa do planeta não rouba o clique das luas: só a arte dele é clicável */
 .aprox-planeta { pointer-events: none; }
 .aprox-planeta img { pointer-events: auto; }
+.aprox-brilho { transition: opacity 0.25s ease; }
+.aprox-planeta.voltando .aprox-brilho, .aprox-planeta.voltando::after { opacity: 0; }
