@@ -4,7 +4,7 @@ Object.assign(window.EN.t, {
 	"Sistema Solar · Turismo espacial": "Solar System · Space tourism",
 	"Destino: braço de Órion": "Destination: the Orion Arm",
 	"Conheça os planetas e as suas luas": "Get to know the planets and their moons",
-	"Passe o mouse em um planeta, numa lua ou num nome para ver o que tem de especial.": "Hover over a planet, a moon or a name to see what makes it special."
+	"Passe o mouse em um planeta ou num nome para ver o que tem de especial. Nos planetas com luas, clique para se aproximar.": "Hover over a planet or a name to see what makes it special. On planets with moons, click to fly closer."
 });
 Object.assign(window.EN.a, {
 	"Júpiter": "Jupiter",
