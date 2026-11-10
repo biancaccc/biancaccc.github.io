@@ -274,7 +274,6 @@
 		var k = kReal * kReal * (3 - 2 * kReal);
 		return [0, 1, 2].map(function (i) { return d.pos[i] + (d.real[i] - d.pos[i]) * k; });
 	}
-	var RAIO_VIZINHANCA = 1600 / ANOS_LUZ; // o quadradinho em volta do Sol que a lupa amplia
 
 	// ---------- Câmera da galáxia ----------
 	var TILT = 0.6;
@@ -466,19 +465,11 @@
 		// linha pontilhada mostrando que Omega Centauri fica acima do disco da galáxia
 		// (só junto com os marcadores, quando estamos escolhendo o destino)
 		DESTINOS.forEach(function (d) {
-			if (d.local || !d.pos[2] || !marcasVisiveis) return;
+			if (d.local || !d.pos[2] || !marcasVisiveis || pot) return;
 			var q = posAtual(d), a = projetar(q[0], q[1], 0), b = projetar(q[0], q[1], q[2]);
 			var passos = Math.round(Math.abs(b[1] - a[1]));
 			for (var p = 0; p < passos; p += 2) ponto(a[0], a[1] + (b[1] - a[1]) * p / passos, cor(255, 224, 138));
 		});
-		// na escala real: cantoneiras em volta do Sol, marcando o pedacinho que a lupa amplia
-		if (marcasVisiveis && kReal > 0.5) {
-			var ps = projetar(sol[0], sol[1], 0), rv = Math.max(3, Math.round(RAIO_VIZINHANCA * escalaGalaxia() * cam.zoom) + 2);
-			var sx = Math.round(ps[0]), sy = Math.round(ps[1]), cc = cor(127, 227, 255);
-			[[-1, -1], [1, -1], [-1, 1], [1, 1]].forEach(function (c) {
-				for (var k = 0; k < 3; k++) { ponto(sx + c[0] * (rv - k), sy + c[1] * rv, cc); ponto(sx + c[0] * rv, sy + c[1] * (rv - k), cc); }
-			});
-		}
 		// estrelas de fundo piscando (só onde está escuro)
 		for (var e = 0; e < fundoEstrelas.length; e++) {
 			var st = fundoEstrelas[e];
@@ -578,6 +569,13 @@
 			? '<a class="botao-hud" href="' + d.href + '">' + T('Viajar para lá', 'Travel there') + ' &rarr;</a>'
 			: '<p class="cartao-dica">' + T('Clique no destino para viajar', 'Click the destination to travel') + '</p>');
 		cartao.classList.add('aberto');
+		/* em telas baixas, o cartão chega até o rádio (e, no celular, até o botão da linha do tempo):
+		   enquanto ele está aberto, o que fica embaixo dele some */
+		var rc = cartao.getBoundingClientRect();
+		document.querySelectorAll('.radio-doca, .botao-linha').forEach(function (el) {
+			var r = el.getBoundingClientRect();
+			el.classList.toggle('sob-cartao', rc.top < r.bottom + 8 && rc.bottom > r.top - 8 && rc.right > r.left && rc.left < r.right);
+		});
 		var ir = cartaoCorpo.querySelector('a');
 		if (ir) ir.addEventListener('click', function (ev) {
 			if (ev.ctrlKey || ev.metaKey || ev.shiftKey) return;
@@ -591,6 +589,7 @@
 		selecionado = null;
 		DESTINOS.forEach(function (o) { o.botao.classList.remove('ativo'); });
 		cartao.classList.remove('aberto');
+		document.querySelectorAll('.sob-cartao').forEach(function (el) { el.classList.remove('sob-cartao'); });
 	}
 
 	function posicionarMarcadores() {
@@ -600,11 +599,6 @@
 			d.tela = [p[0] * P, p[1] * P];
 		});
 		arrumarNomes();
-		// régua: quantos pixels da tela valem 10.000 anos-luz agora
-		if (escalaReal) {
-			var S = escalaGalaxia() * cam.zoom * P;
-			regua.style.width = Math.round(10000 / ANOS_LUZ * S) + 'px';
-		}
 	}
 
 	// ---------- Nomes do mapa sem se amontoar ----------
@@ -650,65 +644,262 @@
 		});
 	}
 
-	// ---------- Botão da escala real, régua e lupa da vizinhança do Sol ----------
+	// ---------- Botão da escala real: as potências de 10 ----------
 	var notaMapa = galaxia.querySelector('.nota-mapa');
 	var TEXTO_ILUSTRATIVO = notaMapa.textContent;
 	var escalaCaixa = document.createElement('div');
 	escalaCaixa.className = 'escala';
 	escalaCaixa.innerHTML =
 		'<button type="button" class="escala-botao" aria-pressed="false">' +
-		'<span>' + T('Ilustrativo', 'Illustrative') + '</span><span>' + T('Escala real', 'Real scale') + '</span></button>' +
-		'<span class="escala-regua" aria-hidden="true"><i></i>' + T('10.000 anos-luz', '10,000 light-years') + '</span>';
+		'<span>' + T('Ilustrativo', 'Illustrative') + '</span><span>' + T('Escala real', 'Real scale') + '</span></button>';
 	galaxia.appendChild(escalaCaixa);
-	var botaoEscala = escalaCaixa.querySelector('button'), regua = escalaCaixa.querySelector('.escala-regua i');
+	var botaoEscala = escalaCaixa.querySelector('button');
 
-	// a lupa: os vizinhos do Sol vistos de cima, com o Sol no meio e o centro da galáxia para
-	// cima. Os anéis marcam a distância até o Sol, e cada anel fica 10 vezes mais longe que o
-	// anterior (10, 100 e 1.000 anos-luz): assim Sirius e Proxima, pertinho, não caem em cima do
-	// Sol, e Órion e Tabby, bem mais longe, ainda cabem no quadro.
-	var lupa = document.createElement('div');
-	lupa.className = 'lupa-sol';
-	function raioLupa(anosLuz) { return 8 + Math.log(Math.max(1, anosLuz)) / Math.LN10 * 32; } // 10 → 40, 100 → 72, 1.000 → 104
-	var svg = '';
-	[[10, '10'], [100, '100'], [1000, T('1.000 anos-luz', '1,000 light-years')]].forEach(function (a) {
-		var rc = raioLupa(a[0]);
-		svg += '<circle cx="150" cy="150" r="' + rc + '" /><text x="153" y="' + (150 - rc - 3) + '">' + a[1] + '</text>';
+	// As potências de 10 (como no filme "Powers of Ten"): a escala real é só para olhar.
+	// Clicando nela, a câmera mergulha até o Sol, e a pessoa vai se afastando, cada passo
+	// 10 vezes maior que o anterior: 10, 100, 1.000 e 10.000 anos-luz de largura e, por fim,
+	// a galáxia inteira. Os destinos aparecem nos lugares de verdade (sem clique), e um círculo
+	// em volta do Sol mostra o tamanho do passo anterior.
+	var PASSOS = [
+		{ ly: 10, rotulo: '10', titulo: T('10 anos-luz', '10 light-years'),
+			texto: T('A luz leva 10 anos para atravessar esta vista. Em volta do Sol, quase só espaço vazio: a estrela mais perto, Proxima Centauri, fica a 4,2 anos-luz.', 'Light takes 10 years to cross this view. Around the Sun, almost nothing but empty space: the nearest star, Proxima Centauri, is 4.2 light-years away.') },
+		{ ly: 100, rotulo: '100', titulo: T('100 anos-luz', '100 light-years'),
+			texto: T('Os vizinhos mais próximos já viraram pontinhos colados no Sol. A luz que sai do Sol hoje só chega à borda desta vista daqui a 50 anos.', 'The nearest neighbors have become dots stuck to the Sun. Light leaving the Sun today will only reach the edge of this view in 50 years.') },
+		{ ly: 1000, rotulo: T('1.000', '1,000'), titulo: T('1.000 anos-luz', '1,000 light-years'),
+			texto: T('Quase todas as estrelas que vemos a olho nu numa noite escura estão dentro desta vista.', 'Almost every star we can see with the naked eye on a dark night is inside this view.') },
+		{ ly: 10000, rotulo: T('10.000', '10,000'), titulo: T('10.000 anos-luz', '10,000 light-years'),
+			texto: T('Um pedaço do braço de Órion, o braço da galáxia onde fica o Sol.', 'A piece of the Orion Arm, the arm of the galaxy where the Sun lives.') },
+		{ ly: 0, rotulo: T('Galáxia', 'Galaxy'), titulo: T('A Via Láctea inteira', 'The whole Milky Way'),
+			texto: T('Uns 100 mil anos-luz de uma ponta à outra e mais de 100 bilhões de estrelas. O Sol é uma delas, a 26.700 anos-luz do centro.', 'About 100,000 light-years from end to end and more than 100 billion stars. The Sun is one of them, 26,700 light-years from the center.') }
+	];
+	var potArranjo = 0, potCentro = null;
+	var pot = null; /* { de: {lv, m}, para: {lv, m}, inicio, dur, passo, saindo } */
+	var potCaixa = document.createElement('div');
+	potCaixa.className = 'potencias';
+	potCaixa.innerHTML =
+		'<div class="pot-veu" aria-hidden="true"></div>' +
+		'<div class="pot-quadro" aria-hidden="true"><i></i><i></i><i></i><i></i></div>' +
+		'<svg class="pot-anel" aria-hidden="true"><ellipse></ellipse><text></text></svg>' +
+		'<div class="pot-pontos" aria-hidden="true"></div>' +
+		'<div class="pot-painel" role="group" aria-label="' + T('Potências de 10', 'Powers of ten') + '">' +
+			'<p class="pot-largura" aria-hidden="true"></p>' +
+			'<p class="pot-titulo" aria-live="polite"></p>' +
+			'<p class="pot-texto"></p>' +
+			'<p class="pot-lista"></p>' +
+			'<div class="pot-passos">' +
+				'<button type="button" class="pot-seta" data-pot="-1" aria-label="' + T('Mais perto', 'Closer') + '">&minus;</button>' +
+				PASSOS.map(function (p, i) { return '<button type="button" class="pot-passo" data-passo="' + i + '">' + p.rotulo + '</button>'; }).join('<i aria-hidden="true">×10</i>') +
+				'<button type="button" class="pot-seta" data-pot="1" aria-label="' + T('Mais longe', 'Farther') + '">+</button>' +
+			'</div>' +
+		'</div>';
+	/* embaixo do título, dos botões e do passaporte (o véu escuro não cobre nada disso) */
+	galaxia.insertBefore(potCaixa, galaxia.firstChild);
+	var potQuadroEl = potCaixa.querySelector('.pot-quadro');
+	var potVeu = potCaixa.querySelector('.pot-veu'), potPontos = potCaixa.querySelector('.pot-pontos');
+	var potAnel = potCaixa.querySelector('.pot-anel'), potElipse = potAnel.querySelector('ellipse'), potAnelTexto = potAnel.querySelector('text');
+	var potLargura = potCaixa.querySelector('.pot-largura'), potTitulo = potCaixa.querySelector('.pot-titulo');
+	var potTexto = potCaixa.querySelector('.pot-texto'), potLista = potCaixa.querySelector('.pot-lista');
+	var potBotoes = [].slice.call(potCaixa.querySelectorAll('.pot-passo'));
+	/* o Sol e os destinos (menos o Sistema Solar, que é o próprio Sol), com a distância até o Sol */
+	var potItens = [{ nome: T('Sol', 'Sun'), cor: '#ffd36a', real: [sol[0], sol[1], 0], sol: true }].concat(DESTINOS.filter(function (d) { return d.id !== 'sistema'; }).map(function (d) {
+		var c = CEU[d.id], al = c ? c[0] : d.id === 'sagitario' ? 26700 : null;
+		return { nome: d.nome, cor: d.cor, real: d.real, dist: al };
+	}));
+	potItens.forEach(function (it) {
+		var e = document.createElement('span');
+		e.className = 'pot-ponto' + (it.sol ? ' sol' : '');
+		e.style.setProperty('--cor-destino', it.cor);
+		var dist = it.dist ? (it.dist < 20 ? (Math.round(it.dist * 10) / 10) : Math.round(it.dist)).toLocaleString(LOCALE) + T(' anos-luz', ' light-years') : '';
+		e.innerHTML = '<i></i><span><b>' + nomeHtml(it.nome) + '</b>' + (dist ? '<small>' + dist + '</small>' : '') + '</span>';
+		potPontos.appendChild(e);
+		it.el = e;
 	});
-	lupa.innerHTML =
-		'<p class="lupa-titulo">' + T('Vizinhos do Sol', 'Neighbors of the Sun') + '</p>' +
-		'<div class="lupa-mapa"><svg viewBox="0 0 300 300" aria-hidden="true"><path d="M150 6 l-5 8 h10 z" class="lupa-seta" />' + svg + '</svg>' +
-		'<span class="lupa-centro" aria-hidden="true">' + T('rumo ao centro da galáxia', 'toward the center of the galaxy') + '</span>' +
-		'<span class="lupa-sol-ponto" aria-hidden="true">' + T('Sol', 'Sun') + '</span></div>' +
-		'<p class="lupa-legenda">' + T('Vista de cima, com o Sol no meio. Cada anel fica 10 vezes mais longe que o anterior. No mapa grande, estes destinos quase encostam no Sol.', 'Seen from above, with the Sun in the middle. Each ring is 10 times farther than the one before. On the big map, these destinations almost touch the Sun.') + '</p>';
-	var lupaMapa = lupa.querySelector('.lupa-mapa');
-	// de que lado do ponto fica o nome, para nenhum encostar no outro
-	var LADO_LUPA = { orion: 'abaixo', betelgeuse: 'acima', tabby: 'esq', sirius: 'esq', proxima: 'esq' };
-	DESTINOS.forEach(function (d) {
-		if (!d.local) return;
-		var l = d.ceu[1] * Math.PI / 180, plano = d.ceu[0] * Math.cos(d.ceu[2] * Math.PI / 180), r = raioLupa(plano);
-		var b = document.createElement('button');
-		b.type = 'button';
-		b.className = 'lupa-destino ' + (LADO_LUPA[d.id] || 'dir');
-		b.style.setProperty('--cor-destino', d.cor);
-		b.style.left = (150 + Math.sin(l) * r) / 300 * 100 + '%';
-		b.style.top = (150 - Math.cos(l) * r) / 300 * 100 + '%';
-		var al = d.ceu[0] < 20 ? (Math.round(d.ceu[0] * 10) / 10).toLocaleString(LOCALE) : Math.round(d.ceu[0]).toLocaleString(LOCALE);
-		b.innerHTML = '<i></i><span><b>' + d.nome.replace('Nebulosa d', 'N. d').replace('Estrela de ', '').replace(' Centauri', '').replace(' Nebula', '').replace("'s Star", '') + '</b><small>' + al + T(' anos-luz', ' light-years') + '</small></span>';
-		b.setAttribute('aria-label', d.nome + ': ' + al + T(' anos-luz do Sol', ' light-years from the Sun'));
-		ligarEscolha(b, d);
-		lupaMapa.appendChild(b);
+	/* a "vista" é o menor lado da área livre da tela (acima do painel), como o quadrado do filme */
+	function areaLivre() {
+		var painel = potCaixa.querySelector('.pot-painel'), rp = painel.getBoundingClientRect();
+		/* tela baixa (celular deitado): o painel vira uma coluna à esquerda e a vista fica entre ele
+		   e os botões da direita (a chave da escala, o passaporte e o rádio) */
+		if (galaxia.classList.contains('pot-lateral')) {
+			var dir = window.innerWidth;
+			[escalaCaixa, document.querySelector('.radio-doca'), document.querySelector('.botao-passaporte')].forEach(function (el) {
+				if (el) { var r = el.getBoundingClientRect(); if (r.width && r.left > window.innerWidth / 2) dir = Math.min(dir, r.left); }
+			});
+			var esq = rp.right + 12;
+			return { esq: esq, w: Math.max(120, dir - 12 - esq), topo: 8, h: window.innerHeight - 16 };
+		}
+		/* no celular, a chave da escala fica em cima, no meio do caminho: a vista começa embaixo dela */
+		var topo = window.innerWidth <= 700 ? escalaCaixa.getBoundingClientRect().bottom + 12 : 0;
+		return { esq: 0, w: window.innerWidth, topo: topo, h: Math.max(160, window.innerHeight - topo - (painel.offsetHeight || 200) - 40) };
+	}
+	function ladoDaVista() { var a = areaLivre(); return Math.min(a.w, a.h); }
+	function larguraGalaxia() { return ladoDaVista() * ANOS_LUZ / (P * escalaGalaxia()); } /* anos-luz na vista, com a galáxia inteira */
+	var LY_GALAXIA = 120000; /* a vista da galáxia inteira: os 100 mil anos-luz dela, com uma folguinha */
+	function lvDoPasso(i) { return Math.log(PASSOS[i].ly || LY_GALAXIA) / Math.LN10; }
+	function potEstado(agora) {
+		var u = calmo ? 1 : suave((agora - pot.inicio) / pot.dur);
+		return { lv: pot.de.lv + (pot.para.lv - pot.de.lv) * u, m: pot.de.m + (pot.para.m - pot.de.m) * u, c: pot.de.c + (pot.para.c - pot.de.c) * u, u: u };
+	}
+	function potIr(i, agora) {
+		i = Math.max(0, Math.min(PASSOS.length - 1, i));
+		agora = agora || performance.now();
+		/* (de onde parte: o mapa do jeito de sempre, na primeira vez) */
+		var e = pot ? potEstado(agora) : { lv: Math.log(larguraGalaxia()) / Math.LN10, m: 1, c: 1 };
+		var para = { lv: lvDoPasso(i), m: i === PASSOS.length - 1 ? 1 : 0, c: 0 };
+		pot = { de: { lv: e.lv, m: e.m, c: e.c }, para: para, inicio: agora, dur: Math.min(3200, 700 + Math.abs(para.lv - e.lv) * 650), passo: i, saindo: pot && pot.saindo };
+		potBotoes.forEach(function (b, j) { b.setAttribute('aria-pressed', j === i ? 'true' : 'false'); });
+		potTitulo.textContent = PASSOS[i].titulo;
+		potTexto.textContent = PASSOS[i].texto;
+		potCaixa.classList.add('em-movimento');
+	}
+	/* chamada a cada quadro (veja quadro()): a câmera, o véu, o círculo e os nomes */
+	function potQuadro(agora) {
+		var e = potEstado(agora), V = Math.pow(10, e.lv);
+		cam.zoom = ladoDaVista() / V * ANOS_LUZ / (P * escalaGalaxia());
+		var Sm = escalaGalaxia() * cam.zoom, ps = projetar(sol[0], sol[1], 0);
+		/* no meio da área livre, o Sol (m = 0) ou o centro da galáxia (m = 1); com c = 1, o mapa do jeito de sempre */
+		/* o centro da área livre muda quando o painel muda de tamanho: o centro da vista vai até lá
+		   deslizando, em vez de pular */
+		var al = areaLivre(), alvoX = al.esq + al.w / 2, alvoY = al.topo + al.h / 2;
+		if (!potCentro) potCentro = { x: alvoX, y: alvoY, t: agora };
+		var passo = Math.min(1, (agora - potCentro.t) / 1000 * 5);
+		potCentro.x += (alvoX - potCentro.x) * passo; potCentro.y += (alvoY - potCentro.y) * passo; potCentro.t = agora;
+		var ty = (potCentro.y / P) * (1 - e.c) + H * 0.54 * e.c;
+		var tx = (potCentro.x / P) * (1 - e.c) + W / 2 * e.c;
+		cam.x = ps[2] * (1 - e.m) - (tx - W / 2) / Sm;
+		cam.y = ps[3] * (1 - e.m) - (ty - H * 0.54) / Sm;
+		if (e.u < 1) ultimaGalaxia = 0;
+		/* o espaço escuro cobre a galáxia de perto (ela só aparece a partir de uns 2.000 anos-luz) */
+		var veu = Math.max(0, Math.min(1, (Math.log(20000) - Math.log(V)) / Math.log(10)));
+		potVeu.style.opacity = veu.toFixed(3);
+		potLargura.textContent = '↔ ' + (V < 100 ? Math.round(V) : Math.round(V / (V < 1e4 ? 10 : 100)) * (V < 1e4 ? 10 : 100)).toLocaleString(LOCALE) + T(' anos-luz', ' light-years');
+		/* o círculo do passo anterior, no plano da galáxia, em volta do Sol */
+		var ant = pot.passo > 0 && pot.passo < PASSOS.length - 1 ? (PASSOS[pot.passo - 1].ly) : 0, sx = ps[0] * P, sy = ps[1] * P, rp0 = potCaixa.querySelector('.pot-painel').getBoundingClientRect();
+		var solTela = projetar(sol[0], sol[1], 0); sx = solTela[0] * P; sy = solTela[1] * P;
+		if (ant) {
+			var rx = ant / 2 / ANOS_LUZ * Sm * P;
+			potElipse.setAttribute('cx', sx.toFixed(1)); potElipse.setAttribute('cy', sy.toFixed(1));
+			potElipse.setAttribute('rx', rx.toFixed(1)); potElipse.setAttribute('ry', (rx * TILT).toFixed(1));
+			potAnelTexto.setAttribute('x', sx.toFixed(1)); potAnelTexto.setAttribute('y', (sy - rx * TILT - 6).toFixed(1));
+			potAnelTexto.textContent = PASSOS[pot.passo - 1].titulo;
+			var cabe = rx > 14 && rx < window.innerWidth * 0.45 && sy + rx * TILT < rp0.top - 8;
+			potAnel.style.opacity = cabe && e.u >= 1 ? 1 : 0;
+		} else potAnel.style.opacity = 0;
+		/* os pontos: todos aparecem; o nome só quando há espaço (os mais longe do Sol têm preferência) */
+		var ocup = [], vistos = [], lado = ladoDaVista(), qx = sx, qy = sy;
+		if (e.m > 0) { var cg = projetar(0, 0, 0); qx = qx + (cg[0] * P - qx) * e.m; qy = qy + (cg[1] * P - qy) * e.m; }
+		potQuadroEl.style.transform = 'translate(' + (qx - lado / 2).toFixed(1) + 'px,' + (qy - lado / 2).toFixed(1) + 'px)';
+		potQuadroEl.style.width = potQuadroEl.style.height = lado.toFixed(0) + 'px';
+		var lista = potItens.map(function (it) {
+			var p = projetar(it.real[0], it.real[1], it.real[2]);
+			return { it: it, x: p[0] * P, y: p[1] * P, d: Math.hypot(p[0] * P - sx, p[1] * P - sy) };
+		}).sort(function (a, b) { return a.it.sol ? -1 : b.it.sol ? 1 : b.d - a.d; });
+		/* nada fica atrás do painel de explicação, e nenhum texto fica em cima de outro: os nomes
+		   desviam do título, da chave da escala, do passaporte, do rádio, do nome do círculo e uns
+		   dos outros (primeiro tentam o outro lado do ponto; se não der, o nome some e fica o pontinho) */
+		var rp = potCaixa.querySelector('.pot-painel').getBoundingClientRect();
+		/* (os nomes se rearrumam 10 vezes por segundo: medir tudo a cada quadro pesaria) */
+		var parado = e.u >= 1;
+		var arrumar = parado && agora - potArranjo > 100;
+		if (arrumar) potArranjo = agora;
+		if (parado && potCaixa.classList.contains('em-movimento')) potCaixa.classList.remove('em-movimento');
+		function cruza(a, b, m) { return a.right > b.left - m && a.left < b.right + m && a.bottom > b.top - m && a.top < b.bottom + m; }
+		function atrasDoPainel(r) { return cruza(r, rp, 8); }
+		var obstaculos = [rp];
+		if (arrumar) ['.galaxia-topo', '.escala', '.botao-passaporte', '.radio-doca'].forEach(function (sel) {
+			var el = document.querySelector(sel);
+			if (el && getComputedStyle(el).visibility !== 'hidden') { var r = el.getBoundingClientRect(); if (r.width) obstaculos.push(r); }
+		});
+		if (arrumar && potAnel.style.opacity !== '0') { var rt = potAnelTexto.getBoundingClientRect(); if (rt.width) obstaculos.push(rt); }
+		lista.forEach(function (o) {
+			var dentro = o.x > -20 && o.x < window.innerWidth + 20 && o.y > -20 && o.y < window.innerHeight + 20;
+			o.it.el.style.transform = 'translate(' + o.x.toFixed(1) + 'px,' + o.y.toFixed(1) + 'px)';
+			if (dentro && atrasDoPainel(o.it.el.querySelector('i').getBoundingClientRect())) dentro = false;
+			o.it.el.style.visibility = dentro ? 'visible' : 'hidden';
+			if (!dentro) return;
+			if (!o.it.sol && Math.abs(o.x - qx) < lado / 2 && Math.abs(o.y - qy) < lado / 2) vistos.push(o.it);
+			if (!arrumar) return;
+			var nome = o.it.el.querySelector('span'), livre = false;
+			[false, true].some(function (esq) {
+				o.it.el.classList.toggle('esq', esq);
+				var r = nome.getBoundingClientRect();
+				livre = r.left > 4 && r.right < window.innerWidth - 4 &&
+					!obstaculos.some(function (q) { return cruza(r, q, 4); }) && !ocup.some(function (q) { return cruza(r, q, 4); });
+				return livre;
+			});
+			o.it.el.classList.toggle('sem-nome', !livre);
+			if (livre) ocup.push(nome.getBoundingClientRect());
+			/* os pontinhos também não ficam embaixo dos nomes dos outros */
+			ocup.push(o.it.el.querySelector('i').getBoundingClientRect());
+		});
+		/* a lista do que cabe na vista: uma etiqueta colorida por destino, do mais perto ao mais longe do Sol */
+		if (e.u >= 1) {
+			vistos.sort(function (a, b) { return (a.dist || 1e9) - (b.dist || 1e9); });
+			var chave = vistos.map(function (it) { return it.nome; }).join('|');
+			if (potLista.getAttribute('data-chave') !== chave) {
+				potLista.setAttribute('data-chave', chave);
+				potLista.innerHTML = vistos.length === potItens.length - 1
+					? '<span class="pot-lista-titulo">' + T('Nesta vista: todos os destinos da Andarilha', 'In this view: every Andarilha destination') + '</span>'
+					: vistos.length
+					? '<span class="pot-lista-titulo">' + T('Nesta vista', 'In this view') + '</span>' + vistos.map(function (it) { return '<span class="pot-etiqueta" style="--cor-destino:' + it.cor + '">' + nomeHtml(it.nome) + '</span>'; }).join('')
+					: '<span class="pot-lista-titulo">' + T('Nenhum outro destino da Andarilha cabe aqui', 'No other Andarilha destination fits here') + '</span>';
+			}
+		}
+		if (pot.saindo && e.u >= 1) potFim();
+	}
+	/* tela baixa e larga (celular deitado): o painel vai para a lateral */
+	function potLayout() { galaxia.classList.toggle('pot-lateral', window.innerHeight < 520 && window.innerWidth > window.innerHeight); }
+	window.addEventListener('resize', potLayout);
+	function potEntrar() {
+		potCentro = null;
+		potLayout();
+		esconderCartao();
+		galaxia.classList.add('potencias-on');
+		pot = null;
+		potIr(0);
+		pot.dur = calmo ? 0 : 2800;
+	}
+	function potSair() {
+		if (!pot) return;
+		potIr(PASSOS.length - 1);
+		/* volta para o mapa do jeito de sempre, sem pulo no fim */
+		pot.para = { lv: Math.log(larguraGalaxia()) / Math.LN10, m: 1, c: 1 };
+		pot.saindo = true;
+		galaxia.classList.add('potencias-saindo');
+	}
+	function potFim() {
+		pot = null; cam.x = 0; cam.y = 0; cam.zoom = 1;
+		galaxia.classList.remove('potencias-on', 'potencias-saindo');
+	}
+	potCaixa.querySelector('.pot-passos').addEventListener('click', function (ev) {
+		var b = ev.target.closest('button'); if (!b || !pot || pot.saindo) return;
+		if (b.hasAttribute('data-passo')) potIr(+b.getAttribute('data-passo'));
+		else potIr(pot.passo + (+b.getAttribute('data-pot')));
 	});
-	galaxia.appendChild(lupa);
+	/* a rodinha do mouse e as setas do teclado também andam de 10 em 10 */
+	var potRoda = 0;
+	window.addEventListener('wheel', function (ev) {
+		if (!pot || pot.saindo || Math.abs(ev.deltaY) < 4) return;
+		var agora = performance.now();
+		if (agora - potRoda < 650) return;
+		potRoda = agora;
+		potIr(pot.passo + (ev.deltaY > 0 ? 1 : -1));
+	}, { passive: true });
+	document.addEventListener('keydown', function (ev) {
+		if (!pot || pot.saindo) return;
+		if (ev.key === 'ArrowRight' || ev.key === 'ArrowUp' || ev.key === '+') { ev.preventDefault(); potIr(pot.passo + 1); }
+		else if (ev.key === 'ArrowLeft' || ev.key === 'ArrowDown' || ev.key === '-') { ev.preventDefault(); potIr(pot.passo - 1); }
+		else if (ev.key === 'Escape') botaoEscala.click();
+	});
 
 	botaoEscala.addEventListener('click', function () {
+		if (pot && pot.saindo) return;
 		escalaReal = !escalaReal;
-		if (calmo) kReal = escalaReal ? 1 : 0;
 		botaoEscala.setAttribute('aria-pressed', escalaReal ? 'true' : 'false');
 		galaxia.classList.toggle('escala-real', escalaReal);
 		notaMapa.textContent = escalaReal
-			? T('Escala real: posições aproximadas, vistas de cima.', 'Real scale: approximate positions, seen from above.')
+			? T('Escala real: só para olhar. Afaste-se de 10 em 10 vezes.', 'Real scale: just for looking. Pull back 10 times at a time.')
 			: TEXTO_ILUSTRATIVO;
-		posicionarMarcadores();
+		if (escalaReal) potEntrar(); else potSair();
 	});
 
 	// ---------- Cenas ----------
@@ -811,7 +1002,8 @@
 		} else {
 			if (!calmo) giro += dt * (2 * Math.PI / 480); // uma volta a cada 8 minutos
 			// os marcadores deslizam entre o mapa ilustrativo e a escala real
-			var alvoReal = escalaReal ? 1 : 0;
+			/* (na escala real os marcadores ficam escondidos: as potências de 10 mostram os lugares de verdade) */
+			var alvoReal = 0;
 			if (kReal !== alvoReal) {
 				kReal = alvoReal > kReal ? Math.min(1, kReal + dt / 1.2) : Math.max(0, kReal - dt / 1.2);
 				ultimaGalaxia = 0; // enquanto deslizam, a tela anda em velocidade normal
@@ -824,6 +1016,8 @@
 					cam.y = alturaDoFuro(ZOOM_SALTO_FIM) * (1 - qc);
 				} else cam.zoom = 1 + 3 * Math.pow(1 - suave(tc / 1.8), 2);
 			}
+			/* as potências de 10 (escala real) cuidam da câmera */
+			if (cena === 'galaxia' && pot) potQuadro(agora);
 			if (cena === 'partida') {
 				// a câmera segue a nave: ela fica no mesmo lugar da tela e a galáxia vem crescendo,
 				// com o destino no ponto de onde as estrelas saem (42% da altura)

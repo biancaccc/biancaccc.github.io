@@ -1130,8 +1130,7 @@
 				marca.className = 'pp-carimbo';
 				marca.style.setProperty('--giro', giroDe(x) + 'deg');
 				marca.appendChild(novoCarimbo(x, null, d.carimbos[x.id])); // a data vai dentro do carimbo
-				marca.title = x.nome + TR(': clique para carimbar de novo', ': click to stamp it again');
-				marca.addEventListener('click', function () { carimbar(vaga, marca, x); });
+				marca.title = x.nome;
 				vaga.appendChild(marca);
 				if (mostrados.indexOf(x.id) < 0) { marca.classList.add('esperando'); novos.push({ vaga: vaga, marca: marca, destino: x }); }
 			} else {
@@ -1340,13 +1339,30 @@
 			}, espera);
 			return true;
 		}
-		// clicando no passaporte aberto, a página vira; clicando de novo, ela volta. Os campos, os
-		// carimbos e os botões continuam funcionando normalmente
+		// como um livro de verdade: clicando na página da direita, a folha vira para a frente;
+		// clicando na página da esquerda, volta uma (e, na primeira, o passaporte fecha na capa).
+		// Os campos, os carimbos e os botões continuam funcionando normalmente
+		function ladoDoClique(e) {
+			var r = livro.getBoundingClientRect();
+			return e.clientX < r.left + r.width / 2 ? 'esquerda' : 'direita';
+		}
 		livro.addEventListener('click', function (e) {
 			if (!aberto || frente.contains(e.target)) return;
-			if (e.target.closest('input, button, a, .pp-carimbo')) return;
-			if (!celular()) virar(!virado);
+			/* em cima dos carimbos também vira: só os campos, os botões e os links ficam de fora */
+			if (e.target.closest('input, button, a')) return;
+			if (celular()) return;
+			if (ladoDoClique(e) === 'direita') { if (!virado) virar(true); }
+			else if (virado) virar(false);
+			else fecharCapa();
 		});
+		/* a setinha do mouse mostra para que lado a página vai virar */
+		livro.addEventListener('mousemove', function (e) {
+			if (!aberto || celular()) { livro.removeAttribute('data-lado'); return; }
+			var lado = ladoDoClique(e);
+			if (lado === 'direita' && virado) livro.removeAttribute('data-lado');
+			else livro.setAttribute('data-lado', lado);
+		});
+		livro.addEventListener('mouseleave', function () { livro.removeAttribute('data-lado'); });
 		// clicando fora do passaporte: primeiro ele fecha; com ele já fechado, a aba de documentos fecha
 		aoClicarFora = fecharCapa;
 		frente.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); abrirCapa(); } });
@@ -1687,7 +1703,7 @@
 
 	// ---------- Carteira de piloto ----------
 	// Uma carteira de habilitação (do tamanho de um cartão), com a foto de quem pilota e a
-	// foto do modelo da nave. Clicando, ela vira e mostra as categorias e observações.
+	// foto do modelo da nave. Só a frente: ela não vira.
 	// "foto" do modelo: a Millennium Falcon em pixel art, vista de frente e de lado (três quartos),
 	// como a foto da maquete do museu. O modelo 3D da nave fica em nave.js (é o mesmo das
 	// transições, só que de outro ângulo); aqui entram o fundo neutro e a sombra embaixo.
@@ -1720,7 +1736,7 @@
 		var emissao = datas[0] ? dataBonita(datas[0]).toUpperCase() : dataBonita(new Date().toISOString()).toUpperCase();
 		var registro = 'CNH-' + numeroDe(d).slice(2);
 		w.innerHTML =
-			'<div class="cnh-cartao" role="button" tabindex="0" aria-label="Carteira de piloto. Clique para virar.">' +
+			'<div class="cnh-cartao" role="group" aria-label="' + TR('Carteira de piloto', 'Pilot license') + '">' +
 				'<div class="cnh-face cnh-frente">' +
 					// enfeites: órbitas pontilhadas com um planetinha, Saturno no canto, chip, faixa holográfica e microtexto
 					'<span class="cnh-orbitas" aria-hidden="true"><i></i><i></i><b></b></span>' +
@@ -1749,58 +1765,16 @@
 					'<span class="cnh-chip" aria-hidden="true"></span>' +
 					'<p class="cnh-micro" aria-hidden="true">' + new Array(9).join(TR('VIA LÁCTEA ✦ PX-01 ✦ PILOTO HABILITADO ✦ ', 'MILKY WAY ✦ PX-01 ✦ LICENSED PILOT ✦ ')) + '</p>' +
 				'</div>' +
-				'<div class="cnh-face cnh-verso">' +
-					'<span class="cnh-orbitas" aria-hidden="true"><i></i><i></i><b></b></span>' +
-					'<p class="cnh-micro" aria-hidden="true">' + new Array(9).join(TR('DEPARTAMENTO DE TRÂNSITO INTERESTELAR ✦ ', 'INTERSTELLAR TRAFFIC DEPARTMENT ✦ ')) + '</p>' +
-					'<header class="cnh-topo cnh-topo-verso"><strong>' + TR('Categorias', 'Categories') + '</strong><span>' + TR('Classes de nave que você pode pilotar', 'Ship classes you may fly') + '</span></header>' +
-					'<table class="cnh-categorias">' +
-						'<thead><tr><th>Cat.</th><th>' + TR('Veículo', 'Vehicle') + '</th><th>' + TR('Habilitado(a)', 'Licensed') + '</th></tr></thead>' +
-						'<tbody>' +
-							'<tr><td>A</td><td>' + TR('Cápsulas e módulos de pouso', 'Capsules and landers') + '</td><td>' + TR('Sim', 'Yes') + '</td></tr>' +
-							'<tr><td>B</td><td>' + TR('Naves de passeio', 'Pleasure craft') + '</td><td>' + TR('Sim', 'Yes') + '</td></tr>' +
-							'<tr><td>C</td><td>' + TR('Cargueiros leves (YT-1300)', 'Light freighters (YT-1300)') + '</td><td>' + TR('Sim', 'Yes') + '</td></tr>' +
-							'<tr><td>L</td><td>' + TR('Saltos na velocidade da luz', 'Jumps at the speed of light') + '</td><td>' + TR('Sim', 'Yes') + '</td></tr>' +
-							'<tr class="nao"><td>X</td><td>' + TR('Naves de batalha', 'Battleships') + '</td><td>' + TR('Não', 'No') + '</td></tr>' +
-						'</tbody>' +
-					'</table>' +
-					'<p class="cnh-obs">' + TR('<b>Observações:</b> apto(a) a pilotar em cinturões de asteroides. Proibido estacionar perto de buracos negros. Uso obrigatório do cinto em saltos para o hiperespaço.', '<b>Notes:</b> fit to fly through asteroid belts. No parking near black holes. Seat belt required for jumps to hyperspace.') + '</p>' +
-					'<div class="cnh-verso-rodape"><span class="cnh-codigo" aria-hidden="true"></span><div class="cnh-autoridade"><span>C. Órion</span><small>' + TR('Autoridade emissora', 'Issuing authority') + '</small></div></div>' +
-				'</div>' +
-			'</div>' +
-			'<p class="cnh-dica">' + TR('Clique na carteira para virar', 'Click the license to flip it') + '</p>';
+			'</div>';
 		w.querySelector('.cnh-nome').textContent = d.nome || TR('Piloto sem nome', 'Nameless pilot');
 		w.querySelector('.cnh-assinatura-nome').textContent = d.nome || '';
 		w.querySelector('.cnh-registro').textContent = registro;
 		desenharFoto(w.querySelector('.cnh-foto canvas'));
 		fotoDaNave(w.querySelector('.cnh-modelo canvas'));
 		w.querySelector('.cnh-brasao').appendChild(novoCarimbo(BRASAO, 'cnh-brasao-tela', null));
-		// código de barras em pixels, tirado do número de registro
-		var codigo = w.querySelector('.cnh-codigo'), s = hashTexto(registro);
-		for (var i = 0; i < 46; i++) {
-			var barra = document.createElement('i');
-			barra.style.width = (sorte(i, 1, s) < 0.5 ? 1 : sorte(i, 2, s) < 0.7 ? 2 : 3) + 'px';
-			codigo.appendChild(barra);
-		}
 		var cartao = w.querySelector('.cnh-cartao');
 		var holo = hologramaDaNave();
 		cartao.insertAdjacentElement('afterend', holo);
-		// virando: primeiro o holograma desliga (a nave encolhe, o feixe recolhe, o projetor apaga)
-		// e só depois a carteira gira; desvirando: a carteira gira de volta e só então o holograma
-		// liga de novo, em etapas. Cliques no meio da animação esperam ela acabar.
-		var DESLIGA = calmo ? 0 : 380, GIRA = calmo ? 0 : 800, ocupado = false;
-		function virar() {
-			if (ocupado) return;
-			ocupado = true;
-			if (!cartao.classList.contains('virada')) {
-				holo.classList.add('desligada');
-				setTimeout(function () { cartao.classList.add('virada'); setTimeout(function () { ocupado = false; }, GIRA); }, DESLIGA);
-			} else {
-				cartao.classList.remove('virada');
-				setTimeout(function () { holo.classList.remove('desligada'); ocupado = false; }, GIRA);
-			}
-		}
-		cartao.addEventListener('click', virar);
-		cartao.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); virar(); } });
 		return w;
 	}
 
