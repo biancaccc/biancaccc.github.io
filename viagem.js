@@ -578,6 +578,13 @@
 			? '<a class="botao-hud" href="' + d.href + '">' + T('Viajar para lá', 'Travel there') + ' &rarr;</a>'
 			: '<p class="cartao-dica">' + T('Clique no destino para viajar', 'Click the destination to travel') + '</p>');
 		cartao.classList.add('aberto');
+		/* em telas baixas, o cartão chega até o rádio (e, no celular, até o botão da linha do tempo):
+		   enquanto ele está aberto, o que fica embaixo dele some */
+		var rc = cartao.getBoundingClientRect();
+		document.querySelectorAll('.radio-doca, .botao-linha').forEach(function (el) {
+			var r = el.getBoundingClientRect();
+			el.classList.toggle('sob-cartao', rc.top < r.bottom + 8 && rc.bottom > r.top - 8 && rc.right > r.left && rc.left < r.right);
+		});
 		var ir = cartaoCorpo.querySelector('a');
 		if (ir) ir.addEventListener('click', function (ev) {
 			if (ev.ctrlKey || ev.metaKey || ev.shiftKey) return;
@@ -591,6 +598,7 @@
 		selecionado = null;
 		DESTINOS.forEach(function (o) { o.botao.classList.remove('ativo'); });
 		cartao.classList.remove('aberto');
+		document.querySelectorAll('.sob-cartao').forEach(function (el) { el.classList.remove('sob-cartao'); });
 	}
 
 	function posicionarMarcadores() {
@@ -622,6 +630,8 @@
 		var ocupados = [], visiveis = DESTINOS.filter(function (d) { return d.tela && getComputedStyle(d.botao).opacity !== '0'; });
 		// os marcadores (as miras) ocupam o lugar deles
 		visiveis.forEach(function (d) { ocupados.push([d.tela[0] - 13, d.tela[1] - 13, d.tela[0] + 13, d.tela[1] + 13, d]); });
+		/* na escala real, a lupa dos vizinhos do Sol também ocupa o lugar dela */
+		if (escalaReal && lupa && !celular) { var rl = lupa.getBoundingClientRect(); if (rl.width) ocupados.push([rl.left - 6, rl.top - 6, rl.right + 6, rl.bottom + 6, null]); }
 		function sobra(r, dono) {
 			var area = 0;
 			ocupados.forEach(function (o) {

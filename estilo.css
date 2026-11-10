@@ -1469,7 +1469,12 @@ body.viagem {
 	cursor: pointer;
 	transform: translate(-4px, -50%); /* o ponto (8px) fica bem em cima da posição */
 }
-.lupa-destino i { width: 8px; height: 8px; flex: none; background: var(--cor-destino); box-shadow: 0 0 6px var(--cor-destino); }
+.lupa-destino i { position: relative; z-index: 2; width: 8px; height: 8px; flex: none; background: var(--cor-destino); box-shadow: 0 0 6px var(--cor-destino); }
+/* só o ponto e o nome recebem o mouse (o resto do botão deixa passar), e os pontos ficam por cima
+   dos nomes: assim um nome nunca cobre o ponto de outro destino que está pertinho */
+.lupa-destino { pointer-events: none; }
+.lupa-destino i, .lupa-destino span { pointer-events: auto; }
+.lupa-destino i::before { content: ""; position: absolute; inset: -5px; }
 /* o nome com a distância embaixo, à direita do ponto (padrão), à esquerda, em cima ou embaixo */
 .lupa-destino span { display: grid; gap: 1px; font-family: var(--rotulo); white-space: nowrap; color: var(--cor-destino); text-shadow: 0 0 4px #05030c, 0 0 3px #05030c, 0 0 2px #05030c; }
 .lupa-destino b { font-weight: 400; font-size: 11px; line-height: 1.1; }
@@ -3995,19 +4000,16 @@ body.viagem:not(.na-galaxia) .radio-doca, .galaxia.partindo ~ .radio-doca { disp
 /* ---------- Mapa da Via Láctea: controles nas bordas, para não cobrir a galáxia ---------- */
 @media (min-width: 701px) {
 	/* na lateral direita, embaixo do passaporte e da linha do tempo: a chave Ilustrativo /
-	   Escala real (em pé), o rádio e, na escala real, a lupa dos vizinhos do Sol. O cartão do
-	   destino continua embaixo, à direita; só na escala real (quando a lupa ocupa a direita e os
-	   vizinhos do Sol saem do mapa) ele passa para a esquerda, que fica vazia */
+	   Escala real (em pé) e o rádio. Na escala real, a lupa dos vizinhos do Sol fica na
+	   esquerda, embaixo do título (assim o rádio não cobre a lupa), e o cartão do destino
+	   continua no lugar de sempre, embaixo à direita */
 	body.viagem .radio-doca { left: auto; right: 56px; top: 314px; bottom: auto; transform: none; align-items: flex-end; }
 	.escala { left: auto; right: 56px; top: 186px; bottom: auto; flex-direction: column; align-items: flex-end; gap: 12px; }
-	.lupa-sol { left: auto; right: 56px; }
-	.galaxia.escala-real .cartao-destino { right: auto; left: 56px; bottom: 96px; }
+	.lupa-sol { left: 56px; right: auto; top: 196px; bottom: auto; width: clamp(200px, calc(100vh - 440px), 290px); }
 	.escala-botao { flex-direction: column; }
 	.escala-botao::before { left: 3px; right: 3px; top: 3px; bottom: auto; width: auto; height: calc(50% - 3px); }
 	.escala-botao[aria-pressed="true"]::before { transform: translateY(100%); }
 	.escala-botao span { min-width: 0; width: 100%; justify-content: flex-start; padding: 8px 12px; }
-	/* a lupa da região do Sol desce para o canto de baixo */
-	.lupa-sol { bottom: 84px; }
 }
 
 /* ---------- Sistema Solar: a beirada do Sol entrando pela esquerda, na escala dos planetas ---------- */
@@ -4629,3 +4631,9 @@ html.aproximando, html.aproximando body { overflow: hidden; }
 	.aprox-voltar { left: 12px; top: 12px; }
 }
 @media (prefers-reduced-motion: reduce) { .aprox, .aprox * { transition: none !important; } }
+
+/* com o cartão do destino aberto por cima deles, o rádio e o botão da linha do tempo somem
+   (e voltam quando o cartão fecha) */
+.radio-doca { transition: opacity 0.3s ease; }
+.botao-linha { transition: transform 0.25s ease, border-color 0.25s ease, opacity 0.3s ease; }
+.radio-doca.sob-cartao, .botao-linha.sob-cartao { opacity: 0; pointer-events: none; }
