@@ -1466,6 +1466,43 @@
 				R(c, vx - 4 * esc, vy - 1, 8 * esc, 2 * esc, '#2a2a3e'); R(c, vx - 2 * esc, vy - 2, 4 * esc, 1, '#5a5e7a');
 				R(c, vx + ida * 4 * esc, vy, 1, 1, '#ffffff'); R(c, vx - ida * 4 * esc, vy, 1, 1, '#ff3a3a');
 			}
+			// o spinner da polícia (Blade Runner): de vez em quando ele desce devagar pela rua, da direita
+			// para a esquerda, com o giroflex piscando azul e vermelho e o holofote varrendo o chão
+			var cicloSp = 28, us = ((t + 9) % cicloSp) / 11;
+			if (us < 1) {
+				/* (desenhado em escala 2, alto no céu, descendo um pouco enquanto cruza) */
+				var esc2 = 2, gx = NUCLEO + OX + 60 - us * (W + 140), gy = 34 + us * 22 + Math.sin(t * 2.2) * 1.5;
+				c.save(); c.translate(Math.round(gx), Math.round(gy)); c.scale(esc2, esc2);
+				var sx = 0, sy = 0;
+				/* o facho do holofote, descendo até a rua e balançando */
+				c.save(); c.globalCompositeOperation = 'lighter'; c.globalAlpha = 0.09; c.fillStyle = '#d8ecff';
+				var fx = sx - 4 + Math.sin(t * 1.3) * 18;
+				var chaoL = (214 - gy) / esc2;
+				c.beginPath(); c.moveTo(sx - 6, sy + 5); c.lineTo(fx - 16, chaoL); c.lineTo(fx + 8, chaoL); c.lineTo(sx - 2, sy + 5); c.fill();
+				c.globalAlpha = 0.14; c.beginPath(); c.ellipse(fx - 4, chaoL, 12, 2, 0, 0, Math.PI * 2); c.fill();
+				c.restore(); c.globalAlpha = 1;
+				/* o brilho dos propulsores embaixo e o rastro */
+				for (var rr = 1; rr < 10; rr++) P(c, sx + 18 + rr * 2, sy + 2, rr < 4 ? 'rgba(255,184,120,0.55)' : 'rgba(255,90,140,0.22)');
+				R(c, sx - 8, sy + 5, 4, 1, Math.sin(t * 20) > 0 ? '#ffb070' : '#ff7a3a'); R(c, sx + 10, sy + 5, 4, 1, Math.sin(t * 20 + 1) > 0 ? '#ffb070' : '#ff7a3a');
+				/* o corpo em cunha: o nariz baixo à esquerda, a traseira alta à direita, com as aletas */
+				R(c, sx - 16, sy + 1, 36, 4, '#22242f'); R(c, sx - 18, sy + 2, 2, 2, '#22242f'); P(c, sx - 19, sy + 3, '#22242f');
+				R(c, sx - 16, sy + 1, 36, 1, '#5a5e72'); R(c, sx - 14, sy + 4, 32, 1, '#14151e');
+				R(c, sx + 14, sy - 2, 6, 3, '#22242f'); R(c, sx + 14, sy - 2, 6, 1, '#4a4e62'); P(c, sx + 20, sy - 3, '#22242f');
+				/* a faixa lateral com POLICE em pixels miudinhos */
+				R(c, sx - 10, sy + 3, 22, 1, '#c8ccd8');
+				for (var lp = 0; lp < 5; lp++) P(c, sx - 6 + lp * 3, sy + 3, '#1a1c28');
+				/* a cabine de vidro, com o reflexo da cidade */
+				R(c, sx - 8, sy - 2, 14, 3, '#3a5a8e'); R(c, sx - 6, sy - 3, 10, 1, '#4a72aa');
+				R(c, sx - 6, sy - 2, 3, 1, '#9ad8ff'); P(c, sx + 2, sy - 1, '#ff8ac8');
+				/* o giroflex no teto, azul e vermelho alternando, com o clarão em volta */
+				var azul = Math.floor(t * 6) % 2;
+				R(c, sx - 3, sy - 4, 2, 1, azul ? '#4a9aff' : '#2a2a3e'); R(c, sx + 1, sy - 4, 2, 1, azul ? '#2a2a3e' : '#ff3a4a');
+				c.save(); c.globalCompositeOperation = 'lighter'; c.globalAlpha = 0.22; c.fillStyle = azul ? '#3a7aff' : '#ff2a3a';
+				c.beginPath(); c.ellipse(sx + (azul ? -2 : 2), sy - 4, 9, 6, 0, 0, Math.PI * 2); c.fill(); c.restore(); c.globalAlpha = 1;
+				/* o farol branco no nariz */
+				P(c, sx - 19, sy + 2, '#ffffff'); for (var ff = 1; ff < 7; ff++) P(c, sx - 19 - ff, sy + 2, 'rgba(255,255,240,' + (0.5 - ff * 0.07) + ')');
+				c.restore();
+			}
 			// as janelas dos apartamentos: a TV piscando de cor, o monitor rolando e os peixinhos do aquário
 			JANELAS.forEach(function (jn, ij) {
 				if (jn.tipo === 'tv') { var cena2 = Math.floor(t * 0.8 + ij) % 4; R(c, jn.x, jn.y, 3, 2, ['#5ab8ff', '#ff8a5a', '#8aff9a', '#ffe08a'][cena2]); if (Math.sin(t * 9 + ij) > 0.6) R(c, jn.x, jn.y, 3, 2, 'rgba(255,255,255,0.4)'); }
@@ -2335,6 +2372,14 @@
 		[13, 15].forEach(function (yy) { for (var xx = 16; xx < JL - 4; xx++) if (xx % 7 !== 6) P2(xx, yy, '#a49a86'); });
 		// um pingo de chuva molhando a ponta
 		mistura(ox + JL - 6, oy + JA - 3, '#8ab0e8', 0.5); mistura(ox + JL - 5, oy + JA - 3, '#8ab0e8', 0.4);
+		// e, logo ao lado, um unicórnio de origami de papel prateado, esquecido no chão (Blade Runner)
+		/* (o: contorno escuro, para o papel prateado aparecer no piso claro; h: o chifre dourado) */
+		var UNI = [
+			'.....o..........', '....oho.........', '....oho.........', '...oaho.........', '..oaabbo........', '.oaabbbco.......',
+			'oaabo.bbcoooooo.', 'oabo..obaaaaaabco', '.oo...obaaabbbcco', '......obco..obbco', '......obo....obo.', '......oco....oco.', '......ooo....ooo.'];
+		var COR_UNI = { o: '#3a3e52', h: '#f0c850', a: '#ffffff', b: '#c8ccdc', c: '#8a8ea4' }, ux = ox - 20, uy = oy + JA - UNI.length - 1;
+		for (var sxu = 0; sxu < 16; sxu++) { mistura(ux + sxu + 2, uy + UNI.length, '#3a3e4a', 0.4); mistura(ux + sxu + 3, uy + UNI.length + 1, '#3a3e4a', 0.2); }
+		UNI.forEach(function (lin, j) { for (var i = 0; i < lin.length; i++) if (lin[i] !== '.') px(ux + i, uy + j, COR_UNI[lin[i]]); });
 	}
 	// onde fica o jornal na tela (para o clique)
 	function areaJornal(C) {
