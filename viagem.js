@@ -607,6 +607,7 @@
 			d.botao.style.transform = 'translate(' + (p[0] * P) + 'px,' + (p[1] * P) + 'px)';
 			d.tela = [p[0] * P, p[1] * P];
 		});
+		if (vizinhanca && SOL_DESTINO.tela) vizinhanca.style.transform = 'translate(' + SOL_DESTINO.tela[0] + 'px,' + SOL_DESTINO.tela[1] + 'px)';
 		arrumarNomes();
 		// régua: quantos pixels da tela valem 10.000 anos-luz agora
 		if (escalaReal) {
@@ -630,8 +631,12 @@
 		var ocupados = [], visiveis = DESTINOS.filter(function (d) { return d.tela && getComputedStyle(d.botao).opacity !== '0'; });
 		// os marcadores (as miras) ocupam o lugar deles
 		visiveis.forEach(function (d) { ocupados.push([d.tela[0] - 13, d.tela[1] - 13, d.tela[0] + 13, d.tela[1] + 13, d]); });
-		/* na escala real, a lupa dos vizinhos do Sol também ocupa o lugar dela */
-		if (escalaReal && lupa && !celular) { var rl = lupa.getBoundingClientRect(); if (rl.width) ocupados.push([rl.left - 6, rl.top - 6, rl.right + 6, rl.bottom + 6, null]); }
+		/* na escala real, o anel da vizinhança do Sol (e o nome dele) também ocupa o lugar dele */
+		if (escalaReal && vizinhanca && !celular) {
+			[vizinhanca.querySelector('.viz-anel'), vizinhanca.querySelector('.viz-nome')].forEach(function (e) {
+				var rv = e.getBoundingClientRect(); if (rv.width) ocupados.push([rv.left - 4, rv.top - 4, rv.right + 4, rv.bottom + 4, null]);
+			});
+		}
 		function sobra(r, dono) {
 			var area = 0;
 			ocupados.forEach(function (o) {
@@ -710,7 +715,49 @@
 	});
 	galaxia.appendChild(lupa);
 
+	// ---------- O mergulho no Sol ----------
+	// Na escala real, os vizinhos do Sol ficam tão perto dele que somem no mapa. Em vez de um
+	// quadro fixo, eles viram um anel em volta do Sol ("Vizinhança do Sol"); clicando no anel,
+	// a câmera mergulha até lá e o mapa dos vizinhos aparece grande no meio da tela.
+	var SOL_DESTINO = DESTINOS.filter(function (d) { return d.id === 'sistema'; })[0];
+	var ZOOM_MERGULHO = 3.2, mergulho = null;
+	var locais = DESTINOS.filter(function (d) { return d.local; });
+	var vizinhanca = document.createElement('button');
+	vizinhanca.type = 'button';
+	vizinhanca.className = 'vizinhanca';
+	vizinhanca.setAttribute('aria-label', T('Vizinhança do Sol: ' + locais.length + ' destinos. Mergulhar até lá', 'The Sun\u2019s neighborhood: ' + locais.length + ' destinations. Dive in'));
+	/* os vizinhos dando voltas no anel, cada um com a sua cor */
+	vizinhanca.innerHTML = '<span class="viz-anel" aria-hidden="true">' + locais.map(function (d, i) {
+		return '<i style="--cor-destino:' + d.cor + ';--i:' + i + ';--n:' + locais.length + '"></i>';
+	}).join('') + '</span><span class="viz-nome"><b>' + T('Vizinhança do Sol', 'The Sun\u2019s neighborhood') + '</b><small>' + locais.length + T(' destinos · clique para mergulhar', ' destinations · click to dive in') + '</small></span>';
+	camadaMarcadores.insertBefore(vizinhanca, camadaMarcadores.firstChild);
+	vizinhanca.addEventListener('click', mergulhar);
+	var voltarMergulho = document.createElement('button');
+	voltarMergulho.type = 'button';
+	voltarMergulho.className = 'mergulho-voltar';
+	voltarMergulho.innerHTML = '&larr; ' + T('Voltar à galáxia inteira', 'Back to the whole galaxy');
+	voltarMergulho.addEventListener('click', emergir);
+	galaxia.appendChild(voltarMergulho);
+	function mergulhar() {
+		if (mergulho || cena !== 'galaxia') return;
+		esconderCartao();
+		mergulho = { ida: true, inicio: performance.now() };
+		galaxia.classList.add('mergulhando');
+		setTimeout(function () { if (mergulho && mergulho.ida) { galaxia.classList.add('mergulhado'); voltarMergulho.focus({ preventScroll: true }); } }, calmo ? 0 : 1100);
+	}
+	function emergir() {
+		if (!mergulho || !mergulho.ida) return;
+		esconderCartao();
+		/* volta do ponto onde a ida parou (se a pessoa voltou no meio do caminho) */
+		var feito = calmo ? 1 : suave((performance.now() - mergulho.inicio) / 1300);
+		mergulho = { ida: false, inicio: performance.now() - (1 - feito) * 1300 };
+		galaxia.classList.remove('mergulhado');
+		setTimeout(function () { galaxia.classList.remove('mergulhando'); vizinhanca.focus({ preventScroll: true }); }, calmo ? 0 : 900);
+	}
+	document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && mergulho && mergulho.ida) emergir(); });
+
 	botaoEscala.addEventListener('click', function () {
+		if (mergulho) { mergulho = null; cam.x = 0; cam.y = 0; galaxia.classList.remove('mergulhado', 'mergulhando'); }
 		escalaReal = !escalaReal;
 		if (calmo) kReal = escalaReal ? 1 : 0;
 		botaoEscala.setAttribute('aria-pressed', escalaReal ? 'true' : 'false');
@@ -754,6 +801,8 @@
 		if (cena === 'partida') return;
 		if (calmo) { location.href = d.href; return; }
 		destinoPartida = d;
+		mergulho = null;
+		galaxia.classList.remove('mergulhado');
 		var q = posAtual(d.local && escalaReal ? DESTINOS[3] : d), p = projetar(q[0], q[1], q[2]);
 		partidaDe ={ x: cam.x, y: cam.y, zoom: cam.zoom, alvoX: p[2], alvoY: p[3], d: d };
 		inicioSaltoDestino = 0;
@@ -833,6 +882,19 @@
 					cam.zoom = ZOOM_SALTO_FIM + (1 - ZOOM_SALTO_FIM) * qc;
 					cam.y = alturaDoFuro(ZOOM_SALTO_FIM) * (1 - qc);
 				} else cam.zoom = 1 + 3 * Math.pow(1 - suave(tc / 1.8), 2);
+			}
+			/* o mergulho no Sol (escala real): a câmera vai até o Sol e aproxima; na volta, desfaz */
+			if (cena === 'galaxia' && mergulho) {
+				var um = calmo ? 1 : suave((agora - mergulho.inicio) / 1300);
+				if (!mergulho.ida) um = 1 - um;
+				var qs = posAtual(SOL_DESTINO), ps = projetar(qs[0], qs[1], qs[2]);
+				cam.zoom = 1 + (ZOOM_MERGULHO - 1) * um;
+				/* o Sol termina bem atrás do mapa dos vizinhos (no computador, ele fica à esquerda do cartão) */
+				var Sm = escalaGalaxia() * cam.zoom, tx = window.innerWidth > 700 ? (window.innerWidth - 436) / 2 : window.innerWidth / 2;
+				cam.x = (ps[2] - (tx / P - W / 2) / Sm) * um;
+				cam.y = (ps[3] - (H / 2 - H * 0.54) / Sm) * um;
+				ultimaGalaxia = 0;
+				if (!mergulho.ida && um <= 0) { mergulho = null; cam.x = 0; cam.y = 0; }
 			}
 			if (cena === 'partida') {
 				// a câmera segue a nave: ela fica no mesmo lugar da tela e a galáxia vem crescendo,

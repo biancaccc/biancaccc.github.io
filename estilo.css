@@ -1435,7 +1435,7 @@ body.viagem {
 	transform: translateY(8px);
 	transition: opacity 0.4s ease, transform 0.4s ease, visibility 0s linear 0.4s;
 }
-.galaxia.escolhendo.escala-real .lupa-sol { opacity: 1; visibility: visible; transform: none; transition: opacity 0.5s ease 0.6s, transform 0.5s ease 0.6s, visibility 0s; }
+.galaxia.escolhendo.mergulhado .lupa-sol { opacity: 1; visibility: visible; transform: translate(-50%, -50%); transition: opacity 0.5s ease, transform 0.5s ease, visibility 0s; }
 .lupa-titulo { margin: 0 0 6px; font-family: var(--rotulo); font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--hud); }
 .lupa-titulo small { margin-left: 6px; font-size: inherit; color: rgba(127, 227, 255, 0.5); text-transform: none; letter-spacing: 0.04em; }
 .lupa-mapa { position: relative; aspect-ratio: 1; }
@@ -4005,7 +4005,6 @@ body.viagem:not(.na-galaxia) .radio-doca, .galaxia.partindo ~ .radio-doca { disp
 	   continua no lugar de sempre, embaixo à direita */
 	body.viagem .radio-doca { left: auto; right: 56px; top: 314px; bottom: auto; transform: none; align-items: flex-end; }
 	.escala { left: auto; right: 56px; top: 186px; bottom: auto; flex-direction: column; align-items: flex-end; gap: 12px; }
-	.lupa-sol { left: 56px; right: auto; top: 196px; bottom: auto; width: clamp(200px, calc(100vh - 440px), 290px); }
 	.escala-botao { flex-direction: column; }
 	.escala-botao::before { left: 3px; right: 3px; top: 3px; bottom: auto; width: auto; height: calc(50% - 3px); }
 	.escala-botao[aria-pressed="true"]::before { transform: translateY(100%); }
@@ -4638,3 +4637,52 @@ html.aproximando, html.aproximando body { overflow: hidden; }
 .botao-linha { transition: transform 0.25s ease, border-color 0.25s ease, opacity 0.3s ease; }
 .radio-doca.sob-cartao, .botao-linha.sob-cartao { opacity: 0; visibility: hidden; pointer-events: none; }
 /* (o botão da linha do tempo tem a animação de surgir, que segura a opacidade: por isso o visibility) */
+
+/* ---------- O mergulho no Sol (escala real da galáxia) ---------- */
+/* o anel da vizinhança do Sol: só na escala real, em volta do marcador do Sistema Solar */
+.vizinhanca { position: absolute; left: 0; top: 0; width: 50px; height: 50px; margin: -25px 0 0 -25px; padding: 0; font: inherit; background: none; border: 0; cursor: pointer; pointer-events: auto; opacity: 0; visibility: hidden; transition: opacity 0.6s ease, visibility 0s linear 0.6s; will-change: transform; }
+.galaxia.escala-real .vizinhanca { opacity: 1; visibility: visible; transition: opacity 0.8s ease 0.9s, visibility 0s; }
+.viz-anel { position: absolute; inset: 0; border: 1px dashed rgba(255, 211, 106, 0.6); border-radius: 50%; box-shadow: 0 0 18px rgba(255, 211, 106, 0.18), inset 0 0 18px rgba(255, 211, 106, 0.12); animation: viz-gira 40s linear infinite; }
+.viz-anel i { position: absolute; left: 50%; top: 50%; width: 5px; height: 5px; margin: -2.5px 0 0 -2.5px; background: var(--cor-destino); box-shadow: 0 0 6px var(--cor-destino); transform: rotate(calc(360deg / var(--n) * var(--i))) translateX(25px); }
+@keyframes viz-gira { to { transform: rotate(360deg); } }
+.viz-nome { position: absolute; left: 50%; top: calc(100% + 8px); transform: translateX(-50%); display: grid; justify-items: center; gap: 2px; white-space: nowrap; }
+.viz-nome b { padding: 3px 8px; font-family: var(--titulo); font-size: 13px; font-weight: 400; letter-spacing: 0.06em; color: #ffe9a8; background: rgba(5, 3, 12, 0.72); border-bottom: 2px solid #ffd36a; }
+.viz-nome small { max-height: 0; overflow: hidden; opacity: 0; transition: opacity 0.2s ease, max-height 0.2s ease; font-family: var(--rotulo); font-size: 9px; letter-spacing: 0.08em; text-transform: uppercase; color: rgba(255, 233, 168, 0.75); text-shadow: 0 0 4px #05030c, 0 0 2px #05030c; }
+.vizinhanca:hover .viz-anel, .vizinhanca:focus-visible .viz-anel { border-style: solid; border-color: #ffd36a; box-shadow: 0 0 24px rgba(255, 211, 106, 0.45), inset 0 0 22px rgba(255, 211, 106, 0.25); }
+.vizinhanca:hover .viz-nome b, .vizinhanca:focus-visible .viz-nome b { color: #05030c; background: #ffd36a; }
+/* o "clique para mergulhar" só aparece com o mouse em cima (o mapa fica mais limpo) */
+.vizinhanca:hover .viz-nome small, .vizinhanca:focus-visible .viz-nome small { max-height: 2em; opacity: 1; }
+.vizinhanca:focus-visible { outline: none; }
+/* mergulhando: o mapa fica só com a galáxia, que cresce até o Sol */
+.galaxia.mergulhando .marcadores,
+.galaxia.mergulhando .galaxia-topo,
+.galaxia.mergulhando .escala,
+.galaxia.mergulhando .nota-mapa,
+.galaxia.mergulhando .rever,
+.galaxia.mergulhando .botao-linha { opacity: 0 !important; visibility: hidden; pointer-events: none; transition: opacity 0.4s ease, visibility 0s linear 0.4s; }
+.galaxia::before { content: ""; position: fixed; inset: 0; pointer-events: none; opacity: 0; transition: opacity 0.8s ease;
+	background: radial-gradient(circle at 50% 50%, rgba(5, 3, 12, 0.55), rgba(5, 3, 12, 0.88) 60%); }
+.galaxia.mergulhado::before { opacity: 1; }
+/* o mapa dos vizinhos, grande, no meio da tela */
+.galaxia .lupa-sol { z-index: 2; }
+.galaxia.mergulhado .cartao-destino { z-index: 4; }
+.galaxia.mergulhado .lupa-sol { left: 50% !important; top: 50% !important; right: auto !important; bottom: auto !important; width: min(560px, 88vw, calc(100vh - 230px)) !important; padding: 16px 20px 14px; background: rgba(8, 6, 20, 0.7); border-color: rgba(255, 211, 106, 0.35); }
+/* no computador, o mapa fica no meio do espaço que sobra à esquerda do cartão do destino (que aparece embaixo à direita) */
+@media (min-width: 701px) { .galaxia.mergulhado .lupa-sol { left: calc((100vw - 436px) / 2) !important; } }
+.galaxia.mergulhado .lupa-titulo { font-size: 14px; text-align: center; color: #ffe9a8; }
+.galaxia.mergulhado .lupa-destino b { font-size: 14px; }
+.galaxia.mergulhado .lupa-destino small { font-size: 11px; }
+.galaxia.mergulhado .lupa-destino i { width: 11px; height: 11px; }
+.galaxia.mergulhado .lupa-centro, .galaxia.mergulhado .lupa-sol-ponto { font-size: 12px; }
+.galaxia.mergulhado .lupa-mapa text { font-size: 9px; }
+.galaxia.mergulhado .lupa-legenda { display: block; font-size: 13px; text-align: center; }
+.mergulho-voltar { position: absolute; z-index: 3; left: 56px; top: 44px; padding: 10px 16px 11px; font-family: var(--rotulo); font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: #ffe9a8; background: rgba(5, 3, 12, 0.75); border: 1px solid rgba(255, 211, 106, 0.45); cursor: pointer; opacity: 0; visibility: hidden; transition: opacity 0.4s ease, visibility 0s linear 0.4s, border-color 0.2s, color 0.2s; }
+.galaxia.mergulhado .mergulho-voltar { opacity: 1; visibility: visible; transition: opacity 0.5s ease 0.2s, visibility 0s; }
+.mergulho-voltar:hover, .mergulho-voltar:focus-visible { color: #fff; border-color: #ffd36a; outline: none; }
+@media (max-width: 700px) {
+	.mergulho-voltar { left: 50%; top: auto; bottom: 34px; transform: translateX(-50%); white-space: nowrap; font-size: 11px; }
+	.galaxia.mergulhado .lupa-sol { width: calc(100vw - 24px) !important; padding: 12px 10px 10px; }
+	.galaxia.mergulhado .lupa-destino b { font-size: 11px; }
+	.galaxia.mergulhado .lupa-destino small { font-size: 9px; }
+}
+@media (prefers-reduced-motion: reduce) { .viz-anel { animation: none; } }
