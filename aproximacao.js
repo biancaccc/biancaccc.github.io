@@ -34,7 +34,6 @@
 	var NOMES = { terra: T('Terra', 'Earth'), jupiter: T('Júpiter', 'Jupiter'), saturno: T('Saturno', 'Saturn'), urano: T('Urano', 'Uranus'), netuno: T('Netuno', 'Neptune') };
 	var LEMAS = { terra: T('O planeta azul', 'The blue planet'), jupiter: T('O rei dos planetas', 'The king of the planets'), saturno: T('O senhor dos anéis', 'The lord of the rings'), urano: T('O planeta deitado', 'The planet lying on its side'), netuno: T('O planeta encontrado pela matemática', 'The planet found by mathematics') };
 
-	var NS = 'http://www.w3.org/2000/svg';
 	var camada = null, estado = null;
 
 	/* clicando num planeta com luas (na imagem, no nome embaixo ou no botão do quadro de informações),
@@ -54,28 +53,29 @@
 
 	function aproximar(id) {
 		if (estado) return;
-		var S = SISTEMAS[id], origem = sistema.querySelector('.astro[data-id="' + id + '"] img');
+		/* (o planeta pequeno do sistema pode ser a imagem ou a animação que entra no lugar dela: balanco.js) */
+		var S = SISTEMAS[id], origem = sistema.querySelector('.astro[data-id="' + id + '"] .planeta');
 		var nomeP = NOMES[id];
 		camada = el('div', 'aprox');
 		camada.setAttribute('role', 'dialog');
 		camada.setAttribute('aria-modal', 'true');
 		camada.setAttribute('aria-label', T('Perto de ', 'Close to ') + nomeP);
 		camada.style.setProperty('--cor-destino', S.cor);
-		el('div', 'aprox-estrelas', camada);
+		/* o céu em pixel art, igual ao do resto do site (fundo.js), com o halo do planeta e as órbitas */
+		var ceu = el('canvas', 'aprox-ceu', camada);
+		ceu.setAttribute('aria-hidden', 'true');
 		var hud = el('p', 'hud-rotulo aprox-hud', camada);
 		hud.textContent = T('Aproximando de ', 'Approaching ') + nomeP + '…';
 		var voltar = el('button', 'aprox-voltar', camada);
 		voltar.type = 'button';
 		voltar.innerHTML = '&larr; ' + T('Voltar ao sistema solar', 'Back to the solar system');
 		var palco = el('div', 'aprox-palco', camada);
-		var svg = document.createElementNS(NS, 'svg');
-		svg.setAttribute('class', 'aprox-orbitas');
-		svg.setAttribute('aria-hidden', 'true');
-		palco.appendChild(svg);
 		/* o planeta, com a arte dela, bem grande */
 		var planeta = el('a', 'aprox-planeta', palco);
 		planeta.href = id + '.html';
 		planeta.setAttribute('aria-label', T('Visitar ', 'Visit ') + nomeP);
+		/* o brilho em volta do planeta, igual ao da página dele */
+		el('span', 'aprox-brilho', planeta);
 		var img = el('img', '', planeta);
 		img.src = 'pixel/' + id + '.png'; img.alt = '';
 		var rotP = el('span', 'aprox-rotulo', planeta);
@@ -87,12 +87,11 @@
 			a.setAttribute('aria-label', T('Visitar ', 'Visit ') + L.nome);
 			var im = el('img', '', a); im.src = 'pixel/' + L.id + '.png'; im.alt = '';
 			var rot = el('span', 'aprox-rotulo', a); rot.textContent = L.nome;
-			var orb = document.createElementNS(NS, 'ellipse'); svg.appendChild(orb);
 			a.addEventListener('mouseenter', function () { mostrar(L); });
 			a.addEventListener('focus', function () { mostrar(L); });
 			a.addEventListener('mouseleave', function () { mostrar(null); });
 			a.addEventListener('blur', function () { mostrar(null); });
-			return { L: L, a: a, orb: orb };
+			return { L: L, a: a };
 		});
 		planeta.addEventListener('mouseenter', function () { mostrar('planeta'); });
 		planeta.addEventListener('focus', function () { mostrar('planeta'); });
@@ -157,7 +156,7 @@
 			img.style.width = largura + 'px';
 			planeta.style.left = (W / 2 - largura / 2) + 'px';
 			planeta.style.top = (H / 2 - img.naturalHeight / img.naturalWidth * largura / 2) + 'px';
-			svg.setAttribute('viewBox', '0 0 ' + W + ' ' + H);
+			prepararCeu();
 		}
 		function posicionar() {
 			var m = medida;
@@ -171,10 +170,16 @@
 				x.a.style.left = (X - tam / 2) + 'px';
 				x.a.style.top = (Y - tam / 2) + 'px';
 				/* na metade de trás da órbita, a lua passa atrás do planeta */
-				x.a.style.zIndex = Math.sin(ang) < 0 ? 1 : 3;
-				x.orb.setAttribute('cx', m.cx); x.orb.setAttribute('cy', m.cy);
-				x.orb.setAttribute('rx', rx); x.orb.setAttribute('ry', ry);
-				x.orb.setAttribute('transform', 'rotate(' + L.incl + ' ' + m.cx + ' ' + m.cy + ')');
+				/* na metade de trás da órbita, ela só passa atrás do planeta quando está em cima do desenho
+				   dele (o globo e, em Saturno, os anéis); nas laterais ela fica na frente da caixa do planeta,
+				   que é quadrada, para continuar clicável */
+				var dx = X - m.cx, dy = Y - m.cy, rl = tam / 2;
+				var sobreGlobo = Math.hypot(dx, dy) < m.rg + rl * 0.6;
+				var sobreAneis = S.globo && Math.abs(dx) < m.largura / 2 + rl * 0.3 && Math.abs(dy) < m.largura * 0.13 + rl * 0.3;
+				var atras = Math.sin(ang) < 0 && (sobreGlobo || sobreAneis);
+				x.a.style.zIndex = atras ? 1 : 3;
+				/* atrás do planeta, o nome dela some (senão aparece cortado pela borda do planeta) */
+				x.a.classList.toggle('atras', atras);
 			});
 		}
 		function quadro(agora) {
@@ -184,10 +189,68 @@
 			/* com o mouse em cima de uma lua ou do planeta, tudo para, para dar tempo de escolher */
 			if (!calmo && !sobre) relogio += dt;
 			posicionar();
+			/* o céu: 30 quadros por segundo bastam (na chegada, com as estrelas riscando, em todos) */
+			if (agora - ultimoCeu > 33 || agora - chegada < 1700) { ultimoCeu = agora; desenharCeu(agora); }
 			requestAnimationFrame(quadro);
 		}
+		/* ---- o céu ---- */
+		var cctx = ceu.getContext('2d'), CP = 3, CW = 0, CH = 0, cimg = null, cbuf = null, estrelas = [], chegada = 0, ultimoCeu = 0;
+		var corP = [parseInt(S.cor.substr(1, 2), 16), parseInt(S.cor.substr(3, 2), 16), parseInt(S.cor.substr(5, 2), 16)];
+		/* pontilhado ordenado 4x4, o mesmo das nebulosas do fundo do site */
+		var LIMIAR = [0, 0.5, 0.125, 0.625, 0.75, 0.25, 0.875, 0.375, 0.1875, 0.6875, 0.0625, 0.5625, 0.9375, 0.4375, 0.8125, 0.3125];
+		function px(r, g, b) { return (255 << 24 | (b & 255) << 16 | (g & 255) << 8 | (r & 255)) >>> 0; }
+		function sorte(i, k) { var h = Math.imul(i + 1, 374761393) ^ Math.imul(k + 7, 668265263); h = Math.imul(h ^ (h >>> 13), 1274126177); return ((h ^ (h >>> 16)) >>> 0) / 4294967295; }
+		function prepararCeu() {
+			CP = window.innerWidth < 700 ? 2 : window.innerWidth < 1400 ? 3 : 4;
+			CW = Math.max(1, Math.ceil(window.innerWidth / CP)); CH = Math.max(1, Math.ceil(window.innerHeight / CP));
+			ceu.width = CW; ceu.height = CH;
+			cimg = cctx.createImageData(CW, CH); cbuf = new Uint32Array(cimg.data.buffer);
+			/* as estrelas do site: de 1 pixel, piscando, e umas poucas maiores, em cruz */
+			estrelas = [];
+			for (var i = 0, n = Math.round(CW * CH / 160); i < n; i++) {
+				var c = sorte(i, 5);
+				estrelas.push({ x: Math.floor(sorte(i, 1) * CW), y: Math.floor(sorte(i, 2) * CH), grande: sorte(i, 3) < 0.025, brilho: 0.35 + sorte(i, 4) * 0.65,
+					vel: 0.6 + sorte(i, 6) * 2.4, fase: sorte(i, 7) * 6.3, c: c < 0.1 ? [180, 210, 255] : c < 0.16 ? [255, 210, 235] : c < 0.2 ? [255, 236, 190] : [255, 255, 255] });
+			}
+		}
+		function ponto(x, y, c) { x = Math.round(x); y = Math.round(y); if (x >= 0 && y >= 0 && x < CW && y < CH) cbuf[y * CW + x] = c; }
+		function desenharCeu(agora) {
+			if (!cbuf || !medida) return;
+			var s = agora / 1000, rp = palco.getBoundingClientRect();
+			var cx = (rp.left + medida.cx) / CP, cy = (rp.top + medida.cy) / CP, R = medida.rg / CP;
+			cbuf.fill(px(5, 3, 12));
+			/* as estrelas; na chegada, elas passam riscando para fora, como a nave freando */
+			var u = calmo ? 1 : Math.min(1, (agora - chegada) / 1600), risco = (1 - u) * (1 - u) * 90 / CP;
+			for (var i = 0; i < estrelas.length; i++) {
+				var e = estrelas[i];
+				var onda = calmo ? 1 : 0.5 + 0.5 * Math.sin(s * e.vel + e.fase), b = e.brilho * (0.25 + 0.75 * onda * onda);
+				if (risco > 1) {
+					var dx = e.x - cx, dy = e.y - cy, dl = Math.hypot(dx, dy) || 1, comp = risco * (0.4 + dl / CW);
+					for (var k = 0; k < comp; k++) { var bk = e.brilho * (1 - k / comp); ponto(e.x - dx / dl * k, e.y - dy / dl * k, px(e.c[0] * bk, e.c[1] * bk, e.c[2] * bk)); }
+					continue;
+				}
+				var cc = px(e.c[0] * b, e.c[1] * b, e.c[2] * b);
+				cbuf[e.y * CW + e.x] = cc;
+				if (e.grande && b > 0.45) {
+					var c2 = px(e.c[0] * b * 0.45, e.c[1] * b * 0.45, e.c[2] * b * 0.55);
+					ponto(e.x - 1, e.y, c2); ponto(e.x + 1, e.y, c2); ponto(e.x, e.y - 1, c2); ponto(e.x, e.y + 1, c2);
+				}
+			}
+			/* as órbitas, pontilhadas em pixel; a da lua em destaque acende na cor do planeta */
+			if (camada.classList.contains('chegou')) luas.forEach(function (l) {
+				var L = l.L, inc = L.incl * Math.PI / 180, rx = R * L.r, ry = rx * L.ach, aceso = sobre === L;
+				var cor = aceso ? px(corP[0], corP[1], corP[2]) : px(70, 78, 112), passos = Math.ceil(2 * Math.PI * rx / (aceso ? 2 : 3));
+				for (var j = 0; j < passos; j++) {
+					var a = j / passos * Math.PI * 2, ex = Math.cos(a) * rx, ey = Math.sin(a) * ry;
+					ponto(cx + ex * Math.cos(inc) - ey * Math.sin(inc), cy + ex * Math.sin(inc) + ey * Math.cos(inc), cor);
+				}
+			});
+			cctx.putImageData(cimg, 0, 0);
+		}
+
 		function iniciar() {
 			medir(); posicionar();
+			chegada = performance.now();
 			/* o voo: o planeta sai do lugar dele no sistema e cresce até o meio da tela */
 			if (origem && !calmo) {
 				var de = origem.getBoundingClientRect(), para = img.getBoundingClientRect();
@@ -210,18 +273,23 @@
 
 		voltar.addEventListener('click', afastar);
 		/* clicando no espaço vazio, a nave se afasta de novo */
-		camada.addEventListener('click', function (e) { if (e.target === camada || e.target === palco || e.target.classList.contains('aprox-estrelas')) afastar(); });
+		camada.addEventListener('click', function (e) { if (e.target === camada || e.target === palco || e.target === ceu) afastar(); });
 	}
 
 	function afastar() {
 		if (!estado || !camada) return;
-		var c = camada, origem = estado.origem, id = estado.id;
+		var c = camada, id = estado.id, origem = sistema.querySelector('.astro[data-id="' + id + '"] .planeta');
 		estado = null;
 		c.classList.remove('chegou');
 		c.classList.add('saindo');
 		var planeta = c.querySelector('.aprox-planeta'), img = planeta.querySelector('img');
 		if (origem && !calmo) {
 			var de = origem.getBoundingClientRect(), para = img.getBoundingClientRect();
+			/* a volta é rápida e já sai andando (a ida começa devagar, a volta não): o planeta encolhe de
+			   volta para o lugar dele no sistema, o brilho apaga, e no fim ele some em cima do de verdade */
+			planeta.style.transition = 'transform 0.55s cubic-bezier(0.2, 0.6, 0.3, 1), opacity 0.15s ease 0.45s';
+			planeta.style.opacity = '0';
+			planeta.classList.add('voltando');
 			planeta.style.transform = 'translate(' + (de.left + de.width / 2 - (para.left + para.width / 2)) + 'px,' + (de.top + de.height / 2 - (para.top + para.height / 2)) + 'px) scale(' + (de.width / para.width) + ')';
 		}
 		c.classList.remove('aberta');
@@ -231,7 +299,7 @@
 			document.documentElement.classList.remove('aproximando');
 			var volta = sistema.querySelector('.astro[data-id="' + id + '"]');
 			if (volta) volta.focus({ preventScroll: true });
-		}, calmo ? 0 : 900);
+		}, calmo ? 0 : 620);
 	}
 
 	document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && estado) afastar(); });
