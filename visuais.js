@@ -73,7 +73,7 @@
 		}
 		// o céu visto de lá (só nos destinos da galáxia): um texto e um céu em pixel art
 		if (D.ceu) secaoExtra('ceu', TR('O céu visto daqui', 'The sky from here'), '<p>' + D.ceu.texto + '</p>' +
-			'<figure class="animacao"><canvas data-animacao="ceu" width="200" height="110" role="img" aria-label="' + D.ceu.aria + '"></canvas>' +
+			'<figure class="animacao"><canvas data-animacao="ceu" width="320" height="176" role="img" aria-label="' + D.ceu.aria + (D.ceu.chao === false ? '' : TR(' Embaixo, um astronauta olha o céu, em pé no chão de um planeta.', ' Below, an astronaut looks at the sky, standing on the ground of a planet.')) + '"></canvas>' +
 			'<div class="animacao-hud" aria-hidden="true"><span data-hud="ano">' + D.ceu.hud[0] + '</span><span data-hud="estacao">' + D.ceu.hud[1] + '</span></div>' +
 			'<figcaption>' + D.ceu.legenda + '</figcaption></figure>');
 		if (D.linha) secaoExtra('linha-do-tempo', TR('Linha do tempo', 'Timeline'), '<ol class="linha-tempo">' +
@@ -2158,69 +2158,249 @@
 	//  [x, y, visível?]. O Sol visível é uma estrelinha amarela; invisível, só a mira pontilhada
 	//  piscando no lugar onde ele estaria.
 	function ceuDe(L, A, c) {
-		var aleat = semente(c.semente || 91), soltas = [];
-		var CORES = (c.coresEstrelas || ['#ffffff', '#cfe0ff', '#ffe8c8']).map(hex);
-		for (var i = 0; i < (c.estrelas || 70); i++) soltas.push([aleat() * L | 0, aleat() * A | 0, aleat(), CORES[i % CORES.length], aleat() * 6]);
-		function bolha(buf, x0, y0, r, corH, forca, t) {
-			var cc = hex(corH);
-			for (var y = Math.max(0, Math.floor(y0 - r)); y < Math.min(A, y0 + r); y++) for (var x = Math.max(0, Math.floor(x0 - r)); x < Math.min(L, x0 + r); x++) {
-				var d = Math.hypot(x - x0, y - y0) / r;
-				if (d > 1) continue;
-				var v = (1 - d) * forca * (0.55 + ruido2d(x * 0.12 + t * 0.05, y * 0.12) * 0.9);
-				if (B4[(x & 1) + ((y & 1) << 1)] < v) buf[y * L + x] = cc;
+		/* os dados vêm numa tela de 200 x 110; aqui ela é maior (mais detalhe), e tudo é esticado junto */
+		var k = L / 200, aleat = semente(c.semente || 91);
+		function rgb(h) { return [parseInt(h.substr(1, 2), 16), parseInt(h.substr(3, 2), 16), parseInt(h.substr(5, 2), 16)]; }
+		function mistura(a, b, f) { return [a[0] + (b[0] - a[0]) * f, a[1] + (b[1] - a[1]) * f, a[2] + (b[2] - a[2]) * f]; }
+		/* pontilhado ordenado 4 x 4 (Bayer): os degradês viram pixel art */
+		var BAY = [0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5].map(function (v) { return (v + 0.5) / 16; });
+		function bay(x, y) { return BAY[(x & 3) + ((y & 3) << 2)]; }
+		function fbm(x, y) { var s = 0, a = 0.5, f = 1; for (var i = 0; i < 4; i++) { s += ruido2d(x * f + i * 17.3, y * f - i * 9.1) * a; f *= 2.03; a *= 0.5; } return s / 0.9375; }
+		function liso(a, b, v) { var u = Math.max(0, Math.min(1, (v - a) / (b - a))); return u * u * (3 - 2 * u); }
+		var FUNDO = rgb(c.fundo || '#07051a');
+		var HOR = rgb(c.horizonte || (c.nuvens && c.nuvens.length ? c.nuvens[0][3] : '#1c1a48'));
+		var temChao = c.chao !== false;
+
+		/* ---- a camada parada (desenhada uma vez): o céu, as nebulosas, a galáxia, o anel, as estrelas fracas e o chão ---- */
+		var F = new Float32Array(L * A * 3);
+		function soma(x, y, cc, f) { var i = (y * L + x) * 3; F[i] += cc[0] * f; F[i + 1] += cc[1] * f; F[i + 2] += cc[2] * f; }
+		/* o céu: um pouco mais claro perto do horizonte (a luz das nebulosas no ar) */
+		for (var y = 0; y < A; y++) {
+			var fh = temChao ? Math.pow(Math.max(0, (y / A - 0.3) / 0.5), 1.6) * 0.32 : 0, cy0 = mistura(FUNDO, HOR, fh);
+			for (var x = 0; x < L; x++) { var i0 = (y * L + x) * 3; F[i0] = cy0[0]; F[i0 + 1] = cy0[1]; F[i0 + 2] = cy0[2]; }
+		}
+		/* as nebulosas: fiapos de gás com vários tons, que se enrolam (ruído deformado) e com faixas de poeira escura */
+		(c.nuvens || []).forEach(function (n, ni) {
+			var nx = n[0] * k, ny = n[1] * k, r = n[2] * k, cc = rgb(n[3]), forca = n[4], claro = mistura(cc, [255, 235, 225], 0.45), esc = 22 * k;
+			for (var y = Math.max(0, Math.floor(ny - r * 1.25)); y < Math.min(A, ny + r * 1.25); y++) for (var x = Math.max(0, Math.floor(nx - r * 1.25)); x < Math.min(L, nx + r * 1.25); x++) {
+				var wx = x / esc + ni * 7.1, wy = y / esc - ni * 3.3, q = fbm(wx, wy);
+				var d = Math.hypot(x - nx, (y - ny) * 1.15) / r;
+				var borda = Math.max(0, 1 - d * (0.7 + 0.6 * q));
+				if (borda <= 0) continue;
+				var fio = fbm(wx * 1.7 + q * 2.4, wy * 1.7 - q * 1.8);
+				var dens = forca * Math.pow(borda, 1.2) * (0.25 + 1.5 * fio * fio);
+				var poeira = liso(0.6, 0.74, fbm(wx * 2.4 + 5, wy * 2.4 - 3)) * 0.65;
+				soma(x, y, dens > 0.42 ? mistura(cc, claro, Math.min(1, (dens - 0.42) * 2)) : cc, dens * 1.25 * (1 - poeira));
+				if (poeira > 0) { var ip = (y * L + x) * 3; F[ip] *= 1 - poeira * borda * 0.5; F[ip + 1] *= 1 - poeira * borda * 0.5; F[ip + 2] *= 1 - poeira * borda * 0.5; }
+			}
+		});
+		/* a Via Láctea vista de cima: braços em espiral com nós rosados, poeira e o bojo amarelado no meio */
+		if (c.galaxia) {
+			var g = c.galaxia, gx0 = g[0] * k, gy0 = g[1] * k, grx = g[2] * k, gry = g[3] * k;
+			for (var y = Math.max(0, Math.floor(gy0 - gry * 1.2)); y < Math.min(A, gy0 + gry * 1.2); y++) for (var x = Math.max(0, Math.floor(gx0 - grx * 1.2)); x < Math.min(L, gx0 + grx * 1.2); x++) {
+				var ux = (x - gx0) / grx, uy = (y - gy0) / gry, rr = Math.hypot(ux, uy);
+				if (rr > 1.15) continue;
+				var th = Math.atan2(uy, ux), espiral = Math.cos(2 * (th - 2.4 * Math.log(rr + 0.06)));
+				var mancha = fbm(x / (6 * k), y / (6 * k));
+				var braco = Math.pow(Math.max(0, espiral), 2.2) * Math.pow(Math.max(0, 1 - rr), 0.9) * (0.5 + mancha);
+				var bojo = Math.exp(-Math.pow(rr / 0.17, 2)), disco = Math.exp(-rr * 3.2) * 0.45;
+				var faixa = Math.pow(Math.max(0, -espiral), 3) * Math.max(0, 1 - rr) * 0.6;
+				soma(x, y, [150, 172, 236], braco * 1.1 + disco * 0.6);
+				soma(x, y, [255, 236, 196], bojo * 1.5 + disco * 0.3);
+				if (braco > 0.3 && ruido2d(x / (2 * k), y / (2 * k)) > 0.82) soma(x, y, [255, 130, 190], 0.35);
+				if (faixa > 0) { var ig = (y * L + x) * 3; F[ig] *= 1 - faixa; F[ig + 1] *= 1 - faixa; F[ig + 2] *= 1 - faixa; }
 			}
 		}
-		return function (buf, t, hud) {
-			buf.fill(hex(c.fundo || '#07051a'));
-			(c.nuvens || []).forEach(function (n) { bolha(buf, n[0], n[1], n[2], n[3], n[4], t); });
-			if (c.galaxia) {
-				// a Via Láctea vista de cima: um disco inclinado com dois braços em espiral
-				var g = c.galaxia;
-				for (var q = 0; q < 1400; q++) {
-					var r = Math.pow((q % 700) / 700, 0.8), ang = Math.log(r * 8 + 1) * 2.4 + (q >= 700 ? Math.PI : 0) + t * 0.02 + (ruido2d(q, 3) - 0.5) * 0.6;
-					var px = g[0] + Math.cos(ang) * r * g[2], py = g[1] + Math.sin(ang) * r * g[3];
-					pintar(buf, L, A, px, py, r < 0.18 ? hex('#fff0c8') : q % 3 ? hex('#8fa8e8') : hex('#e8c8ff'));
+		/* o anel da Hélice: azul-esverdeado por dentro, avermelhado por fora, com os "nós" na beirada de dentro */
+		if (c.anel) {
+			var an = c.anel, ax = an[0] * k, ay = an[1] * k, arx = an[2] * k, ary = an[3] * k, dentro = rgb(an[4]), fora = rgb(an[5] || an[4]);
+			for (var y = Math.max(0, Math.floor(ay - ary * 1.4)); y < Math.min(A, ay + ary * 1.4); y++) for (var x = Math.max(0, Math.floor(ax - arx * 1.4)); x < Math.min(L, ax + arx * 1.4); x++) {
+				var ex = (x - ax) / arx, ey = (y - ay) / ary, th2 = Math.atan2(ey, ex);
+				var ra = Math.hypot(ex, ey) * (1 + (fbm(Math.cos(th2) * 2 + 9, Math.sin(th2) * 2) - 0.5) * 0.22);
+				var anelD = Math.exp(-Math.pow((ra - 1) / 0.16, 2)) * (0.55 + 0.6 * fbm(x / (7 * k), y / (7 * k)));
+				var miolo = ra < 1 ? Math.pow(1 - ra, 0.4) * 0.28 : 0;
+				soma(x, y, mistura(dentro, fora, liso(0.85, 1.15, ra)), anelD * 1.3);
+				soma(x, y, dentro, miolo);
+				if (ra > 0.8 && ra < 0.96 && ruido2d(x / (1.6 * k), y / (1.6 * k)) > 0.8) soma(x, y, [210, 90, 80], 0.6);
+			}
+		}
+		/* as estrelas fracas, paradas (as que cintilam são desenhadas a cada quadro) */
+		var CORES = (c.coresEstrelas || ['#ffffff', '#cfe0ff', '#ffe8c8']).map(rgb), soltas = [];
+		var total = Math.round((c.estrelas || 70) * k * k);
+		for (var s = 0; s < total; s++) {
+			var sx = aleat() * L | 0, sy = aleat() * A | 0, sb = 0.18 + aleat() * aleat() * 0.7, sc = CORES[s % CORES.length];
+			if (s % 9 === 0 && soltas.length < 70) soltas.push({ x: sx, y: sy, c: sc, b: 0.5 + aleat() * 0.5, v: 0.8 + aleat() * 2.2, f: aleat() * 6.3, cruz: aleat() < 0.35 });
+			else soma(sx, sy, sc, sb);
+		}
+		/* as linhas de uma constelação, bem fraquinhas */
+		if (c.linhas) for (var li = 0; li < c.linhas.length - 1; li++) {
+			var p0 = c.linhas[li], p1 = c.linhas[li + 1], comp = Math.hypot(p1[0] - p0[0], p1[1] - p0[1]) * k;
+			for (var st = 4; st < comp - 4; st += 2) {
+				var lx = Math.round(p0[0] * k + (p1[0] - p0[0]) * k * st / comp), ly = Math.round(p0[1] * k + (p1[1] - p0[1]) * k * st / comp);
+				if (lx >= 0 && ly >= 0 && lx < L && ly < A) soma(lx, ly, [90, 96, 170], 0.7);
+			}
+		}
+		/* o chão de um planeta imaginário: uma serra recortada ao longe (escura, com a borda acesa pela luz do
+		   céu) e, perto, o chão com pedras e rochas grandes, em silhueta */
+		var chao = new Uint8Array(L * A), topoPerto = new Int16Array(L), bordas = [];
+		if (temChao) {
+			var sem = (c.semente || 91) * 0.37;
+			/* (a serra é mais escura que o céu, para virar silhueta; o chão de perto, quase preto) */
+			var serra = mistura(mistura(FUNDO, HOR, 0.1), [0, 0, 0], 0.5), perto = mistura([3, 2, 7], HOR, 0.03);
+			var bordaSerra = mistura(HOR, [255, 236, 220], 0.32), bordaPerto = mistura(HOR, [255, 236, 220], 0.2);
+			var HS = new Float32Array(L), HP = new Float32Array(L);
+			for (var x = 0; x < L; x++) {
+				/* a serra: picos (ruído "dobrado", que faz pontas) */
+				var pico = 1 - Math.abs(ruido2d(x / (22 * k) + sem, 1.7) * 2 - 1), ond = fbm(x / (60 * k) + sem, 3.1);
+				HS[x] = Math.round(A * 0.8 - (pico * 13 + ond * 16 + 2) * k);
+				/* o chão de perto: ondulado, com rochas grandes de vez em quando */
+				var rocha = Math.max(0, ruido2d(x / (14 * k) + sem + 4, 8.3) - 0.6) * 26 * k;
+				HP[x] = Math.round(A * 0.9 - fbm(x / (30 * k) + sem + 9, 5.5) * 12 * k - rocha);
+				topoPerto[x] = HP[x];
+			}
+			for (var x = 0; x < L; x++) {
+				/* a borda acesa vai do topo de cada coluna até o topo da vizinha (assim ela fica contínua nas subidas) */
+				var bS = Math.max(HS[x], x > 0 ? HS[x - 1] : HS[x], x < L - 1 ? HS[x + 1] : HS[x]);
+				var bP = Math.max(HP[x], x > 0 ? HP[x - 1] : HP[x], x < L - 1 ? HP[x + 1] : HP[x]);
+				for (var y = Math.max(0, HS[x]); y < A; y++) {
+					var ic = (y * L + x) * 3, cc2;
+					if (y >= HP[x]) {
+						cc2 = y <= bP ? bordaPerto : perto;
+						if (y <= bP) bordas.push([y * L + x, bordaPerto]);
+					} else {
+						var prof = Math.min(1, (y - HS[x]) / (10 * k));
+						cc2 = y <= bS ? bordaSerra : mistura(mistura(serra, bordaSerra, 0.12), serra, prof);
+						if (y <= bS) bordas.push([y * L + x, bordaSerra]);
+					}
+					F[ic] = cc2[0]; F[ic + 1] = cc2[1]; F[ic + 2] = cc2[2];
+					chao[y * L + x] = 1;
 				}
-				// o bojo do centro, na mesma proporção do disco (redondo quando a galáxia está de frente)
-				var bx = Math.max(3, Math.round(g[2] * 0.1)), by = Math.max(2, Math.round(g[3] * 0.1));
-				for (var gy = -by; gy <= by; gy++) for (var gx = -bx; gx <= bx; gx++) if (gx * gx / (bx * bx) + gy * gy / (by * by) < 1) pintar(buf, L, A, g[0] + gx, g[1] + gy, hex(gx * gx / (bx * bx) + gy * gy / (by * by) < 0.3 ? '#fff8e0' : '#ffe8b0'));
 			}
-			soltas.forEach(function (e) { var b = 0.45 + e[2] * 0.55 + Math.sin(t * 1.5 + e[4]) * 0.15; if (b > 0.55) buf[e[1] * L + e[0]] = e[3]; });
-			if (c.anel) {
-				var an = c.anel;
-				for (var a = 0; a < Math.PI * 2; a += 0.004) {
-					var rr = 1 + (ruido2d(Math.cos(a) * 3 + 9, Math.sin(a) * 3) - 0.5) * 0.25, w = (aleat() - 0.5) * 0.22;
-					pintar(buf, L, A, an[0] + Math.cos(a) * an[2] * (rr + w), an[1] + Math.sin(a) * an[3] * (rr + w), hex(Math.abs(w) < 0.06 ? an[4] : an[5] || an[4]));
+		}
+		/* tudo vira pixel art: cada cor é arredondada em degraus, com o pontilhado decidindo o degrau */
+		var base = new Uint32Array(L * A), DEG = 10;
+		for (var y = 0; y < A; y++) for (var x = 0; x < L; x++) {
+			var ib = (y * L + x) * 3, bb = bay(x, y);
+			base[y * L + x] = cor(Math.min(255, Math.floor(F[ib] / DEG + bb) * DEG), Math.min(255, Math.floor(F[ib + 1] / DEG + bb) * DEG), Math.min(255, Math.floor(F[ib + 2] / DEG + bb) * DEG));
+		}
+		/* as bordas acesas do chão ficam com a cor exata (o pontilhado deixava a linha tracejada) */
+		bordas.forEach(function (b) { base[b[0]] = cor(b[1][0], b[1][1], b[1][2]); });
+		F = null;
+
+		/* ---- o astronauta (em pé no chão, olhando o céu) e a plaquinha com o nome da Bianca ---- */
+		/* (o: contorno, w: roupa, g: sombra, b: mochila, v: visor, l: luz do visor, r: faixa vermelha) */
+		var ASTRO = [
+			'.........o.', '...ooo..owo', '..owwwo.owo', '.owvvvwoowo', '.owvlvwowo.', '.owvvvwowo.', '..owwwoowo.',
+			'.obwrrwwwo.', 'obbwwwwwo..', 'obbwwwwo...', 'obbwwwwo...', '.owwgwwo...', '.owwowwo...', '.owgogwo...', '.ogo.ogo...', 'oooo.ooo...'];
+		var VISOR = mistura(HOR, [255, 220, 150], 0.35);
+		var astroX = Math.round((c.astronauta !== undefined ? c.astronauta : (c.sol && c.sol[0] < 100 ? 172 : 26)) * k), olhaEsq = astroX > L / 2;
+		var LETRAS = { B: ['110', '101', '110', '101', '110'], I: ['111', '010', '010', '010', '111'], A: ['111', '101', '111', '101', '101'], N: ['101', '111', '111', '101', '101'], C: ['011', '100', '100', '100', '011'] };
+		function desenharAstronauta(buf, t) {
+			if (!temChao) return;
+			var pe = topoPerto[Math.max(0, Math.min(L - 1, astroX + 3))], y0 = pe - ASTRO.length + 1;
+			var pal = { o: cor(14, 12, 26), w: cor(222, 226, 240), g: cor(150, 150, 172), b: cor(112, 116, 146), v: cor(VISOR[0], VISOR[1], VISOR[2]), l: cor(Math.min(255, VISOR[0] + 70), Math.min(255, VISOR[1] + 70), Math.min(255, VISOR[2] + 70)), r: cor(232, 80, 110) };
+			ASTRO.forEach(function (lin, j) {
+				for (var i = 0; i < lin.length; i++) {
+					var ch = lin[i]; if (ch === '.') continue;
+					pintar(buf, L, A, olhaEsq ? astroX + 10 - i : astroX + i, y0 + j, pal[ch]);
 				}
-			}
-			if (c.disco) {
-				// uma estrela enorme no céu (só um pedaço aparece), fervendo
-				var dc = c.disco, PAL = [hex('#ffd0a0'), hex('#ff9a5a'), hex('#e0602a'), hex('#a8301e')];
-				for (var y = 0; y < A; y++) for (var x = 0; x < L; x++) {
-					var d = Math.hypot(x - dc[0], y - dc[1]);
-					if (d > dc[2] + 6) continue;
-					if (d > dc[2]) { if (B4[(x & 1) + ((y & 1) << 1)] < (dc[2] + 6 - d) / 8) buf[y * L + x] = PAL[3]; continue; }
-					var n = Math.floor(d / dc[2] * 2.6 + (0.5 - ruido2d(x * 0.15 + t * 0.2, y * 0.15)) * 1.4 + B4[(x & 1) + ((y & 1) << 1)] * 0.6);
-					buf[y * L + x] = PAL[Math.max(0, Math.min(3, n))];
-				}
-			}
-			if (c.linhas) for (var k = 0; k < c.linhas.length - 1; k++) {
-				var p0 = c.linhas[k], p1 = c.linhas[k + 1], nn = Math.hypot(p1[0] - p0[0], p1[1] - p0[1]);
-				for (var s = 3; s < nn - 3; s += 2) pintar(buf, L, A, p0[0] + (p1[0] - p0[0]) * s / nn, p0[1] + (p1[1] - p0[1]) * s / nn, hex('#3a3a7a'));
-			}
-			(c.brilhantes || []).forEach(function (e, i) {
-				var b = e[4] ? (0.55 + 0.45 * Math.max(0, Math.sin(t * (e[4] === 'rapido' ? 25 : 0.9) + i))) : 1, cc = hex(e[2]), tam = e[3];
-				pintar(buf, L, A, e[0], e[1], b > 0.6 ? hex('#ffffff') : cc);
-				for (var p = 1; p <= tam; p++) if (b > 0.4 || p === 1) [[1, 0], [-1, 0], [0, 1], [0, -1]].forEach(function (dd) { pintar(buf, L, A, e[0] + dd[0] * p, e[1] + dd[1] * p, cc); });
-				if (tam > 2) [[1, 1], [-1, -1], [1, -1], [-1, 1]].forEach(function (dd) { pintar(buf, L, A, e[0] + dd[0], e[1] + dd[1], cc); });
 			});
-			// o Sol: estrelinha amarela (se dá para ver) ou só a mira piscando onde ele estaria
-			if (c.sol) {
-				var sx = c.sol[0], sy = c.sol[1], aceso = Math.sin(t * 3) > -0.2;
-				if (c.sol[2]) { pintar(buf, L, A, sx, sy, hex('#fff4c0')); [[1, 0], [-1, 0], [0, 1], [0, -1]].forEach(function (dd) { pintar(buf, L, A, sx + dd[0], sy + dd[1], hex('#ffd36a')); }); }
-				else pintar(buf, L, A, sx, sy, hex('#5a5040'));
-				if (aceso) for (var m = 0; m < Math.PI * 2; m += 0.35) pintar(buf, L, A, sx + Math.cos(m) * 6, sy + Math.sin(m) * 6, hex('#ffd36a'));
+			/* um brilho passa pelo visor de vez em quando, e a luzinha da antena pisca */
+			if (Math.sin(t * 0.7) > 0.75) pintar(buf, L, A, olhaEsq ? astroX + 7 : astroX + 3, y0 + 3, cor(255, 255, 255));
+			pintar(buf, L, A, olhaEsq ? astroX + 7 : astroX + 3, y0, cor(40, 40, 60));
+			if (Math.sin(t * 3) > 0) pintar(buf, L, A, olhaEsq ? astroX + 7 : astroX + 3, y0 - 1, cor(255, 90, 110));
+			/* a plaquinha fincada no chão, com o nome (pequenininho) */
+			var px0 = olhaEsq ? astroX - 31 : astroX + 16, pchao = topoPerto[Math.max(0, Math.min(L - 1, px0 + 12))], py0 = pchao - 11;
+			var tabua = cor(Math.min(255, HOR[0] * 0.4 + 88), Math.min(255, HOR[1] * 0.4 + 78), Math.min(255, HOR[2] * 0.4 + 66)), madeira = cor(30, 24, 28);
+			for (var yy = 0; yy < 7; yy++) for (var xx = 0; xx < 26; xx++) pintar(buf, L, A, px0 + xx, py0 + yy, yy === 0 || yy === 6 || xx === 0 || xx === 25 ? madeira : tabua);
+			for (var yy = 7; yy < 11; yy++) pintar(buf, L, A, px0 + 12, py0 + yy, madeira);
+			'BIANCA'.split('').forEach(function (l, n) {
+				LETRAS[l].forEach(function (lin, j) { for (var i = 0; i < 3; i++) if (lin[i] === '1') pintar(buf, L, A, px0 + 2 + n * 4 + i, py0 + 1 + j, madeira); });
+			});
+		}
+
+		/* ---- uma estrela brilhante: núcleo branco, halo pontilhado na cor dela e raios em cruz ---- */
+		function brilhante(buf, x, y, cc, tam, b, t) {
+			x = Math.round(x); y = Math.round(y);
+			var R = Math.round(tam * 2.6 * k * (0.55 + 0.45 * b)), cr = rgb(cc);
+			for (var yy = -R; yy <= R; yy++) for (var xx = -R; xx <= R; xx++) {
+				var px2 = x + xx, py2 = y + yy;
+				if (px2 < 0 || py2 < 0 || px2 >= L || py2 >= A || chao[py2 * L + px2]) continue;
+				var d = Math.hypot(xx, yy) / R;
+				if (d >= 1) continue;
+				var forca = Math.pow(1 - d, 1.8) * b;
+				if (bay(px2, py2) < forca * 1.4) buf[py2 * L + px2] = forca > 0.45 ? cor(Math.min(255, cr[0] * 0.8 + 50), Math.min(255, cr[1] * 0.8 + 50), Math.min(255, cr[2] * 0.8 + 50)) : cor(cr[0] * 0.5, cr[1] * 0.5, cr[2] * 0.55);
 			}
+			/* os raios: curtos, contínuos, apagando para a ponta; nas maiores, também nas diagonais */
+			var raio = Math.round((tam * 1.8 + 1) * k * b);
+			function raioPara(dx, dy, n) {
+				for (var p = 1; p <= n; p++) {
+					var f = 1 - p / (n + 1), qx = x + dx * p, qy = y + dy * p;
+					if (qx < 0 || qy < 0 || qx >= L || qy >= A || chao[qy * L + qx]) continue;
+					buf[qy * L + qx] = f > 0.6 ? cor(255, 255, 255) : cor(Math.min(255, cr[0] * (0.35 + f)), Math.min(255, cr[1] * (0.35 + f)), Math.min(255, cr[2] * (0.4 + f)));
+				}
+			}
+			[[1, 0], [-1, 0], [0, 1], [0, -1]].forEach(function (dd) { raioPara(dd[0], dd[1], raio); });
+			if (tam > 2) [[1, 1], [-1, -1], [1, -1], [-1, 1]].forEach(function (dd) { raioPara(dd[0], dd[1], Math.round(raio * 0.35)); });
+			[[0, 0], [1, 0], [0, 1], [1, 1]].forEach(function (dd) { if (tam > 2 || (dd[0] === 0 && dd[1] === 0)) pintar(buf, L, A, x + dd[0], y + dd[1], cor(255, 255, 255)); });
+		}
+
+		/* ---- estrela-cadente, de vez em quando ---- */
+		var cadente = null, proxCadente = 3 + aleat() * 5;
+
+		return function (buf, t, hud) {
+			buf.set(base);
+			/* a estrela gigante no céu (Betelgeuse), fervendo: grãos de convecção, borda mais escura e uma coroa */
+			if (c.disco) {
+				var dc = c.disco, dx0 = dc[0] * k, dy0 = dc[1] * k, R = dc[2] * k;
+				var PAL = [[255, 214, 160], [255, 160, 92], [228, 98, 44], [168, 48, 30], [96, 22, 20]].map(function (v) { return cor(v[0], v[1], v[2]); });
+				for (var y = Math.max(0, Math.floor(dy0 - R - 10 * k)); y < Math.min(A, dy0 + R + 10 * k); y++) for (var x = 0; x < Math.min(L, dx0 + R + 10 * k); x++) {
+					if (chao[y * L + x]) continue;
+					var d = Math.hypot(x - dx0, y - dy0);
+					if (d > R) { var cor2 = (R + 10 * k - d) / (10 * k); if (cor2 > 0 && bay(x, y) < cor2 * cor2 * 0.8) buf[y * L + x] = d < R + 3 * k ? PAL[3] : PAL[4]; continue; }
+					var mu = Math.sqrt(1 - (d / R) * (d / R));
+					var grao = ruido2d(x / (5 * k) + t * 0.12, y / (5 * k)) * 0.65 + ruido2d(x / (2 * k) - t * 0.3, y / (2 * k) + 7) * 0.35;
+					var nv = (1 - mu) * 3.2 + (0.5 - grao) * 2.2 + bay(x, y) * 0.9;
+					buf[y * L + x] = PAL[Math.max(0, Math.min(4, Math.floor(nv)))];
+				}
+			}
+			/* as estrelas que cintilam: umas ficam só piscando, outras viram uma cruzinha no auge */
+			soltas.forEach(function (e) {
+				if (chao[e.y * L + e.x]) return;
+				var b = e.b * (0.35 + 0.65 * Math.pow(0.5 + 0.5 * Math.sin(t * e.v + e.f), 2));
+				buf[e.y * L + e.x] = cor(e.c[0] * b, e.c[1] * b, e.c[2] * b);
+				if (e.cruz && b > 0.75) [[1, 0], [-1, 0], [0, 1], [0, -1]].forEach(function (dd) { var qx = e.x + dd[0], qy = e.y + dd[1]; if (qx >= 0 && qy >= 0 && qx < L && qy < A && !chao[qy * L + qx]) buf[qy * L + qx] = cor(e.c[0] * b * 0.5, e.c[1] * b * 0.5, e.c[2] * b * 0.55); });
+			});
+			/* as estrelas brilhantes (com o jeito de piscar de cada uma) */
+			(c.brilhantes || []).forEach(function (e, i) {
+				var b = 1;
+				if (e[4] === 'rapido') b = Math.sin(t * 60) > 0 ? 1 : 0.35; /* o pulsar: 30 vezes por segundo (aqui, o mais rápido que a tela mostra) */
+				else if (e[4] === 'apaga') { var ciclo = (t % 14) / 14; b = ciclo > 0.55 && ciclo < 0.8 ? 0.25 + 0.75 * Math.abs(Math.cos((ciclo - 0.55) / 0.25 * Math.PI)) : 1; } /* a Estrela de Tabby: o brilho cai de repente e volta */
+				else if (e[4]) b = 0.7 + 0.3 * Math.sin(t * 0.9 + i);
+				brilhante(buf, e[0] * k, e[1] * k, e[2], e[3], b, t);
+			});
+			/* o Sol: a estrelinha amarela (se dá para ver) e a mira com cantoneiras, piscando, onde ele estaria */
+			if (c.sol) {
+				var sx = Math.round(c.sol[0] * k), sy = Math.round(c.sol[1] * k);
+				if (c.sol[2]) brilhante(buf, sx, sy, '#ffd36a', 1, 1, t);
+				else pintar(buf, L, A, sx, sy, cor(110, 96, 64));
+				var m = Math.round(7 * k), aceso = Math.sin(t * 2.6) > -0.3, cm = aceso ? cor(255, 211, 106) : cor(150, 120, 60);
+				[[-1, -1], [1, -1], [-1, 1], [1, 1]].forEach(function (q) {
+					for (var p = 0; p < 4; p++) { pintar(buf, L, A, sx + q[0] * (m - p), sy + q[1] * m, cm); pintar(buf, L, A, sx + q[0] * m, sy + q[1] * (m - p), cm); }
+				});
+			}
+			/* a estrela-cadente: risca o céu de cima em meio segundo e some */
+			if (!cadente && t > proxCadente) { cadente = { t0: t, x: (0.15 + aleat() * 0.6) * L, y: aleat() * A * 0.35, dx: (aleat() < 0.5 ? -1 : 1) * L * 0.35, dy: A * 0.18 }; }
+			if (cadente) {
+				var u = (t - cadente.t0) / 0.6;
+				if (u > 1) { cadente = null; proxCadente = t + 6 + aleat() * 9; }
+				else for (var q = 0; q < 14 * k; q++) {
+					var uu = u - q / (40 * k); if (uu < 0) break;
+					var qx = Math.round(cadente.x + cadente.dx * uu), qy = Math.round(cadente.y + cadente.dy * uu), fb = (1 - q / (14 * k)) * Math.sin(Math.min(1, u) * Math.PI);
+					if (qx >= 0 && qy >= 0 && qx < L && qy < A && !chao[qy * L + qx]) buf[qy * L + qx] = cor(255 * fb, 250 * fb, 230 * fb);
+				}
+			}
+			desenharAstronauta(buf, t);
 			if (hud) { hud.ano.textContent = c.hud[0]; hud.estacao.textContent = c.hud[1]; }
 		};
 	}

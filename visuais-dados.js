@@ -811,14 +811,14 @@ window.VISUAIS_DADOS = {
 		aria: 'Céu lotado de estrelas e nuvens avermelhadas, com um brilho no meio e uma estrela azulada passando; uma mira amarela marca onde o Sol estaria, sem ele aparecer.',
 		hud: ['o céu no centro da galáxia', SOL_INVISIVEL], fundo: '#0e0612', estrelas: 420, coresEstrelas: ['#ffd8b0', '#ffffff', '#ffb080', '#cfe0ff'],
 		nuvens: [[60, 40, 55, '#3a1020', 0.55], [140, 70, 60, '#4a1828', 0.5], [100, 55, 30, '#5a2030', 0.35]],
-		brilhantes: [[100, 55, '#ffe8c0', 3], [112, 48, '#bcd4ff', 2, true]], sol: [28, 92, false] };
+		brilhantes: [[100, 55, '#ffe8c0', 3], [112, 48, '#bcd4ff', 2, true]], sol: [30, 30, false] };
 	V.fermi.ceu = {
 		texto: 'Lá do alto de uma das bolhas, uns 25 mil anos-luz acima do disco, a vista é incrível: dá para ver a Via Láctea inteira de cima, como um redemoinho gigante de estrelas lá embaixo. O Sol é só um dos pontinhos de um dos braços, impossível de achar.',
 		legenda: 'De cima de uma Bolha de Fermi, a Via Láctea aparece lá embaixo, vista de cima. A mira marca onde fica o Sol, num dos braços.',
 		aria: 'A Via Láctea vista de cima, como um redemoinho com dois braços, embaixo; em volta, um brilho roxo fraquinho; uma mira amarela marca onde o Sol fica num dos braços.',
 		hud: ['do alto de uma bolha', 'o Sol: perdido num dos braços'], fundo: '#05030c', estrelas: 40,
 		// (lá de cima a galáxia aparece quase de frente: redondinha, inteira dentro do quadro)
-		nuvens: [[100, 56, 95, '#2a0a3a', 0.45]], galaxia: [100, 58, 52, 42], sol: [130, 72, false] };
+		nuvens: [[100, 56, 95, '#2a0a3a', 0.45]], galaxia: [100, 58, 52, 42], sol: [130, 72, false], chao: false };
 	V.orion.ceu = {
 		texto: 'Dentro da Nebulosa de Órion, o céu é todo colorido: nuvens rosas e alaranjadas em todas as direções, iluminadas pelas quatro estrelas do Trapézio, tão fortes que fariam sombra no chão. Do Sol, nem sinal: daqui ele seria fraco demais para ver.',
 		legenda: 'Dentro da Nebulosa de Órion: nuvens coloridas por todo o céu e as quatro estrelas do Trapézio no meio.',
@@ -832,7 +832,7 @@ window.VISUAIS_DADOS = {
 		aria: 'Céu com sete estrelas azuis muito brilhantes espalhadas e uma névoa azul; uma mira amarela marca onde o Sol estaria, sem ele aparecer.',
 		hud: ['no meio das Plêiades', SOL_FRACO], estrelas: 60,
 		nuvens: [[100, 55, 90, '#14284e', 0.5], [70, 45, 40, '#1f3a6a', 0.4]],
-		brilhantes: [[40, 30, '#cfe0ff', 3], [80, 60, '#bcd4ff', 4], [120, 35, '#dfe8ff', 3], [150, 70, '#bcd4ff', 3], [170, 30, '#cfe0ff', 2], [60, 85, '#e8f0ff', 2], [110, 85, '#cfe0ff', 3]], sol: [185, 95, false] };
+		brilhantes: [[40, 30, '#cfe0ff', 3], [80, 60, '#bcd4ff', 4], [120, 35, '#dfe8ff', 3], [150, 70, '#bcd4ff', 3], [170, 30, '#cfe0ff', 2], [60, 72, '#e8f0ff', 2], [110, 76, '#cfe0ff', 3]], sol: [186, 62, false] };
 	V.helice.ceu = {
 		texto: 'Perto da Nebulosa da Hélice, o céu teria um anel enorme de gás em volta, azulado por dentro e avermelhado por fora, e bem no meio a anã branca: pequenininha, mas muito brilhante. O Sol, a 650 anos-luz, não apareceria.',
 		legenda: 'Perto da Hélice: o anel de gás tomando o céu e a anã branca brilhando no meio.',
@@ -845,19 +845,19 @@ window.VISUAIS_DADOS = {
 		legenda: 'Perto da Estrela de Tabby: um céu comum, com ela apagando e acendendo de vez em quando.',
 		aria: 'Céu estrelado comum com uma estrela grande que apaga e acende devagar; uma mira amarela marca onde o Sol estaria, sem ele aparecer.',
 		hud: ['perto da Estrela de Tabby', SOL_FRACO], estrelas: 80,
-		brilhantes: [[100, 50, '#fff0d8', 4, true]], sol: [30, 90, false] };
+		brilhantes: [[100, 46, '#fff0d8', 4, 'apaga']], sol: [30, 58, false] };
 	V['omega-centauri'].ceu = {
 		texto: 'No meio de Omega Centauri, o céu nunca fica escuro: são milhares de estrelas mais brilhantes que Vênus, para todo lado, amareladas e velhinhas. Dava para ler um livro à noite só com a luz delas! O Sol, a 17 mil anos-luz, nem de longe apareceria.',
 		legenda: 'No meio de Omega Centauri: estrelas por todo o céu, tantas que a noite fica clara.',
 		aria: 'Céu completamente tomado por milhares de estrelas amareladas, com um brilho no meio; uma mira amarela marca onde o Sol estaria, sem ele aparecer.',
 		hud: ['no meio de Omega Centauri', SOL_INVISIVEL], fundo: '#14100a', estrelas: 1100, coresEstrelas: ['#fff0c8', '#ffe0a0', '#ffffff', '#ffc890'],
-		nuvens: [[100, 55, 95, '#3a3018', 0.5]], sol: [20, 100, false] };
+		nuvens: [[100, 55, 95, '#3a3018', 0.5]], sol: [22, 58, false] };
 	V.betelgeuse.ceu = {
 		texto: 'Se existisse um planeta perto de Betelgeuse, ela tomaria um pedaço enorme do céu, vermelha e fervendo. E as constelações seriam todas diferentes das nossas: Órion, por exemplo, nem existiria. O Sol, a 550 anos-luz, ficaria fraco demais para ver.',
 		legenda: 'De um planeta perto de Betelgeuse: a estrela gigante ocupando um pedaço enorme do céu.',
 		aria: 'Um pedaço enorme de uma estrela vermelha e fervendo tomando a esquerda do céu, com estrelas comuns em volta; uma mira amarela marca onde o Sol estaria, sem ele aparecer.',
 		hud: ['de um planeta perto de Betelgeuse', SOL_FRACO], estrelas: 60,
-		disco: [-30, 60, 95], brilhantes: [[160, 25, '#dfe8ff', 2]], sol: [178, 92, false] };
+		disco: [-30, 52, 95], brilhantes: [[160, 25, '#dfe8ff', 2]], sol: [176, 58, false] };
 	V['eta-carinae'].ceu = {
 		texto: 'Perto de Eta Carinae, o céu seria tomado pela Nebulosa de Carina, com nuvens rosas e pilares de poeira, e Eta brilhando mais que todas as outras estrelas juntas. O Sol, a 7.500 anos-luz, não apareceria.',
 		legenda: 'Perto de Eta Carinae: as nuvens da Nebulosa de Carina e Eta brilhando no meio.',
@@ -877,7 +877,7 @@ window.VISUAIS_DADOS = {
 		aria: 'Céu com nuvens alaranjadas e uma névoa azulada, e um pontinho azul piscando muito rápido no meio; uma mira amarela marca onde o Sol estaria, sem ele aparecer.',
 		hud: ['dentro do Caranguejo', SOL_INVISIVEL], fundo: '#0a0814', estrelas: 50,
 		nuvens: [[100, 55, 95, '#2a3a50', 0.45], [45, 40, 45, '#6a3418', 0.45], [160, 70, 45, '#5a2a14', 0.45], [100, 20, 30, '#4a3a14', 0.35]],
-		brilhantes: [[100, 55, '#cfe0ff', 2, 'rapido']], sol: [180, 100, false] };
+		brilhantes: [[100, 50, '#cfe0ff', 2, 'rapido']], sol: [178, 62, false] };
 	V['proxima-centauri'].ceu = {
 		texto: 'De Proxima b, o Sol aparece como uma estrela brilhante na constelação de Cassiopeia. O famoso "W" de Cassiopeia ganharia uma sexta estrela: o nosso Sol! E as vizinhas Alfa Centauri A e B brilhariam no céu mais forte que qualquer estrela que a gente vê daqui.',
 		legenda: 'De Proxima b: o "W" de Cassiopeia ganha mais uma estrela, o Sol (dentro da mira), e Alfa Centauri A e B brilham forte.',
