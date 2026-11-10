@@ -4618,3 +4618,14 @@ html.aproximando, html.aproximando body { overflow: hidden; }
 .pot-quadro i:nth-child(2) { right: 0; top: 0; border-width: 1px 1px 0 0; }
 .pot-quadro i:nth-child(3) { left: 0; bottom: 0; border-width: 0 0 1px 1px; }
 .pot-quadro i:nth-child(4) { right: 0; bottom: 0; border-width: 0 1px 1px 0; }
+.pot-ponto.esq { flex-direction: row-reverse; translate: calc(-100% + 8px) 0; }
+.pot-ponto.esq > span { justify-items: end; text-align: right; }
+/* tela baixa e larga (celular deitado): o painel vira uma coluna à esquerda, e o título some para dar lugar */
+.galaxia.potencias-on.pot-lateral .galaxia-topo { opacity: 0; visibility: hidden; transition: opacity 0.3s ease, visibility 0s linear 0.3s; }
+.galaxia.pot-lateral .pot-painel { left: 12px; top: 12px; bottom: 12px; transform: none; width: min(300px, 38vw); padding: 10px 12px; overflow-y: auto; display: flex; flex-direction: column; justify-content: center; }
+.galaxia.pot-lateral .pot-titulo { font-size: 18px; }
+.galaxia.pot-lateral .pot-texto { font-size: 12px; }
+.galaxia.pot-lateral .pot-lista { font-size: 11px; }
+.galaxia.pot-lateral .pot-passos { margin-top: 8px; gap: 4px; }
+.galaxia.pot-lateral .pot-passos i { display: none; }
+.galaxia.pot-lateral .pot-passos button { min-height: 30px; padding: 5px 7px; font-size: 10px; }
