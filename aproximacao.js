@@ -304,4 +304,17 @@
 
 	document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && estado) afastar(); });
 	window.addEventListener('resize', function () { if (estado) estado.medir(); });
+
+	/* vindo do menu de outra página (sistema-solar.html#perto-jupiter): assim que a chegada termina,
+	   a nave já se aproxima daquele planeta */
+	var pedido = /^#perto-(terra|jupiter|saturno|urano|netuno)$/.exec(location.hash);
+	if (pedido) {
+		if (history.replaceState) history.replaceState(null, '', location.pathname);
+		var raizDoc = document.documentElement, inicio = Date.now();
+		(function esperar() {
+			var ocupado = raizDoc.classList.contains('chegando') || raizDoc.classList.contains('em-salto');
+			if (ocupado && Date.now() - inicio < 20000) { setTimeout(esperar, 200); return; }
+			setTimeout(function () { aproximar(pedido[1]); }, 400);
+		})();
+	}
 })();

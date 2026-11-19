@@ -34,6 +34,7 @@ Object.assign(window.EN.t, {
 	'Nosso sistema solar': 'Our solar system',
 	'Nosso sistema solar · Via Láctea · textos e pixel art feitos à mão': '<a href="sistema-solar.html">Our solar system</a> · <a href="index.html#galaxia">Milky Way</a> · texts and pixel art made by hand',
 	'← Via Láctea': '&larr; Milky Way',
+	'← Sistema Solar': '&larr; Solar System',
 	'Via Láctea': 'Milky Way',
 	'Sistema Solar': 'Solar System',
 	'Mercúrio': 'Mercury',

@@ -3,6 +3,14 @@
 //  - as seções aparecem deslizando quando chegam na tela;
 //  - um aviso "role para explorar" no topo.
 (function () {
+	// no menu de cima, os planetas que têm luas levam ao sistema solar já pertinho deles,
+	// para ver as luas e escolher entre o planeta e elas (aproximacao.js)
+	document.querySelectorAll('.menu a').forEach(function (a) {
+		var m = /^(terra|jupiter|saturno|urano|netuno)\.html$/.exec(a.getAttribute('href') || '');
+		if (m) a.setAttribute('href', 'sistema-solar.html#perto-' + m[1]);
+	});
+})();
+(function () {
 	var calmo = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 	var raiz = document.documentElement;
 	if (!calmo && 'IntersectionObserver' in window) raiz.classList.add('com-js');

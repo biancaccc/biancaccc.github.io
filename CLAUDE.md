@@ -40,7 +40,8 @@ com os destinos, uma página para cada destino, o passaporte espacial e uma cena
   quizzes, linhas do tempo e o "céu visto daqui" das páginas. `nave.js`: o modelo 3D da nave.
 - `aproximacao.js`: no sistema solar, clicar num planeta com luas (Terra, Júpiter, Saturno, Urano, Netuno) só
   aproxima a nave (sem alfândega): o planeta grande com as luas visitáveis em volta, para escolher com calma; a viagem
-  (e a alfândega) só vem depois da escolha. De longe, as luas não aparecem. `escala-real.html` + `escala-real.js`:
+  (e a alfândega) só vem depois da escolha. De longe, as luas não aparecem. Nas páginas dos planetas e das luas,
+  esses 5 planetas no menu de cima levam a `sistema-solar.html#perto-<planeta>` (pagina.js), que abre a aproximação. `escala-real.html` + `escala-real.js`:
   a página da escala real.
 - `estilo.css`: todo o estilo. `marca.js`: o símbolo, o selo e o crédito da autora.
 - `idioma.js` + `en/`: a versão em inglês (botão PT | EN; nos scripts, `T('pt', 'en')`; os textos das páginas
