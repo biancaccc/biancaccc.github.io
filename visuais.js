@@ -38,7 +38,7 @@
 		});
 		// mini animações (cada página tem duas, em seções diferentes)
 		/* (as animações já refeitas, mais detalhadas, usam uma tela maior) */
-		var GRANDES = /^(lua-face|lua-theia)$/;
+		var GRANDES = /^(lua-face|lua-theia|io-mare|io-pluma|europa-oceano|europa-rachaduras|ganimedes-aurora|ganimedes-tamanho)$/;
 		[D.animacao, D.animacao2].forEach(function (a) {
 			var secA = a && document.getElementById('secao-' + a.secao);
 			if (secA) secA.appendChild(el('figure', 'animacao',
@@ -2754,20 +2754,23 @@
 	// desenha a arte centrada em (cx, cy), com "lar" de largura, girada de "giro" radianos e com a
 	// luz vindo da direção (lx, ly) na tela (sem luz: como na arte). "sombra" é o quanto o lado da
 	// noite escurece (0 a 1). Devolve false enquanto a imagem ainda não carregou.
-	function arte(buf, L, A, id, cx, cy, lar, giro, lx, ly, sombra, brilho) {
+	function arte(buf, L, A, id, cx, cy, lar, giro, lx, ly, sombra, brilho, estica) {
 		var s = arteNoTamanho(id, lar); if (!s) return false;
-		var c = Math.cos(giro || 0), sn = Math.sin(giro || 0), R = Math.hypot(s.w, s.h) / 2 + 1, raio = Math.min(s.w, s.h) / 2;
+		/* (estica: alonga a arte na direção do giro, mantendo a área, como uma maré) */
+		var e = estica || 1, re = Math.sqrt(e);
+		var c = Math.cos(giro || 0), sn = Math.sin(giro || 0), R = Math.hypot(s.w, s.h) / 2 * e + 1, raio = Math.min(s.w, s.h) / 2;
 		var luz = lx !== undefined && lx !== null, ln = luz ? Math.hypot(lx, ly) || 1 : 1;
 		for (var y = Math.floor(cy - R); y <= cy + R; y++) for (var x = Math.floor(cx - R); x <= cx + R; x++) {
 			if (x < 0 || y < 0 || x >= L || y >= A) continue;
 			var dx = x + 0.5 - cx, dy = y + 0.5 - cy;
-			var u = dx * c + dy * sn + s.w / 2, v = -dx * sn + dy * c + s.h / 2;
+			var u = (dx * c + dy * sn) / e + s.w / 2, v = (-dx * sn + dy * c) * re + s.h / 2;
 			var iu = Math.floor(u), iv = Math.floor(v);
 			if (iu < 0 || iv < 0 || iu >= s.w || iv >= s.h) continue;
 			var k = (iv * s.w + iu) * 4, a = s.d[k + 3]; if (a < 0.5) continue;
 			var f = brilho || 1;
 			if (luz) {
-				var nx = dx / raio, ny = dy / raio, nz = Math.sqrt(Math.max(0, 1 - nx * nx - ny * ny));
+				var nx = (u - s.w / 2) / raio, ny = (v - s.h / 2) / raio, nz = Math.sqrt(Math.max(0, 1 - nx * nx - ny * ny));
+				var gx = nx * c - ny * sn, gy = nx * sn + ny * c; nx = gx; ny = gy;
 				var d = (nx * lx + ny * ly) / ln * 0.9 + nz * 0.25;
 				f *= 1 - (sombra === undefined ? 0.85 : sombra) * suave(0.5 - d * 2.2);
 			}
@@ -2944,28 +2947,28 @@
 		// Io espremida: na órbita (exagerada aqui), quando passa perto de Júpiter ela estica e esquenta;
 		// Europa e Ganimedes, mais longe, dão 2 e 1 voltas enquanto Io dá 4
 		'io-mare': function (L, A) {
-			var fundo = estrelasFundo(L, A, 403, 50), jx = 36, jy = A / 2, CICLO = 16;
+			var ceu = ceuBonito(L, A, 403, '#5a4a3a'), jx = 58, jy = A / 2 + 2, CICLO = 16, E = 0.3;
 			return function (buf, t, hud) {
-				buf.fill(hex('#07051a')); fundo(buf, t);
-				luaJupiter(buf, L, A, jx, jy, 24, t, 1);
+				ceu(buf, t);
 				var c = t % CICLO, ai = c / CICLO * Math.PI * 2 * 4, ae = c / CICLO * Math.PI * 2 * 2, ag = c / CICLO * Math.PI * 2;
+				function raioIo(a) { return 104 * (1 - E * E) / (1 + E * Math.cos(a)); }
+				var ri = raioIo(ai), ix = jx + Math.cos(ai) * ri, iy = jy + Math.sin(ai) * ri * 0.34;
+				var ex = jx + Math.cos(ae) * 160, ey = jy + Math.sin(ae) * 160 * 0.3, gxm = jx + Math.cos(ag) * 230, gym = jy + Math.sin(ag) * 230 * 0.26;
 				/* as órbitas (a de Io achatada de propósito, para dar para ver o perto e o longe) */
-				function orbita(r, e, cc, ach) { for (var a = 0, n = 0; a < Math.PI * 2; a += 0.03, n++) if (n % 3 === 0) { var rr = r * (1 - e * e) / (1 + e * Math.cos(a)); pintar(buf, L, A, jx + Math.cos(a) * rr, jy + Math.sin(a) * rr * (ach || 0.42), cc); } }
-				orbita(66, 0.28, hex('#6a5838')); orbita(104, 0, hex('#3e3a6a'), 0.34); orbita(146, 0, hex('#3a3664'), 0.3);
-				var ri = 66 * (1 - 0.28 * 0.28) / (1 + 0.28 * Math.cos(ai)), ix = jx + Math.cos(ai) * ri, iy = jy + Math.sin(ai) * ri * 0.42;
-				var perto = suave((90 - ri) / 38);
-				/* Io esticada na direção de Júpiter, e vermelha de calor quando está perto */
-				var dx = (jx - ix), dy = (jy - iy), dn = Math.hypot(dx, dy) || 1; dx /= dn; dy /= dn;
-				for (var y = -8; y <= 8; y++) for (var x = -8; x <= 8; x++) {
-					var u = x * dx + y * dy, v = -x * dy + y * dx, e = 1 + perto * 0.45;
-					if ((u / (5 * e)) * (u / (5 * e)) + (v / (5 / Math.sqrt(e))) * (v / (5 / Math.sqrt(e))) > 1) continue;
-					var lim = B4[((x + 8) & 1) + (((y + 8) & 1) << 1)];
-					var base = (x + y * 0.3) / 5 + lim * 0.6 > 0.4 ? [200, 160, 40] : [240, 210, 70];
-					var q = perto * (1 - Math.hypot(u, v) / 7);
-					pintar(buf, L, A, ix + x, iy + y, cor(base[0] + (255 - base[0]) * q, base[1] * (1 - q * 0.7), base[2] * (1 - q)));
+				for (var k = 0; k < 220; k += 2) { var a = k / 220 * Math.PI * 2, r = raioIo(a); luaMistura(buf, L, A, jx + Math.cos(a) * r, jy + Math.sin(a) * r * 0.34, 240, 200, 90, 0.35 + 0.5 * Math.pow(Math.max(0, Math.cos(a - ai)), 8)); }
+				orbitaPontilhada(buf, L, A, jx, jy, 160, 48, ae, 200, 190, 170);
+				orbitaPontilhada(buf, L, A, jx, jy, 230, 60, ag, 170, 160, 150);
+				var perto = suave((96 - ri) / 34);
+				function io() {
+					brilhoSoma(buf, L, A, ix, iy, 14 + perto * 10, 255, 120, 40, 0.25 + perto * 0.7);
+					/* Io esticada na direção de Júpiter */
+					arte(buf, L, A, 'io', ix, iy, 16, Math.atan2(jy - iy, jx - ix), jx - ix, jy - iy, 0.75, 1 + perto * 0.25, 1 + perto * 0.45);
 				}
-				luaDisco(buf, L, A, jx + Math.cos(ae) * 104, jy + Math.sin(ae) * 104 * 0.34, 2, hex('#e8d8c0'));
-				luaDisco(buf, L, A, jx + Math.cos(ag) * 146, jy + Math.sin(ag) * 146 * 0.3, 3, hex('#b0a088'));
+				var luas = [[Math.sin(ai) < 0, io], [Math.sin(ae) < 0, function () { arte(buf, L, A, 'europa', ex, ey, 14, 0, jx - ex, jy - ey, 0.75); }], [Math.sin(ag) < 0, function () { arte(buf, L, A, 'ganimedes', gxm, gym, 20, 0, jx - gxm, jy - gym, 0.75); }]];
+				luas.forEach(function (l) { if (l[0]) l[1](); });
+				brilhoSoma(buf, L, A, jx, jy, 66, 230, 190, 140, 0.35);
+				arte(buf, L, A, 'jupiter', jx, jy, 92, 0);
+				luas.forEach(function (l) { if (!l[0]) l[1](); });
 				if (hud) {
 					hud.ano.textContent = TR('Io ' + (Math.floor(c / CICLO * 4) + 1) + ' · Europa ' + (Math.floor(c / CICLO * 2) + 1) + ' · Ganimedes 1', 'Io ' + (Math.floor(c / CICLO * 4) + 1) + ' · Europa ' + (Math.floor(c / CICLO * 2) + 1) + ' · Ganymede 1');
 					hud.estacao.textContent = perto > 0.5 ? TR('perto: Io estica e esquenta', 'close: Io stretches and heats up') : TR('longe: Io relaxa', 'far: Io relaxes');
@@ -2973,33 +2976,55 @@
 			};
 		},
 		// a pluma de um vulcão de Io: sem ar, o material sobe e cai em arcos, formando um guarda-chuva,
-		// e a poeira que cai pinta um anel vermelho no chão
+		// e a poeira que cai pinta um anel vermelho no chão. Júpiter enorme no céu.
 		'io-pluma': function (L, A) {
-			var fundo = estrelasFundo(L, A, 404, 50), CICLO = 12, vx0 = 100, CHAO = 92, aleat = semente(44), gotas = [];
-			for (var i = 0; i < 520; i++) gotas.push([aleat() * CICLO, (aleat() - 0.5) * 1.5, 0.8 + aleat() * 0.25, aleat()]);
+			var ceu = ceuBonito(L, A, 404, '#3a2a1a'), CICLO = 12, vx0 = 150, aleat = semente(44), gotas = [];
+			for (var i = 0; i < 2600; i++) gotas.push([aleat() * CICLO, (aleat() - 0.5) * 1.7, 0.86 + aleat() * 0.16, aleat()]);
+			var CHAO = 136;
+			function chaoY(x) { return CHAO + Math.pow((x - 160) / 160, 2) * 10; }
+			/* o chão de enxofre: amarelos, laranjas, manchas pretas de lava e brancas de geada de SO2 */
+			var chao = new Uint32Array(L * A);
+			for (var y = 0; y < A; y++) for (var x = 0; x < L; x++) {
+				var h = chaoY(x); if (y < h) continue;
+				/* (achatado na perspectiva: as manchas ficam mais largas que altas) */
+				var n = ruido2d(x * 0.03, y * 0.1) * 0.65 + ruido2d(x * 0.08, y * 0.22) * 0.35, prof = (y - h) / (A - h);
+				var col = n > 0.66 ? [222, 134, 56] : n > 0.56 ? [234, 188, 70] : n > 0.44 ? [242, 212, 96] : [248, 230, 140];
+				if (ruido2d(x * 0.05 + 30, y * 0.16) > 0.82) col = [96, 52, 34];
+				if (ruido2d(x * 0.06 - 9, y * 0.2 + 4) > 0.84) col = [236, 236, 220];
+				var f = 0.75 + 0.25 * (1 - prof) - (y - h < 1 ? -0.15 : 0);
+				chao[y * L + x] = cor(Math.min(255, col[0] * f), Math.min(255, col[1] * f), Math.min(255, col[2] * f));
+			}
 			return function (buf, t, hud) {
-				buf.fill(hex('#05040e')); fundo(buf, t);
-				luaJupiter(buf, L, A, 170, 26, 30, t, -1);
+				ceu(buf, t);
+				brilhoSoma(buf, L, A, 262, 40, 110, 220, 170, 110, 0.25);
+				arte(buf, L, A, 'jupiter', 262, 40, 150, -0.15, -1, 0.2, 0.7);
 				var c = t % CICLO;
-				/* o chão amarelo de enxofre, com a curva do horizonte */
+				for (var y = 0; y < A; y++) for (var x = 0; x < L; x++) if (chao[y * L + x]) buf[y * L + x] = chao[y * L + x];
+				/* o anel vermelho de poeira, crescendo no chão em volta do vulcão */
+				var raioAnel = 120 * Math.min(1, c / 7), forte = suave(c / 4);
 				for (var x = 0; x < L; x++) {
-					var h = CHAO + Math.pow((x - 100) / 100, 2) * 6;
-					for (var y = Math.round(h); y < A; y++) {
-						var anel = Math.abs(Math.abs(x - vx0) - 70 * Math.min(1, c / 7)) < 6 && y < h + 6 ? suave(c / 4) : 0;
-						var base = ruido2d(x * 0.15, y * 0.3) > 0.55 ? [214, 170, 50] : [236, 204, 74];
-						pintar(buf, L, A, x, y, cor(base[0] - anel * 40, base[1] - anel * 120, base[2] - anel * 20));
+					var h = chaoY(x);
+					for (var dy = 0; dy < 10; dy++) {
+						var dd = Math.abs(Math.abs(x - vx0) - raioAnel * (1 - dy * 0.03)) / 9;
+						if (dd < 1) luaMistura(buf, L, A, x, h + dy, 200, 50, 30, forte * (1 - dd) * 0.85);
 					}
 				}
-				luaDisco(buf, L, A, vx0, CHAO + 1, 3, hex('#3a1a10')); luaDisco(buf, L, A, vx0, CHAO, 1, (Math.floor(t * 6) % 2) ? hex('#ffd36a') : hex('#ff8a3a'));
-				/* a coluna quente logo em cima do vulcão */
-				for (var cy0 = 0; cy0 < 26; cy0++) luaMistura(buf, L, A, vx0 + Math.sin(cy0 * 0.5 + t * 6) * 0.6, CHAO - 2 - cy0, 255, 200, 110, 0.7 * (1 - cy0 / 26));
+				/* a boca do vulcão, acesa, e o calor tremendo em cima */
+				var vy = chaoY(vx0);
+				for (var k = -6; k <= 6; k++) pintar(buf, L, A, vx0 + k, vy + 1 - Math.max(0, 3 - Math.abs(k) * 0.5), hex('#3a1a10'));
+				brilhoSoma(buf, L, A, vx0, vy, 16, 255, 150, 50, 0.9);
+				for (var q = 0; q < 40; q++) luaMistura(buf, L, A, vx0 + Math.sin(q * 0.5 + t * 6) * (1 + q * 0.05), vy - 2 - q, 255, 210, 120, 0.75 * (1 - q / 40));
 				/* as partículas: cada uma sai do vulcão e cai num arco (gravidade sem ar) */
 				gotas.forEach(function (g) {
-					var tau = ((c - g[0]) % CICLO + CICLO) % CICLO * 1.2, vy = 42 * g[2], vxp = g[1] * 26;
-					var y = CHAO - (vy * tau - 10 * tau * tau), x = vx0 + vxp * tau;
-					if (y > CHAO || tau > 8.5) return;
-					var br = 1 - tau / 9;
-					if (g[3] > 0.6) luaMistura(buf, L, A, x, y, 255, 240, 160, 0.5 + br * 0.5); else if (g[3] > 0.3) luaMistura(buf, L, A, x, y, 255, 184, 74, 0.45 + br * 0.5); else luaMistura(buf, L, A, x, y, 232, 120, 58, 0.4 + br * 0.5);
+					var tau = ((c - g[0]) % CICLO + CICLO) % CICLO * 1.2, v = 64 * g[2], vxp = g[1] * 36;
+					var y = vy - (v * tau - 10 * tau * tau), x = vx0 + vxp * tau;
+					if (y > chaoY(x) || tau > 8) return;
+					/* (no alto do arco ela anda devagar: ali as partículas se juntam e formam o guarda-chuva) */
+					var br = 1 - tau / 9, topo = Math.exp(-Math.pow((tau - v / 20) / 1.2, 2)) * 0.3;
+					br += topo;
+					if (g[3] > 0.65) luaMistura(buf, L, A, x, y, 255, 244, 200, 0.25 + br * 0.35);
+					else if (g[3] > 0.3) luaMistura(buf, L, A, x, y, 255, 190, 100, 0.22 + br * 0.35);
+					else luaMistura(buf, L, A, x, y, 230, 110, 60, 0.22 + br * 0.35);
 				});
 				if (hud) {
 					hud.ano.textContent = TR('altura: mais de 300 km', 'height: over 300 km');
@@ -3007,64 +3032,82 @@
 				}
 			};
 		},
-		// Europa cortada ao meio: a casca de gelo, o oceano escondido (com bolhinhas subindo das fontes
-		// quentes do fundo), a rocha e o núcleo de metal
+		// Europa cortada ao meio: de um lado a superfície (a arte), do outro as camadas: a casca de gelo,
+		// o oceano escondido (com bolhas subindo das fontes quentes do fundo), a rocha e o núcleo de metal
 		'europa-oceano': function (L, A) {
-			var fundo = estrelasFundo(L, A, 405, 50), cx = 100, cy = 104, R = 96, CICLO = 14, aleat = semente(45), bolhas = [];
-			for (var i = 0; i < 26; i++) bolhas.push([aleat() * 2 - 1, aleat() * CICLO, aleat()]);
+			var ceu = ceuBonito(L, A, 405, '#2a4a6a'), cx = 160, cy = 92, R = 78, CICLO = 14, aleat = semente(45), bolhas = [];
+			for (var i = 0; i < 60; i++) bolhas.push([(aleat() - 0.5) * 2.6, aleat() * CICLO, aleat()]);
+			/* (as camadas em fração do raio, com a casca e o oceano engordados para dar para ver) */
+			var GELO = 0.9, OCEANO = 0.72, ROCHA = 0.36;
 			return function (buf, t, hud) {
-				buf.fill(hex('#07051a')); fundo(buf, t);
-				var c = t % CICLO;
-				for (var y = 0; y < A; y++) for (var x = 0; x < L; x++) {
-					var d = Math.hypot(x - cx, y - cy); if (d > R) continue;
-					var lim = B4[(x & 1) + ((y & 1) << 1)], col;
-					if (d > R - 9) col = d > R - 2 ? hex('#ffffff') : (d > R - 5 + lim ? hex('#e6ecf4') : hex('#c4d4e6'));
-					else if (d > R - 30) { var onda = Math.sin(x * 0.12 + t * 1.4 + d * 0.3) * 0.5 + 0.5; col = onda + lim * 0.5 > 1.1 ? hex('#3a7ac8') : d > R - 14 ? hex('#2a5aa8') : hex('#1e4688'); }
-					else if (d > 26) col = (ruido2d(x * 0.2, y * 0.2) + lim * 0.3 > 0.75) ? hex('#7a5a3e') : hex('#8a6a48');
-					else col = d > 22 ? hex('#9a9aa8') : hex('#c4c4d0');
-					pintar(buf, L, A, x, y, col);
+				ceu(buf, t);
+				var c = t % CICLO, etapa = Math.floor(c / CICLO * 3);
+				brilhoSoma(buf, L, A, cx, cy, R + 24, 140, 160, 200, 0.3);
+				arte(buf, L, A, 'europa', cx, cy, R * 2, 0, -1, -0.3, 0.6);
+				/* o corte: um quarto da lua aberto, de cima até a direita */
+				for (var y = Math.floor(cy - R); y <= cy; y++) for (var x = Math.floor(cx); x <= cx + R; x++) {
+					var d = Math.hypot(x + 0.5 - cx, y + 0.5 - cy) / R; if (d > 1) continue;
+					var col;
+					if (d > GELO) { var g = (d - GELO) / (1 - GELO); col = [214 + g * 30, 230 + g * 18, 246]; if (ruido2d(x * 0.4, y * 0.4) > 0.7) col = [190, 210, 236]; }
+					else if (d > OCEANO) {
+						var p = (d - OCEANO) / (GELO - OCEANO), onda = Math.sin((x - y) * 0.12 + t * 1.6) * 0.5 + 0.5;
+						col = [24 + p * 40 + onda * 14, 70 + p * 70 + onda * 20, 140 + p * 70 + onda * 20];
+					} else if (d > ROCHA) { var r = ruido2d(x * 0.12, y * 0.12); col = r > 0.6 ? [120, 86, 60] : r > 0.4 ? [140, 104, 74] : [158, 120, 86]; col = col.map(function (v) { return v * (0.7 + 0.3 * (d - ROCHA) / (OCEANO - ROCHA)); }); }
+					else { var m = 1 - d / ROCHA; col = [150 + m * 70, 150 + m * 70, 166 + m * 60]; }
+					var acende = (etapa === 0 && d > GELO) || (etapa === 1 && d > OCEANO && d <= GELO) || (etapa === 2 && d <= OCEANO) ? 1.12 : 0.92;
+					buf[y * L + x] = cor(Math.min(255, col[0] * acende), Math.min(255, col[1] * acende), Math.min(255, col[2] * acende));
 				}
-				/* as rachaduras avermelhadas no gelo, por fora */
-				[0.3, 0.9, 1.6, 2.4].forEach(function (a) { for (var k = 0; k < 4; k++) pintar(buf, L, A, cx - Math.cos(a) * (R - k * 2), cy - Math.sin(a) * (R - k * 2), hex('#a8603a')); });
-				/* fontes quentes no fundo do oceano e bolhas subindo */
-				bolhas.forEach(function (b) {
-					var a = -Math.PI / 2 + b[0] * 0.9, s = ((c - b[1]) % CICLO + CICLO) % CICLO / CICLO;
-					var r = R - 30 + s * 21; if (r > R - 10) return;
-					pintar(buf, L, A, cx + Math.cos(a) * r + Math.sin(t * 3 + b[2] * 9), cy + Math.sin(a) * r, hex('#bfe8ff'));
+				/* as bordas do corte, claras */
+				for (var k = 0; k <= R; k++) { luaMistura(buf, L, A, cx + k, cy, 255, 255, 255, 0.5); luaMistura(buf, L, A, cx, cy - k, 255, 255, 255, 0.5); }
+				/* fontes quentes no fundo do oceano e bolhas subindo até o gelo */
+				[0.2, 0.75, 1.3].forEach(function (b, i) {
+					var a = -Math.PI / 2 + b, fx = cx + Math.cos(a) * R * (OCEANO + 0.01), fy = cy + Math.sin(a) * R * (OCEANO + 0.01);
+					brilhoSoma(buf, L, A, fx, fy, 7, 255, 140, 50, 0.6 + 0.3 * Math.sin(t * 4 + i));
 				});
-				[-0.5, 0.15, 0.6].forEach(function (b) { var a = -Math.PI / 2 + b * 0.9; luaDisco(buf, L, A, cx + Math.cos(a) * (R - 31), cy + Math.sin(a) * (R - 31), 1, (Math.floor(t * 4) % 2) ? hex('#ff8a3a') : hex('#ffd36a')); });
+				bolhas.forEach(function (b) {
+					var a = -Math.PI / 2 + 0.2 + (b[0] + 1.3) / 2.6 * 1.1, s = ((c - b[1]) % CICLO + CICLO) % CICLO / 3;
+					if (s > 1) return;
+					var r = R * (OCEANO + s * (GELO - OCEANO - 0.01)), x = cx + Math.cos(a) * r + Math.sin(t * 3 + b[2] * 9) * 1.2, y = cy + Math.sin(a) * r;
+					if (x < cx || y > cy) return;
+					luaMistura(buf, L, A, x, y, 200, 240, 255, 0.8);
+				});
 				if (hud) {
-					var etapa = Math.floor(c / CICLO * 3);
 					hud.ano.textContent = [TR('gelo: 15 a 25 km', 'ice: 15 to 25 km'), TR('oceano: 60 a 150 km', 'ocean: 60 to 150 km'), TR('fundo de rocha', 'rocky seafloor')][etapa];
 					hud.estacao.textContent = [TR('a casca rachada por fora', 'the shell is cracked outside'), TR('o dobro da água da Terra', "twice Earth's water"), TR('fontes quentes? bolhas subindo', 'hot vents? bubbles rising')][etapa];
 				}
 			};
 		},
-		// cada volta em Júpiter estica Europa e o gelo racha: a cada volta, uma rachadura nova
+		// cada volta em Júpiter estica Europa e o gelo racha: a cada volta, uma rachadura nova (primeiro
+		// acesa, depois cor de ferrugem, com os sais que sobem de baixo)
 		'europa-rachaduras': function (L, A) {
-			var fundo = estrelasFundo(L, A, 406, 50), CICLO = 16, VOLTAS = 8, gx = 140, gy = A / 2, R = 40, aleat = semente(46), linhas = [];
-			for (var i = 0; i < VOLTAS; i++) { var v = [aleat() * 2 - 1, aleat() * 2 - 1, aleat() * 2 - 1], n = Math.hypot(v[0], v[1], v[2]); linhas.push([v[0] / n, v[1] / n, v[2] / n]); }
-			var GELO = [hex('#faf6ee'), hex('#ece2d0'), hex('#d8c8b0'), hex('#b8a48a'), hex('#8a7864'), hex('#5a4c40')];
+			var ceu = ceuBonito(L, A, 406, '#4a3a5a'), CICLO = 16, VOLTAS = 8, gx = 214, gy = A / 2 + 4, R = 62, aleat = semente(46), linhas = [];
+			for (var i = 0; i < VOLTAS; i++) { var v = [aleat() * 2 - 1, aleat() * 2 - 1, aleat() + 0.2], n = Math.hypot(v[0], v[1], v[2]); linhas.push([v[0] / n, v[1] / n, v[2] / n, aleat() * Math.PI * 2]); }
 			return function (buf, t, hud) {
-				buf.fill(hex('#07051a')); fundo(buf, t);
+				ceu(buf, t);
 				var c = t % CICLO, volta = c / CICLO * VOLTAS, ang = volta * Math.PI * 2, feitas = Math.floor(volta);
-				luaJupiter(buf, L, A, 30, gy, 16, t, 1);
-				for (var a = 0, n = 0; a < Math.PI * 2; a += 0.05, n++) if (n % 3 === 0) pintar(buf, L, A, 30 + Math.cos(a) * 46, gy + Math.sin(a) * 20, hex('#3a3470'));
-				luaDisco(buf, L, A, 30 + Math.cos(ang) * 46, gy + Math.sin(ang) * 20, 2, hex('#e8dcc8'));
+				/* Júpiter pequeno, e Europa dando voltas nele */
+				var jx = 50, jy = gy, ex = jx + Math.cos(ang) * 40, ey = jy + Math.sin(ang) * 14;
+				orbitaPontilhada(buf, L, A, jx, jy, 40, 14, ang, 200, 190, 170);
+				if (Math.sin(ang) < 0) arte(buf, L, A, 'europa', ex, ey, 8, 0);
+				arte(buf, L, A, 'jupiter', jx, jy, 40, 0);
+				if (Math.sin(ang) >= 0) arte(buf, L, A, 'europa', ex, ey, 8, 0);
 				/* Europa de perto: esticada (só um tiquinho) quando passa perto de Júpiter */
-				var estica = 1 + Math.max(0, Math.cos(ang)) * 0.06;
-				for (var y = -R; y <= R; y++) for (var x = -R; x <= R; x++) {
-					var xe = x / estica, ye = y * estica; if (xe * xe + ye * ye > R * R) continue;
-					var z = Math.sqrt(R * R - xe * xe - ye * ye), nx = xe / R, ny = ye / R, nz = z / R;
-					var luz = (-nx * 0.7 - ny * 0.3 + nz * 0.6), lim = B4[((x + 40) & 1) + (((y + 40) & 1) << 1)];
-					var nivel = Math.round((1 - luz) * 2.5 + lim * 0.9), col = GELO[Math.max(0, Math.min(5, nivel))];
-					for (var q = 0; q < Math.min(feitas + 1, VOLTAS); q++) {
-						var l = linhas[q], dd = Math.abs(nx * l[0] + ny * l[1] + nz * l[2]);
-						var cresce = q < feitas ? 1 : volta - feitas;
-						var ao = Math.atan2(ny - l[1] * (nx * l[0] + ny * l[1] + nz * l[2]), nx);
-						if (dd < 0.03 && (ao + Math.PI) / (Math.PI * 2) < cresce) col = q === feitas ? hex('#ff8a5a') : hex('#a85a3a');
+				var estica = 1 + Math.max(0, Math.cos(ang)) * 0.07;
+				brilhoSoma(buf, L, A, gx, gy, R + 20, 150, 140, 130, 0.25);
+				arte(buf, L, A, 'europa', gx, gy, R * 2, 0, -1, -0.3, 0.55, 1, estica);
+				/* as rachaduras: grandes círculos na esfera; cada volta, uma nova crescendo */
+				for (var q = 0; q < Math.min(feitas + 1, VOLTAS); q++) {
+					var l = linhas[q], cresce = q < feitas ? 1 : volta - feitas;
+					var u = [-l[1], l[0], 0], un = Math.hypot(u[0], u[1]) || 1; u = [u[0] / un, u[1] / un, 0];
+					var w = [l[1] * u[2] - l[2] * u[1], l[2] * u[0] - l[0] * u[2], l[0] * u[1] - l[1] * u[0]];
+					var nova = q === feitas, idade = nova ? 0 : (volta - q - 1);
+					for (var s = 0; s < cresce * 2.4; s += 0.006) {
+						var a = l[3] + s, p = [u[0] * Math.cos(a) + w[0] * Math.sin(a), u[1] * Math.cos(a) + w[1] * Math.sin(a), u[2] * Math.cos(a) + w[2] * Math.sin(a)];
+						if (p[2] < 0.05) continue;
+						var x = gx + p[0] * R * estica, y = gy + p[1] * R / Math.sqrt(estica);
+						if (nova) { luaMistura(buf, L, A, x, y, 255, 170, 90, 0.9); luaMistura(buf, L, A, x + 1, y, 255, 120, 60, 0.35); }
+						else luaMistura(buf, L, A, x, y, 150, 70, 44, Math.min(0.85, 0.5 + idade * 0.12));
 					}
-					pintar(buf, L, A, gx + x, gy + y, col);
 				}
 				if (hud) {
 					hud.ano.textContent = TR('volta ' + (feitas + 1) + ' em Júpiter', 'orbit ' + (feitas + 1) + ' around Jupiter');
@@ -3075,21 +3118,39 @@
 		// As auroras de Ganimedes balançam conforme Júpiter gira. Sem oceano, balançariam uns 6 graus;
 		// o Hubble mediu só 2: um oceano de água salgada segura o balanço
 		'ganimedes-aurora': function (L, A) {
-			var fundo = estrelasFundo(L, A, 407, 50), cx = 100, cy = A / 2 + 2, R = 34, CICLO = 14;
-			var PAL = [hex('#e4dccc'), hex('#c4b8a0'), hex('#9a8a72'), hex('#74644e'), hex('#4e4232'), hex('#2e2620')];
+			var ceu = ceuBonito(L, A, 407, '#2a5a4a'), cx = 196, cy = A / 2 + 4, R = 56, CICLO = 14;
 			return function (buf, t, hud) {
-				buf.fill(hex('#07051a')); fundo(buf, t);
+				ceu(buf, t);
 				var c = t % CICLO, comOceano = c >= CICLO / 2, amp = (comOceano ? 2 : 6) * Math.PI / 180 * 4;
 				var bal = Math.sin(t * 2.2) * amp;
-				globoLuz(buf, L, A, cx, cy, R, -1, -0.4, PAL, function (x, y) { return ruido2d(x * 0.12 + 4, y * 0.12) > 0.55 ? 1 : 0; });
+				/* Júpiter enorme ali do lado, girando, com as linhas do campo magnético */
+				brilhoSoma(buf, L, A, -40, cy, 150, 230, 190, 140, 0.3);
+				arte(buf, L, A, 'jupiter', -40, cy, 220, 0, 1, 0, 0.5);
+				for (var f = 0; f < 4; f++) {
+					var alc = 120 + f * 34;
+					for (var a = -1.2; a <= 1.2; a += 0.012) {
+						var x = -40 + Math.cos(a) * alc, y = cy + Math.sin(a) * alc * 0.75 + Math.sin(bal * 3) * 6 * Math.cos(a);
+						if (((a * 40 + t * 6) % 3) < 1) luaMistura(buf, L, A, x, y, 120, 200, 255, 0.28);
+					}
+				}
+				brilhoSoma(buf, L, A, cx, cy, R + 18, 160, 150, 130, 0.25);
+				arte(buf, L, A, 'ganimedes', cx, cy, R * 2, 0, -1, -0.3, 0.65);
+				/* com oceano: um anel azul por dentro, mostrando a água salgada escondida */
+				if (comOceano) {
+					var surge = suave((c - CICLO / 2) / 1.2);
+					for (var y = Math.floor(cy - R); y <= cy + R; y++) for (var x = Math.floor(cx - R); x <= cx + R; x++) {
+						var d = Math.hypot(x + 0.5 - cx, y + 0.5 - cy) / R;
+						if (d > 0.84 && d < 0.94) luaMistura(buf, L, A, x, y, 60, 140, 255, 0.26 * surge);
+					}
+				}
 				/* os dois anéis de aurora, perto dos polos, balançando */
-				[[-1, 0.62], [1, 0.62]].forEach(function (p) {
-					for (var a = 0; a < Math.PI * 2; a += 0.04) {
-						var rx = R * 0.62, ry = R * 0.16, px0 = Math.cos(a) * rx, py0 = Math.sin(a) * ry + p[0] * R * 0.72;
+				[-1, 1].forEach(function (p) {
+					for (var a = 0; a < Math.PI * 2; a += 0.01) {
+						var px0 = Math.cos(a) * R * 0.6, py0 = Math.sin(a) * R * 0.15 + p * R * 0.72;
 						var xr = px0 * Math.cos(bal) - py0 * Math.sin(bal), yr = px0 * Math.sin(bal) + py0 * Math.cos(bal);
-						if (Math.sin(a) < 0 && Math.abs(p[0]) > 0) { if (xr * xr + yr * yr < R * R * 0.9) continue; }
-						var br = 0.6 + 0.4 * Math.sin(a * 3 + t * 4);
-						pintar(buf, L, A, cx + xr, cy + yr, br > 0.7 ? hex('#a8ffe0') : hex('#4ae8b0'));
+						var atras = Math.sin(a) * p < 0 && xr * xr + yr * yr < R * R * 0.95;
+						var br = 0.55 + 0.45 * Math.sin(a * 5 + t * 4);
+						for (var h = 0; h < 5; h++) luaMistura(buf, L, A, cx + xr, cy + yr - p * h * 1.2, 90, 255, 180, (atras ? 0.15 : 0.6) * br * (1 - h / 5));
 					}
 				});
 				if (hud) {
@@ -3100,20 +3161,25 @@
 		},
 		// Ganimedes ao lado da nossa Lua, de Mercúrio e de Titã, todos na mesma escala
 		'ganimedes-tamanho': function (L, A) {
-			var fundo = estrelasFundo(L, A, 408, 50), CICLO = 12, ESC = 34 / 5268;
-			var ASTROS = [
-				[3474, [hex('#f2f2ee'), hex('#d4d4d0'), hex('#aeaeaa'), hex('#86868a'), hex('#5e5e66'), hex('#3a3a44')], TR('Lua: 3.474 km', 'Moon: 3,474 km')],
-				[4879, [hex('#e0e4f0'), hex('#b8bccc'), hex('#9094a8'), hex('#6a6e84'), hex('#4a4c60'), hex('#2a2c3c')], TR('Mercúrio: 4.879 km', 'Mercury: 4,879 km')],
-				[5150, [hex('#ffd890'), hex('#e8b050'), hex('#c8842e'), hex('#a0601e'), hex('#704014'), hex('#40240c')], TR('Titã: 5.150 km', 'Titan: 5,150 km')],
-				[5268, [hex('#e4dccc'), hex('#c4b8a0'), hex('#9a8a72'), hex('#74644e'), hex('#4e4232'), hex('#2e2620')], TR('Ganimedes: 5.268 km, a maior!', 'Ganymede: 5,268 km, the largest!')]];
+			var ceu = ceuBonito(L, A, 408, '#3a3a5a'), CICLO = 12, ESC = 74 / 5268;
+			var ASTROS = [['lua', 3474, TR('Lua: 3.474 km', 'Moon: 3,474 km')], ['mercurio', 4879, TR('Mercúrio: 4.879 km', 'Mercury: 4,879 km')],
+				['tita', 5150, TR('Titã: 5.150 km', 'Titan: 5,150 km')], ['ganimedes', 5268, TR('Ganimedes: 5.268 km, a maior!', 'Ganymede: 5,268 km, the largest!')]];
 			return function (buf, t, hud) {
-				buf.fill(hex('#07051a')); fundo(buf, t);
-				var c = t % CICLO, foco = Math.min(3, Math.floor(c / CICLO * 4)), x = 9;
+				ceu(buf, t);
+				var c = t % CICLO, foco = Math.min(3, Math.floor(c / CICLO * 4)), x = 14, base = A / 2 + 16;
+				/* a régua no chão: todos apoiados na mesma linha */
+				for (var k = 6; k < L - 6; k++) luaMistura(buf, L, A, k, base + 44, 150, 140, 200, k % 4 < 2 ? 0.5 : 0.2);
 				ASTROS.forEach(function (a, i) {
-					var r = Math.round(a[0] / 5268 * 22); x += r;
-					globoLuz(buf, L, A, x, A / 2 + 6, r, -1, -0.3, a[1]);
-					if (i === foco) { var sy = A / 2 + 6 - r - 6 + Math.round(Math.sin(t * 5)); luaLinha(buf, L, A, x - 2, sy - 2, x, sy, hex('#ffd36a')); luaLinha(buf, L, A, x + 2, sy - 2, x, sy, hex('#ffd36a')); luaLinha(buf, L, A, x, sy - 5, x, sy, hex('#ffd36a')); }
-					x += r + 8;
+					var d = a[1] * ESC; x += d / 2;
+					var y = base + 44 - d / 2 - 2;
+					if (i === foco) brilhoSoma(buf, L, A, x, y, d * 0.8, 255, 220, 140, 0.35);
+					arte(buf, L, A, a[0], x, y, d, 0, -1, -0.3, 0.55);
+					if (i === foco) {
+						var sy = y - d / 2 - 12 + Math.round(Math.sin(t * 5) * 1.5);
+						for (var q = 0; q < 5; q++) for (var w = -q; w <= q; w++) pintar(buf, L, A, x + w, sy + q, hex('#ffd36a'));
+						for (var q2 = -6; q2 < 0; q2++) { pintar(buf, L, A, x, sy + q2, hex('#ffd36a')); pintar(buf, L, A, x + 1, sy + q2, hex('#ffd36a')); }
+					}
+					x += d / 2 + 9;
 				});
 				if (hud) { hud.ano.textContent = ASTROS[foco][2]; hud.estacao.textContent = TR('todos na mesma escala', 'all at the same scale'); }
 			};
@@ -3456,7 +3522,7 @@
 		desenhar();
 		if ('IntersectionObserver' in window) new IntersectionObserver(function (e) { visivel = e[0].isIntersecting; }).observe(tela);
 		(function laco(agora) {
-			var dt = Math.min(0.1, (agora - anterior) / 1000);
+			var dt = Math.max(0, Math.min(0.1, (agora - anterior) / 1000));
 			anterior = agora;
 			if (tocando && visivel) {
 				tempo += dt;
