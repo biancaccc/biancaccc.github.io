@@ -4687,3 +4687,6 @@ html.aproximando, html.aproximando body { overflow: hidden; }
 .aprox-planeta img { pointer-events: auto; }
 .aprox-brilho { transition: opacity 0.25s ease; }
 .aprox-planeta.voltando .aprox-brilho, .aprox-planeta.voltando::after { opacity: 0; }
+
+/* o crédito de uma foto usada como base de uma pixel art (página da Lua) */
+.rodape .rodape-credito { margin-top: 8px; font-size: 12px; opacity: 0.8; }
