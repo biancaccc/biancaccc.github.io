@@ -37,10 +37,12 @@
 			if (sec) sec.appendChild(el('p', 'comparacao-dia', '<span class="icone-secao" data-icone="balao" aria-hidden="true"></span><span><b>' + TR('Isso é como…', 'That is like…') + '</b> ' + D.comparacoes[n] + '</span>'));
 		});
 		// mini animações (cada página tem duas, em seções diferentes)
+		/* (as animações já refeitas, mais detalhadas, usam uma tela maior) */
+		var GRANDES = /^(lua-face|lua-theia)$/;
 		[D.animacao, D.animacao2].forEach(function (a) {
 			var secA = a && document.getElementById('secao-' + a.secao);
 			if (secA) secA.appendChild(el('figure', 'animacao',
-				'<canvas data-animacao="' + a.id + '" width="200" height="110" role="img" aria-label="' + a.aria + '"></canvas>' +
+				'<canvas data-animacao="' + a.id + '" width="' + (GRANDES.test(a.id) ? 320 : 200) + '" height="' + (GRANDES.test(a.id) ? 176 : 110) + '" role="img" aria-label="' + a.aria + '"></canvas>' +
 				'<div class="animacao-hud" aria-hidden="true"><span data-hud="ano">' + a.hud[0] + '</span><span data-hud="estacao">' + a.hud[1] + '</span></div>' +
 				'<figcaption>' + a.legenda + '</figcaption>'));
 		});
@@ -2691,7 +2693,7 @@
 	function luaMistura(buf, L, A, x, y, r, g, b, a) {
 		x = Math.round(x); y = Math.round(y); if (x < 0 || y < 0 || x >= L || y >= A || a <= 0) return;
 		var v = buf[y * L + x], r0 = v & 255, g0 = (v >>> 8) & 255, b0 = (v >>> 16) & 255; a = Math.min(1, a);
-		buf[y * L + x] = cor(r0 + (r - r0) * a, g0 + (g - g0) * a, b0 + (b - b0) * a);
+		buf[y * L + x] = cor(Math.min(255, r0 + (r - r0) * a), Math.min(255, g0 + (g - g0) * a), Math.min(255, b0 + (b - b0) * a));
 	}
 	var JUP = [hex('#f4e4c8'), hex('#e6c49a'), hex('#c8955e'), hex('#a8703e'), hex('#7a4e2a'), hex('#4a2e18')];
 	// Júpiter com as faixas e a Grande Mancha Vermelha (girando de leve)
@@ -2714,65 +2716,228 @@
 		anel(true);
 	}
 	var LUA_CINZA = [hex('#f2f2ee'), hex('#d4d4d0'), hex('#aeaeaa'), hex('#86868a'), hex('#5e5e66'), hex('#3a3a44')];
+	// ---------- Ferramentas novas das animações das luas (tela maior, 320 x 176) ----------
+	// As artes de verdade (pixel/<nome>.png: os planetas da Bianca e as luas) reduzidas com média
+	// das cores, giradas e iluminadas; um céu com estrelas de vários brilhos e cores e nebulosa
+	// suave; brilhos somados (luz); esferas lisas com muitos tons, sem o quadriculado.
+	var ARTES_PX = {};
+	function arteCarregar(id) {
+		if (ARTES_PX[id]) return ARTES_PX[id];
+		var reg = ARTES_PX[id] = { ok: false, tam: {} }, im = new Image();
+		im.onload = function () {
+			var c = document.createElement('canvas'); c.width = im.naturalWidth; c.height = im.naturalHeight;
+			var x = c.getContext('2d'); x.drawImage(im, 0, 0);
+			reg.w = c.width; reg.h = c.height; reg.d = x.getImageData(0, 0, c.width, c.height).data; reg.ok = true;
+		};
+		im.src = 'pixel/' + id + '.png';
+		return reg;
+	}
+	// a arte reduzida para "lar" pixels de largura (média das cores de cada bloco), guardada
+	function arteNoTamanho(id, lar) {
+		var reg = arteCarregar(id); lar = Math.max(2, Math.round(lar));
+		if (!reg.ok) return null;
+		if (reg.tam[lar]) return reg.tam[lar];
+		var alt = Math.max(2, Math.round(lar * reg.h / reg.w)), sx = reg.w / lar, sy = reg.h / alt;
+		var r = new Float32Array(lar * alt * 4);
+		for (var y = 0; y < alt; y++) for (var x = 0; x < lar; x++) {
+			var x0 = Math.floor(x * sx), x1 = Math.max(x0 + 1, Math.floor((x + 1) * sx)), y0 = Math.floor(y * sy), y1 = Math.max(y0 + 1, Math.floor((y + 1) * sy));
+			var sr = 0, sg = 0, sb = 0, sa = 0, n = 0;
+			for (var yy = y0; yy < y1; yy++) for (var xx = x0; xx < x1; xx++) {
+				var i = (yy * reg.w + xx) * 4, a = reg.d[i + 3] / 255;
+				sr += reg.d[i] * a; sg += reg.d[i + 1] * a; sb += reg.d[i + 2] * a; sa += a; n++;
+			}
+			var k = (y * lar + x) * 4;
+			if (sa > 0) { r[k] = sr / sa; r[k + 1] = sg / sa; r[k + 2] = sb / sa; } r[k + 3] = sa / n;
+		}
+		return (reg.tam[lar] = { w: lar, h: alt, d: r });
+	}
+	// desenha a arte centrada em (cx, cy), com "lar" de largura, girada de "giro" radianos e com a
+	// luz vindo da direção (lx, ly) na tela (sem luz: como na arte). "sombra" é o quanto o lado da
+	// noite escurece (0 a 1). Devolve false enquanto a imagem ainda não carregou.
+	function arte(buf, L, A, id, cx, cy, lar, giro, lx, ly, sombra, brilho) {
+		var s = arteNoTamanho(id, lar); if (!s) return false;
+		var c = Math.cos(giro || 0), sn = Math.sin(giro || 0), R = Math.hypot(s.w, s.h) / 2 + 1, raio = Math.min(s.w, s.h) / 2;
+		var luz = lx !== undefined && lx !== null, ln = luz ? Math.hypot(lx, ly) || 1 : 1;
+		for (var y = Math.floor(cy - R); y <= cy + R; y++) for (var x = Math.floor(cx - R); x <= cx + R; x++) {
+			if (x < 0 || y < 0 || x >= L || y >= A) continue;
+			var dx = x + 0.5 - cx, dy = y + 0.5 - cy;
+			var u = dx * c + dy * sn + s.w / 2, v = -dx * sn + dy * c + s.h / 2;
+			var iu = Math.floor(u), iv = Math.floor(v);
+			if (iu < 0 || iv < 0 || iu >= s.w || iv >= s.h) continue;
+			var k = (iv * s.w + iu) * 4, a = s.d[k + 3]; if (a < 0.5) continue;
+			var f = brilho || 1;
+			if (luz) {
+				var nx = dx / raio, ny = dy / raio, nz = Math.sqrt(Math.max(0, 1 - nx * nx - ny * ny));
+				var d = (nx * lx + ny * ly) / ln * 0.9 + nz * 0.25;
+				f *= 1 - (sombra === undefined ? 0.85 : sombra) * suave(0.5 - d * 2.2);
+			}
+			buf[y * L + x] = cor(Math.min(255, s.d[k] * f), Math.min(255, s.d[k + 1] * f), Math.min(255, s.d[k + 2] * f));
+		}
+		return true;
+	}
+	// um brilho redondo somado à cor de baixo (a luz "acende" o que está atrás)
+	function brilhoSoma(buf, L, A, cx, cy, R, r, g, b, forca) {
+		for (var y = Math.floor(cy - R); y <= cy + R; y++) for (var x = Math.floor(cx - R); x <= cx + R; x++) {
+			if (x < 0 || y < 0 || x >= L || y >= A) continue;
+			var d = Math.hypot(x + 0.5 - cx, y + 0.5 - cy) / R; if (d >= 1) continue;
+			var k = Math.pow(1 - d, 2) * forca, v = buf[y * L + x];
+			buf[y * L + x] = cor(Math.min(255, (v & 255) + r * k), Math.min(255, ((v >>> 8) & 255) + g * k), Math.min(255, ((v >>> 16) & 255) + b * k));
+		}
+	}
+	// uma esfera lisa, com muitos tons (pal: do mais claro ao mais escuro), luz de (lx, ly) e
+	// "textura(x, y)" opcional (de -1 a 1) para manchas
+	function esfera(buf, L, A, cx, cy, R, pal, lx, ly, textura) {
+		var ln = Math.hypot(lx, ly) || 1, n = pal.length;
+		for (var y = Math.floor(cy - R); y <= cy + R; y++) for (var x = Math.floor(cx - R); x <= cx + R; x++) {
+			if (x < 0 || y < 0 || x >= L || y >= A) continue;
+			var nx = (x + 0.5 - cx) / R, ny = (y + 0.5 - cy) / R, d2 = nx * nx + ny * ny; if (d2 > 1) continue;
+			var nz = Math.sqrt(1 - d2), l = (-(nx * lx + ny * ly) / ln) * 0.75 + nz * 0.45;
+			var v = 1 - Math.max(0, Math.min(1, l)) + (textura ? textura(nx, ny) * 0.18 : 0);
+			buf[y * L + x] = pal[Math.max(0, Math.min(n - 1, Math.floor(v * (n - 0.01))))];
+		}
+	}
+	function rampaCores(lista, n) {
+		var cs = lista.map(function (h) { return [parseInt(h.substr(1, 2), 16), parseInt(h.substr(3, 2), 16), parseInt(h.substr(5, 2), 16)]; }), out = [];
+		for (var i = 0; i < n; i++) {
+			var p = i / (n - 1) * (cs.length - 1), a = Math.floor(p), f = p - a, b = Math.min(cs.length - 1, a + 1);
+			out.push(cor(cs[a][0] + (cs[b][0] - cs[a][0]) * f, cs[a][1] + (cs[b][1] - cs[a][1]) * f, cs[a][2] + (cs[b][2] - cs[a][2]) * f));
+		}
+		return out;
+	}
+	// o céu: fundo com degradê, uma nebulosa bem suave e estrelas de vários brilhos e cores
+	// (umas cintilam e viram cruzinha no auge)
+	function ceuBonito(L, A, sem, neb) {
+		var aleat = semente(sem), base = new Uint32Array(L * A), pisca = [];
+		var nc = neb ? [parseInt(neb.substr(1, 2), 16), parseInt(neb.substr(3, 2), 16), parseInt(neb.substr(5, 2), 16)] : [70, 40, 110];
+		for (var y = 0; y < A; y++) for (var x = 0; x < L; x++) {
+			var n = ruido2d(x * 0.018 + sem, y * 0.03) * 0.6 + ruido2d(x * 0.05, y * 0.07 + sem) * 0.4, k = Math.max(0, n - 0.5) * 0.55;
+			base[y * L + x] = cor(6 + nc[0] * k, 4 + nc[1] * k, 16 + nc[2] * k + y * 0.04);
+		}
+		var CORES = [[255, 255, 255], [200, 220, 255], [255, 230, 200], [255, 200, 220]];
+		for (var i = 0; i < L * A / 70; i++) {
+			var x = aleat() * L | 0, y = aleat() * A | 0, b = 0.25 + aleat() * aleat() * 0.75, c = CORES[i % 4];
+			if (i % 7 === 0) pisca.push([x, y, c, 0.6 + aleat() * 0.4, 0.8 + aleat() * 2, aleat() * 6]);
+			else base[y * L + x] = cor(c[0] * b, c[1] * b, c[2] * b);
+		}
+		return function (buf, t) {
+			buf.set(base);
+			pisca.forEach(function (e) {
+				var b = e[3] * (0.35 + 0.65 * Math.pow(0.5 + 0.5 * Math.sin(t * e[4] + e[5]), 2)), c = e[2];
+				buf[e[1] * L + e[0]] = cor(c[0] * b, c[1] * b, c[2] * b);
+				if (b > 0.75) [[1, 0], [-1, 0], [0, 1], [0, -1]].forEach(function (d) { luaMistura(buf, L, A, e[0] + d[0], e[1] + d[1], c[0], c[1], c[2], 0.4); });
+			});
+		};
+	}
+	// uma órbita pontilhada (elipse), mais acesa perto de quem passa por ela (ang)
+	function orbitaPontilhada(buf, L, A, cx, cy, rx, ry, ang, r, g, b) {
+		var n = Math.max(40, Math.round((rx + ry) * 1.6));
+		for (var i = 0; i < n; i += 2) {
+			var a = i / n * Math.PI * 2, perto = ang === null ? 0 : Math.max(0, Math.cos(a - ang)) ;
+			var f = 0.35 + 0.65 * Math.pow(perto, 6);
+			luaMistura(buf, L, A, cx + Math.cos(a) * rx, cy + Math.sin(a) * ry, r, g, b, f);
+		}
+	}
 	Object.assign(ANIMACOES, {
-		// A Lua dá a volta na Terra e gira no mesmo tempo: a marquinha vermelha (o "rosto" que a
-		// gente vê daqui) fica sempre virada para a Terra
+		// A Lua dá a volta na Terra e gira no mesmo tempo: a bandeirinha vermelha (o lado que a gente
+		// vê daqui) fica sempre virada para a Terra. No cantinho, a Lua vista da Terra: sempre igual.
 		'lua-face': function (L, A) {
-			var fundo = estrelasFundo(L, A, 401, 60), cx = 100, cy = A / 2, rx = 70, ry = 34, CICLO = 14;
-			var MAR = [hex('#bfe0ff'), hex('#8fc0ff'), hex('#5f9fe8'), hex('#3a6fc0'), hex('#244a8a'), hex('#17305e'), hex('#0e1c3a')];
+			var ceu = ceuBonito(L, A, 401, '#3a4a8a'), cx = 138, cy = A / 2 + 4, rx = 104, ry = 52, CICLO = 14;
 			return function (buf, t, hud) {
-				buf.fill(hex('#07051a')); fundo(buf, t);
-				for (var a = 0, n = 0; a < Math.PI * 2; a += 0.02, n++) if (n % 3 === 0) pintar(buf, L, A, cx + Math.cos(a) * rx, cy + Math.sin(a) * ry, hex('#3a3470'));
+				ceu(buf, t);
 				var ang = (t % CICLO) / CICLO * Math.PI * 2, mx = cx + Math.cos(ang) * rx, my = cy + Math.sin(ang) * ry;
+				orbitaPontilhada(buf, L, A, cx, cy, rx, ry, ang, 150, 160, 230);
+				/* a Lua gira uma vez a cada volta: a arte acompanha o ângulo da órbita */
+				var giro = Math.atan2(cy - my, cx - mx) + Math.PI / 2;
 				var atras = Math.sin(ang) < 0;
 				function lua() {
-					globoLuz(buf, L, A, Math.round(mx), Math.round(my), 7, -1, -0.2, LUA_CINZA, function (x, y) { return Math.sin(x * 0.9 + 1) * Math.cos(y * 0.8) > 0.6 ? 1 : 0; });
-					/* a marquinha do lado que olha para a Terra */
-					var dx = cx - mx, dy = cy - my, dn = Math.hypot(dx, dy) || 1;
-					var fx = mx + dx / dn * 5, fy = my + dy / dn * 5;
-					luaDisco(buf, L, A, fx, fy, 1, hex('#ff4a5a'));
-					for (var k = 8; k < dn - 12; k += 4) pintar(buf, L, A, mx + dx / dn * k, my + dy / dn * k, hex('#5a3a60'));
+					brilhoSoma(buf, L, A, mx, my, 22, 120, 120, 140, 0.35);
+					arte(buf, L, A, 'lua', mx, my, 26, giro);
+					/* a bandeirinha fincada no lado que olha para a Terra */
+					var dx = cx - mx, dy = cy - my, dn = Math.hypot(dx, dy) || 1, ux = dx / dn, uy = dy / dn;
+					var bx = mx + ux * 12, by = my + uy * 12;
+					luaLinha(buf, L, A, bx, by, bx + ux * 7, by + uy * 7, hex('#e8e6f0'));
+					luaLinha(buf, L, A, bx + ux * 7, by + uy * 7, bx + ux * 5 - uy * 4, by + uy * 5 + ux * 4, hex('#ff4a5a'));
+					luaLinha(buf, L, A, bx + ux * 5, by + uy * 5, bx + ux * 5 - uy * 4, by + uy * 5 + ux * 4, hex('#ff4a5a'));
+					/* a linha de visão até a Terra, pontilhada */
+					for (var k = 22; k < dn - 30; k += 5) luaMistura(buf, L, A, mx + ux * k, my + uy * k, 255, 110, 130, 0.55);
 				}
 				if (atras) lua();
-				globoLuz(buf, L, A, cx, cy, 12, -1, -0.2, MAR, function (x, y) { return Math.sin(x * 0.5) * Math.cos(y * 0.6 + 1) > 0.5 ? -1 : 0; });
+				brilhoSoma(buf, L, A, cx, cy, 46, 60, 120, 255, 0.45);
+				arte(buf, L, A, 'terra', cx, cy, 52, t * 0.35);
 				if (!atras) lua();
+				/* o quadrinho: a Lua vista da Terra, sempre com o mesmo lado (e a bandeirinha no mesmo lugar) */
+				var qx = L - 74, qy = 8, qw = 66, qh = 66;
+				for (var y = qy; y < qy + qh; y++) for (var x = qx; x < qx + qw; x++) {
+					var borda = x === qx || y === qy || x === qx + qw - 1 || y === qy + qh - 1;
+					buf[y * L + x] = borda ? hex('#6a74c8') : hex('#0a0820');
+				}
+				brilhoSoma(buf, L, A, qx + qw / 2, qy + qh / 2 + 2, 30, 110, 110, 130, 0.3);
+				arte(buf, L, A, 'lua', qx + qw / 2, qy + qh / 2 + 2, 42, 0);
+				luaLinha(buf, L, A, qx + qw / 2 - 2, qy + qh / 2 - 6, qx + qw / 2 - 2, qy + qh / 2 + 2, hex('#e8e6f0'));
+				luaDisco(buf, L, A, qx + qw / 2 - 2, qy + qh / 2 + 3, 1, hex('#e8e6f0'));
+				for (var fy = 0; fy < 3; fy++) for (var fx = 0; fx < 4 - fy; fx++) pintar(buf, L, A, qx + qw / 2 - 1 + fx, qy + qh / 2 - 6 + fy, hex('#ff4a5a'));
 				if (hud) {
-					hud.ano.textContent = TR('dia ' + Math.floor((t % CICLO) / CICLO * 27.3) + ' de 27', 'day ' + Math.floor((t % CICLO) / CICLO * 27.3) + ' of 27');
-					hud.estacao.textContent = TR('a marquinha sempre virada para a Terra', 'the mark always faces Earth');
+					var dia = Math.floor((t % CICLO) / CICLO * 27.3);
+					hud.ano.textContent = TR('dia ' + dia + ' de 27', 'day ' + dia + ' of 27');
+					hud.estacao.textContent = TR('da Terra: sempre o mesmo lado', 'from Earth: always the same side');
 				}
 			};
 		},
-		// O nascimento da Lua: Theia, do tamanho de Marte, bate na Terra jovem; os pedaços ficam
-		// girando em volta e se juntam, formando a Lua
+		// O nascimento da Lua: Theia, do tamanho de Marte, bate de raspão na Terra jovem (ainda de
+		// lava); os pedaços formam um disco em volta e vão se juntando, até virar a Lua
 		'lua-theia': function (L, A) {
-			var fundo = estrelasFundo(L, A, 402, 60), cx = 92, cy = A / 2 + 4, CICLO = 16, aleat = semente(41), pedacos = [];
-			for (var i = 0; i < 90; i++) pedacos.push([aleat() * Math.PI * 2, 22 + aleat() * 26, aleat(), aleat()]);
-			var TERRA = [hex('#ffd0a0'), hex('#e8a060'), hex('#c87840'), hex('#a0522e'), hex('#6a3420'), hex('#3a1c14')];
-			var THEIA = [hex('#e0d0ff'), hex('#b8a0e8'), hex('#8a70c0'), hex('#5e4a8a'), hex('#3a2e5a'), hex('#241c38')];
+			var ceu = ceuBonito(L, A, 402, '#6a3a5a'), cx = 128, cy = A / 2 + 6, CICLO = 16, BATE = 3.6, aleat = semente(41), pedacos = [];
+			for (var i = 0; i < 420; i++) pedacos.push({ a: aleat() * Math.PI * 2, r: 38 + aleat() * aleat() * 52, f: aleat(), g: aleat(), v: aleat() });
+			var LAVA = rampaCores(['#fff2c0', '#ffc060', '#f07a30', '#b8401e', '#6a1e14', '#2a0c0c'], 16);
+			var ROCHA = rampaCores(['#e6d8ff', '#b0a0e0', '#7a68b0', '#4a3c78', '#241c40'], 12);
+			var LUAX = 128 + 86, LUAY = cy - 26;
 			return function (buf, t, hud) {
-				buf.fill(hex('#07051a')); fundo(buf, t);
-				var c = t % CICLO, BATE = 4;
+				ceu(buf, t);
+				var c = t % CICLO, depois = c - BATE;
+				/* Theia vindo, com o rastro */
 				if (c < BATE) {
-					var k = c / BATE, thx = 190 - k * (190 - cx - 16), thy = cy - 30 + k * 26;
-					globoLuz(buf, L, A, Math.round(thx), Math.round(thy), 7, -1, 0, THEIA);
+					var k = suave(c / BATE), thx = L + 30 - k * (L + 30 - cx - 34), thy = 18 + k * (cy - 14 - 18);
+					for (var r = 1; r < 26; r++) luaMistura(buf, L, A, thx + r * 2.4, thy - r * 0.9, 150, 130, 230, 0.4 * (1 - r / 26));
+					esfera(buf, L, A, thx, thy, 15, ROCHA, -1, -0.4, function (x, y) { return ruido2d(x * 3 + 7, y * 3) - 0.5; });
 				}
-				globoLuz(buf, L, A, cx, cy, 14, -1, -0.2, TERRA, function (x, y) { return ruido2d(x * 0.4 + 3, y * 0.4) > 0.6 ? 1 : 0; });
-				if (c >= BATE && c < BATE + 0.6) { var fl = 1 - (c - BATE) / 0.6; for (var y = -26; y <= 26; y++) for (var x = -26; x <= 26; x++) { var d = Math.hypot(x, y); if (d < 26) luaMistura(buf, L, A, cx + 14 + x, cy - 4 + y, 255, 240, 200, fl * (1 - d / 26) * 1.4); } }
-				if (c >= BATE) {
-					/* os pedaços: primeiro um anel bagunçado, depois juntando num ponto só */
-					var junta = suave((c - BATE - 3) / 6), ang0 = (c - BATE) * 0.9;
-					var lx = cx + Math.cos(ang0) * 40, ly = cy + Math.sin(ang0) * 18;
+				/* a Terra jovem: lava com rachaduras acesas; depois da batida, ainda mais quente e esfriando */
+				var quente = c < BATE ? 0.25 : Math.max(0.25, 1 - depois / 9);
+				brilhoSoma(buf, L, A, cx, cy, 58, 255, 110, 40, 0.25 + quente * 0.5);
+				esfera(buf, L, A, cx, cy, 30, LAVA, -1, -0.3, function (x, y) {
+					var n = ruido2d(x * 4 + t * 0.15, y * 4) - 0.5, risca = Math.abs(ruido2d(x * 6 + 3, y * 6 - t * 0.1) - 0.5) < 0.05 ? -1.6 * quente : 0;
+					return n * 1.2 + risca + (1 - quente) * 1.2;
+				});
+				/* o clarão e a onda de choque */
+				if (depois >= 0 && depois < 1.2) {
+					var fl = 1 - depois / 1.2;
+					brilhoSoma(buf, L, A, cx + 26, cy - 12, 80 * (0.4 + depois), 255, 240, 210, fl * 1.6);
+					var ro = 10 + depois * 90;
+					for (var a = 0; a < Math.PI * 2; a += 0.02) luaMistura(buf, L, A, cx + 26 + Math.cos(a) * ro, cy - 12 + Math.sin(a) * ro * 0.7, 255, 220, 180, fl * 0.8);
+				}
+				if (depois >= 0) {
+					/* os pedaços: um jato de lado, depois um disco girando, e por fim juntando na Lua */
+					var junta = suave((depois - 5) / 6), sai = Math.min(1, depois / 1.4);
 					pedacos.forEach(function (p) {
-						var a = p[0] + (c - BATE) * (1.6 - p[1] / 40), r = p[1] * Math.min(1, (c - BATE) / 0.8);
-						var px0 = cx + Math.cos(a) * r, py0 = cy + Math.sin(a) * r * 0.45;
-						var x2 = px0 + (lx + (p[2] - 0.5) * 4 - px0) * junta, y2 = py0 + (ly + (p[3] - 0.5) * 4 - py0) * junta;
-						pintar(buf, L, A, x2, y2, p[2] > 0.5 ? hex('#ffb070') : hex('#c8c0d8'));
+						var w = 0.9 * Math.pow(52 / p.r, 1.5);
+						var a = p.a + depois * w, rr = p.r * sai;
+						var x0 = cx + Math.cos(a) * rr, y0 = cy + Math.sin(a) * rr * 0.36;
+						var tx = LUAX + (p.f - 0.5) * 10 * (1 - junta), ty = LUAY + (p.g - 0.5) * 10 * (1 - junta);
+						var x = x0 + (tx - x0) * junta, y = y0 + (ty - y0) * junta;
+						var na = Math.sin(a) < 0 && junta < 0.5 && Math.abs(x - cx) < 30 && Math.abs(y - cy) < 30;
+						if (na) return;
+						var calor = Math.max(0, 1 - depois / 6);
+						var r = 150 + 105 * calor + p.v * 20, g = 140 + 60 * calor * p.v, b = 170 - 120 * calor;
+						luaMistura(buf, L, A, x, y, r, g, b, 0.85);
 					});
-					if (junta > 0.85) globoLuz(buf, L, A, Math.round(lx), Math.round(ly), 4, -1, 0, LUA_CINZA);
+					if (junta > 0.6) {
+						var tamanho = 8 + 18 * suave((junta - 0.6) / 0.4);
+						brilhoSoma(buf, L, A, LUAX, LUAY, tamanho, 160, 150, 170, 0.4);
+						arte(buf, L, A, 'lua', LUAX, LUAY, tamanho, 0, -1, -0.3, 0.6);
+					}
 				}
 				if (hud) {
 					hud.ano.textContent = TR('há 4,5 bilhões de anos', '4.5 billion years ago');
-					hud.estacao.textContent = c < BATE ? TR('Theia se aproxima', 'Theia approaches') : c < BATE + 1.5 ? TR('a batida!', 'the impact!') : c < BATE + 5 ? TR('os pedaços ficam girando', 'the pieces keep orbiting') : TR('nasce a Lua', 'the Moon is born');
+					hud.estacao.textContent = c < BATE ? TR('Theia se aproxima', 'Theia approaches') : depois < 1.4 ? TR('a batida!', 'the impact!') : depois < 5 ? TR('os pedaços ficam girando', 'the pieces keep orbiting') : TR('nasce a Lua', 'the Moon is born');
 				}
 			};
 		},
