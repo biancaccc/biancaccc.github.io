@@ -38,7 +38,7 @@
 		});
 		// mini animações (cada página tem duas, em seções diferentes)
 		/* (as animações já refeitas, mais detalhadas, usam uma tela maior) */
-		var GRANDES = /^(lua|io|europa|ganimedes|tita|encelado|mimas|miranda|tritao|sol|mercurio|venus|terra|marte|jupiter|saturno|urano|netuno)-/;
+		var GRANDES = /^/;
 		[D.animacao, D.animacao2].forEach(function (a) {
 			var secA = a && document.getElementById('secao-' + a.secao);
 			if (secA) secA.appendChild(el('figure', 'animacao',
@@ -188,1102 +188,6 @@
 	function semente(s) { return function () { s = (s * 16807) % 2147483647; return s / 2147483647; }; }
 
 	var ANIMACOES = {
-		// ---------- Destinos da galáxia ----------
-		// Sagittarius A*: a estrela S2 numa órbita bem alongada em volta do buraco negro.
-		// Como um cometa, ela anda devagar lá longe e dispara quando passa perto (leis de Kepler).
-		'sgr-s2': function (L, A) {
-			var fundo = estrelasFundo(L, A, 41, 70);
-			var FUNDO = hex('#07051a'), DISCO = [hex('#fff1b8'), hex('#ffc65a'), hex('#e8822a'), hex('#8a3a1a')];
-			var fx = 150, fy = A / 2 + 4, giro = -0.2, cg = Math.cos(giro), sg = Math.sin(giro);
-			var a = 70, e = 0.88, b = a * Math.sqrt(1 - e * e), T = 16;
-			// outras estrelas S, em órbitas menores e mais redondas
-			var OUTRAS = [[34, 0.45, 1.2, 9], [26, 0.3, -0.9, 7], [44, 0.6, 2.4, 12]];
-			function kepler(M, ee) { var E = Math.PI; for (var k = 0; k < 14; k++) E -= (E - ee * Math.sin(E) - M) / (1 - ee * Math.cos(E)); return E; }
-			function naTela(X, Y, gg) { var c = Math.cos(gg), s = Math.sin(gg); return [fx + X * c - Y * s, fy + X * s + Y * c]; }
-			var vPeri = Math.sqrt(2 / (a * (1 - e)) - 1 / a);
-			return function (buf, t, hud) {
-				buf.fill(FUNDO);
-				fundo(buf, t);
-				// a órbita pontilhada da S2
-				for (var k = 0; k < 220; k += 2) {
-					var E0 = k / 220 * Math.PI * 2, p0 = naTela(a * (Math.cos(E0) - e), b * Math.sin(E0), giro);
-					pintar(buf, L, A, p0[0], p0[1], hex('#3a3470'));
-				}
-				// as outras estrelas S
-				OUTRAS.forEach(function (o) {
-					var bo = o[0] * Math.sqrt(1 - o[1] * o[1]), Eo = kepler(((t / o[3]) % 1) * Math.PI * 2, o[1]);
-					var q = naTela(o[0] * (Math.cos(Eo) - o[1]), bo * Math.sin(Eo), o[2]);
-					pintar(buf, L, A, q[0], q[1], hex('#9fb4e8'));
-				});
-				// o buraco negro: disquinho de gás, anel de luz e a sombra
-				for (var y = -9; y <= 9; y++) for (var x = -14; x <= 14; x++) {
-					var r = Math.sqrt(x * x + y * y), disco = (x * x) / 196 + (y * y) / 9;
-					var px = fx + x, py = fy + y;
-					if (r < 3.6) { pintar(buf, L, A, px, py, hex('#000000')); continue; }
-					if (r < 5) { pintar(buf, L, A, px, py, DISCO[r < 4.3 ? 0 : 1]); continue; }
-					if (disco < 1 && B4[(x & 1) + ((y & 1) << 1)] < 1.2 - disco) pintar(buf, L, A, px, py, DISCO[Math.min(3, Math.floor(disco * 3 + 1))]);
-				}
-				// a S2, com um rastro mostrando a velocidade (rastro comprido = rápida)
-				var M = ((t / T + 0.5) % 1) * Math.PI * 2;
-				for (var j = 14; j >= 0; j--) {
-					var Mj = M - j * 0.012, Ej = kepler(Mj, e), pj = naTela(a * (Math.cos(Ej) - e), b * Math.sin(Ej), giro);
-					var k2 = 1 - j / 15;
-					if (j) pintar(buf, L, A, pj[0], pj[1], cor(90 + 130 * k2, 140 + 100 * k2, 255));
-				}
-				var E = kepler(M, e), X = a * (Math.cos(E) - e), Y = b * Math.sin(E), p = naTela(X, Y, giro);
-				var sx = Math.round(p[0]), sy = Math.round(p[1]);
-				[[0, 0], [1, 0], [0, 1], [1, 1]].forEach(function (d) { pintar(buf, L, A, sx + d[0], sy + d[1], hex('#ffffff')); });
-				[[-1, 0], [2, 0], [0, -1], [1, -1], [0, 2], [1, 2]].forEach(function (d) { pintar(buf, L, A, sx + d[0], sy + d[1], hex('#8fd3fa')); });
-				if (hud) {
-					var dist = Math.sqrt(X * X + Y * Y), v = Math.sqrt(2 / dist - 1 / a) / vPeri * 7650;
-					hud.ano.textContent = TR('ano ' + Math.floor((M / (Math.PI * 2)) * 16) + ' de 16', 'year ' + Math.floor((M / (Math.PI * 2)) * 16) + ' of 16');
-					hud.estacao.textContent = numero(Math.round(v / 10) * 10, 0) + ' km/s';
-				}
-			};
-		},
-
-		// Bolhas de Fermi: a Via Láctea de lado; o centro engole uma nuvem, solta jatos e as
-		// duas bolhas vão inflando (magenta), com a casca do eROSITA (turquesa) em volta
-		'fermi-sopro': function (L, A) {
-			var fundo = estrelasFundo(L, A, 53, 60), aleat = semente(57), disco = [];
-			var FUNDO = hex('#07051a'), cx = L / 2, cy = A / 2, CICLO = 15;
-			for (var i = 0; i < 520; i++) {
-				var dx = (aleat() - 0.5) * 2, larg = Math.pow(Math.abs(dx), 0.8);
-				disco.push([cx + dx * 92, cy + (aleat() - 0.5) * (6 - larg * 4.2) * (1 + (1 - larg) * 0.8), aleat()]);
-			}
-			var MAG = [hex('#ff9ff0'), hex('#e070ff'), hex('#a43ad0'), hex('#5e1f86')], TURQ = hex('#5fe0d6');
-			function lobo(x, y, rw, rh, sinal) { // dentro de uma bolha? (0 = borda, 1 = miolo)
-				var yc = cy - sinal * rh, u = (x - cx) / rw, v = (y - yc) / rh;
-				if (sinal * (cy - y) < 0) return -1;
-				var d = u * u + v * v;
-				return d < 1 ? 1 - d : -1;
-			}
-			return function (buf, t, hud) {
-				buf.fill(FUNDO);
-				fundo(buf, t);
-				var c = t % CICLO, cresce = suave((c - 3) / 8), shell = suave((c - 6) / 6), some = c > 13.5 ? 1 - (c - 13.5) / 1.5 : 1;
-				var rw = 4 + cresce * 19, rh = 3 + cresce * 19; // do tamanho certo para caber inteira (com a casca) na tela
-				// as bolhas (antes do disco, que passa na frente)
-				if (c > 3) for (var y = 0; y < A; y++) for (var x = 0; x < L; x++) {
-					for (var s = -1; s <= 1; s += 2) {
-						var dentro = lobo(x, y, rw, rh, s), lim = B4[(x & 1) + ((y & 1) << 1)];
-						if (dentro >= 0) {
-							var nivel = dentro < 0.12 ? 0 : dentro < 0.4 ? 1 : 2;
-							if (nivel === 0 || lim < (0.9 - dentro) * some) buf[y * L + x] = MAG[nivel + (some < 0.6 ? 1 : 0)];
-						} else if (shell > 0) {
-							var fora = lobo(x, y, rw * 1.2 * shell + 1, rh * 1.18 * shell + 1, s);
-							if (fora >= 0 && fora < 0.1 && lim < 0.6 * some) buf[y * L + x] = TURQ;
-						}
-					}
-				}
-				// partículas subindo dentro das bolhas
-				if (c > 3) for (var k = 0; k < 40; k++) {
-					var f = ((t * 0.35 + k / 40) % 1), lado = k & 1 ? 1 : -1;
-					var px = cx + Math.sin(k * 12.9898) * rw * 0.7 * f, py = cy - lado * f * rh * 1.8;
-					if (lobo(px, py, rw, rh, lado) > 0.05) pintar(buf, L, A, px, py, hex('#ffd6f6'));
-				}
-				// o disco da galáxia, de lado, com o miolo dourado
-				disco.forEach(function (d) {
-					var br = 0.5 + 0.5 * d[2], perto = 1 - Math.min(1, Math.abs(d[0] - cx) / 30);
-					pintar(buf, L, A, d[0], d[1], cor(150 + 105 * perto * br, 150 + 70 * br, 200 - 90 * perto));
-				});
-				for (var yy = -3; yy <= 3; yy++) for (var xx = -6; xx <= 6; xx++) if ((xx * xx) / 36 + (yy * yy) / 9 < 1) pintar(buf, L, A, cx + xx, cy + yy, hex('#ffe9b8'));
-				// a nuvem de gás chegando ao centro, o clarão e os jatos
-				if (c < 2.6) {
-					var nx = cx - 70 + suave(c / 2.6) * 70;
-					for (var n = 0; n < 30; n++) pintar(buf, L, A, nx + Math.sin(n * 7.1) * 6 * (1 - c / 3), cy - 6 + Math.cos(n * 3.3) * 3, hex('#ff8ad8'));
-				}
-				if (c > 2.4 && c < 3.4) { var fl = 1 - Math.abs(c - 2.9) * 2; for (var q = -6; q <= 6; q++) { pintar(buf, L, A, cx + q * fl, cy, hex('#ffffff')); pintar(buf, L, A, cx, cy + q * fl, hex('#ffffff')); } }
-				if (c > 2.8 && c < 9) for (var jy = 4; jy < 4 + Math.min(48, (c - 2.8) * 24); jy++) {
-					pintar(buf, L, A, cx, cy - jy, hex('#cdf1ff')); pintar(buf, L, A, cx, cy + jy, hex('#cdf1ff'));
-				}
-				if (hud) {
-					var ma = c < 3 ? 4 : Math.max(0, 4 - (c - 3) / 8 * 4);
-					hud.ano.textContent = TR(ma <= 0.05 ? 'hoje' : 'há ' + numero(ma, ma < 1 ? 1 : 0).replace(',0', '') + (ma >= 2 ? ' milhões' : ' milhão') + ' de anos', ma <= 0.05 ? 'today' : numero(ma, ma < 1 ? 1 : 0).replace('.0', '') + ' million years ago');
-					hud.estacao.textContent = TR(c < 2.4 ? 'uma nuvem de gás cai no centro' : c < 3.4 ? 'o buraco negro engole a nuvem' : c < 9 ? 'jatos soprando as bolhas' : 'bolhas de 25 mil anos-luz', c < 2.4 ? 'a gas cloud falls to the center' : c < 3.4 ? 'the black hole swallows the cloud' : c < 9 ? 'jets blowing the bubbles' : 'bubbles 25 thousand light-years tall');
-				}
-			};
-		},
-
-		// Nebulosa de Órion: uma nuvem encolhe e gira, acende uma estrela no meio de um disco
-		// de poeira, e no disco vão se formando planetas (abrindo "trilhas" sem poeira)
-		'orion-disco': function (L, A) {
-			var fundo = estrelasFundo(L, A, 67, 50), aleat = semente(71), poeira = [];
-			for (var i = 0; i < 520; i++) poeira.push([12 + Math.pow(aleat(), 0.7) * 62, aleat() * Math.PI * 2, aleat()]);
-			var PLANETAS = [[20, hex('#c8a07a')], [32, hex('#e8906c')], [46, hex('#e6c49a')], [60, hex('#8fb8ff')]];
-			var FUNDO = hex('#0a0616'), CICLO = 16, cx = L / 2, cy = A / 2, incl = 0.28;
-			var PO = [hex('#ff8ac0'), hex('#d0607a'), hex('#a8705a'), hex('#6a3a4a')];
-			return function (buf, t, hud) {
-				buf.fill(FUNDO);
-				fundo(buf, t);
-				var c = t % CICLO, nuvem = 1 - suave((c - 0.5) / 3), acesa = suave((c - 2.8) / 1.2), forma = suave((c - 6) / 6);
-				function desenharPoeira(frente) {
-					poeira.forEach(function (p) {
-						var r = p[0] * (0.35 + 0.65 * (1 - nuvem * 0.6)), ang = p[1] + t * 2.2 / Math.pow(r / 12, 1.5);
-						var sy = Math.sin(ang);
-						if ((sy >= 0) !== frente) return;
-						// perto de um planeta, a poeira vai sumindo (ele "varre" a trilha dele)
-						var limpa = 0;
-						PLANETAS.forEach(function (pl) { if (Math.abs(p[0] - pl[0]) < 4) limpa = Math.max(limpa, forma); });
-						if (p[2] < limpa) return;
-						var x = cx + Math.cos(ang) * r, y = cy + sy * r * (incl + nuvem * 0.7);
-						pintar(buf, L, A, x, y, PO[Math.min(3, Math.floor(p[2] * 3 + r / 50))]);
-					});
-				}
-				desenharPoeira(false);
-				// a estrela nascendo
-				if (acesa > 0) for (var y = -5; y <= 5; y++) for (var x = -5; x <= 5; x++) {
-					var d = Math.sqrt(x * x + y * y);
-					if (d < 2.2 * acesa + 0.5) pintar(buf, L, A, cx + x, cy + y, hex('#fffbe0'));
-					else if (d < 4.5 * acesa && B4[(x & 1) + ((y & 1) << 1)] < 0.6) pintar(buf, L, A, cx + x, cy + y, hex('#ffd36a'));
-				}
-				// os planetas
-				PLANETAS.forEach(function (pl, n) {
-					if (forma <= 0) return;
-					var ang = n * 1.7 + t * 2.2 / Math.pow(pl[0] / 12, 1.5), sy = Math.sin(ang);
-					var x = cx + Math.cos(ang) * pl[0], y = cy + sy * pl[0] * incl, tam = forma * (n === 2 ? 2.4 : 1.6);
-					for (var yy = -2; yy <= 2; yy++) for (var xx = -2; xx <= 2; xx++) if (xx * xx + yy * yy <= tam * tam) pintar(buf, L, A, x + xx, y + yy, pl[1]);
-				});
-				desenharPoeira(true);
-				if (hud) {
-					hud.ano.textContent = TR(c < 2.8 ? numero(Math.round(c / 2.8 * 100), 0) + ' mil anos' : c < 6 ? numero(0.1 + (c - 2.8) / 3.2 * 0.9, 1) + ' milhão de anos' : numero(Math.min(10, 1 + (c - 6) / 6 * 9), 0) + ' milhões de anos', c < 2.8 ? numero(Math.round(c / 2.8 * 100), 0) + ' thousand years' : c < 6 ? numero(0.1 + (c - 2.8) / 3.2 * 0.9, 1) + ' million years' : numero(Math.min(10, 1 + (c - 6) / 6 * 9), 0) + ' million years');
-					hud.estacao.textContent = TR(c < 2.8 ? 'a nuvem encolhe e gira' : c < 6 ? 'uma estrela acende no disco' : c < 12 ? 'planetas se formando' : 'um novo sistema solar', c < 2.8 ? 'the cloud shrinks and spins' : c < 6 ? 'a star lights up in the disk' : c < 12 ? 'planets forming' : 'a new solar system');
-				}
-			};
-		},
-
-		// Plêiades: a família de estrelas azuis vai se espalhando, puxada pela galáxia
-		'pleiades-separa': function (L, A) {
-			var fundo = estrelasFundo(L, A, 83, 50), aleat = semente(89), irmas = [];
-			var cx = L / 2, cy = A / 2, CICLO = 16;
-			for (var i = 0; i < 16; i++) {
-				var r = Math.sqrt(aleat()) * 22, an = aleat() * Math.PI * 2, x = cx + Math.cos(an) * r * 1.2, y = cy + Math.sin(an) * r * 0.8;
-				var va = aleat() * Math.PI * 2, vel = 45 + aleat() * 60;
-				irmas.push({ x: x, y: y, vx: Math.cos(va) * vel + (y - cy) * 2, vy: Math.sin(va) * vel * 0.6, grande: i < 7 });
-			}
-			// a névoa: fiapos (ondas suaves) com um pontilhado solto, sem cara de grade
-			var NEVOA = new Float32Array(L * A);
-			for (var py = 0; py < A; py++) for (var px = 0; px < L; px++) {
-				var onda = 0.5 + 0.3 * Math.sin(px * 0.11 + py * 0.05) + 0.2 * Math.sin(px * 0.04 - py * 0.19 + 1.3);
-				NEVOA[py * L + px] = onda * 0.45 - aleat() * 0.35;
-			}
-			var FUNDO = hex('#060a1e');
-			return function (buf, t, hud) {
-				buf.fill(FUNDO);
-				fundo(buf, t);
-				var c = t % CICLO, k = suave((c - 2) / 11), apaga = c > 15 ? (c - 15) : 0;
-				// a névoa azul em volta, que fica para trás
-				var nevoa = (1 - k) * (1 - apaga);
-				if (nevoa > 0.05) for (var y = 0; y < A; y++) for (var x = 0; x < L; x++) {
-					var dx = (x - cx) / 44, dy = (y - cy) / 28, d = dx * dx + dy * dy;
-					var n = d < 1 ? NEVOA[y * L + x] * (1 - d) * nevoa : 0;
-					if (n > 0.12) buf[y * L + x] = n > 0.2 ? hex('#2a4f9a') : hex('#18306a');
-				}
-				irmas.forEach(function (s) {
-					var x = s.x + s.vx * k, y = s.y + s.vy * k, br = 1 - apaga;
-					if (br <= 0) return;
-					var brilho = cor(200 * br + 30, 225 * br + 20, 255 * br);
-					pintar(buf, L, A, x, y, brilho);
-					if (s.grande) {
-						var raio = cor(110 * br, 160 * br, 255 * br);
-						[[1, 0], [-1, 0], [0, 1], [0, -1]].forEach(function (d) { pintar(buf, L, A, x + d[0], y + d[1], raio); });
-						if (Math.sin(t * 2 + s.x) > 0.3) [[2, 0], [-2, 0], [0, 2], [0, -2]].forEach(function (d) { pintar(buf, L, A, x + d[0], y + d[1], cor(60 * br, 100 * br, 200 * br)); });
-					}
-				});
-				if (hud) {
-					hud.ano.textContent = TR(k < 0.02 ? 'hoje' : 'daqui a ' + numero(Math.round(k * 250 / 10) * 10, 0) + ' milhões de anos', k < 0.02 ? 'today' : numero(Math.round(k * 250 / 10) * 10, 0) + ' million years from now');
-					hud.estacao.textContent = TR(k < 0.3 ? 'irmãs juntas' : k < 0.7 ? 'se afastando' : 'cada uma no seu caminho', k < 0.3 ? 'sisters together' : k < 0.7 ? 'drifting apart' : 'each on its own path');
-				}
-			};
-		},
-
-		// Nebulosa da Hélice: a estrela incha (gigante vermelha), solta as camadas de fora num
-		// anel colorido que vai se abrindo e, no meio, sobra uma anã branca acendendo o gás
-		'helice-morte': function (L, A) {
-			var fundo = estrelasFundo(L, A, 97, 60), cx = L / 2, cy = A / 2 + 2, CICLO = 17;
-			var MEIO = [hex('#e8fff8'), hex('#a8f4e8'), hex('#5fd6d0'), hex('#2f9aa8'), hex('#1a5a6a'), hex('#103440')];
-			var ANEL = [hex('#ffe8b0'), hex('#ffc070'), hex('#ff8a4a'), hex('#e8503a'), hex('#a8283a'), hex('#5a1428')];
-			function mistura(a, b, k) { return cor(a[0] + (b[0] - a[0]) * k, a[1] + (b[1] - a[1]) * k, a[2] + (b[2] - a[2]) * k); }
-			return function (buf, t, hud) {
-				buf.fill(hex('#06040f'));
-				fundo(buf, t);
-				var c = t % CICLO, incha = suave((c - 2.5) / 3.2), solta = suave((c - 6) / 1.6), abre = suave((c - 6.4) / 7.5), apaga = c > 15.4 ? suave((c - 15.4) / 1.6) : 0;
-				var vivo = 1 - apaga;
-				// a nebulosa: um "olho" com a borda irregular, que vai se abrindo
-				if (c > 6) {
-					var Ra = 14 + abre * 34, esp = 4 + abre * 11;
-					for (var y = 0; y < A; y++) for (var x = 0; x < L; x++) {
-						var dx = x - cx, dy = (y - cy) / 0.84, d = Math.sqrt(dx * dx + dy * dy), a = Math.atan2(dy, dx), lim = B4[(x & 1) + ((y & 1) << 1)];
-						var torto = ruido2d(Math.cos(a) * 3 + 5, Math.sin(a) * 3 + t * 0.05) * 0.1 - 0.05; // a borda não é um círculo perfeito
-						var Rn = Ra * (1 + torto), dentro = Rn - esp;
-						var k = y * L + x;
-						if (d < dentro) { // o miolo azul-esverdeado, mais claro perto da anã branca
-							var g = Math.pow(1 - d / dentro, 0.8) * vivo * (0.55 + abre * 0.45) + ruido2d(x * 0.12, y * 0.12 + t * 0.1) * 0.25;
-							var n = Math.floor((1 - g) * 5.5 + lim * 0.7);
-							if (n < 5 || lim < 0.3 * vivo) buf[k] = MEIO[Math.max(0, Math.min(5, n))];
-						} else if (d < Rn + esp * 0.35) { // o anel: amarelo na borda de dentro, vermelho por fora, em grumos
-							var f = (d - dentro) / (esp * 1.35), grumo = ruido2d(Math.cos(a) * 6 + d * 0.15, Math.sin(a) * 6 + t * 0.08);
-							var m2 = Math.floor(f * 5.2 + (0.5 - grumo) * 1.6 + lim * 0.6 + apaga * 2);
-							if (m2 < 6) buf[k] = ANEL[Math.max(0, Math.min(5, m2))];
-							// os nós cometários: raiozinhos claros saindo da borda de dentro
-							if (f < 0.3 && Math.sin(a * 46 + grumo * 4) > 0.86 && vivo > 0.4) buf[k] = f < 0.12 ? hex('#fff6e0') : hex('#ffd0a0');
-						} else if (d < Rn + esp * 0.35 + 9) { // um halo vermelho bem fraquinho em volta
-							var h = 1 - (d - Rn - esp * 0.35) / 9;
-							if (lim < h * 0.35 * vivo * abre) buf[k] = hex('#5a1428');
-						}
-					}
-				}
-				// as camadas de fora sendo sopradas: nuvens irregulares saindo da gigante vermelha
-				if (c > 5.6 && c < 9) {
-					var sopro = (c - 5.6) / 3.4;
-					for (var q = 0; q < 70; q++) {
-						var aq = q * 2.39996, rq = 22 + sopro * 30 * (0.7 + ruido2d(q * 0.7, 3) * 0.6);
-						pintar(buf, L, A, cx + Math.cos(aq) * rq, cy + Math.sin(aq) * rq * 0.84, sopro < 0.6 ? hex('#ff8a4a') : hex('#c83a3a'));
-					}
-				}
-				// a estrela: amarela fervendo, depois a gigante vermelha turbulenta, depois a anã branca
-				var R = c < 6 ? 6 + incha * 20 : 26 * (1 - solta) + 2.2 * solta;
-				var base = c < 6 ? [255, 236 - incha * 140, 150 - incha * 110] : [235 + solta * 20, 96 + solta * 150, 40 + solta * 215];
-				for (var yy = -Math.ceil(R) - 1; yy <= R + 1; yy++) for (var xx = -Math.ceil(R) - 1; xx <= R + 1; xx++) {
-					var dd = Math.sqrt(xx * xx + yy * yy), ferve = ruido2d(xx * 0.35 + t * 0.6, yy * 0.35 - t * 0.4);
-					var borda = R + (R > 5 ? (ferve - 0.5) * 2.4 : 0);
-					if (dd > borda) continue;
-					var luz = (1 - (dd / Math.max(1, R)) * 0.45) * (0.75 + ferve * 0.4);
-					pintar(buf, L, A, cx + xx, cy + yy, cor(Math.min(255, base[0] * luz), Math.min(255, base[1] * luz), Math.min(255, base[2] * luz)));
-				}
-				// o brilho azulado da anã branca
-				if (c > 7) for (var s = 2; s <= 4; s++) [[-s, 0], [s, 0], [0, -s], [0, s]].forEach(function (p) { pintar(buf, L, A, cx + p[0], cy + p[1], s < 4 ? hex('#bff6ff') : hex('#5fd6d0')); });
-				if (hud) {
-					hud.ano.textContent = TR(c < 2.5 ? 'estrela como o Sol' : c < 6 ? 'gigante vermelha' : c < 8 ? 'solta as camadas' : 'nebulosa planetária', c < 2.5 ? 'a star like the Sun' : c < 6 ? 'red giant' : c < 8 ? 'sheds its layers' : 'planetary nebula');
-					hud.estacao.textContent = TR(c < 2.5 ? 'bilhões de anos' : c < 6 ? 'o combustível acaba' : c < 15.4 ? 'há ' + numero(Math.max(1, Math.round((c - 6) / 9.4 * 10)), 0) + ' mil anos' : 'o gás se espalha', c < 2.5 ? 'billions of years' : c < 6 ? 'the fuel runs out' : c < 15.4 ? numero(Math.max(1, Math.round((c - 6) / 9.4 * 10)), 0) + ' thousand years ago' : 'the gas spreads out');
-				}
-			};
-		},
-
-		// Estrela de Tabby: uma nuvem de poeira passa na frente da estrela, e o gráfico mostra a
-		// luz azul caindo mais que a vermelha (como a poeira faz; um painel sólido não faria)
-		'tabby-cores': function (L, A) {
-			var fundo = estrelasFundo(L, A, 113, 40), aleat = semente(127), graos = [];
-			for (var i = 0; i < 320; i++) { var gr = Math.sqrt(aleat()), ga = aleat() * Math.PI * 2; graos.push([Math.cos(ga) * gr * 26, Math.sin(ga) * gr * 17, aleat()]); }
-			var FUNDO = hex('#08060f'), sx = 46, sy = 52, R = 17, CICLO = 9;
-			var g0 = 104, g1 = 194, gt = 16, gb = 92; // a área do gráfico
-			function cobre(tt) { // quanto da estrela a poeira cobre (0 a 1)
-				var xc = -30 + ((tt % CICLO) / CICLO) * 150, d = Math.abs(xc - sx) / 34;
-				return d < 1 ? Math.pow(1 - d * d, 1.5) * (0.8 + 0.2 * Math.sin(tt * 2.3)) : 0;
-			}
-			function yDo(b) { return gt + (1 - b) / 0.25 * (gb - gt); } // 100% em cima, 75% embaixo
-			return function (buf, t, hud) {
-				buf.fill(FUNDO);
-				fundo(buf, t);
-				var k = cobre(t), luz = 1 - k * 0.2;
-				// a estrela, escurecendo um pouco
-				for (var y = -R; y <= R; y++) for (var x = -R; x <= R; x++) {
-					var d = Math.sqrt(x * x + y * y);
-					if (d > R) continue;
-					var l = (1 - d / R * 0.35) * luz;
-					pintar(buf, L, A, sx + x, sy + y, cor(255 * l, (205 - d * 3) * l, (110 - d * 3) * l));
-				}
-				// a nuvem de poeira passando (grãos marrons, mais densos no meio)
-				var xc = -30 + ((t % CICLO) / CICLO) * 150;
-				graos.forEach(function (g) {
-					pintar(buf, L, A, xc + g[0], sy + g[1] + Math.sin(g[0] * 0.3 + t) * 2, g[2] > 0.7 ? hex('#6a4a3a') : hex('#3e2c2a'));
-				});
-				// o gráfico: linhas de 100% e 75%, e as duas cores do brilho (o tempo corre para a esquerda)
-				for (var gx = g0; gx <= g1; gx++) { if (gx % 3 === 0) { pintar(buf, L, A, gx, gt, hex('#2a2a50')); pintar(buf, L, A, gx, gb, hex('#2a2a50')); } }
-				for (var gy = gt; gy <= gb; gy++) pintar(buf, L, A, g0 - 1, gy, hex('#3a3a6a'));
-				for (gx = g0; gx <= g1; gx++) {
-					var kk = cobre(t - (g1 - gx) * 0.05);
-					pintar(buf, L, A, gx, yDo(1 - kk * 0.13), hex('#ff6a5a'));
-					pintar(buf, L, A, gx, yDo(1 - kk * 0.22), hex('#6fb0ff'));
-				}
-				if (hud) {
-					hud.ano.textContent = TR('azul: ' + Math.round((1 - k * 0.22) * 100) + '%', 'blue: ' + Math.round((1 - k * 0.22) * 100) + '%');
-					hud.estacao.textContent = TR('vermelho: ' + Math.round((1 - k * 0.13) * 100) + '%', 'red: ' + Math.round((1 - k * 0.13) * 100) + '%');
-				}
-			};
-		},
-
-		// Omega Centauri na contramão: a Via Láctea vista de cima, girando num sentido, e o
-		// aglomerado dando a volta no sentido contrário, numa órbita inclinada, por fora do disco
-		'omega-contramao': function (L, A) {
-			var fundo = estrelasFundo(L, A, 131, 40), aleat = semente(137), disco = [];
-			var cx = L / 2, cy = A / 2, achata = 0.55;
-			for (var i = 0; i < 600; i++) {
-				var r = 6 + Math.pow(aleat(), 0.8) * 58, braco = aleat() < 0.5 ? 0 : Math.PI;
-				var an = braco + Math.log(r / 6) * 1.6 + (aleat() - 0.5) * 1.3;
-				disco.push([r, an, aleat()]);
-			}
-			var FUNDO = hex('#07051a');
-			return function (buf, t, hud) {
-				buf.fill(FUNDO);
-				fundo(buf, t);
-				// Omega Centauri: órbita inclinada (passa por trás e pela frente do disco)
-				var ao = -t * 0.55, ox = Math.cos(ao) * 82, oz = Math.sin(ao), oy = oz * 30 - Math.cos(ao) * 10;
-				var atras = oz < 0;
-				function omega() {
-					for (var j = 1; j <= 18; j++) { var aj = ao + j * 0.05; pintar(buf, L, A, cx + Math.cos(aj) * 82, cy + Math.sin(aj) * 30 - Math.cos(aj) * 10, cor(120 - j * 5, 100 - j * 4, 40)); }
-					var x0 = Math.round(cx + ox), y0 = Math.round(cy + oy);
-					for (var y = -2; y <= 2; y++) for (var x = -2; x <= 2; x++) if (x * x + y * y <= 5) pintar(buf, L, A, x0 + x, y0 + y, x * x + y * y < 2 ? hex('#fff1b8') : hex('#ffc65a'));
-				}
-				if (atras) omega();
-				// o disco girando (as estrelas de dentro dão a volta mais depressa)
-				disco.forEach(function (d) {
-					var a = d[1] + t * 0.9 * (12 / (d[0] + 6)), x = cx + Math.cos(a) * d[0], y = cy + Math.sin(a) * d[0] * achata;
-					var quente = Math.max(0, 1 - d[0] / 22);
-					pintar(buf, L, A, x, y, cor(150 + 100 * quente + 40 * d[2], 160 + 60 * quente + 40 * d[2], 230 - 80 * quente));
-				});
-				for (var yy = -4; yy <= 4; yy++) for (var xx = -6; xx <= 6; xx++) if ((xx * xx) / 36 + (yy * yy) / 16 < 1) pintar(buf, L, A, cx + xx, cy + yy, hex('#ffe9b8'));
-				if (!atras) omega();
-			};
-		},
-
-		// ---------- Segundas animações dos destinos ----------
-		// Sagittarius A*: raios de luz passando perto do buraco negro. Os de longe só entortam;
-		// os que chegam perto demais caem lá dentro e não voltam mais
-		'sgr-luz': function (L, A) {
-			var fundo = estrelasFundo(L, A, 79, 50), cx = 112, cy = A / 2 + 4, SOMBRA = 9, K = 6;
-			var raios = [];
-			[-40, -30, -22, -16, -12, -8, -4, 4, 8, 12, 16, 22, 30, 40].forEach(function (b) {
-				var x = -5, y = cy + b, vx = 1, vy = 0, pts = [], caiu = false;
-				for (var s = 0; s < 420; s++) {
-					var dx = cx - x, dy = cy - y, r2 = dx * dx + dy * dy, r = Math.sqrt(r2);
-					if (r < SOMBRA) { caiu = true; break; }
-					vx += dx / r * K / r2 * 0.5; vy += dy / r * K / r2 * 0.5;
-					var v = Math.sqrt(vx * vx + vy * vy); vx /= v; vy /= v;
-					x += vx * 0.6; y += vy * 0.6;
-					if (s % 2 === 0) pts.push([x, y]);
-					if (x > L + 4 || y < -4 || y > A + 4) break;
-				}
-				raios.push({ pts: pts, caiu: caiu });
-			});
-			return function (buf, t) {
-				buf.fill(hex('#07051a'));
-				fundo(buf, t);
-				raios.forEach(function (rr, j) {
-					rr.pts.forEach(function (p, i) { if (i % 3 === 0) pintar(buf, L, A, p[0], p[1], rr.caiu ? hex('#3a2a50') : hex('#2a3a6a')); });
-					// os "pacotinhos" de luz andando pelo caminho
-					for (var q = 0; q < 3; q++) {
-						var i2 = Math.floor(((t * 0.35 + q / 3 + j * 0.07) % 1) * rr.pts.length), p2 = rr.pts[i2];
-						if (!p2) continue;
-						pintar(buf, L, A, p2[0], p2[1], rr.caiu ? hex('#ffb347') : hex('#ffffff'));
-						var p3 = rr.pts[Math.max(0, i2 - 2)]; pintar(buf, L, A, p3[0], p3[1], rr.caiu ? hex('#a8501e') : hex('#8fd3fa'));
-					}
-				});
-				for (var y = -14; y <= 14; y++) for (var x = -14; x <= 14; x++) {
-					var d = Math.sqrt(x * x + y * y);
-					if (d < SOMBRA) pintar(buf, L, A, cx + x, cy + y, hex('#000000'));
-					else if (d < SOMBRA + 1.3) pintar(buf, L, A, cx + x, cy + y, hex('#ffd36a'));
-					else if (d < SOMBRA + 4 && B4[(x & 1) + ((y & 1) << 1)] < (SOMBRA + 4 - d) / 5) pintar(buf, L, A, cx + x, cy + y, hex('#a8501e'));
-				}
-			};
-		},
-
-		// Bolhas de Fermi: a mesma região vista em luz comum (só a galáxia) e em raios gama
-		// (as bolhas aparecem). Uma "lente" passa de um lado para o outro trocando a visão
-		'fermi-raios': function (L, A) {
-			var fundo = estrelasFundo(L, A, 83, 60), aleat = semente(87), disco = [];
-			var cx = L / 2, cy = A / 2;
-			for (var i = 0; i < 480; i++) { var dx = (aleat() - 0.5) * 2, larg = Math.pow(Math.abs(dx), 0.8); disco.push([cx + dx * 92, cy + (aleat() - 0.5) * (6 - larg * 4.2) * 1.4, aleat()]); }
-			var MAG = [hex('#ff9ff0'), hex('#e070ff'), hex('#a43ad0')];
-			return function (buf, t, hud) {
-				var c = t % 8, corte = c < 4 ? suave(c / 3.2) * (L + 8) - 4 : L + 4 - suave((c - 4) / 3.2) * (L + 8);
-				buf.fill(hex('#07051a'));
-				fundo(buf, t);
-				for (var y = 0; y < A; y++) for (var x = 0; x < L; x++) {
-					if (x > corte) continue; // à esquerda da lente: raios gama
-					buf[y * L + x] = hex('#120a24');
-					for (var s = -1; s <= 1; s += 2) {
-						var yc = cy - s * 21, u = (x - cx) / 18, v = (y - yc) / 22;
-						if (s * (cy - y) < 0) continue;
-						var d = u * u + v * v + Math.sin(Math.atan2(v, u) * 5 + s) * 0.07 + Math.sin(Math.atan2(v, u) * 11) * 0.04; // borda irregular
-						if (d < 1) buf[y * L + x] = d > 0.85 ? MAG[0] : B4[(x & 1) + ((y & 1) << 1)] < (1 - d) * 0.9 ? MAG[1] : MAG[2];
-					}
-				}
-				disco.forEach(function (d) {
-					var gama = d[0] <= corte, perto = 1 - Math.min(1, Math.abs(d[0] - cx) / 30), br = 0.5 + 0.5 * d[2];
-					pintar(buf, L, A, d[0], d[1], gama ? cor(90, 70, 120) : cor(150 + 105 * perto * br, 150 + 70 * br, 200 - 90 * perto));
-				});
-				for (y = 0; y < A; y++) { pintar(buf, L, A, corte, y, hex('#ffffff')); if (y % 2) pintar(buf, L, A, corte + 1, y, hex('#9ffcff')); }
-				if (hud) {
-					hud.ano.textContent = TR('← raios gama', '← gamma rays');
-					hud.estacao.textContent = TR('luz que os olhos veem →', 'light our eyes see →');
-				}
-			};
-		},
-
-		// Órion vista do Brasil (de cabeça para baixo): as Três Marias, a "espada" acima delas e,
-		// chegando mais perto da estrela do meio da espada, ela vira a nebulosa
-		'orion-constelacao': function (L, A) {
-			var fundo = estrelasFundo(L, A, 89, 30), CICLO = 12;
-			// posições no céu (constelação girada: como se vê daqui do hemisfério sul)
-			var E = { betelgeuse: [0.7, 0.8, '#ffb070', 2], bellatrix: [0.32, 0.75, '#dfe8ff', 1], meissa: [0.5, 0.88, '#dfe8ff', 1],
-				alnitak: [0.57, 0.48, '#dfe8ff', 1], alnilam: [0.5, 0.5, '#ffffff', 1], mintaka: [0.43, 0.53, '#dfe8ff', 1],
-				saiph: [0.62, 0.18, '#cfe0ff', 1], rigel: [0.3, 0.22, '#bcd4ff', 2] };
-			var ESPADA = [[0.515, 0.38], [0.52, 0.32], [0.525, 0.26]];
-			var LINHAS = [['betelgeuse', 'alnitak'], ['bellatrix', 'mintaka'], ['alnitak', 'alnilam'], ['alnilam', 'mintaka'], ['alnitak', 'saiph'], ['mintaka', 'rigel'], ['betelgeuse', 'meissa'], ['bellatrix', 'meissa']];
-			return function (buf, t, hud) {
-				var c = t % CICLO;
-				// chegando perto: tudo cresce em volta da estrela do meio da espada, que vai para o centro
-				function base(p) { return [L / 2 + (p[0] - 0.5) * A * 1.5, A / 2 + (p[1] - 0.5) * A * 0.95]; }
-				var T = base(ESPADA[1]), z01 = suave((c - 6.2) / 3), zoom = 1 + z01 * z01 * 9;
-				function tela(p) { var b = base(p); return [T[0] + (b[0] - T[0]) * zoom + (L / 2 - T[0]) * z01, T[1] + (b[1] - T[1]) * zoom + (A / 2 - T[1]) * z01]; }
-				buf.fill(hex('#07051a'));
-				fundo(buf, t);
-				var linhas = suave(c / 1.2) * (1 - suave((c - 6.2) / 1));
-				LINHAS.forEach(function (l) {
-					var a = tela(E[l[0]]), b = tela(E[l[1]]), n = Math.hypot(b[0] - a[0], b[1] - a[1]);
-					for (var d = 4; d < n - 4; d += 2) if (linhas > 0.3) pintar(buf, L, A, a[0] + (b[0] - a[0]) * d / n, a[1] + (b[1] - a[1]) * d / n, hex('#4a4a9a'));
-				});
-				Object.keys(E).forEach(function (k) {
-					var e = E[k], p = tela(e), marias = (k === 'alnitak' || k === 'alnilam' || k === 'mintaka') && c > 1.5 && c < 4 && Math.sin(t * 8) > 0;
-					// cada estrela da constelação com raios em cruz (as maiores, raios maiores)
-					var tam = e[3] > 1 ? 2 : 1;
-					for (var r = 1; r <= tam; r++) [[r, 0], [-r, 0], [0, r], [0, -r]].forEach(function (s) { pintar(buf, L, A, p[0] + s[0], p[1] + s[1], hex(marias ? '#c89a3a' : r === 1 ? '#8fa4e0' : '#4a5a9a')); });
-					pintar(buf, L, A, p[0], p[1], hex(marias ? '#ffd36a' : e[2]));
-				});
-				// a espada; a "estrela" do meio vira a nebulosa quando chegamos perto
-				var nebula = suave((c - 7) / 2.5);
-				ESPADA.forEach(function (s, i) {
-					var p = tela(s);
-					if (i === 1 && nebula > 0) {
-						// a estrela borrada vira a nebulosa: a própria pixel art do topo da página, crescendo
-						var R = 3 + nebula * 44, arte = document.querySelector('canvas.arte-destino'), px = null;
-						try { if (arte && arte.width) px = arte.getContext('2d').getImageData(0, 0, arte.width, arte.height); } catch (er) {}
-						for (var y = -R; y <= R; y++) for (var x = -R; x <= R; x++) {
-							var d = Math.sqrt(x * x + y * y) / R, lim = B4[(((p[0] + x) | 0) & 1) + ((((p[1] + y) | 0) & 1) << 1)];
-							if (d > 1 || (d > 0.75 && lim < (d - 0.75) * 4)) continue; // a borda some num pontilhado
-							if (px) {
-								var ax = Math.min(px.width - 1, Math.floor((x + R) / (2 * R) * px.width)), ay = Math.min(px.height - 1, Math.floor((y + R) / (2 * R) * px.height)), ki = (ay * px.width + ax) * 4;
-								if (px.data[ki + 3] > 0) pintar(buf, L, A, p[0] + x, p[1] + y, cor(px.data[ki], px.data[ki + 1], px.data[ki + 2]));
-							} else if (lim < 1 - d) pintar(buf, L, A, p[0] + x, p[1] + y, d < 0.3 ? hex('#fff0e8') : hex('#d0507a'));
-						}
-					}
-					pintar(buf, L, A, p[0], p[1], i === 1 && c > 4 && c < 6.2 && Math.sin(t * 8) > 0 ? hex('#ff9ad0') : hex('#e8e0ff'));
-				});
-				if (hud) {
-					hud.ano.textContent = TR(c < 1.5 ? 'a constelação de Órion' : c < 4 ? 'as Três Marias' : c < 6.2 ? 'a espada: a do meio é borrada' : 'chegando mais perto…', c < 1.5 ? 'the constellation Orion' : c < 4 ? "Orion's Belt" : c < 6.2 ? 'the sword: the middle one is blurry' : 'getting closer…');
-					hud.estacao.textContent = TR(c < 7.5 ? 'vista do Brasil' : 'não é estrela: é a nebulosa!', c < 7.5 ? 'seen from Brazil' : 'not a star: it is the nebula!');
-				}
-			};
-		},
-
-		// Plêiades: quantas irmãs dá para ver no céu da cidade, no céu do campo e com binóculo
-		'pleiades-ceu': function (L, A) {
-			var aleat = semente(97), cx = L / 2, cy = A / 2 - 2, estrelas = [];
-			// as mais brilhantes primeiro (os nomes das irmãs), depois as mais fracas
-			[[0, 0, 1], [-14, -6, 0.92], [10, -10, 0.88], [-6, 8, 0.86], [18, 2, 0.84], [-22, 4, 0.8], [6, 14, 0.62], [-2, -16, 0.6], [24, -8, 0.58]].forEach(function (s) { estrelas.push([cx + s[0] * 1.7, cy + s[1] * 1.5, s[2]]); });
-			for (var i = 0; i < 50; i++) estrelas.push([cx + (aleat() - 0.5) * 130, cy + (aleat() - 0.5) * 70, 0.08 + aleat() * 0.45]);
-			var CICLO = 12;
-			return function (buf, t, hud) {
-				var c = t % CICLO, etapa = c < 4 ? 0 : c < 8 ? 1 : 2, mistura = Math.min(1, (c % 4) / 0.8);
-				var limite = [0.83, 0.57, 0.08][etapa], antes = [0.08, 0.83, 0.57][etapa], corte = antes + (limite - antes) * mistura;
-				if (etapa === 0 && c < 0.8) corte = 0.08 + (0.83 - 0.08) * mistura; // volta do binóculo para a cidade
-				var ceu = etapa === 0 ? [40, 26, 30] : [7, 6, 22];
-				for (var y = 0; y < A; y++) for (var x = 0; x < L; x++) {
-					var brilho = etapa === 0 ? Math.max(0, (y - 40) / 70) : etapa === 1 ? Math.max(0, (y - 70) / 160) : 0; // no campo, só um clarinho no horizonte
-					buf[y * L + x] = cor(ceu[0] + brilho * 90, ceu[1] + brilho * 50, ceu[2] + brilho * 20);
-				}
-				var vistas = 0;
-				estrelas.forEach(function (s) {
-					if (s[2] < corte) return;
-					vistas++;
-					var b = Math.min(1, 0.4 + s[2] * 0.6) * (0.85 + 0.15 * Math.sin(t * 2 + s[0]));
-					pintar(buf, L, A, s[0], s[1], cor(190 * b + 50, 215 * b + 30, 255 * b));
-					if (s[2] > 0.82 || (etapa === 2 && s[2] > 0.55)) [[1, 0], [-1, 0], [0, 1], [0, -1]].forEach(function (d) { pintar(buf, L, A, s[0] + d[0], s[1] + d[1], cor(90 * b, 130 * b, 230 * b)); });
-				});
-				// embaixo: prédios com janelas acesas (cidade), árvores (campo) ou a borda do binóculo
-				if (etapa === 0) for (var x2 = 0; x2 < L; x2++) { var alt = 10 + ((x2 / 14) | 0) % 3 * 7; for (var y2 = A - alt; y2 < A; y2++) buf[y2 * L + x2] = (x2 % 5 === 2 && y2 % 4 === 1) ? hex('#ffd36a') : hex('#0b0812'); }
-				if (etapa === 1) for (x2 = 0; x2 < L; x2++) { var arv = 6 + Math.abs(Math.sin(x2 * 0.3) * 6) + Math.abs(Math.sin(x2 * 0.11)) * 5; for (y2 = A - arv; y2 < A; y2++) buf[y2 * L + x2] = hex('#05040a'); }
-				if (etapa === 2) for (y2 = 0; y2 < A; y2++) for (x2 = 0; x2 < L; x2++) {
-					var dl = Math.hypot(x2 - cx + 26, y2 - cy) , dr = Math.hypot(x2 - cx - 26, y2 - cy);
-					if (Math.min(dl, dr) > 50) buf[y2 * L + x2] = hex('#000000');
-				}
-				if (hud) {
-					hud.ano.textContent = TR(['no céu da cidade', 'no céu do campo', 'com binóculo'][etapa], ['in a city sky', 'in a country sky', 'with binoculars'][etapa]);
-					hud.estacao.textContent = TR('você vê ' + vistas + ' estrelas', 'you see ' + vistas + ' stars');
-				}
-			};
-		},
-
-		// Hélice de perto: a borda de dentro do anel, com os nós cometários. O vento e a luz da
-		// anã branca (à esquerda) sopram para fora e esticam as caudas deles
-		'helice-nos': function (L, A) {
-			var aleat = semente(103), nos = [], vento = [];
-			function borda(y) { return 92 + Math.sin(y * 0.12 + 1) * 10 + Math.sin(y * 0.31) * 4; } // a borda de dentro do anel
-			for (var i = 0; i < 26; i++) { var ny = 5 + aleat() * (A - 10); nos.push([borda(ny) - 2 + aleat() * 26, ny, 1 + aleat() * 1.5, aleat() * 6]); }
-			for (i = 0; i < 40; i++) vento.push([aleat(), aleat() * A, 0.5 + aleat()]);
-			var MEIO = [hex('#7fe6d8'), hex('#3f9fa8'), hex('#1d4a5a')], ANEL = [hex('#ffb070'), hex('#ff7048'), hex('#c83a3a'), hex('#6a1a2a')];
-			return function (buf, t) {
-				for (var y = 0; y < A; y++) for (var x = 0; x < L; x++) {
-					var lim = B4[(x & 1) + ((y & 1) << 1)], b = borda(y), k = y * L + x;
-					var onda = Math.sin(y * 0.15 + x * 0.04) * 0.15 + Math.sin(y * 0.05 - x * 0.02) * 0.1;
-					if (x < b) { var f0 = x / b + onda; buf[k] = MEIO[Math.min(2, Math.floor(f0 * 2.3 + lim * 0.5))]; }
-					else { var f = (x - b) / (L - b) + onda; buf[k] = ANEL[Math.max(0, Math.min(3, Math.floor(f * 3.4 + lim * 0.5)))]; }
-				}
-				// o vento saindo da anã branca, para a direita
-				vento.forEach(function (v) { var x = ((v[0] + t * 0.12 * v[2]) % 1) * L; pintar(buf, L, A, x, v[1], hex('#c8fff6')); pintar(buf, L, A, x - 1, v[1], hex('#7fe6d8')); });
-				// os nós: cabeça clara, cauda comprida apontando para fora (para a direita)
-				// (como nas fotos do Hubble: a cabeça acesa do lado da estrela e a cauda escura atrás)
-				nos.forEach(function (n) {
-					var cauda = 10 + n[2] * 7 + Math.sin(t * 2 + n[3]) * 2;
-					for (var q = 1; q < cauda; q++) {
-						var yq = n[1] + Math.sin(q * 0.25 + t + n[3]) * 0.7;
-						pintar(buf, L, A, n[0] + q, yq, q < cauda * 0.6 ? hex('#4a1a2a') : hex('#7a2a32'));
-						if (q < cauda * 0.4) pintar(buf, L, A, n[0] + q, yq + 1, hex('#5a2030'));
-					}
-					pintar(buf, L, A, n[0] - 1, n[1], hex('#fff6e8')); pintar(buf, L, A, n[0] - 1, n[1] + 1, hex('#ffe0c0')); pintar(buf, L, A, n[0] - 2, n[1], hex('#ffd0a0'));
-					pintar(buf, L, A, n[0], n[1] - 1, hex('#ffe0c0')); pintar(buf, L, A, n[0], n[1] + 2, hex('#ffd0a0'));
-				});
-				// a anã branca, lá na esquerda
-				for (y = -4; y <= 4; y++) for (x = -4; x <= 4; x++) { var d = Math.sqrt(x * x + y * y); if (d < 2) pintar(buf, L, A, 8 + x, A / 2 + y, hex('#ffffff')); else if (d < 4.5 && B4[(x & 1) + ((y & 1) << 1)] < 0.6) pintar(buf, L, A, 8 + x, A / 2 + y, hex('#bff6ff')); }
-			};
-		},
-
-		// Tabby x uma estrela comum: em cima, um planeta passando na frente faz o brilho cair um
-		// tiquinho, sempre igual; embaixo, a Estrela de Tabby cai muito, sem padrão nenhum
-		'tabby-quedas': function (L, A) {
-			var fundo = estrelasFundo(L, A, 107, 30), g0 = 64, g1 = 196;
-			function planeta(tt) { var f = (tt % 4) / 4; return Math.abs(f - 0.5) < 0.06 ? 0.01 : 0; }
-			function tabby(tt) {
-				var q = 0;
-				[[1.2, 0.08, 0.5], [3.1, 0.22, 0.9], [5.3, 0.12, 0.6], [6.6, 0.05, 0.3], [8.4, 0.18, 1.2]].forEach(function (d) { var x = (tt % 10) - d[0]; q += d[1] * Math.exp(-x * x / (d[2] * d[2] * 0.3)); });
-				return Math.min(0.24, q);
-			}
-			function linha(buf, topo, base, fn, t, corL) {
-				for (var x = g0; x <= g1; x += 3) { pintar(buf, L, A, x, topo, hex('#2a2a50')); pintar(buf, L, A, x, base, hex('#2a2a50')); }
-				for (x = g0; x <= g1; x++) { var q = fn(t - (g1 - x) * 0.06); pintar(buf, L, A, x, topo + q / 0.25 * (base - topo), corL); }
-			}
-			function estrela(buf, ex, ey, R, luz, cor0) {
-				for (var y = -R; y <= R; y++) for (var x = -R; x <= R; x++) { var d = Math.sqrt(x * x + y * y); if (d <= R) pintar(buf, L, A, ex + x, ey + y, cor(cor0[0] * luz * (1 - d / R * 0.3), cor0[1] * luz * (1 - d / R * 0.3), cor0[2] * luz * (1 - d / R * 0.3))); }
-			}
-			return function (buf, t, hud) {
-				buf.fill(hex('#08060f'));
-				fundo(buf, t);
-				var qp = planeta(t), qt = tabby(t);
-				estrela(buf, 30, 34, 12, 1 - qp, [255, 230, 160]);
-				var f = (t % 4) / 4; if (Math.abs(f - 0.5) < 0.12) { var px = 30 + (f - 0.5) * 140; for (var y = -1; y <= 1; y++) for (var x = -1; x <= 1; x++) pintar(buf, L, A, px + x, 34 + y, hex('#1a1424')); }
-				estrela(buf, 30, 82, 12, 1 - qt * 0.9, [255, 200, 120]);
-				// a poeira passando na frente da Tabby
-				for (var g = 0; g < 50; g++) { var gx = 30 + (((t * 0.11 + g * 0.37) % 1.4) - 0.7) * 50, gy = 82 + Math.sin(g * 2.3) * 9; if (qt > 0.03) pintar(buf, L, A, gx, gy, hex('#5a3e30')); }
-				linha(buf, 24, 50, planeta, t, hex('#7fd8ff'));
-				linha(buf, 72, 100, tabby, t, hex('#ffb347'));
-				if (hud) {
-					hud.ano.textContent = TR('com planeta: ' + (qp > 0 ? '99%' : '100%'), 'with planet: ' + (qp > 0 ? '99%' : '100%'));
-					hud.estacao.textContent = 'Tabby: ' + Math.round((1 - qt) * 100) + '%';
-				}
-			};
-		},
-
-		// Omega Centauri: uma galáxia pequena chega perto da Via Láctea, perde as estrelas de fora
-		// pelo caminho e sobra só o miolo, que continua dando voltas: Omega Centauri
-		'omega-engolida': function (L, A) {
-			// (a Via Láctea no meio e o caminho da galáxia pequena todo dentro da tela, sem cortar)
-			var fundo = estrelasFundo(L, A, 109, 40), aleat = semente(113), CICLO = 20, FUSAO = 13, gx = L / 2, gy = A / 2 + 2;
-			var disco = [], ana = [];
-			for (var i = 0; i < 420; i++) { var r = 4 + Math.pow(aleat(), 0.8) * 34, br = aleat() < 0.5 ? 0 : Math.PI; disco.push([r, br + Math.log(r / 4) * 1.6 + (aleat() - 0.5) * 1.2, aleat()]); }
-			for (i = 0; i < 170; i++) { var rr = Math.pow(aleat(), 1.3) * 15, aa = aleat() * Math.PI * 2; ana.push([Math.cos(aa) * rr, Math.sin(aa) * rr * 0.75, rr / 15, aleat() < 0.5 ? -1 : 1]); }
-			function caminho(k) { // o centro da galáxia pequena, chegando em espiral
-				var ang = 2.6 + k * Math.PI * 3.2, raio = 80 - 46 * Math.min(1, k * 1.5);
-				return [gx + Math.cos(ang) * raio, gy + Math.sin(ang) * raio * 0.45];
-			}
-			return function (buf, t, hud) {
-				// k vai de 0 a 1 durante a fusão (13 s) e continua passando de 1 depois: o miolo segue
-				// dando voltas e as estrelas arrancadas vão se espalhando pela órbita toda
-				var c = t % CICLO, k = c / FUSAO;
-				buf.fill(hex('#07051a'));
-				fundo(buf, t);
-				disco.forEach(function (d) {
-					var a = d[1] + t * 0.5 * (10 / (d[0] + 5)), q = Math.max(0, 1 - d[0] / 14);
-					pintar(buf, L, A, gx + Math.cos(a) * d[0], gy + Math.sin(a) * d[0] * 0.5, cor(150 + 100 * q + 40 * d[2], 160 + 60 * q + 40 * d[2], 230 - 80 * q));
-				});
-				for (var y = -3; y <= 3; y++) for (var x = -5; x <= 5; x++) if ((x * x) / 25 + (y * y) / 9 < 1) pintar(buf, L, A, gx + x, gy + y, hex('#ffe9b8'));
-				var cc = caminho(k);
-				ana.forEach(function (s) {
-					var solta = 0.2 + 0.55 * (1 - s[2]); // as de fora soltam primeiro
-					var px, py, br = 1;
-					if (k < solta || s[2] < 0.3) { var aperta = 1 - Math.min(0.5, k * 0.5); px = cc[0] + s[0] * aperta; py = cc[1] + s[1] * aperta; }
-					else { var p = caminho(Math.max(0, k - (k - solta) * 1.1 * (s[3] > 0 ? 1 : -0.6))); px = p[0] + s[0] * 0.7; py = p[1] + s[1] * 0.7; br = Math.max(k > 1 ? 0.45 : 0.6, 1 - (k - solta) * 0.8); }
-					// depois da fusão, as estrelas arrancadas se espalham em volta da Via Láctea e viram parte dela
-					if (k > 1 && s[2] >= 0.3) {
-						var mist = suave((k - 1) / 0.4), fi = s[0] * 0.7 + s[1] + t * 0.12, ro = 26 + s[2] * 34;
-						px += (gx + Math.cos(fi) * ro - px) * mist; py += (gy + Math.sin(fi) * ro * 0.5 - py) * mist;
-					}
-					pintar(buf, L, A, px, py, cor(255 * br, 220 * br, 150 * br));
-				});
-				for (y = -2; y <= 2; y++) for (x = -2; x <= 2; x++) if (x * x + y * y <= 5) pintar(buf, L, A, cc[0] + x, cc[1] + y, x * x + y * y < 2 ? hex('#fff1b8') : hex('#ffc65a'));
-				if (hud) {
-					var bi = 10 - Math.min(1, k) * 10;
-					hud.ano.textContent = TR(bi < 0.4 ? 'hoje' : 'há ' + numero(bi, bi < 2 ? 1 : 0) + (bi < 2 ? ' bilhão' : ' bilhões') + ' de anos', bi < 0.4 ? 'today' : numero(bi, bi < 2 ? 1 : 0) + ' billion years ago');
-					hud.estacao.textContent = TR(k < 0.2 ? 'uma galáxia pequena chega perto' : k < 0.75 ? 'a Via Láctea arranca as estrelas de fora' : k < 1 ? 'sobra só o miolo' : 'Omega Centauri, dando voltas na Via Láctea', k < 0.2 ? 'a small galaxy comes close' : k < 0.75 ? 'the Milky Way strips its outer stars' : k < 1 ? 'only the core is left' : 'Omega Centauri, orbiting the Milky Way');
-				}
-			};
-		},
-
-		// ---------- Betelgeuse ----------
-		// O grande apagão (2019-2020): a estrela solta uma bolha de gás embaixo, a bolha esfria e
-		// vira poeira na frente dela, o brilho cai pela metade e depois a poeira se espalha
-		'betelgeuse-apagao': function (L, A) {
-			var fundo = estrelasFundo(L, A, 151, 50), cx = 56, cy = A / 2 + 6, R = 34, CICLO = 14;
-			var MESES = TR(['outubro de 2019', 'novembro de 2019', 'dezembro de 2019', 'janeiro de 2020', 'fevereiro de 2020', 'março de 2020', 'abril de 2020'], ['October 2019', 'November 2019', 'December 2019', 'January 2020', 'February 2020', 'March 2020', 'April 2020']);
-			var SOLO = [hex('#ffe0a0'), hex('#ffb060'), hex('#f07a32'), hex('#c8461e'), hex('#8a2414'), hex('#4a1008')];
-			function brilho(k) { var x = (k - 0.55) / 0.22; return 1 - 0.6 * Math.exp(-x * x); } // o mínimo em fevereiro de 2020
-			var g0 = 112, g1 = 194, gt = 26, gb = 96; // o gráfico do brilho
-			return function (buf, t, hud) {
-				var c = t % CICLO, k = Math.min(1, c / 12), b = brilho(k);
-				buf.fill(hex('#07051a'));
-				fundo(buf, t);
-				// a estrela, fervendo (escurece junto com o brilho)
-				for (var y = -R - 3; y <= R + 3; y++) for (var x = -R - 3; x <= R + 3; x++) {
-					var d = Math.sqrt(x * x + y * y), lim = B4[(x & 1) + ((y & 1) << 1)];
-					if (d > R) { if (d < R + 4 && lim < (R + 4 - d) / 6 * b) pintar(buf, L, A, cx + x, cy + y, SOLO[4]); continue; }
-					var mu = Math.sqrt(1 - (d / R) * (d / R)), cel = ruido2d(x * 0.16 + t * 0.15, y * 0.16 - t * 0.1);
-					var n = Math.floor((1 - mu) * 3.2 + (0.5 - cel) * 1.6 + lim * 0.7 + (1 - b) * 2.4);
-					pintar(buf, L, A, cx + x, cy + y, SOLO[Math.max(0, Math.min(5, n))]);
-				}
-				// a bolha de gás saindo embaixo, à esquerda, e virando uma nuvem de poeira escura
-				var sai = suave(k / 0.3), esfria = suave((k - 0.25) / 0.25), some = suave((k - 0.62) / 0.35);
-				var bx = cx - 8 - sai * 6 - some * 16, by = cy + 12 + sai * 6 + some * 12, br = 10 + sai * 12 + some * 10;
-				for (var q = 0; q < 420; q++) {
-					var a = q * 2.39996, rr = Math.sqrt(q / 420) * br, px = bx + Math.cos(a) * rr, py = by + Math.sin(a) * rr * 0.75;
-					if (ruido2d(px * 0.3, py * 0.3 + t * 0.2) < 0.35 + some * 0.5 || sai < 0.05) continue;
-					pintar(buf, L, A, px, py, esfria < 0.5 ? (q % 3 ? hex('#ff9a4a') : hex('#ffd08a')) : (q % 4 ? hex('#2a140c') : hex('#4a2414')));
-				}
-				// o gráfico: o brilho de outubro a abril (100% em cima, 30% embaixo)
-				for (var gx = g0; gx <= g1; gx += 3) { pintar(buf, L, A, gx, gt, hex('#2a2a50')); pintar(buf, L, A, gx, gb, hex('#2a2a50')); }
-				for (var gy = gt; gy <= gb; gy++) pintar(buf, L, A, g0 - 1, gy, hex('#3a3a6a'));
-				var ate = g0 + Math.round(k * (g1 - g0));
-				for (gx = g0; gx <= ate; gx++) pintar(buf, L, A, gx, gt + (1 - brilho((gx - g0) / (g1 - g0))) / 0.7 * (gb - gt), hex('#ff8a4a'));
-				pintar(buf, L, A, ate, gt + (1 - b) / 0.7 * (gb - gt) - 1, hex('#ffffff'));
-				if (hud) {
-					hud.ano.textContent = MESES[Math.min(6, Math.floor(k * 6.99))];
-					hud.estacao.textContent = TR('brilho: ' + Math.round(b * 100) + '%' + (k > 0.25 && k < 0.75 ? ' (poeira na frente)' : ''), 'brightness: ' + Math.round(b * 100) + '%' + (k > 0.25 && k < 0.75 ? ' (dust in front)' : ''));
-				}
-			};
-		},
-
-		// O dia em que Betelgeuse explodir, visto do Brasil: Órion de cabeça para baixo no céu,
-		// a estrela vermelha vira um ponto brilhantíssimo (dá para ver até de dia), vai apagando
-		// ao longo dos meses e, no fim, Órion fica sem o ombro
-		'betelgeuse-supernova': function (L, A) {
-			var fundo = estrelasFundo(L, A, 157, 40), CICLO = 16;
-			// Órion vista daqui (girada): Betelgeuse fica embaixo, à direita
-			var E = [[100, 30, '#bcd4ff', 2], [130, 34, '#cfe0ff', 1], [109, 52, '#dfe8ff', 1], [115, 50, '#ffffff', 1], [121, 48, '#dfe8ff', 1], [105, 74, '#dfe8ff', 1], [127, 66, '#ffb070', 2]];
-			var LINHAS = [[0, 4], [1, 2], [2, 3], [3, 4], [2, 5], [4, 6]];
-			return function (buf, t, hud) {
-				var c = t % CICLO, explode = c > 3, k = explode ? (c - 3) / 11 : 0; // k: 0 no dia da explosão, 1 meses depois
-				var forca = explode ? Math.max(0, 1 - Math.pow(k, 0.7)) : 0;
-				// o céu: noite comum; na explosão, clareia como um entardecer azul
-				var ceu = forca * 0.55;
-				for (var y = 0; y < A; y++) for (var x = 0; x < L; x++) {
-					var alt = y / A;
-					buf[y * L + x] = cor(7 + ceu * 60 * (1 - alt * 0.5), 5 + ceu * 90 * (1 - alt * 0.3), 26 + ceu * 150);
-				}
-				if (ceu < 0.25) fundo(buf, t);
-				LINHAS.forEach(function (l) {
-					if (l[1] === 6 && c > 14) return; // sem Betelgeuse, sem a linha do ombro
-					var a = E[l[0]], b = E[l[1]], n = Math.hypot(b[0] - a[0], b[1] - a[1]);
-					for (var d = 4; d < n - 4; d += 2) pintar(buf, L, A, a[0] + (b[0] - a[0]) * d / n, a[1] + (b[1] - a[1]) * d / n, hex('#3a3a7a'));
-				});
-				E.forEach(function (e, i) {
-					if (i === 6) return;
-					pintar(buf, L, A, e[0], e[1], hex(e[2]));
-					if (e[3] > 1) [[1, 0], [-1, 0], [0, 1], [0, -1]].forEach(function (s) { pintar(buf, L, A, e[0] + s[0], e[1] + s[1], hex('#5a6a9a')); });
-				});
-				// Betelgeuse: vermelha antes; depois, um ponto branco-azulado enorme com raios, apagando
-				var bx = E[6][0], by = E[6][1];
-				if (!explode) {
-					pintar(buf, L, A, bx, by, hex('#ffb070'));
-					[[1, 0], [-1, 0], [0, 1], [0, -1]].forEach(function (s) { pintar(buf, L, A, bx + s[0], by + s[1], hex('#c8602a')); });
-				} else if (c < 14) {
-					var tam = 2 + forca * 16 + (c < 3.4 ? (3.4 - c) * 30 : 0);
-					for (var yy = -tam; yy <= tam; yy++) for (var xx = -tam; xx <= tam; xx++) {
-						var d2 = Math.sqrt(xx * xx + yy * yy), raio = Math.min(Math.abs(xx), Math.abs(yy)) < 1 ? 0.5 : 0;
-						var v = (1 - d2 / tam) * (0.6 + raio) * (0.4 + forca);
-						if (v > 0.12 && B4[(((bx + xx) | 0) & 1) + ((((by + yy) | 0) & 1) << 1)] < v * 1.6) pintar(buf, L, A, bx + xx, by + yy, v > 0.55 ? hex('#ffffff') : v > 0.3 ? hex('#cdf1ff') : hex('#7fb8ff'));
-					}
-				}
-				// o chão, com morros e árvores (aqui do Brasil)
-				for (var x2 = 0; x2 < L; x2++) {
-					var h = 10 + Math.sin(x2 * 0.05) * 4 + Math.abs(Math.sin(x2 * 0.37)) * (x2 % 23 < 6 ? 6 : 0);
-					for (var y2 = Math.round(A - h); y2 < A; y2++) buf[y2 * L + x2] = ceu > 0.3 ? hex('#1a2440') : hex('#05040a');
-				}
-				if (hud) {
-					var semanas = Math.round(k * 52);
-					hud.ano.textContent = TR(!explode ? 'uma noite comum' : c < 4 ? 'o dia da explosão!' : c < 14 ? semanas + ' semanas depois' : 'um ano depois', !explode ? 'an ordinary night' : c < 4 ? 'the day of the explosion!' : c < 14 ? semanas + ' weeks later' : 'a year later');
-					hud.estacao.textContent = TR(!explode ? 'Betelgeuse vermelhinha' : forca > 0.5 ? 'quase tão forte quanto a Lua' : forca > 0.15 ? 'ainda dá para ver de dia' : c < 14 ? 'apagando devagar' : 'Órion sem o ombro', !explode ? 'little red Betelgeuse' : forca > 0.5 ? 'almost as bright as the Moon' : forca > 0.15 ? 'still visible by day' : c < 14 ? 'slowly fading' : 'Orion without its shoulder');
-				}
-			};
-		},
-
-		// ---------- Eta Carinae ----------
-		// As duas estrelas numa órbita bem esticada (uma volta a cada 5 anos e meio): os ventos das
-		// duas se chocam numa "frente" de gás que brilha em raios X, mais forte quando passam perto
-		'eta-par': function (L, A) {
-			// vista de cima: a estrela grande parada (à esquerda) e a pequena dando a volta numa órbita
-			// esticada. Os ventos das duas saem como ondas; onde as ondas se encontram, o gás se choca
-			// e brilha (o arco). Perto uma da outra, o choque fica fortíssimo: o medidor de raios X sobe
-			var fundo = estrelasFundo(L, A, 163, 40), CICLO = 14, e = 0.78, a = 52, b = a * Math.sqrt(1 - e * e);
-			var Ax = 48, Ay = A / 2 + 4; // a grande fica num dos focos da órbita, que se abre para a direita
-			function kepler(M) { var E = Math.PI; for (var k = 0; k < 14; k++) E -= (E - e * Math.sin(E) - M) / (1 - e * Math.cos(E)); return E; }
-			function posicao(k) { var E = kepler((((k + 0.5) % 1) + 1) % 1 * Math.PI * 2); return [Ax - a * (Math.cos(E) - e), Ay + b * Math.sin(E)]; }
-			return function (buf, t, hud) {
-				var k = (t % CICLO) / CICLO, p = posicao(k), Bx = p[0], By = p[1];
-				var dist = Math.hypot(Bx - Ax, By - Ay), perto = Math.max(0, Math.min(1, (40 - dist) / 30));
-				buf.fill(hex('#07051a'));
-				fundo(buf, t);
-				// a órbita pontilhada e o rastro da pequena
-				for (var q = 0; q < 1; q += 0.006) { var o = posicao(q); if (Math.round(q * 166) % 2 === 0) pintar(buf, L, A, o[0], o[1], hex('#2e2a5a')); }
-				for (var r = 1; r <= 24; r++) { var o2 = posicao(k - r * 0.004); pintar(buf, L, A, o2[0], o2[1], r < 10 ? hex('#7fb8ff') : hex('#3f5fa8')); }
-				// os ventos: ondas que saem de cada estrela (a grande sopra mais forte)
-				[[Ax, Ay, 30, '#5a6ab8'], [Bx, By, 16, '#4a8ac8']].forEach(function (s, n) {
-					for (var w = 0; w < 3; w++) {
-						var raio = ((t * 0.6 + w / 3 + n * 0.17) % 1) * s[2] + 6;
-						for (var ang = 0; ang < Math.PI * 2; ang += 0.12) pintar(buf, L, A, s[0] + Math.cos(ang) * raio, s[1] + Math.sin(ang) * raio, hex(s[3]));
-					}
-				});
-				// o choque dos ventos: um arco entre as duas, mais perto da pequena (o vento dela é mais fraco)
-				var dir = Math.atan2(By - Ay, Bx - Ax), mx = Ax + (Bx - Ax) * 0.68, my = Ay + (By - Ay) * 0.68, forte = 0.35 + perto * 0.65;
-				for (var s2 = -1; s2 <= 1; s2 += 0.05) {
-					var curva = s2 * s2 * 5, px = mx + Math.cos(dir + Math.PI / 2) * s2 * 14 + Math.cos(dir) * curva, py = my + Math.sin(dir + Math.PI / 2) * s2 * 14 + Math.sin(dir) * curva;
-					var f = forte * (1 - Math.abs(s2) * 0.6);
-					pintar(buf, L, A, px, py, f > 0.75 ? hex('#ffffff') : f > 0.5 ? hex('#ffe08a') : hex('#c8902a'));
-					if (perto > 0.4 && Math.sin(t * 20 + s2 * 9) > 0.6) pintar(buf, L, A, px + Math.cos(dir) * 2, py + Math.sin(dir) * 2, hex('#fff6c8')); // faíscas de raios X
-				}
-				globoLuz(buf, L, A, Ax, Ay, 8, 0, -1, [hex('#ffffff'), hex('#e8f4ff'), hex('#bcd8ff'), hex('#8fb0f0')]);
-				globoLuz(buf, L, A, Math.round(Bx), Math.round(By), 4, 0, -1, [hex('#ffffff'), hex('#d8ecff'), hex('#9fc0f0')]);
-				// o medidor de raios X, na direita
-				var mxx = 186, topo = 24, base = 100, nivel = 0.12 + perto * 0.88;
-				for (var y = topo; y <= base; y++) { pintar(buf, L, A, mxx - 1, y, hex('#4a4280')); pintar(buf, L, A, mxx + 6, y, hex('#4a4280')); }
-				for (var x = mxx - 1; x <= mxx + 6; x++) { pintar(buf, L, A, x, topo, hex('#4a4280')); pintar(buf, L, A, x, base, hex('#4a4280')); }
-				for (y = Math.round(base - 1 - nivel * (base - topo - 2)); y < base; y++) for (x = mxx; x <= mxx + 5; x++) pintar(buf, L, A, x, y, nivel > 0.7 ? hex('#ffffff') : nivel > 0.4 ? hex('#ffe08a') : hex('#c8902a'));
-				if (hud) {
-					hud.ano.textContent = TR('ano ' + numero(k * 5.5, 1) + ' de 5,5', 'year ' + numero(k * 5.5, 1) + ' of 5.5');
-					hud.estacao.textContent = TR(perto > 0.5 ? 'pertinho: o choque brilha muito!' : perto > 0.1 ? 'se aproximando…' : 'longe: o choque é fraco', perto > 0.5 ? 'up close: the shock glows bright!' : perto > 0.1 ? 'getting closer…' : 'far apart: the shock is faint');
-				}
-			};
-		},
-
-		// A Grande Erupção, de 1837 até hoje: a estrela brilha demais (em 1843, só Sírius brilhava
-		// mais), solta gás que forma as duas bolhas do Homúnculo, some atrás da própria poeira e,
-		// do século 20 para cá, volta a aparecer no meio da nuvem
-		'eta-erupcao': function (L, A) {
-			var fundo = estrelasFundo(L, A, 173, 50), CICLO = 16, cx = L / 2, cy = A / 2 + 4;
-			var LOBO = [hex('#fff0e0'), hex('#f0c8b0'), hex('#d89a80'), hex('#a8645a'), hex('#6a3a34')], POEIRA = [hex('#6a3a2a'), hex('#4a2420'), hex('#2e1618')];
-			function ano(c) { return c < 2 ? 1837 + c * 3 : c < 7 ? 1843 + (c - 2) * 7.4 : c < 12 ? 1880 + (c - 7) * 29 : 2025; }
-			return function (buf, t, hud) {
-				var c = t % CICLO, an = ano(c);
-				var cresce = suave((an - 1843) / 70), poeira = an > 1856 && an < 1945 ? Math.min(1, (an - 1856) / 12, (1945 - an) / 25) : 0;
-				var brilho = an < 1843 ? 0.5 + (an - 1837) / 6 * 1.1 : an < 1856 ? 1.6 - (an - 1843) / 13 * 0.9 : an < 1945 ? 0.7 - poeira * 0.5 : 0.7 + Math.min(1, (an - 1945) / 80) * 0.5; // do século 20 para cá, ela volta a brilhar
-				buf.fill(hex('#07051a'));
-				fundo(buf, t);
-				// as duas bolhas crescendo na diagonal
-				if (cresce > 0.01) for (var y = 0; y < A; y++) for (var x = 0; x < L; x++) {
-					var u = x - cx, v = y - cy, s = u * 0.75 + v * 0.66, p = -u * 0.66 + v * 0.75, lado = s >= 0 ? 1 : -1;
-					var ds = s - lado * 25 * cresce, rl = Math.sqrt(ds * ds / Math.pow(24 * cresce + 1, 2) + p * p / Math.pow(19 * cresce + 1, 2));
-					var bord = 1 + (ruido2d(Math.atan2(p, ds) * 2 + lado * 3, 1) - 0.5) * 0.25;
-					if (rl > bord) continue;
-					var mu = Math.sqrt(Math.max(0, 1 - (rl / bord) * (rl / bord))), lim = B4[(x & 1) + ((y & 1) << 1)];
-					var tex = ruido2d(x * 0.25 + lado * 7, y * 0.25), n = Math.floor((1 - mu) * 2.2 + (0.5 - tex) * 2.2 + lim * 0.8 + 1 + (lado > 0 ? 0 : 0.5));
-					buf[y * L + x] = poeira > 0.4 ? POEIRA[Math.max(0, Math.min(2, n - 1))] : LOBO[Math.max(0, Math.min(4, n))];
-				}
-				// a estrela no meio, com raios (bem grandes no auge de 1843)
-				var tam = 2 + brilho * 6;
-				for (var yy = -tam; yy <= tam; yy++) for (var xx = -tam; xx <= tam; xx++) {
-					var d = Math.sqrt(xx * xx + yy * yy), raio = Math.min(Math.abs(xx), Math.abs(yy)) < 1 ? 0.45 : 0;
-					var v2 = (1 - d / tam) * (0.55 + raio) * brilho;
-					if (v2 > 0.15 && B4[(((cx + xx) | 0) & 1) + ((((cy + yy) | 0) & 1) << 1)] < v2 * 1.5) pintar(buf, L, A, cx + xx, cy + yy, v2 > 0.6 ? hex('#ffffff') : v2 > 0.35 ? hex('#ffe8c8') : hex('#ffb070'));
-				}
-				if (hud) {
-					hud.ano.textContent = TR('ano ' + Math.round(an), 'year ' + Math.round(an));
-					hud.estacao.textContent = TR(an < 1840 ? 'uma estrela comum' : an < 1846 ? '2ª estrela mais brilhante do céu!' : an < 1860 ? 'o gás forma duas bolhas' : an < 1945 ? 'escondida pela própria poeira' : 'o Homúnculo hoje', an < 1840 ? 'an ordinary star' : an < 1846 ? '2nd brightest star in the sky!' : an < 1860 ? 'the gas forms two bubbles' : an < 1945 ? 'hidden by its own dust' : 'the Homunculus today');
-				}
-			};
-		},
-
-		// ---------- Sirius ----------
-		// Cem anos de Sirius no céu (1760 a 1862): ela anda fazendo ondas, em vez de seguir reto.
-		// Em 1844, Bessel percebe o bambeio (aparece a linha reta que ela "deveria" seguir); em
-		// 1862, Alvan Clark vê a companheira, que faz ondas ao contrário. As duas giram em volta de
-		// um ponto entre elas (a cruzinha), e é esse ponto que anda reto. Sirius A pesa o dobro de
-		// Sirius B, por isso balança a metade.
-		'sirius-bambeio': function (L, A) {
-			var fundo = estrelasFundo(L, A, 181, 45), CICLO = 16;
-			function ano(c) { return 1760 + Math.min(1, c / 10.5) * 102; }
-			function centro(an) { var k = (an - 1760) / 102; return [16 + k * 168, 62 - k * 16]; }
-			function separacao(an) { var f = (an - 1760) / 50 * Math.PI * 2 + 0.6; return [Math.cos(f) * 7, Math.sin(f) * 27]; }
-			function posA(an) { var c = centro(an), s = separacao(an); return [c[0] - s[0] / 3, c[1] - s[1] / 3]; }
-			function posB(an) { var c = centro(an), s = separacao(an); return [c[0] + s[0] * 2 / 3, c[1] + s[1] * 2 / 3]; }
-			return function (buf, t, hud) {
-				var c = t % CICLO, an = ano(c), bessel = an >= 1844, clark = c >= 10.5;
-				buf.fill(hex('#07051a'));
-				fundo(buf, t);
-				// a linha reta que Bessel esperava (o caminho do ponto entre as duas)
-				if (bessel) for (var q = 1760; q <= 1862; q += 0.7) { if (Math.round(q / 0.7) % 3 === 0) continue; var p = centro(q); pintar(buf, L, A, p[0], p[1], hex('#5a5aa8')); }
-				// o rastro de Sirius A: as ondas
-				for (q = 1760; q < an; q += 0.35) { var pa = posA(q); pintar(buf, L, A, pa[0], pa[1], an - q < 8 ? hex('#8fb0ff') : hex('#4a5aa8')); }
-				// depois de 1862: o rastro de Sirius B, ao contrário, e a cruzinha no meio
-				if (clark) {
-					for (q = 1760; q <= 1862; q += 0.5) { if (Math.round(q * 2) % 2) continue; var pb = posB(q); pintar(buf, L, A, pb[0], pb[1], hex('#5a5a78')); }
-					var cm = centro(an);
-					[[0, 0], [1, 0], [-1, 0], [0, 1], [0, -1], [2, 0], [-2, 0], [0, 2], [0, -2]].forEach(function (d) { pintar(buf, L, A, cm[0] + d[0], cm[1] + d[1], hex('#ffe08a')); });
-				}
-				// Sirius A, branco-azulada, com as pontinhas
-				var a = posA(an), ax = Math.round(a[0]), ay = Math.round(a[1]);
-				globoLuz(buf, L, A, ax, ay, 3, 0, -1, [hex('#ffffff'), hex('#e8f2ff'), hex('#bcd4ff'), hex('#8fb0f0')]);
-				for (var e = 4; e <= 8; e++) [[1, 0], [-1, 0], [0, 1], [0, -1]].forEach(function (d) { pintar(buf, L, A, ax + d[0] * e, ay + d[1] * e, e < 6 ? hex('#cfe0ff') : hex('#6a7ac8')); });
-				// Sirius B: um pontinho, e a mira do telescópio de Clark piscando em volta
-				if (clark) {
-					var b = posB(an), bx = Math.round(b[0]), by = Math.round(b[1]);
-					pintar(buf, L, A, bx, by, hex('#ffffff'));
-					[[1, 0], [-1, 0], [0, 1], [0, -1]].forEach(function (d) { pintar(buf, L, A, bx + d[0], by + d[1], hex('#8a8ab0')); });
-					if (Math.sin(t * 6) > -0.3) for (var g = 0; g < Math.PI * 2; g += 0.3) pintar(buf, L, A, bx + Math.cos(g) * 7, by + Math.sin(g) * 7, hex('#ffe08a'));
-				}
-				if (hud) {
-					hud.ano.textContent = TR('ano ' + Math.round(an), 'year ' + Math.round(an));
-					hud.estacao.textContent = TR(!bessel ? 'Sirius anda pelo céu… fazendo ondas' : !clark ? 'Bessel: algo invisível a puxa!' : 'Clark vê a companheira (na mira)', !bessel ? 'Sirius moves across the sky… in waves' : !clark ? 'Bessel: something invisible pulls it!' : 'Clark sees the companion (in the crosshair)');
-				}
-			};
-		},
-
-		// A vida de Sirius B: ela nasceu maior que Sirius A, gastou o combustível mais depressa,
-		// inchou até virar uma gigante vermelha, soltou as camadas de fora num anel de gás e
-		// sobrou só o miolo, a anã branca do tamanho da Terra
-		'sirius-vida': function (L, A) {
-			var fundo = estrelasFundo(L, A, 191, 45), CICLO = 16, Ax = 150, Bx = 62, cy = A / 2 + 2;
-			var AZUL = [hex('#ffffff'), hex('#e0ecff'), hex('#b0c8ff'), hex('#7f9cf0')];
-			var GIGANTE = [hex('#ffe0a0'), hex('#ffb060'), hex('#f07a32'), hex('#c8461e'), hex('#8a2414'), hex('#4a1008')];
-			var NEBULOSA = [hex('#7fe3d8'), hex('#5fb8c8'), hex('#e070a8'), hex('#a84a8a')];
-			function milhoes(c) { return c < 3.5 ? 230 - c / 3.5 * 90 : c < 7.5 ? 140 - (c - 3.5) / 4 * 18 : 122 - (c - 7.5) / 3 * 4; }
-			return function (buf, t, hud) {
-				var c = t % CICLO;
-				var incha = suave((c - 3.5) / 4), solta = suave((c - 7.5) / 3), hoje = c >= 10.5;
-				buf.fill(hex('#07051a'));
-				fundo(buf, t);
-				// Sirius A: quase não muda (só fica um pouquinho maior e mais brilhante)
-				globoLuz(buf, L, A, Ax, cy, 6 + (hoje ? 1 : 0), -1, -1, AZUL);
-				// Sirius B
-				if (solta < 0.02) {
-					var R = 9 + incha * 26;
-					for (var y = -R - 2; y <= R + 2; y++) for (var x = -R - 2; x <= R + 2; x++) {
-						var d = Math.sqrt(x * x + y * y);
-						if (d > R) continue;
-						var mu = Math.sqrt(1 - (d / R) * (d / R)), lim = B4[(x & 1) + ((y & 1) << 1)];
-						var pal = incha > 0.35 ? GIGANTE : AZUL, cel = incha > 0.35 ? ruido2d(x * 0.18 + t * 0.2, y * 0.18) : 0.5;
-						var n = Math.floor((1 - mu) * (pal.length - 1.5) + (0.5 - cel) * 1.6 + lim * 0.8 + (incha > 0.35 ? 0 : -0.3) + (x + y > 0 ? 0.4 : 0));
-						pintar(buf, L, A, Bx + x, cy + y, pal[Math.max(0, Math.min(pal.length - 1, n))]);
-					}
-				} else {
-					// as camadas de fora se espalham num anel de gás (como a Nebulosa da Hélice) que vai sumindo
-					var raio = 30 + solta * 46, some = 1 - suave((c - 9.5) / 1.6);
-					for (var q = 0; q < 900; q++) {
-						var ang = q * 2.39996, rr = raio * (0.6 + 0.4 * Math.sqrt((q % 97) / 97)), px = Bx + Math.cos(ang) * rr, py = cy + Math.sin(ang) * rr * 0.92;
-						if (ruido2d(px * 0.2 + 5, py * 0.2) > some * 0.9) continue;
-						pintar(buf, L, A, px, py, NEBULOSA[(rr / raio > 0.85 ? 2 : 0) + (q % 3 === 0 ? 1 : 0)]);
-					}
-					// o miolo que sobrou: a anã branca, branquinha e minúscula
-					pintar(buf, L, A, Bx, cy, hex('#ffffff'));
-					[[1, 0], [-1, 0], [0, 1], [0, -1]].forEach(function (d) { pintar(buf, L, A, Bx + d[0], cy + d[1], hex('#cfe0ff')); });
-					if (hoje) {
-						// do lado, a Terra no mesmo tamanho (é desse tamanho que ela ficou)
-						pintar(buf, L, A, Bx, cy + 9, hex('#4f8fe8')); pintar(buf, L, A, Bx + 1, cy + 9, hex('#5fd08a'));
-						pintar(buf, L, A, Bx, cy + 10, hex('#3f6fc8')); pintar(buf, L, A, Bx + 1, cy + 10, hex('#4f8fe8'));
-					}
-				}
-				if (hud) {
-					hud.ano.textContent = TR(hoje ? 'hoje' : 'há ' + Math.round(milhoes(c)) + ' milhões de anos', hoje ? 'today' : Math.round(milhoes(c)) + ' million years ago');
-					hud.estacao.textContent = TR(c < 3.5 ? 'duas estrelas nascem: B é a maior' : c < 7.5 ? 'Sirius B incha: uma gigante vermelha' : !hoje ? 'ela solta as camadas de fora' : 'B virou uma anã branca, do tamanho da Terra', c < 3.5 ? 'two stars are born: B is the bigger one' : c < 7.5 ? 'Sirius B swells: a red giant' : !hoje ? 'it sheds its outer layers' : 'B became a white dwarf, the size of Earth');
-				}
-			};
-		},
-
-		// ---------- Nebulosa do Caranguejo ----------
-		// O céu visto da China em 1054: uma noite comum no Touro; aparece a "estrela convidada", tão
-		// forte que dá para ver de dia (o céu fica azul, com o Sol); depois, à noite, ela vai
-		// apagando ao longo de quase dois anos até sumir; no fim, a nebulosa como é vista hoje
-		'caranguejo-1054': function (L, A) {
-			var fundo = estrelasFundo(L, A, 197, 40), CICLO = 16, sx = 112, sy = 40;
-			// o Touro (o "V" da cabeça e os chifres), perto de onde a estrela aparece
-			var TOURO = [[96, 52], [102, 58], [108, 64], [112, 58], [118, 52], [86, 40], [126, 40], [104, 70]];
-			var NEBULOSA = [hex('#ffb070'), hex('#e0603a'), hex('#9fc0ff'), hex('#ffe0a0')];
-			function quando(c) {
-				if (c < 1.5) return TR(['junho de 1054', 'uma noite comum'], ['June 1054', 'an ordinary night']);
-				if (c < 5) return TR(['4 de julho de 1054', 'dá para ver até de dia!'], ['July 4, 1054', 'visible even by day!']);
-				if (c < 12) { var m = Math.round((c - 5) / 7 * 21) + 1; return TR([m + (m > 1 ? ' meses' : ' mês') + ' depois', 'à noite, ainda brilhando'], [m + (m > 1 ? ' months' : ' month') + ' later', 'at night, still shining']) }
-				if (c < 13.5) return ['1056', TR('apagou', 'faded away')];
-				return TR(['hoje, num telescópio', 'a Nebulosa do Caranguejo'], ['today, in a telescope', 'the Crab Nebula']);
-			}
-			return function (buf, t, hud) {
-				var c = t % CICLO, dia = c >= 1.5 && c < 5, forca = c < 1.5 ? 0 : c < 5 ? 1 : c < 12 ? 1 - (c - 5) / 7 * 0.92 : 0;
-				// o céu: azul de dia, escuro de noite
-				for (var y = 0; y < A; y++) for (var x = 0; x < L; x++) {
-					var alt = y / A;
-					buf[y * L + x] = dia ? cor(70 + alt * 60, 130 + alt * 50, 210 + alt * 30) : cor(7, 5, 26);
-				}
-				if (!dia) {
-					fundo(buf, t);
-					TOURO.forEach(function (e) { pintar(buf, L, A, e[0], e[1], hex('#dfe8ff')); });
-					pintar(buf, L, A, 104, 70, hex('#ffb070')); // Aldebarã, alaranjada
-				} else {
-					// o Sol, do lado
-					globoLuz(buf, L, A, 40, 34, 7, 0, -1, [hex('#ffffff'), hex('#fff6d0'), hex('#ffe08a')]);
-				}
-				// a estrela convidada
-				if (forca > 0.02) {
-					var tam = 1 + forca * 5;
-					for (var yy = -tam - 2; yy <= tam + 2; yy++) for (var xx = -tam - 2; xx <= tam + 2; xx++) {
-						var d = Math.sqrt(xx * xx + yy * yy), raio = Math.min(Math.abs(xx), Math.abs(yy)) < 1 ? 0.6 : 0;
-						var v = (1 - d / (tam + 2)) * (0.5 + raio) * (0.4 + forca);
-						if (v > 0.15 && B4[((sx + xx) & 1) + (((sy + yy) & 1) << 1)] < v * 1.6) pintar(buf, L, A, sx + xx, sy + yy, v > 0.55 ? hex('#ffffff') : dia ? hex('#fff8e0') : hex('#ffe8b0'));
-					}
-				}
-				// hoje: a nebulosa, uma manchinha com fiapos
-				if (c >= 13.5) for (var q = 0; q < 160; q++) {
-					var a = q * 2.39996, rr = Math.sqrt(q / 160) * 7, px = sx + Math.cos(a) * rr * 1.3, py = sy + Math.sin(a) * rr;
-					pintar(buf, L, A, px, py, NEBULOSA[rr < 2.5 ? 2 : q % 4 === 0 ? 3 : q % 2 ? 0 : 1]);
-				}
-				// o chão, com o telhado de um observatório chinês
-				for (var x2 = 0; x2 < L; x2++) {
-					var h = 8 + Math.sin(x2 * 0.04) * 2;
-					for (var y2 = Math.round(A - h); y2 < A; y2++) buf[y2 * L + x2] = dia ? hex('#2a3a2a') : hex('#05040a');
-				}
-				var tx = 160, ty = A - 10, TELHADO = dia ? hex('#4a2a2a') : hex('#0c0a14');
-				for (var i = 0; i < 4; i++) for (var j = -14 - i * 0; j <= 14; j++) {
-					var curva = Math.abs(j) > 11 ? 1 : 0;
-					pintar(buf, L, A, tx + j, ty - 10 - i - curva * (Math.abs(j) - 11), TELHADO);
-				}
-				for (var py2 = ty - 9; py2 < ty + 2; py2++) for (var px2 = tx - 9; px2 <= tx + 9; px2++) pintar(buf, L, A, px2, py2, TELHADO);
-				for (j = -6; j <= 6; j++) pintar(buf, L, A, tx + j, ty - 14, TELHADO);
-				if (hud) { var w = quando(c); hud.ano.textContent = w[0]; hud.estacao.textContent = w[1]; }
-			};
-		},
-
-		// O pulsar como um farol: gira e solta dois feixes de luz em lados opostos. Quando um feixe
-		// passa pela Terra (à direita), ela pisca e o gráfico embaixo marca um pico. Câmera lenta:
-		// aqui, uma volta a cada 2 segundos; de verdade, 30 voltas por segundo
-		'caranguejo-pulsar': function (L, A) {
-			// (bem devagar, para dar para acompanhar o feixe: uma volta a cada 8 segundos)
-			var fundo = estrelasFundo(L, A, 199, 40), cx = 62, cy = 48, Tx = 182, Ty = 48, VOLTA = 8, JANELA = 16;
-			var FIAPOS = [];
-			var aleat = semente(201);
-			for (var i = 0; i < 140; i++) { var a = aleat() * Math.PI * 2, r = 22 + aleat() * 12; FIAPOS.push([cx + Math.cos(a) * r * 1.2, cy + Math.sin(a) * r * 0.8, aleat() < 0.5 ? '#c8602a' : '#8a3a2a']); }
-			return function (buf, t, hud) {
-				var ang = (t / VOLTA) * Math.PI * 2;
-				buf.fill(hex('#07051a'));
-				fundo(buf, t);
-				FIAPOS.forEach(function (f) { pintar(buf, L, A, f[0], f[1], hex(f[2])); });
-				// os dois feixes (cones estreitos que giram)
-				[0, Math.PI].forEach(function (lado) {
-					var a2 = ang + lado;
-					for (var s = 4; s < 140; s += 0.7) {
-						var larg = s * 0.06;
-						for (var w = -larg; w <= larg; w += 0.8) {
-							var px = cx + Math.cos(a2) * s - Math.sin(a2) * w, py = cy + Math.sin(a2) * s + Math.cos(a2) * w;
-							var f = (1 - s / 140) * (1 - Math.abs(w) / (larg + 0.5));
-							if (f > 0.08 && B4[(Math.round(px) & 1) + ((Math.round(py) & 1) << 1)] < f * 1.8) pintar(buf, L, A, px, py, f > 0.5 ? hex('#cfe0ff') : hex('#5a7ad8'));
-						}
-					}
-				});
-				// a estrela de nêutrons, com o ímã (torto em relação ao giro) que gira junto: os feixes
-				// saem dos dois polos dele, o vermelho (norte) e o azul (sul)
-				globoLuz(buf, L, A, cx, cy, 3, 0, -1, [hex('#ffffff'), hex('#e8f2ff'), hex('#9fc0ff')]);
-				[[0, '#ff5a6a'], [Math.PI, '#5a8aff']].forEach(function (polo) {
-					var pa = ang + polo[0];
-					for (var e = 2; e <= 6; e++) pintar(buf, L, A, cx + Math.cos(pa) * e, cy + Math.sin(pa) * e, hex(polo[1]));
-					[[0, 1], [0, -1], [1, 0]].forEach(function (q) { pintar(buf, L, A, cx + Math.cos(pa) * 6 - Math.sin(pa) * q[0] + Math.cos(pa) * q[1] * 0, cy + Math.sin(pa) * 6 + Math.cos(pa) * q[0], hex(polo[1])); });
-				});
-				// a Terra pisca quando um feixe passa por ela
-				var dif = Math.abs(((ang % Math.PI) + Math.PI) % Math.PI), pisca = dif < 0.12 || dif > Math.PI - 0.12;
-				// o tempo desde a última passada do feixe (uma a cada meia volta): a Terra continua
-				// acesa por quase 1 segundo e a mensagem fica 2,5 segundos, para dar tempo de ler
-				var desde = ((t + VOLTA * 0.02) % (VOLTA / 2)), aceso = pisca || desde < 0.9, lendo = t > 1 && desde < 2.5;
-				if (aceso) for (var g = 0; g < Math.PI * 2; g += 0.3) { pintar(buf, L, A, Tx + Math.cos(g) * 7, Ty + Math.sin(g) * 7, hex('#ffffff')); pintar(buf, L, A, Tx + Math.cos(g) * 9, Ty + Math.sin(g) * 9, hex('#9be36a')); }
-				globoLuz(buf, L, A, Tx, Ty, 4, -1, -0.3, [hex('#9fe0ff'), hex('#4f8fe8'), hex('#3a7a4a'), hex('#1f3a6a')]);
-				// o gráfico das piscadas: os últimos 16 segundos, andando para a esquerda
-				var g0 = 10, g1 = 190, gy = A - 10;
-				for (var gx = g0; gx <= g1; gx += 2) pintar(buf, L, A, gx, gy, hex('#2a2a50'));
-				for (gx = g0; gx <= g1; gx++) {
-					var tp = t - (g1 - gx) / (g1 - g0) * JANELA;
-					if (tp < 0) continue; // (antes de começar não tem piscada)
-					var ap = ((tp / VOLTA) * Math.PI * 2) % Math.PI, d2 = Math.min(ap, Math.PI - ap);
-					var alt = d2 < 0.12 ? Math.round((0.12 - d2) / 0.12 * 12) : 0;
-					for (var yy = 0; yy <= alt; yy++) pintar(buf, L, A, gx, gy - yy, hex('#9be36a'));
-				}
-				if (hud) {
-					hud.ano.textContent = TR('piscadas: ' + Math.floor(t / VOLTA * 2), 'blinks: ' + Math.floor(t / VOLTA * 2));
-					hud.estacao.textContent = TR(pisca || lendo ? 'o feixe passou pela Terra: pisca!' : 'em câmera lenta (de verdade, 30 voltas por segundo)', pisca || lendo ? 'the beam swept past Earth: blink!' : 'in slow motion (really 30 turns per second)');
-				}
-			};
-		},
-
-		// ---------- Proxima Centauri ----------
-		// Vista de cima: Proxima b dá a volta na estrela em 11 dias (aqui, 1 segundo = 1 dia), sempre
-		// com o mesmo lado virado para ela. A bandeirinha fica no lado do dia e nunca vê a noite
-		'proxima-b': function (L, A) {
-			// o mesmo cenário das voltas em volta do Sol (como Urano e Marte), com Proxima, vermelha,
-			// no lugar do Sol; na metade de cima da órbita, o planeta passa atrás da estrela
-			var O = cenarioOrbita(L, A, 203), CICLO = 11;
-			var ESTRELA = [hex('#ffd0a0'), hex('#ff9a6a'), hex('#e05a3a'), hex('#a8302a')];
-			// o lado do dia (quente, iluminado) e o lado da noite (azul-escuro), bem diferentes
-			var DIA = [hex('#ffd2b0'), hex('#f0a882'), hex('#d8845e')], NOITE = [hex('#3a3a78'), hex('#2a2a5e'), hex('#1e1c46')];
-			function estrela(buf, t) {
-				for (var y = -14; y <= 14; y++) for (var x = -14; x <= 14; x++) {
-					var d = Math.sqrt(x * x + y * y);
-					if (d > 8 && d < 14 && B4[(x & 1) + ((y & 1) << 1)] < (14 - d) / 7) pintar(buf, L, A, O.cx + x, O.cy + y, hex('#6a1a1a'));
-				}
-				globoLuz(buf, L, A, O.cx, O.cy, 8, -0.3, -0.5, ESTRELA, function (x, y) { return ruido2d(x * 0.5 + t * 0.4, y * 0.5) > 0.7 ? 1 : 0; });
-			}
-			return function (buf, t, hud) {
-				var k = (t % CICLO) / CICLO, a = k * Math.PI * 2, p = O.pos(a, 1), px = Math.round(p[0]), py = Math.round(p[1]);
-				O.fundo(buf);
-				O.orbita(buf, 1, hex('#6a4a8a'));
-				// no estilo de Urano: o eixo em pé com o polo marcado, as crateras e a bandeirinha
-				// presas no chão e a setinha do giro. Ele gira uma vez a cada volta em torno da
-				// estrela, do jeito certo para a bandeirinha ficar sempre virada para ela (no plano da
-				// órbita, a estrela fica na direção a + 180°): é dia lá para sempre
-				var planeta = function () {
-					globoGirando(buf, L, A, px, py, { R: 9, inc: 0, giro: a + Math.PI, luz: [O.cx - px, O.cy - py], PAL: DIA, noite: NOITE,
-						manchas: [[0.45, 0.9, 0.35], [-0.4, 2.4, 0.4], [0.1, 3.9, 0.35], [-0.2, 5.3, 0.3]], manchaPAL: [DIA[1], DIA[2], hex('#b06a54')],
-						bandeira: [0, 0] });
-				};
-				if (O.atras(a)) { planeta(); estrela(buf, t); } else { estrela(buf, t); planeta(); }
-				if (hud) {
-					hud.ano.textContent = TR('dia ' + Math.floor(k * 11) + ' de 11', 'day ' + Math.floor(k * 11) + ' of 11');
-					hud.estacao.textContent = TR('a bandeirinha fica sempre de dia', 'the little flag is always in daylight');
-				}
-			};
-		},
-
-		// Uma corrida do Sol até Proxima (4,2 anos-luz), em três pistas: em cima, um raio de luz;
-		// no meio, uma navezinha com vela, empurrada por um laser da Terra (um quinto da velocidade
-		// da luz: uns 21 anos); embaixo, a Voyager 1 (mais de 70 mil anos: quase não sai do lugar)
-		'proxima-viagem': function (L, A) {
-			var fundo = estrelasFundo(L, A, 207, 40), CICLO = 16, x0 = 22, x1 = 176, PISTAS = [30, 56, 82];
-			function anos(c) { return Math.min(25, c / 13 * 25); }
-			return function (buf, t, hud) {
-				var c = t % CICLO, an = anos(c);
-				buf.fill(hex('#07051a'));
-				fundo(buf, t);
-				// o Sol na esquerda e Proxima na direita
-				globoLuz(buf, L, A, 10, A / 2, 7, 1, -0.3, [hex('#fff4c0'), hex('#ffd36a'), hex('#ffb347'), hex('#e07a2a')]);
-				globoLuz(buf, L, A, 190, A / 2, 5, -1, -0.3, [hex('#ffb08a'), hex('#e05a3a'), hex('#a8302a')]);
-				PISTAS.forEach(function (py) { for (var x = x0; x <= x1; x += 3) pintar(buf, L, A, x, py, hex('#2a2a50')); });
-				// a luz: chega em 4,2 anos
-				var kl = Math.min(1, an / 4.2), lx = x0 + kl * (x1 - x0);
-				for (var r = 0; r < 10; r++) pintar(buf, L, A, lx - r, PISTAS[0], r < 3 ? hex('#ffffff') : hex('#ffe08a'));
-				// a navezinha com vela: chega em uns 21 anos (o laser empurra no começo)
-				var kv = Math.min(1, an / 21), vx = x0 + kv * (x1 - x0), vy = PISTAS[1];
-				if (an < 2) for (var lz = x0; lz < vx - 4; lz += 2) pintar(buf, L, A, lz, vy, hex('#ff4f6a'));
-				for (var s = -4; s <= 4; s++) { pintar(buf, L, A, vx - 2, vy + s, hex('#dfe8ff')); if (Math.abs(s) < 4) pintar(buf, L, A, vx - 3, vy + s, hex('#9aa6d8')); }
-				pintar(buf, L, A, vx, vy, hex('#ffe08a')); pintar(buf, L, A, vx - 1, vy, hex('#c8c8e8'));
-				// a Voyager 1: em 25 anos, anda 25/75.000 do caminho (nem um pixel)
-				var gx = x0 + 1, gy = PISTAS[2];
-				pintar(buf, L, A, gx, gy, hex('#c8c8e8')); pintar(buf, L, A, gx - 1, gy - 1, hex('#8a8ab0')); pintar(buf, L, A, gx - 1, gy + 1, hex('#8a8ab0')); pintar(buf, L, A, gx + 1, gy, hex('#ffffff'));
-				if (hud) {
-					hud.ano.textContent = TR('ano ' + numero(an, an < 10 ? 1 : 0), 'year ' + numero(an, an < 10 ? 1 : 0));
-					hud.estacao.textContent = TR(an < 4.2 ? 'a luz vai na frente' : an < 21 ? 'a luz chegou! a vela ainda vai' : 'a vela chegou! a Voyager… nem saiu', an < 4.2 ? 'light goes first' : an < 21 ? 'light arrived! the sail is still going' : 'the sail arrived! Voyager… barely left');
-				}
-			};
-		}
 	};
 	// ---------- Os sons de verdade (tocador da seção "Ouça de verdade") ----------
 	// Um som de cada vez: tocar um para o outro. O botão vira pausa, e a barrinha anda.
@@ -3564,6 +2468,1033 @@
 				if (hud) {
 					hud.ano.textContent = TR(c < T1 ? numero(Math.round(c / T1 * 50), 0) + ' mil anos dentro do Sol' : c < T2 ? 'subindo numa bolha de gás' : c < T3 ? numero(Math.min(8, Math.floor((c - T2) / (T3 - T2) * 8)), 0) + ' min viajando' : 'chegou à Terra!', c < T1 ? numero(Math.round(c / T1 * 50), 0) + ' thousand years inside the Sun' : c < T2 ? 'rising in a gas bubble' : c < T3 ? numero(Math.min(8, Math.floor((c - T2) / (T3 - T2) * 8)), 0) + ' min traveling' : 'reached Earth!');
 					hud.estacao.textContent = TR(c < T1 ? 'presa no labirinto' : c < T2 ? 'quase lá fora' : 'só 8 minutos até aqui', c < T1 ? 'trapped in the maze' : c < T2 ? 'almost outside' : 'only 8 minutes to here');
+				}
+			};
+		}
+	});
+	// ---------- Ferramentas das animações dos destinos (tela grande) ----------
+	// uma estrela com brilho somado e raios em cruz (tam: o tamanho dos raios)
+	function estrelaBrilho(buf, L, A, x, y, r, g, b, tam, forca) {
+		forca = forca === undefined ? 1 : forca;
+		brilhoSoma(buf, L, A, x, y, tam * 1.6 + 2, r * 0.7, g * 0.7, b * 0.7, 0.55 * forca);
+		for (var k = 1; k <= tam; k++) {
+			var a = (1 - k / (tam + 1)) * 0.85 * forca;
+			luaMistura(buf, L, A, x + k, y, r, g, b, a); luaMistura(buf, L, A, x - k, y, r, g, b, a);
+			luaMistura(buf, L, A, x, y + k, r, g, b, a); luaMistura(buf, L, A, x, y - k, r, g, b, a);
+		}
+		luaMistura(buf, L, A, x, y, 255, 255, 255, Math.min(1, forca * 1.2));
+	}
+	// uma camada pré-pintada (r, g, b, alfa por pixel) misturada por cima, com força k
+	function camadaMistura(buf, L, A, cam, k) {
+		for (var i = 0, n = L * A; i < n; i++) {
+			var a = cam[i * 4 + 3] * k; if (a <= 0.004) continue;
+			var v = buf[i];
+			buf[i] = cor((v & 255) + (cam[i * 4] - (v & 255)) * a, ((v >>> 8) & 255) + (cam[i * 4 + 1] - ((v >>> 8) & 255)) * a, ((v >>> 16) & 255) + (cam[i * 4 + 2] - ((v >>> 16) & 255)) * a);
+		}
+	}
+	// um painel de vidro escuro com grade (para os gráficos)
+	function painel(buf, L, A, x0, y0, x1, y1, linhas) {
+		for (var y = y0; y <= y1; y++) for (var x = x0; x <= x1; x++) {
+			var borda = x === x0 || x === x1 || y === y0 || y === y1;
+			luaMistura(buf, L, A, x, y, borda ? 140 : 10, borda ? 130 : 8, borda ? 230 : 30, borda ? 0.7 : 0.62);
+		}
+		(linhas || []).forEach(function (ly) { for (var x = x0 + 2; x < x1 - 1; x += 3) luaMistura(buf, L, A, x, ly, 120, 120, 200, 0.45); });
+	}
+	// um ponto de linha de gráfico com brilho (para as curvas ficarem acesas)
+	function pontoAceso(buf, L, A, x, y, r, g, b) {
+		luaMistura(buf, L, A, x, y, r, g, b, 1);
+		luaMistura(buf, L, A, x, y - 1, r, g, b, 0.35); luaMistura(buf, L, A, x, y + 1, r, g, b, 0.35);
+	}
+	// o buraco negro: o disco de gás quente inclinado (a metade de trás aparece também por cima,
+	// entortada pela gravidade), o anel de fótons e a sombra. "lado" mais claro: o gás vindo em nossa direção
+	function buracoNegro(buf, L, A, cx, cy, R, t) {
+		var RX = R * 3.4, RY = R * 0.62;
+		function disco(frente) {
+			for (var y = Math.floor(cy - RY - 2); y <= cy + RY + 2; y++) for (var x = Math.floor(cx - RX); x <= cx + RX; x++) {
+				var dx = (x + 0.5 - cx) / RX, dy = (y + 0.5 - cy) / RY, r = Math.hypot(dx, dy);
+				if (r > 1 || r < R * 1.5 / RX) continue;
+				if ((dy > 0) !== frente) continue;
+				var a = Math.atan2(dy, dx), giro = ruido2d(a * 3 - t * 1.2 / (r + 0.2), r * 9);
+				var quente = 1 - (r - R * 1.5 / RX) / (1 - R * 1.5 / RX), lado = 0.65 - 0.45 * Math.cos(a);
+				var k = Math.pow(quente, 1.4) * (0.55 + giro * 0.6) * lado;
+				luaMistura(buf, L, A, x, y, 255, 140 + 115 * k, 50 + 160 * k * k, Math.min(1, k * 1.6 + 0.1));
+			}
+		}
+		disco(false);
+		/* a metade de trás do disco, vista por cima do buraco (o arco entortado pela gravidade) */
+		for (var a = Math.PI * 1.03; a < Math.PI * 1.97; a += 0.006) for (var w = 0; w < R * 0.9; w += 0.7) {
+			var rr = R * 1.45 + w, x = cx + Math.cos(a) * rr, y = cy + Math.sin(a) * rr * 0.95;
+			var k = (1 - w / (R * 0.9)) * (0.5 + 0.5 * ruido2d(a * 6 - t, w * 0.5)) * (0.65 - 0.45 * Math.cos(a));
+			luaMistura(buf, L, A, x, y, 255, 170 + 80 * k, 80 + 120 * k, Math.min(1, k * 1.3));
+		}
+		brilhoSoma(buf, L, A, cx, cy, R * 3, 255, 150, 60, 0.35);
+		for (var y2 = Math.floor(cy - R * 1.3); y2 <= cy + R * 1.3; y2++) for (var x2 = Math.floor(cx - R * 1.3); x2 <= cx + R * 1.3; x2++) {
+			var d = Math.hypot(x2 + 0.5 - cx, y2 + 0.5 - cy);
+			if (d < R) pintar(buf, L, A, x2, y2, hex('#000000'));
+			else if (d < R + 1.4) luaMistura(buf, L, A, x2, y2, 255, 236, 190, 0.95 * (1 - (d - R) / 1.6));
+		}
+		disco(true);
+	}
+	// a Via Láctea vista de lado, como camada pré-pintada: a faixa de estrelas, o bojo dourado
+	// no meio e a faixa escura de poeira
+	function viaDeLado(L, A, cx, cy, larg, sem) {
+		var cam = new Float32Array(L * A * 4), aleat = semente(sem);
+		function por(x, y, r, g, b, a) {
+			x = Math.round(x); y = Math.round(y); if (x < 0 || y < 0 || x >= L || y >= A) return;
+			var i = (y * L + x) * 4, a0 = cam[i + 3], na = a0 + a * (1 - a0); if (na <= 0) return;
+			cam[i] = (cam[i] * a0 + r * a * (1 - a0)) / na; cam[i + 1] = (cam[i + 1] * a0 + g * a * (1 - a0)) / na; cam[i + 2] = (cam[i + 2] * a0 + b * a * (1 - a0)) / na; cam[i + 3] = na;
+		}
+		for (var y = 0; y < A; y++) for (var x = 0; x < L; x++) {
+			var u = (x - cx) / larg, v = (y - cy), esp = 7 * (1 - 0.55 * Math.min(1, Math.abs(u))) + 10 * Math.exp(-u * u * 18);
+			var k = Math.exp(-v * v / (esp * esp)) * Math.max(0, 1 - Math.abs(u) * 0.9) * (0.6 + 0.4 * ruido2d(x * 0.08 + sem, y * 0.2));
+			var bojo = Math.exp(-(u * u * 30 + v * v / 70));
+			var poeira = Math.abs(v - Math.sin(u * 3) * 1.2) < 1.6 && Math.abs(u) < 0.8 && ruido2d(x * 0.15, 3 + sem) > 0.35 ? 0.55 : 1;
+			if (k + bojo > 0.02) por(x, y, 170 + 85 * bojo, 170 + 50 * bojo, 230 - 90 * bojo, Math.min(1, (k * 0.75 + bojo * 0.9)) * poeira);
+		}
+		for (var i = 0; i < larg * 9; i++) {
+			var u2 = (aleat() - 0.5) * 2, x2 = cx + u2 * larg, sp = 7 * (1 - 0.55 * Math.abs(u2));
+			var y3 = cy + (aleat() + aleat() + aleat() - 1.5) * sp * 0.9, br = 0.6 + aleat() * 0.4;
+			por(x2, y3, 230 * br, 225 * br, 255 * br, 0.8);
+		}
+		return cam;
+	}
+
+	Object.assign(ANIMACOES, {
+		// Sagittarius A*: a estrela S2 numa órbita bem alongada em volta do buraco negro.
+		// Como um cometa, ela anda devagar lá longe e dispara quando passa perto (leis de Kepler).
+		'sgr-s2': function (L, A) {
+			var ceu = ceuBonito(L, A, 601, '#6a3a2a'), fx = 228, fy = A / 2 + 4, giro = -0.2;
+			var a = 104, e = 0.88, b = a * Math.sqrt(1 - e * e), T = 16;
+			var OUTRAS = [[52, 0.45, 1.2, 9, [255, 220, 180]], [40, 0.3, -0.9, 7, [200, 220, 255]], [70, 0.6, 2.4, 12, [255, 255, 230]], [60, 0.5, 0.4, 10, [190, 210, 255]]];
+			function kepler(M, ee) { var E = Math.PI; for (var k = 0; k < 14; k++) E -= (E - ee * Math.sin(E) - M) / (1 - ee * Math.cos(E)); return E; }
+			function naTela(X, Y, gg) { var c = Math.cos(gg), s = Math.sin(gg); return [fx + X * c - Y * s, fy + X * s + Y * c]; }
+			var vPeri = Math.sqrt(2 / (a * (1 - e)) - 1 / a);
+			return function (buf, t, hud) {
+				ceu(buf, t);
+				brilhoSoma(buf, L, A, fx, fy, 90, 90, 40, 80, 0.4);
+				for (var k = 0; k < 400; k += 2) {
+					var E0 = k / 400 * Math.PI * 2, p0 = naTela(a * (Math.cos(E0) - e), b * Math.sin(E0), giro);
+					luaMistura(buf, L, A, p0[0], p0[1], 150, 150, 230, 0.4);
+				}
+				OUTRAS.forEach(function (o) {
+					var bo = o[0] * Math.sqrt(1 - o[1] * o[1]), Eo = kepler(((t / o[3]) % 1) * Math.PI * 2, o[1]);
+					var q = naTela(o[0] * (Math.cos(Eo) - o[1]), bo * Math.sin(Eo), o[2]);
+					estrelaBrilho(buf, L, A, q[0], q[1], o[4][0], o[4][1], o[4][2], 2, 0.7);
+				});
+				buracoNegro(buf, L, A, fx, fy, 8, t);
+				var M = ((t / T + 0.5) % 1) * Math.PI * 2;
+				for (var j = 40; j >= 1; j--) {
+					var Ej = kepler(M - j * 0.006, e), pj = naTela(a * (Math.cos(Ej) - e), b * Math.sin(Ej), giro);
+					luaMistura(buf, L, A, pj[0], pj[1], 140, 200, 255, 0.85 * (1 - j / 41));
+				}
+				var E = kepler(M, e), X = a * (Math.cos(E) - e), Y = b * Math.sin(E), p = naTela(X, Y, giro);
+				estrelaBrilho(buf, L, A, p[0], p[1], 170, 220, 255, 4);
+				if (hud) {
+					var dist = Math.sqrt(X * X + Y * Y), v = Math.sqrt(2 / dist - 1 / a) / vPeri * 7650;
+					hud.ano.textContent = TR('ano ' + Math.floor((M / (Math.PI * 2)) * 16) + ' de 16', 'year ' + Math.floor((M / (Math.PI * 2)) * 16) + ' of 16');
+					hud.estacao.textContent = numero(Math.round(v / 10) * 10, 0) + ' km/s';
+				}
+			};
+		},
+
+		// Sagittarius A*: raios de luz passando perto do buraco negro. Os de longe só entortam;
+		// os que chegam perto demais caem lá dentro e não voltam mais
+		'sgr-luz': function (L, A) {
+			var ceu = ceuBonito(L, A, 602, '#3a2a5a'), cx = 176, cy = A / 2, SOMBRA = 14, K = 14, raios = [];
+			[-74, -58, -44, -34, -26, -20, -14, -8, 8, 14, 20, 26, 34, 44, 58, 74].forEach(function (b) {
+				var x = -5, y = cy + b, vx = 1, vy = 0, pts = [], caiu = false;
+				for (var s = 0; s < 1400; s++) {
+					var dx = cx - x, dy = cy - y, r2 = dx * dx + dy * dy, r = Math.sqrt(r2);
+					if (r < SOMBRA) { caiu = true; break; }
+					vx += dx / r * K / r2 * 0.6; vy += dy / r * K / r2 * 0.6;
+					var v = Math.sqrt(vx * vx + vy * vy); vx /= v; vy /= v;
+					x += vx * 0.5; y += vy * 0.5;
+					pts.push([x, y]);
+					if (x > L + 4 || y < -4 || y > A + 4 || x < -8) break;
+				}
+				raios.push({ pts: pts, caiu: caiu });
+			});
+			return function (buf, t) {
+				ceu(buf, t);
+				raios.forEach(function (rr) {
+					for (var i = 0; i < rr.pts.length; i += 2) { var p = rr.pts[i]; luaMistura(buf, L, A, p[0], p[1], rr.caiu ? 200 : 120, rr.caiu ? 110 : 150, rr.caiu ? 90 : 240, 0.3); }
+				});
+				buracoNegro(buf, L, A, cx, cy, SOMBRA - 4, t);
+				raios.forEach(function (rr, j) {
+					for (var q = 0; q < 2; q++) {
+						var i2 = Math.floor(((t * 0.22 + q / 2 + j * 0.061) % 1) * rr.pts.length);
+						for (var w = 0; w < 26; w++) {
+							var p2 = rr.pts[i2 - w]; if (!p2) break;
+							luaMistura(buf, L, A, p2[0], p2[1], rr.caiu ? 255 : 220, rr.caiu ? 170 - w * 3 : 240, rr.caiu ? 80 : 255, 1 - w / 26);
+						}
+						var pc = rr.pts[i2];
+						if (pc) brilhoSoma(buf, L, A, pc[0], pc[1], 5, rr.caiu ? 255 : 160, rr.caiu ? 140 : 220, rr.caiu ? 60 : 255, 0.6);
+					}
+				});
+			};
+		},
+
+		// Bolhas de Fermi: a Via Láctea de lado; o centro engole uma nuvem, solta jatos e as
+		// duas bolhas vão inflando (magenta), com a casca do eROSITA (turquesa) em volta
+		'fermi-sopro': function (L, A) {
+			var ceu = ceuBonito(L, A, 603, '#3a2a6a'), cx = L / 2, cy = A / 2, CICLO = 15, via = viaDeLado(L, A, cx, cy, 150, 7);
+			return function (buf, t, hud) {
+				ceu(buf, t);
+				var c = t % CICLO, cresce = suave((c - 3) / 8), casca = suave((c - 6) / 6), some = c > 13.5 ? 1 - (c - 13.5) / 1.5 : 1;
+				var rw = 6 + cresce * 36, rh = 5 + cresce * 34;
+				if (c > 3) for (var y = 0; y < A; y++) for (var x = 0; x < L; x++) {
+					for (var s = -1; s <= 1; s += 2) {
+						if (s * (cy - y) < 0) continue;
+						var u = (x - cx) / rw, v = (y - (cy - s * rh)) / rh, a = Math.atan2(v, u);
+						var bord = 1 + (ruido2d(Math.cos(a) * 2 + s * 4, Math.sin(a) * 2) - 0.5) * 0.12, d = Math.hypot(u, v) / bord;
+						if (d < 1) {
+							var borda = Math.pow(d, 6), fil = ruido2d(x * 0.08 + s * 9, y * 0.08 - t * 0.2);
+							luaMistura(buf, L, A, x, y, 230 + 25 * borda, 90 + 90 * borda, 230, (0.18 + 0.55 * borda + fil * 0.12) * some);
+						} else if (casca > 0) {
+							var u2 = (x - cx) / (rw * 1.22 * casca + 1), v2 = (y - (cy - s * rh * 1.12 * casca)) / (rh * 1.2 * casca + 1), d2 = Math.hypot(u2, v2);
+							if (d2 < 1 && d2 > 0.86) luaMistura(buf, L, A, x, y, 90, 230, 215, (1 - Math.abs(d2 - 0.93) / 0.07) * 0.5 * some * casca);
+						}
+					}
+				}
+				/* partículas subindo dentro das bolhas */
+				if (c > 3) for (var k = 0; k < 60; k++) {
+					var f = ((t * 0.3 + k / 60) % 1), lado = k & 1 ? 1 : -1;
+					var px = cx + Math.sin(k * 12.9898) * rw * 0.8 * Math.sin(f * Math.PI), py = cy - lado * f * rh * 1.9;
+					luaMistura(buf, L, A, px, py, 255, 220, 250, 0.8 * some * Math.sin(f * Math.PI));
+				}
+				camadaMistura(buf, L, A, via, 1);
+				brilhoSoma(buf, L, A, cx, cy, 26, 255, 210, 140, 0.6);
+				if (c < 2.6) {
+					var nx = cx - 120 + suave(c / 2.6) * 120;
+					for (var n = 0; n < 60; n++) luaMistura(buf, L, A, nx + Math.sin(n * 7.1) * 10 * (1 - c / 3), cy - 8 + Math.cos(n * 3.3) * 5, 255, 140, 220, 0.8);
+					brilhoSoma(buf, L, A, nx, cy - 8, 12, 255, 100, 200, 0.4);
+				}
+				if (c > 2.4 && c < 3.6) { var fl = 1 - Math.abs(c - 3) / 0.6; brilhoSoma(buf, L, A, cx, cy, 10 + fl * 40, 255, 255, 240, fl * 1.5); }
+				if (c > 2.8 && c < 9.5) {
+					var jl = Math.min(80, (c - 2.8) * 40), jf = c > 8 ? (9.5 - c) / 1.5 : 1;
+					for (var jy = 6; jy < jl; jy++) { var a2 = (1 - jy / 90) * jf; luaMistura(buf, L, A, cx, cy - jy, 200, 240, 255, a2); luaMistura(buf, L, A, cx, cy + jy, 200, 240, 255, a2); luaMistura(buf, L, A, cx + 1, cy - jy, 150, 220, 255, a2 * 0.5); luaMistura(buf, L, A, cx + 1, cy + jy, 150, 220, 255, a2 * 0.5); }
+				}
+				if (hud) {
+					var ma = c < 3 ? 4 : Math.max(0, 4 - (c - 3) / 8 * 4);
+					hud.ano.textContent = TR(ma <= 0.05 ? 'hoje' : 'há ' + numero(ma, ma < 1 ? 1 : 0).replace(',0', '') + (ma >= 2 ? ' milhões' : ' milhão') + ' de anos', ma <= 0.05 ? 'today' : numero(ma, ma < 1 ? 1 : 0).replace('.0', '') + ' million years ago');
+					hud.estacao.textContent = TR(c < 2.4 ? 'uma nuvem de gás cai no centro' : c < 3.4 ? 'o buraco negro engole a nuvem' : c < 9 ? 'jatos soprando as bolhas' : 'bolhas de 25 mil anos-luz', c < 2.4 ? 'a gas cloud falls to the center' : c < 3.4 ? 'the black hole swallows the cloud' : c < 9 ? 'jets blowing the bubbles' : 'bubbles 25 thousand light-years tall');
+				}
+			};
+		},
+
+		// Bolhas de Fermi: a mesma região vista em luz comum (só a galáxia) e em raios gama
+		// (as bolhas aparecem). Uma "lente" passa de um lado para o outro trocando a visão
+		'fermi-raios': function (L, A) {
+			var ceu = ceuBonito(L, A, 604, '#2a2a5a'), cx = L / 2, cy = A / 2, via = viaDeLado(L, A, cx, cy, 150, 11);
+			var GAMA = new Float32Array(L * A * 4);
+			for (var y = 0; y < A; y++) for (var x = 0; x < L; x++) {
+				var i = (y * L + x) * 4, m = 0;
+				for (var s = -1; s <= 1; s += 2) {
+					if (s * (cy - y) < 0) continue;
+					var u = (x - cx) / 38, v = (y - (cy - s * 36)) / 38, a = Math.atan2(v, u);
+					var d = Math.hypot(u, v) / (1 + Math.sin(a * 5 + s) * 0.05 + Math.sin(a * 11) * 0.03);
+					if (d < 1) m = Math.max(m, 0.35 + 0.6 * Math.pow(d, 5) + (ruido2d(x * 0.1, y * 0.1) - 0.5) * 0.2);
+				}
+				var faixa = Math.exp(-Math.pow((y - cy) / 6, 2)) * Math.max(0, 1 - Math.abs(x - cx) / 160);
+				GAMA[i] = 255; GAMA[i + 1] = Math.min(240, 90 + 110 * faixa + 60 * Math.pow(m, 3)); GAMA[i + 2] = 230 - 60 * faixa;
+				GAMA[i + 3] = Math.min(1, m * 0.85 + faixa * 0.6 + 0.05);
+			}
+			return function (buf, t, hud) {
+				var c = t % 8, corte = c < 4 ? suave(c / 3.2) * (L + 8) - 4 : L + 4 - suave((c - 4) / 3.2) * (L + 8);
+				ceu(buf, t);
+				camadaMistura(buf, L, A, via, 1);
+				brilhoSoma(buf, L, A, cx, cy, 24, 255, 210, 140, 0.5);
+				/* à esquerda da lente: o céu em raios gama (fundo roxo e as bolhas acesas) */
+				for (var y = 0; y < A; y++) for (var x = 0; x < Math.min(L, corte); x++) {
+					var k = y * L + x, i = k * 4, v = buf[k], g = ((v & 255) + ((v >>> 8) & 255) + ((v >>> 16) & 255)) / 3 * 0.25;
+					var a = GAMA[i + 3];
+					buf[k] = cor(Math.min(255, 18 + g + (GAMA[i] - 18) * a), Math.min(255, 8 + g + (GAMA[i + 1] - 8) * a), Math.min(255, 36 + g + (GAMA[i + 2] - 36) * a));
+				}
+				for (y = 0; y < A; y++) { luaMistura(buf, L, A, corte, y, 255, 255, 255, 0.95); luaMistura(buf, L, A, corte + 1, y, 160, 250, 255, 0.6); luaMistura(buf, L, A, corte - 1, y, 255, 160, 240, 0.6); }
+				brilhoSoma(buf, L, A, corte, cy, 30, 180, 240, 255, 0.25);
+				if (hud) {
+					hud.ano.textContent = TR('← raios gama', '← gamma rays');
+					hud.estacao.textContent = TR('luz que os olhos veem →', 'light our eyes see →');
+				}
+			};
+		},
+
+		// Nebulosa de Órion: uma nuvem encolhe e gira, acende uma estrela no meio de um disco
+		// de poeira, e no disco vão se formando planetas (abrindo "trilhas" sem poeira)
+		'orion-disco': function (L, A) {
+			var ceu = ceuBonito(L, A, 605, '#8a3a6a'), aleat = semente(71), poeira = [], cx = L / 2, cy = A / 2, incl = 0.3, CICLO = 16;
+			for (var i = 0; i < 1600; i++) poeira.push([18 + Math.pow(aleat(), 0.7) * 120, aleat() * Math.PI * 2, aleat()]);
+			var PLANETAS = [[34, rampaCores(['#f0d0b0', '#b08060', '#4a3020'], 8), 3], [56, rampaCores(['#ffc0a0', '#d0604a', '#5a2018'], 8), 3.5], [82, rampaCores(['#fff0c8', '#d8b080', '#6a4a2a'], 8), 6], [110, rampaCores(['#c8e0ff', '#5a8ae0', '#1a2a6a'], 8), 4.5]];
+			return function (buf, t, hud) {
+				ceu(buf, t);
+				var c = t % CICLO, nuvem = 1 - suave((c - 0.5) / 3), acesa = suave((c - 2.8) / 1.2), forma = suave((c - 6) / 6);
+				brilhoSoma(buf, L, A, cx, cy, 140, 200, 80, 140, 0.25 + nuvem * 0.2);
+				function desenhar(frente) {
+					poeira.forEach(function (p) {
+						var r = p[0] * (0.4 + 0.6 * (1 - nuvem * 0.6)), ang = p[1] + t * 3 / Math.pow(r / 18, 1.5), sy = Math.sin(ang);
+						if ((sy >= 0) !== frente) return;
+						var limpa = 0;
+						PLANETAS.forEach(function (pl) { if (Math.abs(p[0] - pl[0]) < 6) limpa = Math.max(limpa, forma); });
+						if (p[2] < limpa) return;
+						var x = cx + Math.cos(ang) * r, y = cy + sy * r * (incl + nuvem * 0.6);
+						var luz = acesa * Math.max(0, 1 - r / 130), q = p[2];
+						luaMistura(buf, L, A, x, y, 200 + 55 * luz, 110 + 60 * q + 80 * luz, 120 + 40 * q, (0.45 + 0.4 * q) * (frente ? 1 : 0.8));
+					});
+				}
+				desenhar(false);
+				if (acesa > 0) { brilhoSoma(buf, L, A, cx, cy, 40 * acesa, 255, 200, 120, 0.7); brilhoSoma(buf, L, A, cx, cy, 10 * acesa + 1, 255, 255, 230, 1.2); estrelaBrilho(buf, L, A, cx, cy, 255, 240, 200, Math.round(6 * acesa), acesa); }
+				PLANETAS.forEach(function (pl, n) {
+					if (forma <= 0) return;
+					var ang = n * 1.7 + t * 3 / Math.pow(pl[0] / 18, 1.5), sy = Math.sin(ang);
+					var x = cx + Math.cos(ang) * pl[0], y = cy + sy * pl[0] * incl;
+					esfera(buf, L, A, x, y, pl[2] * forma, pl[1], cx - x, cy - y);
+				});
+				desenhar(true);
+				if (hud) {
+					hud.ano.textContent = TR(c < 2.8 ? numero(Math.round(c / 2.8 * 100), 0) + ' mil anos' : c < 6 ? numero(0.1 + (c - 2.8) / 3.2 * 0.9, 1) + ' milhão de anos' : numero(Math.min(10, 1 + (c - 6) / 6 * 9), 0) + ' milhões de anos', c < 2.8 ? numero(Math.round(c / 2.8 * 100), 0) + ' thousand years' : c < 6 ? numero(0.1 + (c - 2.8) / 3.2 * 0.9, 1) + ' million years' : numero(Math.min(10, 1 + (c - 6) / 6 * 9), 0) + ' million years');
+					hud.estacao.textContent = TR(c < 2.8 ? 'a nuvem encolhe e gira' : c < 6 ? 'uma estrela acende no disco' : c < 12 ? 'planetas se formando' : 'um novo sistema solar', c < 2.8 ? 'the cloud shrinks and spins' : c < 6 ? 'a star lights up in the disk' : c < 12 ? 'planets forming' : 'a new solar system');
+				}
+			};
+		},
+
+		// Órion vista do Brasil (de cabeça para baixo): as Três Marias, a "espada" acima delas e,
+		// chegando mais perto da estrela do meio da espada, ela vira a nebulosa
+		'orion-constelacao': function (L, A) {
+			var ceu = ceuBonito(L, A, 606, '#2a2a6a'), CICLO = 12;
+			var E = { betelgeuse: [0.7, 0.8, [255, 170, 110], 4], bellatrix: [0.32, 0.75, [220, 230, 255], 3], meissa: [0.5, 0.88, [220, 230, 255], 2],
+				alnitak: [0.57, 0.48, [220, 230, 255], 3], alnilam: [0.5, 0.5, [255, 255, 255], 3], mintaka: [0.43, 0.53, [220, 230, 255], 3],
+				saiph: [0.62, 0.18, [200, 220, 255], 3], rigel: [0.3, 0.22, [180, 210, 255], 4] };
+			var ESPADA = [[0.515, 0.38], [0.52, 0.32], [0.525, 0.26]];
+			var LINHAS = [['betelgeuse', 'alnitak'], ['bellatrix', 'mintaka'], ['alnitak', 'alnilam'], ['alnilam', 'mintaka'], ['alnitak', 'saiph'], ['mintaka', 'rigel'], ['betelgeuse', 'meissa'], ['bellatrix', 'meissa']];
+			return function (buf, t, hud) {
+				var c = t % CICLO;
+				function base(p) { return [L / 2 + (p[0] - 0.5) * A * 1.5, A / 2 + (p[1] - 0.5) * A * 0.95]; }
+				var T = base(ESPADA[1]), z01 = suave((c - 6.2) / 3), zoom = 1 + z01 * z01 * 9;
+				function tela(p) { var b = base(p); return [T[0] + (b[0] - T[0]) * zoom + (L / 2 - T[0]) * z01, T[1] + (b[1] - T[1]) * zoom + (A / 2 - T[1]) * z01]; }
+				ceu(buf, t);
+				var linhas = suave(c / 1.2) * (1 - suave((c - 6.2) / 1));
+				if (linhas > 0.02) LINHAS.forEach(function (l) {
+					var a = tela(E[l[0]]), b = tela(E[l[1]]), n = Math.hypot(b[0] - a[0], b[1] - a[1]);
+					for (var d = 6; d < n - 6; d += 2) luaMistura(buf, L, A, a[0] + (b[0] - a[0]) * d / n, a[1] + (b[1] - a[1]) * d / n, 130, 140, 230, 0.5 * linhas);
+				});
+				Object.keys(E).forEach(function (k) {
+					var e = E[k], p = tela(e), marias = (k === 'alnitak' || k === 'alnilam' || k === 'mintaka') && c > 1.5 && c < 4;
+					var cc = marias ? [255, 220, 120] : e[2], pul = marias ? 0.75 + 0.25 * Math.sin(t * 8) : 1;
+					estrelaBrilho(buf, L, A, p[0], p[1], cc[0], cc[1], cc[2], e[3], pul);
+				});
+				var nebula = suave((c - 7) / 2.5);
+				ESPADA.forEach(function (s, i) {
+					var p = tela(s);
+					if (i === 1 && nebula > 0) {
+						var R = 4 + nebula * 70, arteD = document.querySelector('canvas.arte-destino'), px = null;
+						try { if (arteD && arteD.width) px = arteD.getContext('2d').getImageData(0, 0, arteD.width, arteD.height); } catch (er) {}
+						brilhoSoma(buf, L, A, p[0], p[1], R * 1.2, 220, 100, 160, 0.4 * nebula);
+						for (var y = -R; y <= R; y++) for (var x = -R; x <= R; x++) {
+							var d = Math.sqrt(x * x + y * y) / R; if (d > 1) continue;
+							var a = Math.min(1, (1 - d) * 4) * nebula;
+							if (px) {
+								var ax = Math.min(px.width - 1, Math.floor((x + R) / (2 * R) * px.width)), ay = Math.min(px.height - 1, Math.floor((y + R) / (2 * R) * px.height)), ki = (ay * px.width + ax) * 4;
+								if (px.data[ki + 3] > 0) luaMistura(buf, L, A, p[0] + x, p[1] + y, px.data[ki], px.data[ki + 1], px.data[ki + 2], a);
+							} else luaMistura(buf, L, A, p[0] + x, p[1] + y, d < 0.3 ? 255 : 210, d < 0.3 ? 240 : 80, d < 0.3 ? 230 : 120, a * (1 - d));
+						}
+					}
+					var pisca = i === 1 && c > 4 && c < 6.2 ? 0.6 + 0.4 * Math.sin(t * 8) : 1;
+					if (!(i === 1 && nebula > 0.5)) estrelaBrilho(buf, L, A, p[0], p[1], i === 1 && c > 4 ? 255 : 230, i === 1 && c > 4 ? 160 : 225, i === 1 && c > 4 ? 210 : 255, 2, pisca);
+				});
+				if (hud) {
+					hud.ano.textContent = TR(c < 1.5 ? 'a constelação de Órion' : c < 4 ? 'as Três Marias' : c < 6.2 ? 'a espada: a do meio é borrada' : 'chegando mais perto…', c < 1.5 ? 'the constellation Orion' : c < 4 ? "Orion's Belt" : c < 6.2 ? 'the sword: the middle one is blurry' : 'getting closer…');
+					hud.estacao.textContent = TR(c < 7.5 ? 'vista do Brasil' : 'não é estrela: é a nebulosa!', c < 7.5 ? 'seen from Brazil' : 'not a star: it is the nebula!');
+				}
+			};
+		},
+
+		// Plêiades: a família de estrelas azuis vai se espalhando, puxada pela galáxia
+		'pleiades-separa': function (L, A) {
+			var ceu = ceuBonito(L, A, 607, '#2a3a8a'), aleat = semente(89), irmas = [], cx = L / 2, cy = A / 2, CICLO = 16;
+			for (var i = 0; i < 22; i++) {
+				var r = Math.sqrt(aleat()) * 36, an = aleat() * Math.PI * 2, x = cx + Math.cos(an) * r * 1.3, y = cy + Math.sin(an) * r * 0.85;
+				var va = aleat() * Math.PI * 2, vel = 60 + aleat() * 90;
+				irmas.push({ x: x, y: y, vx: Math.cos(va) * vel + (y - cy) * 3, vy: Math.sin(va) * vel * 0.55, tam: i < 7 ? 4 + (i < 3 ? 2 : 0) : 1 + (aleat() * 2 | 0) });
+			}
+			/* a névoa azul (luz das estrelas batendo na poeira): fiapos riscados, pré-pintados */
+			var NEVOA = new Float32Array(L * A * 4);
+			for (var py = 0; py < A; py++) for (var px = 0; px < L; px++) {
+				var dx = (px - cx) / 90, dy = (py - cy) / 56, d = dx * dx + dy * dy;
+				var fio = ruido2d(px * 0.03 + py * 0.06, py * 0.02 - px * 0.01) * 0.7 + ruido2d(px * 0.12 + py * 0.2, py * 0.05) * 0.3;
+				var k = Math.max(0, 1 - d) * Math.max(0, fio - 0.3) * 1.6, i4 = (py * L + px) * 4;
+				NEVOA[i4] = 90 + 80 * fio; NEVOA[i4 + 1] = 140 + 70 * fio; NEVOA[i4 + 2] = 255; NEVOA[i4 + 3] = Math.min(0.75, k);
+			}
+			return function (buf, t, hud) {
+				ceu(buf, t);
+				var c = t % CICLO, k = suave((c - 2) / 11), apaga = c > 15 ? (c - 15) : 0;
+				camadaMistura(buf, L, A, NEVOA, (1 - k) * (1 - apaga));
+				irmas.forEach(function (s) {
+					var x = s.x + s.vx * k, y = s.y + s.vy * k, br = (1 - apaga) * (0.85 + 0.15 * Math.sin(t * 2 + s.x));
+					if (br <= 0) return;
+					estrelaBrilho(buf, L, A, x, y, 170, 205, 255, s.tam, br);
+				});
+				if (hud) {
+					hud.ano.textContent = TR(k < 0.02 ? 'hoje' : 'daqui a ' + numero(Math.round(k * 250 / 10) * 10, 0) + ' milhões de anos', k < 0.02 ? 'today' : numero(Math.round(k * 250 / 10) * 10, 0) + ' million years from now');
+					hud.estacao.textContent = TR(k < 0.3 ? 'irmãs juntas' : k < 0.7 ? 'se afastando' : 'cada uma no seu caminho', k < 0.3 ? 'sisters together' : k < 0.7 ? 'drifting apart' : 'each on its own path');
+				}
+			};
+		},
+
+		// Plêiades: quantas irmãs dá para ver no céu da cidade, no céu do campo e com binóculo
+		'pleiades-ceu': function (L, A) {
+			var aleat = semente(97), cx = L / 2, cy = A / 2 - 8, estrelas = [], CICLO = 12, base = ceuBonito(L, A, 608, '#1a2a5a');
+			[[0, 0, 1], [-14, -6, 0.92], [10, -10, 0.88], [-6, 8, 0.86], [18, 2, 0.84], [-22, 4, 0.8], [6, 14, 0.62], [-2, -16, 0.6], [24, -8, 0.58]].forEach(function (s) { estrelas.push([cx + s[0] * 2.6, cy + s[1] * 2.2, s[2]]); });
+			for (var i = 0; i < 80; i++) estrelas.push([cx + (aleat() - 0.5) * 200, cy + (aleat() - 0.5) * 110, 0.08 + aleat() * 0.45]);
+			var PREDIOS = [];
+			for (var x = 0; x < L; ) { var w = 14 + (aleat() * 22 | 0); PREDIOS.push([x, w, 14 + (aleat() * 30 | 0)]); x += w + 1; }
+			return function (buf, t, hud) {
+				var c = t % CICLO, etapa = c < 4 ? 0 : c < 8 ? 1 : 2, mistura = Math.min(1, (c % 4) / 0.8);
+				var limite = [0.83, 0.57, 0.08][etapa], antes = [0.08, 0.83, 0.57][etapa], corte = antes + (limite - antes) * mistura;
+				if (etapa === 0 && c < 0.8) corte = 0.08 + (0.83 - 0.08) * mistura;
+				/* o céu: na cidade, a luz alaranjada esconde as estrelas fracas */
+				for (var y = 0; y < A; y++) for (var x = 0; x < L; x++) {
+					var b = etapa === 0 ? Math.pow(y / A, 1.6) : etapa === 1 ? Math.pow(y / A, 3) * 0.35 : 0;
+					buf[y * L + x] = etapa === 0 ? cor(26 + b * 150, 18 + b * 80, 40 + b * 30) : cor(5 + b * 60, 6 + b * 50, 22 + b * 50);
+				}
+				if (etapa === 2) base(buf, t);
+				var vistas = 0;
+				estrelas.forEach(function (s) {
+					if (s[2] < corte) return;
+					vistas++;
+					var br = Math.min(1, 0.35 + s[2] * 0.7) * (0.85 + 0.15 * Math.sin(t * 2 + s[0]));
+					if (s[2] > 0.55 || etapa === 2) estrelaBrilho(buf, L, A, s[0], s[1], 180, 210, 255, s[2] > 0.82 ? 4 : s[2] > 0.5 ? 2 : 1, br);
+					else luaMistura(buf, L, A, s[0], s[1], 200, 220, 255, br);
+				});
+				if (etapa === 0) PREDIOS.forEach(function (p, n) {
+					for (var y = A - p[2]; y < A; y++) for (var x = p[0]; x < p[0] + p[1]; x++) {
+						var jan = (x - p[0]) % 4 === 2 && (y - (A - p[2])) % 5 === 2 && ruido2d(x * 0.7, y * 0.7 + n) > 0.45;
+						pintar(buf, L, A, x, y, jan ? hex('#ffd36a') : cor(14, 10, 22));
+					}
+					if (n % 3 === 0) luaMistura(buf, L, A, p[0] + 3, A - p[2] - 3, 255, 80, 80, 0.5 + 0.5 * Math.sin(t * 3 + n));
+				});
+				if (etapa === 1) for (x = 0; x < L; x++) {
+					var arv = 8 + Math.abs(Math.sin(x * 0.21)) * 9 + Math.abs(Math.sin(x * 0.07 + 1)) * 8 + (ruido2d(x * 0.3, 1) - 0.5) * 5;
+					for (y = Math.round(A - arv); y < A; y++) pintar(buf, L, A, x, y, cor(4, 4, 10));
+				}
+				if (etapa === 1) [[40, 6], [210, 8]].forEach(function (v) { luaMistura(buf, L, A, v[0], A - v[1] - 12, 255, 240, 120, 0.4 + 0.6 * Math.max(0, Math.sin(t * 4 + v[0]))); });
+				if (etapa === 2) for (y = 0; y < A; y++) for (x = 0; x < L; x++) {
+					var d = Math.min(Math.hypot(x - cx + 44, y - cy - 8), Math.hypot(x - cx - 44, y - cy - 8));
+					if (d > 78) buf[y * L + x] = cor(0, 0, 0);
+					else if (d > 70) { var v2 = buf[y * L + x], f = 1 - (d - 70) / 8; buf[y * L + x] = cor((v2 & 255) * f, ((v2 >>> 8) & 255) * f, ((v2 >>> 16) & 255) * f); }
+				}
+				if (hud) {
+					hud.ano.textContent = TR(['no céu da cidade', 'no céu do campo', 'com binóculo'][etapa], ['in a city sky', 'in a country sky', 'with binoculars'][etapa]);
+					hud.estacao.textContent = TR('você vê ' + vistas + ' estrelas', 'you see ' + vistas + ' stars');
+				}
+			};
+		},
+
+		// Nebulosa da Hélice: a estrela incha (gigante vermelha), solta as camadas de fora num
+		// anel colorido que vai se abrindo e, no meio, sobra uma anã branca acendendo o gás
+		'helice-morte': function (L, A) {
+			var ceu = ceuBonito(L, A, 609, '#2a3a5a'), cx = L / 2, cy = A / 2 + 2, CICLO = 17;
+			var GIG = rampaCores(['#fff0c0', '#ffb060', '#e0602a', '#a02a14', '#4a0e06'], 14);
+			return function (buf, t, hud) {
+				ceu(buf, t);
+				var c = t % CICLO, incha = suave((c - 2.5) / 3.2), solta = suave((c - 6) / 1.6), abre = suave((c - 6.4) / 7.5), apaga = c > 15.4 ? suave((c - 15.4) / 1.6) : 0, vivo = 1 - apaga;
+				if (c > 6) {
+					var Ra = 22 + abre * 56, esp = 6 + abre * 18;
+					for (var y = Math.max(0, Math.floor(cy - Ra * 1.5)); y < Math.min(A, cy + Ra * 1.5); y++) for (var x = Math.max(0, Math.floor(cx - Ra * 1.5)); x < Math.min(L, cx + Ra * 1.5); x++) {
+						var dx = x - cx, dy = (y - cy) / 0.84, d = Math.hypot(dx, dy), a = Math.atan2(dy, dx);
+						var Rn = Ra * (1 + (ruido2d(Math.cos(a) * 3 + 5, Math.sin(a) * 3 + t * 0.05) - 0.5) * 0.18), dentro = Rn - esp;
+						if (d < dentro) {
+							var g = Math.pow(1 - d / dentro, 0.7), n = ruido2d(x * 0.08, y * 0.08 + t * 0.1);
+							luaMistura(buf, L, A, x, y, 110 + 140 * g, 220 + 35 * g, 215 + 30 * g, (0.25 + 0.45 * g + n * 0.25) * vivo * (0.5 + abre * 0.5));
+						} else if (d < Rn + esp * 0.6) {
+							var f = (d - dentro) / (esp * 1.6), grumo = ruido2d(Math.cos(a) * 7 + d * 0.12, Math.sin(a) * 7 + t * 0.08);
+							var ff = Math.max(0, Math.min(1, f + (grumo - 0.5) * 0.4));
+							luaMistura(buf, L, A, x, y, 255, 220 - 180 * ff, 130 - 90 * ff, (0.9 - ff * 0.5) * vivo * (0.6 + grumo * 0.5));
+							if (f < 0.3 && Math.sin(a * 60 + grumo * 4) > 0.9 && vivo > 0.4) luaMistura(buf, L, A, x, y, 255, 245, 225, 0.8);
+						} else if (d < Rn + esp * 0.6 + 16) {
+							var h = 1 - (d - Rn - esp * 0.6) / 16;
+							luaMistura(buf, L, A, x, y, 160, 30, 60, h * h * 0.4 * vivo * abre);
+						}
+					}
+				}
+				if (c > 5.6 && c < 9) {
+					var sopro = (c - 5.6) / 3.4;
+					for (var q = 0; q < 200; q++) {
+						var aq = q * 2.39996, rq = 30 + sopro * 50 * (0.7 + ruido2d(q * 0.7, 3) * 0.6);
+						luaMistura(buf, L, A, cx + Math.cos(aq) * rq, cy + Math.sin(aq) * rq * 0.84, 255, 140 - sopro * 60, 70, 0.8 * (1 - sopro * 0.6));
+					}
+				}
+				var R = c < 6 ? 9 + incha * 34 : 43 * (1 - solta) + 2.5 * solta;
+				if (c < 6.5 || solta < 0.95) {
+					brilhoSoma(buf, L, A, cx, cy, R * 1.8, 255, 120 + 100 * (1 - incha), 50, 0.5);
+					var pal = incha < 0.3 ? rampaCores(['#fffbe8', '#ffe8a0', '#ffc050', '#e08a30'], 12) : GIG;
+					esfera(buf, L, A, cx, cy, R, pal, -0.6, -0.5, function (x, y) { return (ruido2d(x * 5 + t * 0.4, y * 5 - t * 0.3) - 0.5) * 3; });
+				}
+				if (c > 7) { brilhoSoma(buf, L, A, cx, cy, 22, 170, 240, 255, 0.8); estrelaBrilho(buf, L, A, cx, cy, 210, 245, 255, 6, vivo * 0.6 + 0.4); }
+				if (hud) {
+					hud.ano.textContent = TR(c < 2.5 ? 'estrela como o Sol' : c < 6 ? 'gigante vermelha' : c < 8 ? 'solta as camadas' : 'nebulosa planetária', c < 2.5 ? 'a star like the Sun' : c < 6 ? 'red giant' : c < 8 ? 'sheds its layers' : 'planetary nebula');
+					hud.estacao.textContent = TR(c < 2.5 ? 'bilhões de anos' : c < 6 ? 'o combustível acaba' : c < 15.4 ? 'há ' + numero(Math.max(1, Math.round((c - 6) / 9.4 * 10)), 0) + ' mil anos' : 'o gás se espalha', c < 2.5 ? 'billions of years' : c < 6 ? 'the fuel runs out' : c < 15.4 ? numero(Math.max(1, Math.round((c - 6) / 9.4 * 10)), 0) + ' thousand years ago' : 'the gas spreads out');
+				}
+			};
+		},
+
+		// Hélice de perto: a borda de dentro do anel, com os nós cometários. O vento e a luz da
+		// anã branca (à esquerda) sopram para fora e esticam as caudas deles
+		'helice-nos': function (L, A) {
+			var aleat = semente(103), nos = [], vento = [];
+			function borda(y) { return 140 + Math.sin(y * 0.08 + 1) * 14 + Math.sin(y * 0.2) * 6; }
+			for (var i = 0; i < 44; i++) { var ny = 6 + aleat() * (A - 12); nos.push([borda(ny) - 4 + aleat() * 40, ny, 1 + aleat() * 1.5, aleat() * 6]); }
+			for (i = 0; i < 80; i++) vento.push([aleat(), aleat() * A, 0.5 + aleat()]);
+			var FUNDO = new Uint32Array(L * A);
+			for (var y = 0; y < A; y++) for (var x = 0; x < L; x++) {
+				var b = borda(y), n = ruido2d(x * 0.04, y * 0.06) * 0.6 + ruido2d(x * 0.12, y * 0.15) * 0.4, r, g, bb;
+				if (x < b) { var f0 = x / b; r = 30 + 60 * f0 + n * 40; g = 120 + 80 * f0 + n * 50; bb = 130 + 50 * f0 + n * 30; }
+				else { var f = Math.min(1, (x - b) / (L - b)); r = 255 - f * 90; g = 170 - f * 130 + n * 40; bb = 100 - f * 40 + n * 20; var k = 0.75 + n * 0.4; r *= k; g *= k; bb *= k; }
+				FUNDO[y * L + x] = cor(Math.min(255, r), Math.min(255, g), Math.min(255, bb));
+			}
+			return function (buf, t) {
+				buf.set(FUNDO);
+				brilhoSoma(buf, L, A, -10, A / 2, 110, 160, 240, 255, 0.45);
+				vento.forEach(function (v) { var x = ((v[0] + t * 0.1 * v[2]) % 1) * L; for (var w = 0; w < 5; w++) luaMistura(buf, L, A, x - w, v[1], 210, 255, 250, 0.5 * (1 - w / 5)); });
+				nos.forEach(function (n) {
+					var cauda = 16 + n[2] * 12 + Math.sin(t * 2 + n[3]) * 3;
+					for (var q = 1; q < cauda; q++) {
+						var yq = n[1] + Math.sin(q * 0.2 + t + n[3]) * 0.8, f = q / cauda;
+						for (var w2 = -n[2]; w2 <= n[2]; w2++) luaMistura(buf, L, A, n[0] + q, yq + w2 * (1 - f * 0.7), 60, 16, 30, 0.75 * (1 - f) * (1 - Math.abs(w2) / (n[2] + 1)));
+					}
+					brilhoSoma(buf, L, A, n[0] - 1, n[1], 4 + n[2], 255, 220, 170, 0.7);
+					luaDisco(buf, L, A, n[0] - 1, n[1], 1, hex('#fff6e8'));
+				});
+				estrelaBrilho(buf, L, A, 8, A / 2, 210, 245, 255, 8);
+			};
+		},
+
+		// Estrela de Tabby: uma nuvem de poeira passa na frente da estrela, e o gráfico mostra a
+		// luz azul caindo mais que a vermelha (como a poeira faz; um painel sólido não faria)
+		'tabby-cores': function (L, A) {
+			var ceu = ceuBonito(L, A, 611, '#4a3a2a'), aleat = semente(127), graos = [], sx = 78, sy = 88, R = 40, CICLO = 9;
+			for (var i = 0; i < 900; i++) { var gr = Math.sqrt(aleat()), ga = aleat() * Math.PI * 2; graos.push([Math.cos(ga) * gr * 46, Math.sin(ga) * gr * 32, aleat()]); }
+			var g0 = 172, g1 = 306, gt = 34, gb = 140, PAL = rampaCores(['#fffbe8', '#fff0b0', '#ffd070', '#f0a040', '#b06020'], 16);
+			function cobre(tt) { var xc = -50 + ((tt % CICLO) / CICLO) * 260, d = Math.abs(xc - sx) / 58; return d < 1 ? Math.pow(1 - d * d, 1.5) * (0.8 + 0.2 * Math.sin(tt * 2.3)) : 0; }
+			function yDo(b) { return gt + 6 + (1 - b) / 0.25 * (gb - gt - 12); }
+			return function (buf, t, hud) {
+				ceu(buf, t);
+				var k = cobre(t);
+				brilhoSoma(buf, L, A, sx, sy, R * 2.2, 255, 190, 100, 0.6 * (1 - k * 0.3));
+				esfera(buf, L, A, sx, sy, R, PAL, -0.4, -0.4, function (x, y) { return (ruido2d(x * 6 + t * 0.3, y * 6) - 0.5) * 1.5; });
+				escurecer(buf, L, A, sx, sy, R, function () { return 1 - k * 0.2; });
+				var xc = -50 + ((t % CICLO) / CICLO) * 260;
+				graos.forEach(function (g) {
+					var gx = xc + g[0], gy = sy + g[1] + Math.sin(g[0] * 0.2 + t) * 3;
+					luaMistura(buf, L, A, gx, gy, 90 + g[2] * 40, 60 + g[2] * 20, 40, 0.35 + g[2] * 0.3);
+				});
+				painel(buf, L, A, g0 - 6, gt, g1 + 4, gb, [yDo(1), yDo(0.75)]);
+				for (var gx = g0; gx <= g1; gx++) {
+					var kk = cobre(t - (g1 - gx) * 0.04);
+					pontoAceso(buf, L, A, gx, yDo(1 - kk * 0.13), 255, 110, 90);
+					pontoAceso(buf, L, A, gx, yDo(1 - kk * 0.22), 110, 175, 255);
+				}
+				brilhoSoma(buf, L, A, g1, yDo(1 - k * 0.13), 6, 255, 110, 90, 0.8);
+				brilhoSoma(buf, L, A, g1, yDo(1 - k * 0.22), 6, 110, 175, 255, 0.8);
+				if (hud) {
+					hud.ano.textContent = TR('azul: ' + Math.round((1 - k * 0.22) * 100) + '%', 'blue: ' + Math.round((1 - k * 0.22) * 100) + '%');
+					hud.estacao.textContent = TR('vermelho: ' + Math.round((1 - k * 0.13) * 100) + '%', 'red: ' + Math.round((1 - k * 0.13) * 100) + '%');
+				}
+			};
+		},
+
+		// Tabby x uma estrela comum: em cima, um planeta passando na frente faz o brilho cair um
+		// tiquinho, sempre igual; embaixo, a Estrela de Tabby cai muito, sem padrão nenhum
+		'tabby-quedas': function (L, A) {
+			var ceu = ceuBonito(L, A, 612, '#3a2a4a'), g0 = 106, g1 = 306;
+			var AMA = rampaCores(['#fffbe0', '#ffe8a0', '#ffc860', '#d08a30'], 12), LAR = rampaCores(['#fff0d0', '#ffc880', '#f09a40', '#b05a20'], 12);
+			function planeta(tt) { var f = (tt % 4) / 4; return Math.abs(f - 0.5) < 0.06 ? 0.01 : 0; }
+			function tabby(tt) {
+				var q = 0;
+				[[1.2, 0.08, 0.5], [3.1, 0.22, 0.9], [5.3, 0.12, 0.6], [6.6, 0.05, 0.3], [8.4, 0.18, 1.2]].forEach(function (d) { var x = (tt % 10) - d[0]; q += d[1] * Math.exp(-x * x / (d[2] * d[2] * 0.3)); });
+				return Math.min(0.24, q);
+			}
+			function grafico(buf, topo, base, fn, t, rgb) {
+				painel(buf, L, A, g0 - 6, topo - 6, g1 + 4, base + 6, [topo, base]);
+				for (var x = g0; x <= g1; x++) pontoAceso(buf, L, A, x, topo + fn(t - (g1 - x) * 0.05) / 0.25 * (base - topo), rgb[0], rgb[1], rgb[2]);
+				brilhoSoma(buf, L, A, g1, topo + fn(t) / 0.25 * (base - topo), 6, rgb[0], rgb[1], rgb[2], 0.8);
+			}
+			return function (buf, t, hud) {
+				ceu(buf, t);
+				var qp = planeta(t), qt = tabby(t);
+				brilhoSoma(buf, L, A, 50, 46, 44, 255, 220, 140, 0.5);
+				esfera(buf, L, A, 50, 46, 24, AMA, -0.4, -0.4);
+				var f = (t % 4) / 4;
+				if (Math.abs(f - 0.5) < 0.16) { var px = 50 + (f - 0.5) * 200; luaDisco(buf, L, A, px, 46, 3, hex('#0c0a14')); }
+				brilhoSoma(buf, L, A, 50, 128, 44, 255, 190, 110, 0.5 * (1 - qt * 2));
+				esfera(buf, L, A, 50, 128, 24, LAR, -0.4, -0.4);
+				escurecer(buf, L, A, 50, 128, 24, function () { return 1 - qt * 0.9; });
+				for (var g = 0; g < 160; g++) { var gx = 50 + (((t * 0.11 + g * 0.37) % 1.4) - 0.7) * 90, gy = 128 + Math.sin(g * 2.3) * 18 + Math.cos(g * 1.7) * 6; if (qt > 0.03) luaMistura(buf, L, A, gx, gy, 110, 76, 56, Math.min(0.7, qt * 4)); }
+				grafico(buf, 30, 62, planeta, t, [130, 220, 255]);
+				grafico(buf, 112, 150, tabby, t, [255, 180, 80]);
+				if (hud) {
+					hud.ano.textContent = TR('com planeta: ' + (qp > 0 ? '99%' : '100%'), 'with planet: ' + (qp > 0 ? '99%' : '100%'));
+					hud.estacao.textContent = 'Tabby: ' + Math.round((1 - qt) * 100) + '%';
+				}
+			};
+		},
+
+		// Omega Centauri na contramão: a Via Láctea vista de cima, girando num sentido, e o
+		// aglomerado dando a volta no sentido contrário, numa órbita inclinada, por fora do disco
+		'omega-contramao': function (L, A) {
+			var ceu = ceuBonito(L, A, 613, '#2a2a5a'), aleat = semente(137), disco = [], cx = L / 2, cy = A / 2, achata = 0.5;
+			for (var i = 0; i < 2200; i++) {
+				var r = 6 + Math.pow(aleat(), 0.8) * 96, braco = aleat() < 0.5 ? 0 : Math.PI;
+				disco.push([r, braco + Math.log(r / 6) * 1.6 + (aleat() - 0.5) * (1.3 + r / 70), aleat()]);
+			}
+			return function (buf, t) {
+				ceu(buf, t);
+				var ao = -t * 0.5, ox = Math.cos(ao) * 134, oz = Math.sin(ao), oy = oz * 46 - Math.cos(ao) * 16, atras = oz < 0;
+				function omega() {
+					for (var j = 1; j <= 60; j++) { var aj = ao + j * 0.02; luaMistura(buf, L, A, cx + Math.cos(aj) * 134, cy + Math.sin(aj) * 46 - Math.cos(aj) * 16, 255, 200, 120, 0.7 * (1 - j / 60)); }
+					var x0 = cx + ox, y0 = cy + oy;
+					brilhoSoma(buf, L, A, x0, y0, 12, 255, 210, 130, 0.8);
+					for (var q = 0; q < 50; q++) { var a = q * 2.39996, rr = Math.sqrt(q / 50) * 6; luaMistura(buf, L, A, x0 + Math.cos(a) * rr, y0 + Math.sin(a) * rr, 255, 235, 190, 0.9); }
+				}
+				if (atras) omega();
+				brilhoSoma(buf, L, A, cx, cy, 110, 90, 100, 200, 0.25);
+				disco.forEach(function (d) {
+					var a = d[1] + t * 0.8 * (14 / (d[0] + 8)), x = cx + Math.cos(a) * d[0], y = cy + Math.sin(a) * d[0] * achata;
+					var q = Math.max(0, 1 - d[0] / 34);
+					luaMistura(buf, L, A, x, y, 150 + 100 * q + 40 * d[2], 160 + 60 * q + 50 * d[2], 240 - 90 * q, 0.3 + 0.5 * d[2] * d[2]);
+				});
+				brilhoSoma(buf, L, A, cx, cy, 30, 255, 220, 150, 0.9);
+				brilhoSoma(buf, L, A, cx, cy, 10, 255, 250, 220, 1);
+				/* setinhas: a galáxia gira para um lado; Omega, para o outro */
+				setaArco(buf, L, A, cx, cy, 108, 56, Math.PI * 0.35, Math.PI * 0.65, 140, 170, 255);
+				if (!atras) omega();
+			};
+		},
+
+		// Omega Centauri: uma galáxia pequena chega perto da Via Láctea, perde as estrelas de fora
+		// pelo caminho e sobra só o miolo, que continua dando voltas: Omega Centauri
+		'omega-engolida': function (L, A) {
+			var ceu = ceuBonito(L, A, 614, '#2a2a5a'), aleat = semente(113), CICLO = 20, FUSAO = 13, gx = L / 2, gy = A / 2 + 2, disco = [], ana = [];
+			for (var i = 0; i < 1400; i++) { var r = 5 + Math.pow(aleat(), 0.8) * 56, br = aleat() < 0.5 ? 0 : Math.PI; disco.push([r, br + Math.log(r / 5) * 1.6 + (aleat() - 0.5) * (1.3 + r / 50), aleat()]); }
+			for (i = 0; i < 420; i++) { var rr = Math.pow(aleat(), 1.3) * 24, aa = aleat() * Math.PI * 2; ana.push([Math.cos(aa) * rr, Math.sin(aa) * rr * 0.75, rr / 24, aleat() < 0.5 ? -1 : 1]); }
+			function caminho(k) { var ang = 2.6 + k * Math.PI * 3.2, raio = 132 - 76 * Math.min(1, k * 1.5); return [gx + Math.cos(ang) * raio, gy + Math.sin(ang) * raio * 0.45]; }
+			return function (buf, t, hud) {
+				var c = t % CICLO, k = c / FUSAO;
+				ceu(buf, t);
+				brilhoSoma(buf, L, A, gx, gy, 70, 90, 100, 200, 0.3);
+				disco.forEach(function (d) {
+					var a = d[1] + t * 0.5 * (10 / (d[0] + 5)), q = Math.max(0, 1 - d[0] / 22);
+					luaMistura(buf, L, A, gx + Math.cos(a) * d[0], gy + Math.sin(a) * d[0] * 0.5, 150 + 100 * q + 40 * d[2], 160 + 60 * q + 40 * d[2], 240 - 90 * q, 0.3 + 0.5 * d[2] * d[2]);
+				});
+				brilhoSoma(buf, L, A, gx, gy, 20, 255, 220, 150, 0.9);
+				var cc = caminho(k);
+				ana.forEach(function (s) {
+					var solta = 0.2 + 0.55 * (1 - s[2]), px, py, br = 1;
+					if (k < solta || s[2] < 0.3) { var aperta = 1 - Math.min(0.5, k * 0.5); px = cc[0] + s[0] * aperta; py = cc[1] + s[1] * aperta; }
+					else { var p = caminho(Math.max(0, k - (k - solta) * 1.1 * (s[3] > 0 ? 1 : -0.6))); px = p[0] + s[0] * 0.7; py = p[1] + s[1] * 0.7; br = Math.max(k > 1 ? 0.45 : 0.6, 1 - (k - solta) * 0.8); }
+					if (k > 1 && s[2] >= 0.3) {
+						var mist = suave((k - 1) / 0.4), fi = s[0] * 0.7 + s[1] + t * 0.12, ro = 42 + s[2] * 56;
+						px += (gx + Math.cos(fi) * ro - px) * mist; py += (gy + Math.sin(fi) * ro * 0.5 - py) * mist;
+					}
+					luaMistura(buf, L, A, px, py, 255, 220, 150, 0.85 * br);
+				});
+				brilhoSoma(buf, L, A, cc[0], cc[1], 12, 255, 210, 130, 0.8);
+				luaDisco(buf, L, A, cc[0], cc[1], 2, hex('#fff1c8'));
+				if (hud) {
+					var bi = 10 - Math.min(1, k) * 10;
+					hud.ano.textContent = TR(bi < 0.4 ? 'hoje' : 'há ' + numero(bi, bi < 2 ? 1 : 0) + (bi < 2 ? ' bilhão' : ' bilhões') + ' de anos', bi < 0.4 ? 'today' : numero(bi, bi < 2 ? 1 : 0) + ' billion years ago');
+					hud.estacao.textContent = TR(k < 0.2 ? 'uma galáxia pequena chega perto' : k < 0.75 ? 'a Via Láctea arranca as estrelas de fora' : k < 1 ? 'sobra só o miolo' : 'Omega Centauri, dando voltas na Via Láctea', k < 0.2 ? 'a small galaxy comes close' : k < 0.75 ? 'the Milky Way strips its outer stars' : k < 1 ? 'only the core is left' : 'Omega Centauri, orbiting the Milky Way');
+				}
+			};
+		},
+
+		// O grande apagão de Betelgeuse (2019-2020): a estrela solta uma bolha de gás embaixo, a
+		// bolha esfria e vira poeira na frente dela, o brilho cai pela metade e depois a poeira se espalha
+		'betelgeuse-apagao': function (L, A) {
+			var ceu = ceuBonito(L, A, 615, '#5a2a2a'), cx = 84, cy = A / 2 + 4, R = 58, CICLO = 14;
+			var MESES = TR(['outubro de 2019', 'novembro de 2019', 'dezembro de 2019', 'janeiro de 2020', 'fevereiro de 2020', 'março de 2020', 'abril de 2020'], ['October 2019', 'November 2019', 'December 2019', 'January 2020', 'February 2020', 'March 2020', 'April 2020']);
+			var PAL = rampaCores(['#fff0c0', '#ffb860', '#f07a32', '#c8461e', '#8a2414', '#3a0a04'], 18);
+			function brilho(k) { var x = (k - 0.55) / 0.22; return 1 - 0.6 * Math.exp(-x * x); }
+			var g0 = 186, g1 = 306, gt = 30, gb = 140;
+			return function (buf, t, hud) {
+				var c = t % CICLO, k = Math.min(1, c / 12), b = brilho(k);
+				ceu(buf, t);
+				brilhoSoma(buf, L, A, cx, cy, R * 1.7, 255, 110, 40, 0.55 * b);
+				/* a estrela: células enormes de gás fervendo (escurece junto com o brilho) */
+				esfera(buf, L, A, cx, cy, R, PAL, -0.3, -0.3, function (x, y) { return (ruido2d(x * 2.6 + t * 0.12, y * 2.6 - t * 0.08) - 0.5) * 3.5 + (1 - b) * 3; });
+				var sai = suave(k / 0.3), esfria = suave((k - 0.25) / 0.25), some = suave((k - 0.62) / 0.35);
+				var bx = cx - 14 - sai * 10 - some * 26, by = cy + 20 + sai * 10 + some * 20, br = 16 + sai * 20 + some * 16;
+				if (sai > 0.05) for (var y = Math.floor(by - br); y <= by + br; y++) for (var x = Math.floor(bx - br); x <= bx + br; x++) {
+					var d = Math.hypot((x - bx) / br, (y - by) / (br * 0.75)); if (d > 1) continue;
+					var n = ruido2d(x * 0.12, y * 0.12 + t * 0.2), a = Math.max(0, (1 - d) * 1.6 * (n - 0.25 - some * 0.3)) * sai;
+					if (esfria < 0.5) luaMistura(buf, L, A, x, y, 255, 160 + n * 60, 80, Math.min(0.85, a));
+					else luaMistura(buf, L, A, x, y, 40, 20, 14, Math.min(0.9, a * 1.3));
+				}
+				painel(buf, L, A, g0 - 6, gt, g1 + 4, gb, [gt + 8, gb - 8]);
+				var ate = g0 + Math.round(k * (g1 - g0));
+				function gy(f) { return gt + 8 + (1 - brilho(f)) / 0.7 * (gb - gt - 16); }
+				for (var gx = g0; gx <= g1; gx++) luaMistura(buf, L, A, gx, gy((gx - g0) / (g1 - g0)), 255, 150, 90, gx <= ate ? 0 : 0.15);
+				for (gx = g0; gx <= ate; gx++) pontoAceso(buf, L, A, gx, gy((gx - g0) / (g1 - g0)), 255, 150, 90);
+				brilhoSoma(buf, L, A, ate, gy(k), 7, 255, 200, 150, 0.9);
+				if (hud) {
+					hud.ano.textContent = MESES[Math.min(6, Math.floor(k * 6.99))];
+					hud.estacao.textContent = TR('brilho: ' + Math.round(b * 100) + '%' + (k > 0.25 && k < 0.75 ? ' (poeira na frente)' : ''), 'brightness: ' + Math.round(b * 100) + '%' + (k > 0.25 && k < 0.75 ? ' (dust in front)' : ''));
+				}
+			};
+		},
+
+		// O dia em que Betelgeuse explodir, visto do Brasil: Órion de cabeça para baixo no céu,
+		// a estrela vermelha vira um ponto brilhantíssimo (dá para ver até de dia), vai apagando
+		// ao longo dos meses e, no fim, Órion fica sem o ombro
+		'betelgeuse-supernova': function (L, A) {
+			var ceu0 = ceuBonito(L, A, 616, '#1a2a5a'), CICLO = 16, aleat = semente(161);
+			var E = [[160, 44, [180, 210, 255], 4], [208, 50, [210, 225, 255], 3], [174, 82, [220, 230, 255], 2], [184, 79, [255, 255, 255], 2], [194, 76, [220, 230, 255], 2], [168, 116, [220, 230, 255], 3], [204, 104, [255, 170, 110], 4]];
+			var LINHAS = [[0, 4], [1, 2], [2, 3], [3, 4], [2, 5], [4, 6]];
+			var ARV = []; for (var x = 0; x < L; x++) ARV.push(16 + Math.sin(x * 0.04) * 6 + Math.abs(Math.sin(x * 0.29)) * (x % 37 < 12 ? 12 : 0) + (ruido2d(x * 0.4, 2) - 0.5) * 4);
+			return function (buf, t, hud) {
+				var c = t % CICLO, explode = c > 3, k = explode ? (c - 3) / 11 : 0, forca = explode ? Math.max(0, 1 - Math.pow(k, 0.7)) : 0, ceu = forca * 0.55;
+				ceu0(buf, t);
+				if (ceu > 0) for (var y = 0; y < A; y++) for (var x2 = 0; x2 < L; x2++) {
+					var alt = y / A;
+					luaMistura(buf, L, A, x2, y, 60 - alt * 20, 110 - alt * 20, 190, Math.min(0.9, ceu * 1.6));
+				}
+				var bx = E[6][0], by = E[6][1];
+				LINHAS.forEach(function (l) {
+					if (l[1] === 6 && c > 14) return;
+					var a = E[l[0]], b = E[l[1]], n = Math.hypot(b[0] - a[0], b[1] - a[1]);
+					for (var d = 6; d < n - 6; d += 2) luaMistura(buf, L, A, a[0] + (b[0] - a[0]) * d / n, a[1] + (b[1] - a[1]) * d / n, 130, 140, 230, 0.45 * (1 - ceu));
+				});
+				E.forEach(function (e, i) { if (i < 6) estrelaBrilho(buf, L, A, e[0], e[1], e[2][0], e[2][1], e[2][2], e[3], 1 - ceu * 1.2); });
+				if (!explode) estrelaBrilho(buf, L, A, bx, by, 255, 170, 110, 4, 1);
+				else if (c < 14) {
+					var tam = 4 + forca * 30 + (c < 3.4 ? (3.4 - c) * 80 : 0);
+					brilhoSoma(buf, L, A, bx, by, tam * 2, 160, 200, 255, 0.6 * (0.3 + forca));
+					brilhoSoma(buf, L, A, bx, by, tam * 0.5, 255, 255, 255, 1.2);
+					for (var r = 1; r < tam * 1.6; r++) { var a2 = (1 - r / (tam * 1.6)) * (0.4 + forca * 0.6); [[1, 0], [-1, 0], [0, 1], [0, -1]].forEach(function (s) { luaMistura(buf, L, A, bx + s[0] * r, by + s[1] * r, 220, 240, 255, a2); }); }
+				}
+				for (x = 0; x < L; x++) for (var y2 = Math.round(A - ARV[x]); y2 < A; y2++) pintar(buf, L, A, x, y2, ceu > 0.25 ? cor(20 + ceu * 30, 30 + ceu * 30, 50 + ceu * 40) : cor(4, 4, 10));
+				if (hud) {
+					var semanas = Math.round(k * 52);
+					hud.ano.textContent = TR(!explode ? 'uma noite comum' : c < 4 ? 'o dia da explosão!' : c < 14 ? semanas + ' semanas depois' : 'um ano depois', !explode ? 'an ordinary night' : c < 4 ? 'the day of the explosion!' : c < 14 ? semanas + ' weeks later' : 'a year later');
+					hud.estacao.textContent = TR(!explode ? 'Betelgeuse vermelhinha' : forca > 0.5 ? 'quase tão forte quanto a Lua' : forca > 0.15 ? 'ainda dá para ver de dia' : c < 14 ? 'apagando devagar' : 'Órion sem o ombro', !explode ? 'little red Betelgeuse' : forca > 0.5 ? 'almost as bright as the Moon' : forca > 0.15 ? 'still visible by day' : c < 14 ? 'slowly fading' : 'Orion without its shoulder');
+				}
+			};
+		},
+
+		// Eta Carinae: as duas estrelas numa órbita bem esticada (uma volta a cada 5 anos e meio).
+		// Os ventos das duas se chocam numa "frente" de gás que brilha em raios X, mais forte quando passam perto
+		'eta-par': function (L, A) {
+			var ceu = ceuBonito(L, A, 617, '#3a2a5a'), CICLO = 14, e = 0.78, a = 92, b = a * Math.sqrt(1 - e * e), Ax = 72, Ay = A / 2 + 4;
+			var GRANDE = rampaCores(['#ffffff', '#e8f4ff', '#bcd8ff', '#7f9ce8'], 12), PEQ = rampaCores(['#ffffff', '#d8ecff', '#8fb0f0'], 8);
+			function kepler(M) { var E = Math.PI; for (var k = 0; k < 14; k++) E -= (E - e * Math.sin(E) - M) / (1 - e * Math.cos(E)); return E; }
+			function posicao(k) { var E = kepler((((k + 0.5) % 1) + 1) % 1 * Math.PI * 2); return [Ax - a * (Math.cos(E) - e), Ay + b * Math.sin(E)]; }
+			return function (buf, t, hud) {
+				var k = (t % CICLO) / CICLO, p = posicao(k), Bx = p[0], By = p[1];
+				var dist = Math.hypot(Bx - Ax, By - Ay), perto = Math.max(0, Math.min(1, (70 - dist) / 52));
+				ceu(buf, t);
+				for (var q = 0; q < 1; q += 0.004) { var o = posicao(q); luaMistura(buf, L, A, o[0], o[1], 140, 140, 230, 0.35); }
+				for (var r = 1; r <= 60; r++) { var o2 = posicao(k - r * 0.002); luaMistura(buf, L, A, o2[0], o2[1], 130, 190, 255, 0.8 * (1 - r / 60)); }
+				[[Ax, Ay, 50, [110, 130, 230]], [Bx, By, 26, [100, 170, 230]]].forEach(function (s, n) {
+					for (var w = 0; w < 4; w++) {
+						var raio = ((t * 0.5 + w / 4 + n * 0.17) % 1) * s[2] + 10, f = 1 - (raio - 10) / s[2];
+						for (var ang = 0; ang < Math.PI * 2; ang += 0.04) luaMistura(buf, L, A, s[0] + Math.cos(ang) * raio, s[1] + Math.sin(ang) * raio, s[3][0], s[3][1], s[3][2], 0.4 * f);
+					}
+				});
+				var dir = Math.atan2(By - Ay, Bx - Ax), mx = Ax + (Bx - Ax) * 0.68, my = Ay + (By - Ay) * 0.68, forte = 0.35 + perto * 0.65;
+				for (var s2 = -1; s2 <= 1; s2 += 0.02) {
+					var curva = s2 * s2 * 9, px = mx + Math.cos(dir + Math.PI / 2) * s2 * 24 + Math.cos(dir) * curva, py = my + Math.sin(dir + Math.PI / 2) * s2 * 24 + Math.sin(dir) * curva;
+					var f2 = forte * (1 - Math.abs(s2) * 0.6);
+					luaMistura(buf, L, A, px, py, 255, 200 + 55 * f2, 120 + 130 * f2, Math.min(1, f2 * 1.3));
+					if (perto > 0.4 && Math.sin(t * 20 + s2 * 19) > 0.7) luaMistura(buf, L, A, px + Math.cos(dir) * 3, py + Math.sin(dir) * 3, 255, 250, 210, 0.9);
+				}
+				brilhoSoma(buf, L, A, mx, my, 18 + perto * 20, 255, 220, 140, 0.3 + perto * 0.6);
+				brilhoSoma(buf, L, A, Ax, Ay, 30, 160, 200, 255, 0.7);
+				esfera(buf, L, A, Ax, Ay, 12, GRANDE, -0.5, -0.5);
+				brilhoSoma(buf, L, A, Bx, By, 16, 160, 210, 255, 0.6);
+				esfera(buf, L, A, Bx, By, 6, PEQ, -0.5, -0.5);
+				termometro(buf, L, A, 296, 26, 140, 0.12 + perto * 0.88, [[0.5, false], [1, true]]);
+				if (hud) {
+					hud.ano.textContent = TR('ano ' + numero(k * 5.5, 1) + ' de 5,5', 'year ' + numero(k * 5.5, 1) + ' of 5.5');
+					hud.estacao.textContent = TR(perto > 0.5 ? 'pertinho: o choque brilha muito!' : perto > 0.1 ? 'se aproximando…' : 'longe: o choque é fraco', perto > 0.5 ? 'up close: the shock glows bright!' : perto > 0.1 ? 'getting closer…' : 'far apart: the shock is faint');
+				}
+			};
+		},
+
+		// A Grande Erupção, de 1837 até hoje: a estrela brilha demais (em 1843, só Sírius brilhava
+		// mais), solta gás que forma as duas bolhas do Homúnculo, some atrás da própria poeira e,
+		// do século 20 para cá, volta a aparecer no meio da nuvem
+		'eta-erupcao': function (L, A) {
+			var ceu = ceuBonito(L, A, 618, '#5a2a3a'), CICLO = 16, cx = L / 2, cy = A / 2 + 4;
+			function ano(c) { return c < 2 ? 1837 + c * 3 : c < 7 ? 1843 + (c - 2) * 7.4 : c < 12 ? 1880 + (c - 7) * 29 : 2025; }
+			return function (buf, t, hud) {
+				var c = t % CICLO, an = ano(c);
+				var cresce = suave((an - 1843) / 70), poeira = an > 1856 && an < 1945 ? Math.min(1, (an - 1856) / 12, (1945 - an) / 25) : 0;
+				var brilho = an < 1843 ? 0.5 + (an - 1837) / 6 * 1.1 : an < 1856 ? 1.6 - (an - 1843) / 13 * 0.9 : an < 1945 ? 0.7 - poeira * 0.5 : 0.7 + Math.min(1, (an - 1945) / 80) * 0.5;
+				ceu(buf, t);
+				if (cresce > 0.01) for (var y = 0; y < A; y++) for (var x = 0; x < L; x++) {
+					var u = x - cx, v = y - cy, s = u * 0.75 + v * 0.66, p = -u * 0.66 + v * 0.75, lado = s >= 0 ? 1 : -1;
+					var ds = s - lado * 42 * cresce, rl = Math.sqrt(ds * ds / Math.pow(40 * cresce + 1, 2) + p * p / Math.pow(32 * cresce + 1, 2));
+					var bord = 1 + (ruido2d(Math.atan2(p, ds) * 2 + lado * 3, 1) - 0.5) * 0.25;
+					if (rl > bord) continue;
+					var mu = Math.sqrt(Math.max(0, 1 - (rl / bord) * (rl / bord))), tex = ruido2d(x * 0.22 + lado * 7, y * 0.22) * 0.6 + ruido2d(x * 0.07, y * 0.07 + lado) * 0.4;
+					var luz = 0.4 + 0.5 * Math.pow(1 - mu, 2) + (tex - 0.5) * 0.5 + (lado > 0 ? 0.08 : -0.05);
+					if (poeira > 0.3) luaMistura(buf, L, A, x, y, 90 * luz, 50 * luz, 36 * luz, 0.85);
+					else luaMistura(buf, L, A, x, y, 255 * Math.min(1, luz + 0.2), 190 * luz, 160 * luz, 0.9);
+				}
+				var tam = 3 + brilho * 12;
+				brilhoSoma(buf, L, A, cx, cy, tam * 3, 255, 200, 150, 0.4 * brilho);
+				brilhoSoma(buf, L, A, cx, cy, tam, 255, 250, 230, 0.9 * brilho);
+				for (var r = 1; r < tam * 1.8; r++) { var a = (1 - r / (tam * 1.8)) * Math.min(1, brilho * 0.8); [[1, 0], [-1, 0], [0, 1], [0, -1]].forEach(function (d) { luaMistura(buf, L, A, cx + d[0] * r, cy + d[1] * r, 255, 240, 220, a); }); }
+				if (hud) {
+					hud.ano.textContent = TR('ano ' + Math.round(an), 'year ' + Math.round(an));
+					hud.estacao.textContent = TR(an < 1840 ? 'uma estrela comum' : an < 1846 ? '2ª estrela mais brilhante do céu!' : an < 1860 ? 'o gás forma duas bolhas' : an < 1945 ? 'escondida pela própria poeira' : 'o Homúnculo hoje', an < 1840 ? 'an ordinary star' : an < 1846 ? '2nd brightest star in the sky!' : an < 1860 ? 'the gas forms two bubbles' : an < 1945 ? 'hidden by its own dust' : 'the Homunculus today');
+				}
+			};
+		},
+
+		// Cem anos de Sirius no céu (1760 a 1862): ela anda fazendo ondas, em vez de seguir reto.
+		// Em 1844, Bessel percebe o bambeio; em 1862, Alvan Clark vê a companheira, que faz ondas ao
+		// contrário. As duas giram em volta de um ponto entre elas, e é esse ponto que anda reto.
+		// Sirius A pesa o dobro de Sirius B, por isso balança a metade.
+		'sirius-bambeio': function (L, A) {
+			var ceu = ceuBonito(L, A, 619, '#2a3a6a'), CICLO = 16;
+			function ano(c) { return 1760 + Math.min(1, c / 10.5) * 102; }
+			function centro(an) { var k = (an - 1760) / 102; return [26 + k * 270, 100 - k * 26]; }
+			function separacao(an) { var f = (an - 1760) / 50 * Math.PI * 2 + 0.6; return [Math.cos(f) * 11, Math.sin(f) * 44]; }
+			function posA(an) { var c = centro(an), s = separacao(an); return [c[0] - s[0] / 3, c[1] - s[1] / 3]; }
+			function posB(an) { var c = centro(an), s = separacao(an); return [c[0] + s[0] * 2 / 3, c[1] + s[1] * 2 / 3]; }
+			return function (buf, t, hud) {
+				var c = t % CICLO, an = ano(c), bessel = an >= 1844, clark = c >= 10.5;
+				ceu(buf, t);
+				if (bessel) for (var q = 1760; q <= 1862; q += 0.25) { if (Math.round(q * 4) % 6 < 3) continue; var p = centro(q); luaMistura(buf, L, A, p[0], p[1], 150, 150, 240, 0.6); }
+				for (q = 1760; q < an; q += 0.12) { var pa = posA(q), f = Math.max(0.25, 1 - (an - q) / 40); luaMistura(buf, L, A, pa[0], pa[1], 140, 180, 255, 0.85 * f); }
+				if (clark) {
+					for (q = 1760; q <= 1862; q += 0.2) { if (Math.round(q * 5) % 2) continue; var pb = posB(q); luaMistura(buf, L, A, pb[0], pb[1], 170, 170, 200, 0.5); }
+					var cm = centro(an);
+					for (var d = -3; d <= 3; d++) { luaMistura(buf, L, A, cm[0] + d, cm[1], 255, 224, 138, 1); luaMistura(buf, L, A, cm[0], cm[1] + d, 255, 224, 138, 1); }
+				}
+				var a = posA(an);
+				estrelaBrilho(buf, L, A, a[0], a[1], 190, 215, 255, 10);
+				brilhoSoma(buf, L, A, a[0], a[1], 16, 160, 200, 255, 0.6);
+				if (clark) {
+					var b = posB(an);
+					estrelaBrilho(buf, L, A, b[0], b[1], 230, 230, 255, 2, 0.9);
+					var pul = Math.sin(t * 6) > -0.3;
+					if (pul) for (var g = 0; g < Math.PI * 2; g += 0.05) luaMistura(buf, L, A, b[0] + Math.cos(g) * 10, b[1] + Math.sin(g) * 10, 255, 224, 138, 0.8);
+					if (pul) for (d = 6; d <= 14; d++) [[1, 0], [-1, 0], [0, 1], [0, -1]].forEach(function (s) { luaMistura(buf, L, A, b[0] + s[0] * d, b[1] + s[1] * d, 255, 224, 138, 0.7); });
+				}
+				if (hud) {
+					hud.ano.textContent = TR('ano ' + Math.round(an), 'year ' + Math.round(an));
+					hud.estacao.textContent = TR(!bessel ? 'Sirius anda pelo céu… fazendo ondas' : !clark ? 'Bessel: algo invisível a puxa!' : 'Clark vê a companheira (na mira)', !bessel ? 'Sirius moves across the sky… in waves' : !clark ? 'Bessel: something invisible pulls it!' : 'Clark sees the companion (in the crosshair)');
+				}
+			};
+		},
+
+		// A vida de Sirius B: ela nasceu maior que Sirius A, gastou o combustível mais depressa,
+		// inchou até virar uma gigante vermelha, soltou as camadas de fora num anel de gás e
+		// sobrou só o miolo, a anã branca do tamanho da Terra
+		'sirius-vida': function (L, A) {
+			var ceu = ceuBonito(L, A, 620, '#2a3a6a'), CICLO = 16, Ax = 246, Bx = 104, cy = A / 2 + 2;
+			var AZUL = rampaCores(['#ffffff', '#e0ecff', '#b0c8ff', '#6a88e0'], 12), GIG = rampaCores(['#fff0c0', '#ffb060', '#e0602a', '#a02a14', '#4a0e06'], 14);
+			function milhoes(c) { return c < 3.5 ? 230 - c / 3.5 * 90 : c < 7.5 ? 140 - (c - 3.5) / 4 * 18 : 122 - (c - 7.5) / 3 * 4; }
+			return function (buf, t, hud) {
+				var c = t % CICLO, incha = suave((c - 3.5) / 4), solta = suave((c - 7.5) / 3), hoje = c >= 10.5;
+				ceu(buf, t);
+				var RA = 10 + (hoje ? 1.5 : 0);
+				brilhoSoma(buf, L, A, Ax, cy, RA * 3, 150, 190, 255, 0.7);
+				esfera(buf, L, A, Ax, cy, RA, AZUL, -0.6, -0.5);
+				estrelaBrilho(buf, L, A, Ax, cy, 200, 220, 255, 16, 0.6);
+				if (solta < 0.02) {
+					var R = 14 + incha * 42, gig = incha > 0.15;
+					brilhoSoma(buf, L, A, Bx, cy, R * 1.8, gig ? 255 : 150, gig ? 110 : 190, gig ? 50 : 255, 0.6);
+					esfera(buf, L, A, Bx, cy, R, gig ? GIG : AZUL, -0.6, -0.5, gig ? function (x, y) { return (ruido2d(x * 4 + t * 0.3, y * 4) - 0.5) * 3; } : null);
+				} else {
+					var raio = 48 + solta * 70, some = 1 - suave((c - 9.5) / 1.6);
+					for (var y = Math.floor(cy - raio * 1.1); y <= cy + raio * 1.1; y++) for (var x = Math.floor(Bx - raio * 1.1); x <= Bx + raio * 1.1; x++) {
+						var d = Math.hypot(x - Bx, (y - cy) / 0.92) / raio; if (d > 1.05) continue;
+						var n = ruido2d(x * 0.07 + 5, y * 0.07), anel = Math.exp(-Math.pow((d - 0.82) / 0.13, 2)), meio = Math.max(0, 0.7 - d) * 0.6;
+						if (anel > 0.05) luaMistura(buf, L, A, x, y, 230, 110, 170, anel * (0.3 + n * 0.6) * some);
+						if (meio > 0.02) luaMistura(buf, L, A, x, y, 120, 230, 220, meio * (0.4 + n * 0.6) * some);
+					}
+					estrelaBrilho(buf, L, A, Bx, cy, 230, 240, 255, 4);
+					if (hoje) {
+						/* do lado, a Terra no mesmo tamanho (é desse tamanho que ela ficou) */
+						arte(buf, L, A, 'terra', Bx, cy + 14, 5, 0);
+						brilhoSoma(buf, L, A, Bx, cy + 14, 6, 60, 120, 255, 0.4);
+					}
+				}
+				if (hud) {
+					hud.ano.textContent = TR(hoje ? 'hoje' : 'há ' + Math.round(milhoes(c)) + ' milhões de anos', hoje ? 'today' : Math.round(milhoes(c)) + ' million years ago');
+					hud.estacao.textContent = TR(c < 3.5 ? 'duas estrelas nascem: B é a maior' : c < 7.5 ? 'Sirius B incha: uma gigante vermelha' : !hoje ? 'ela solta as camadas de fora' : 'B virou uma anã branca, do tamanho da Terra', c < 3.5 ? 'two stars are born: B is the bigger one' : c < 7.5 ? 'Sirius B swells: a red giant' : !hoje ? 'it sheds its outer layers' : 'B became a white dwarf, the size of Earth');
+				}
+			};
+		},
+
+		// O céu visto da China em 1054: uma noite comum no Touro; aparece a "estrela convidada", tão
+		// forte que dá para ver de dia (o céu fica azul, com o Sol); depois, à noite, ela vai
+		// apagando ao longo de quase dois anos até sumir; no fim, a nebulosa como é vista hoje
+		'caranguejo-1054': function (L, A) {
+			var noite = ceuBonito(L, A, 621, '#2a2a5a'), CICLO = 16, sx = 180, sy = 62;
+			var TOURO = [[154, 82], [164, 92], [174, 100], [180, 92], [190, 82], [138, 62], [202, 62]];
+			function quando(c) {
+				if (c < 1.5) return TR(['junho de 1054', 'uma noite comum'], ['June 1054', 'an ordinary night']);
+				if (c < 5) return TR(['4 de julho de 1054', 'dá para ver até de dia!'], ['July 4, 1054', 'visible even by day!']);
+				if (c < 12) { var m = Math.round((c - 5) / 7 * 21) + 1; return TR([m + (m > 1 ? ' meses' : ' mês') + ' depois', 'à noite, ainda brilhando'], [m + (m > 1 ? ' months' : ' month') + ' later', 'at night, still shining']); }
+				if (c < 13.5) return ['1056', TR('apagou', 'faded away')];
+				return TR(['hoje, num telescópio', 'a Nebulosa do Caranguejo'], ['today, in a telescope', 'the Crab Nebula']);
+			}
+			var CHAO = []; for (var x = 0; x < L; x++) CHAO.push(14 + Math.sin(x * 0.03) * 4 + Math.sin(x * 0.11) * 2);
+			return function (buf, t, hud) {
+				var c = t % CICLO, dia = c >= 1.5 && c < 5, forca = c < 1.5 ? 0 : c < 5 ? 1 : c < 12 ? 1 - (c - 5) / 7 * 0.92 : 0;
+				if (dia) {
+					for (var y = 0; y < A; y++) for (var x = 0; x < L; x++) { var alt = y / A; buf[y * L + x] = cor(70 + alt * 90, 130 + alt * 70, 220 + alt * 20); }
+					brilhoSoma(buf, L, A, 60, 46, 50, 255, 240, 200, 0.7);
+					brilhoSoma(buf, L, A, 60, 46, 12, 255, 255, 240, 1.5);
+					[[40, 120, 60], [230, 100, 80]].forEach(function (n) { for (var k = 0; k < 6; k++) brilhoSoma(buf, L, A, n[0] + k * 10 + Math.sin(t * 0.3 + k) * 2, n[1] - Math.abs(k - 2.5) * 3, 14, 255, 255, 255, 0.5); });
+				} else {
+					noite(buf, t);
+					TOURO.forEach(function (e) { estrelaBrilho(buf, L, A, e[0], e[1], 220, 230, 255, 2, 0.8); });
+					estrelaBrilho(buf, L, A, 166, 112, 255, 170, 110, 3, 1);
+				}
+				if (forca > 0.02) {
+					var tam = 2 + forca * 10;
+					brilhoSoma(buf, L, A, sx, sy, tam * 2.5, 255, 230, 180, 0.6 * forca);
+					brilhoSoma(buf, L, A, sx, sy, tam * 0.6, 255, 255, 245, 1.2);
+					for (var r = 1; r < tam * 2; r++) { var a = (1 - r / (tam * 2)) * (0.3 + forca * 0.7); [[1, 0], [-1, 0], [0, 1], [0, -1]].forEach(function (d) { luaMistura(buf, L, A, sx + d[0] * r, sy + d[1] * r, 255, 250, 230, a); }); }
+				}
+				if (c >= 13.5) {
+					var neb = suave((c - 13.5) / 1.2);
+					for (var y2 = sy - 14; y2 <= sy + 14; y2++) for (var x3 = sx - 18; x3 <= sx + 18; x3++) {
+						var d2 = Math.hypot((x3 - sx) / 18, (y2 - sy) / 13); if (d2 > 1) continue;
+						var fio = Math.abs(ruido2d(x3 * 0.35, y2 * 0.35) - 0.5) < 0.08;
+						if (fio) luaMistura(buf, L, A, x3, y2, 255, 140, 90, (1 - d2) * neb * 1.2);
+						else luaMistura(buf, L, A, x3, y2, 150, 190, 255, (1 - d2) * (1 - d2) * neb * 0.7);
+					}
+				}
+				for (x = 0; x < L; x++) for (y = Math.round(A - CHAO[x]); y < A; y++) pintar(buf, L, A, x, y, dia ? cor(40, 70, 46) : cor(6, 5, 12));
+				/* o telhado curvo de um observatório chinês */
+				var tx = 262, ty = A - 14, TEL = dia ? [80, 40, 40] : [14, 10, 22];
+				for (var j = -26; j <= 26; j++) { var curva = Math.abs(j) > 18 ? (Math.abs(j) - 18) * 0.6 : 0; for (var i = 0; i < 4; i++) pintar(buf, L, A, tx + j, ty - 18 - i - curva, cor(TEL[0], TEL[1], TEL[2])); }
+				for (var py = ty - 17; py < ty + 4; py++) for (var px = tx - 16; px <= tx + 16; px++) pintar(buf, L, A, px, py, cor(TEL[0] * 0.8, TEL[1] * 0.8, TEL[2] * 0.8));
+				for (j = -10; j <= 10; j++) for (i = 0; i < 3; i++) pintar(buf, L, A, tx + j, ty - 25 - i, cor(TEL[0], TEL[1], TEL[2]));
+				if (!dia) [[-8, -8], [8, -8]].forEach(function (w) { luaMistura(buf, L, A, tx + w[0], ty + w[1], 255, 200, 110, 0.7 + 0.3 * Math.sin(t * 3 + w[0])); luaMistura(buf, L, A, tx + w[0], ty + w[1] + 1, 255, 200, 110, 0.6); });
+				if (hud) { var w2 = quando(c); hud.ano.textContent = w2[0]; hud.estacao.textContent = w2[1]; }
+			};
+		},
+
+		// O pulsar como um farol: gira e solta dois feixes de luz em lados opostos. Quando um feixe
+		// passa pela Terra (à direita), ela pisca e o gráfico embaixo marca um pico. Câmera lenta:
+		// aqui, uma volta a cada 8 segundos; de verdade, 30 voltas por segundo
+		'caranguejo-pulsar': function (L, A) {
+			var ceu = ceuBonito(L, A, 622, '#3a2a4a'), cx = 96, cy = 74, Tx = 290, Ty = 74, VOLTA = 8, JANELA = 16;
+			var NEB = new Float32Array(L * A * 4);
+			for (var y = 0; y < A; y++) for (var x = 0; x < L; x++) {
+				var d = Math.hypot((x - cx) / 74, (y - cy) / 52); if (d > 1.1) continue;
+				var fio = Math.abs(ruido2d(x * 0.07 + Math.sin(y * 0.1), y * 0.07) - 0.5) + Math.abs(ruido2d(x * 0.2, y * 0.2) - 0.5) * 0.15, i4 = (y * L + x) * 4, k = Math.max(0, 1 - d);
+				if (fio < 0.09) { NEB[i4] = 255; NEB[i4 + 1] = 140; NEB[i4 + 2] = 90; NEB[i4 + 3] = Math.min(0.7, k * 1.4) * (1 - fio / 0.09); }
+				else { NEB[i4] = 140; NEB[i4 + 1] = 180; NEB[i4 + 2] = 255; NEB[i4 + 3] = k * k * 0.55; }
+			}
+			return function (buf, t, hud) {
+				var ang = (t / VOLTA) * Math.PI * 2;
+				ceu(buf, t);
+				camadaMistura(buf, L, A, NEB, 1);
+				[0, Math.PI].forEach(function (lado) {
+					var a2 = ang + lado;
+					for (var s = 4; s < 260; s += 0.6) {
+						var larg = s * 0.05;
+						for (var w = -larg; w <= larg; w += 0.6) {
+							var f = (1 - s / 260) * (1 - Math.abs(w) / (larg + 0.5));
+							luaMistura(buf, L, A, cx + Math.cos(a2) * s - Math.sin(a2) * w, cy + Math.sin(a2) * s + Math.cos(a2) * w, 200, 225, 255, f * 0.5);
+						}
+					}
+				});
+				brilhoSoma(buf, L, A, cx, cy, 16, 180, 210, 255, 0.9);
+				estrelaBrilho(buf, L, A, cx, cy, 230, 240, 255, 4);
+				[[0, [255, 90, 106]], [Math.PI, [90, 138, 255]]].forEach(function (polo) {
+					var pa = ang + polo[0];
+					for (var e = 3; e <= 9; e++) luaMistura(buf, L, A, cx + Math.cos(pa) * e, cy + Math.sin(pa) * e, polo[1][0], polo[1][1], polo[1][2], 0.9);
+				});
+				var dif = Math.abs(((ang % Math.PI) + Math.PI) % Math.PI), pisca = dif < 0.06 || dif > Math.PI - 0.06;
+				var desde = ((t + VOLTA * 0.02) % (VOLTA / 2)), aceso = pisca || desde < 0.9, lendo = t > 1 && desde < 2.5;
+				if (aceso) brilhoSoma(buf, L, A, Tx, Ty, 26, 160, 255, 150, 0.8 * (pisca ? 1 : 1 - desde / 0.9));
+				arteGlobo(buf, L, A, 'terra', Tx, Ty, 9, t * 0.5, -1, 0, 0.6);
+				var g0 = 14, g1 = 306, gy = A - 12;
+				painel(buf, L, A, g0 - 4, gy - 26, g1 + 4, gy + 4, [gy]);
+				for (var gx = g0; gx <= g1; gx++) {
+					var tp = t - (g1 - gx) / (g1 - g0) * JANELA; if (tp < 0) continue;
+					var ap = ((tp / VOLTA) * Math.PI * 2) % Math.PI, d2 = Math.min(ap, Math.PI - ap);
+					var alt = d2 < 0.12 ? (0.12 - d2) / 0.12 * 20 : 0;
+					for (var yy = 0; yy <= alt; yy++) luaMistura(buf, L, A, gx, gy - yy, 155, 227, 106, yy > alt - 1.5 ? 1 : 0.4);
+					if (alt <= 0) luaMistura(buf, L, A, gx, gy, 155, 227, 106, 0.6);
+				}
+				if (hud) {
+					hud.ano.textContent = TR('piscadas: ' + Math.floor(t / VOLTA * 2), 'blinks: ' + Math.floor(t / VOLTA * 2));
+					hud.estacao.textContent = TR(pisca || lendo ? 'o feixe passou pela Terra: pisca!' : 'em câmera lenta (de verdade, 30 voltas por segundo)', pisca || lendo ? 'the beam swept past Earth: blink!' : 'in slow motion (really 30 turns per second)');
+				}
+			};
+		},
+
+		// Vista de cima: Proxima b dá a volta na estrela em 11 dias (aqui, 1 segundo = 1 dia), sempre
+		// com o mesmo lado virado para ela. A bandeirinha fica no lado do dia e nunca vê a noite
+		'proxima-b': function (L, A) {
+			var ceu = ceuBonito(L, A, 623, '#5a2a3a'), cx = L / 2, cy = A / 2 + 2, rx = 112, ry = 54, CICLO = 11;
+			var ESTRELA = rampaCores(['#ffe0c0', '#ff9a6a', '#e05a3a', '#a8302a', '#5a1410'], 14);
+			var PLAN = rampaCores(['#ffd8b8', '#e8a888', '#b07058', '#5a3a3a'], 10), NOITE = rampaCores(['#4a4a90', '#2a2a64', '#14123a'], 6);
+			return function (buf, t, hud) {
+				ceu(buf, t);
+				var k = (t % CICLO) / CICLO, a = k * Math.PI * 2, px = cx + Math.cos(a) * rx, py = cy + Math.sin(a) * ry;
+				orbitaPontilhada(buf, L, A, cx, cy, rx, ry, a, 230, 150, 170);
+				function estrela() {
+					brilhoSoma(buf, L, A, cx, cy, 52, 255, 90, 60, 0.6);
+					esfera(buf, L, A, cx, cy, 16, ESTRELA, -0.4, -0.4, function (x, y) { return (ruido2d(x * 4 + t * 0.3, y * 4) - 0.5) * 2.5; });
+					/* as erupções de Proxima: de vez em quando ela dá um clarão */
+					var fl = Math.max(0, Math.sin(t * 0.9) - 0.92) * 12;
+					if (fl > 0) brilhoSoma(buf, L, A, cx + 10, cy - 8, 20, 255, 230, 200, fl);
+				}
+				function planeta() {
+					var lx = cx - px, ly = cy - py, ln = Math.hypot(lx, ly); lx /= ln; ly /= ln;
+					brilhoSoma(buf, L, A, px, py, 18, 255, 140, 100, 0.3);
+					esfera(buf, L, A, px, py, 11, PLAN, -lx, -ly, function (x, y) { return (ruido2d(x * 3 + Math.cos(a) * 2, y * 3 + Math.sin(a) * 2) - 0.5) * 1.5; });
+					escurecer(buf, L, A, px, py, 11, function (x, y) { var d = x * lx + y * ly; return 0.3 + 0.7 * suave((d + 0.1) / 0.3); });
+					/* a bandeirinha, sempre no ponto virado para a estrela */
+					bandeirinha(buf, L, A, px + lx * 10, py + ly * 10, lx, ly, 7);
+				}
+				if (Math.sin(a) < 0) { planeta(); estrela(); } else { estrela(); planeta(); }
+				if (hud) {
+					hud.ano.textContent = TR('dia ' + Math.floor(k * 11) + ' de 11', 'day ' + Math.floor(k * 11) + ' of 11');
+					hud.estacao.textContent = TR('a bandeirinha fica sempre de dia', 'the little flag is always in daylight');
+				}
+			};
+		},
+
+		// Uma corrida do Sol até Proxima (4,2 anos-luz), em três pistas: em cima, um raio de luz;
+		// no meio, uma navezinha com vela, empurrada por um laser da Terra (um quinto da velocidade
+		// da luz: uns 21 anos); embaixo, a Voyager 1 (mais de 70 mil anos: quase não sai do lugar)
+		'proxima-viagem': function (L, A) {
+			var ceu = ceuBonito(L, A, 624, '#2a2a5a'), CICLO = 16, x0 = 40, x1 = 280, PISTAS = [46, 92, 138];
+			var SOL = rampaCores(['#fffbe0', '#ffd060', '#f09030', '#a04810'], 12), PROX = rampaCores(['#ffd0b0', '#e05a3a', '#7a2018'], 10);
+			function anos(c) { return Math.min(25, c / 13 * 25); }
+			return function (buf, t, hud) {
+				var c = t % CICLO, an = anos(c);
+				ceu(buf, t);
+				brilhoSoma(buf, L, A, 0, A / 2, 70, 255, 200, 100, 0.7);
+				esfera(buf, L, A, 2, A / 2, 26, SOL, -1, 0);
+				brilhoSoma(buf, L, A, L - 4, A / 2, 40, 255, 90, 60, 0.6);
+				esfera(buf, L, A, L - 4, A / 2, 14, PROX, 1, 0);
+				PISTAS.forEach(function (py) { for (var x = x0; x <= x1; x += 4) luaMistura(buf, L, A, x, py, 130, 130, 220, 0.45); for (var q = -3; q <= 3; q++) luaMistura(buf, L, A, x1, py + q, 255, 200, 160, 0.6); });
+				var kl = Math.min(1, an / 4.2), lx = x0 + kl * (x1 - x0);
+				for (var r = 0; r < 30; r++) luaMistura(buf, L, A, lx - r, PISTAS[0], 255, 240, 170, 1 - r / 30);
+				brilhoSoma(buf, L, A, lx, PISTAS[0], 7, 255, 250, 210, 0.9);
+				var kv = Math.min(1, an / 21), vx = x0 + kv * (x1 - x0), vy = PISTAS[1];
+				if (an < 2) { for (var lz = x0 - 30; lz < vx - 6; lz++) luaMistura(buf, L, A, lz, vy, 255, 80, 110, 0.8); brilhoSoma(buf, L, A, vx - 6, vy, 10, 255, 80, 110, 0.6); }
+				for (var s = -8; s <= 8; s++) { luaMistura(buf, L, A, vx - 4 + Math.abs(s) * 0.15, vy + s, 230, 235, 255, 0.95); luaMistura(buf, L, A, vx - 5 + Math.abs(s) * 0.15, vy + s, 150, 160, 220, 0.8); }
+				luaLinha(buf, L, A, vx - 4, vy - 8, vx + 2, vy, hex('#9aa6d8')); luaLinha(buf, L, A, vx - 4, vy + 8, vx + 2, vy, hex('#9aa6d8'));
+				luaDisco(buf, L, A, vx + 2, vy, 1, hex('#ffe08a'));
+				var gx = x0 + 1, gy = PISTAS[2];
+				luaLinha(buf, L, A, gx - 3, gy, gx + 3, gy, hex('#c8c8e8')); luaDisco(buf, L, A, gx - 4, gy, 2, hex('#e8e8f8')); luaLinha(buf, L, A, gx, gy, gx + 2, gy - 5, hex('#8a8ab0'));
+				luaMistura(buf, L, A, gx - 4, gy - 3, 255, 80, 80, 0.5 + 0.5 * Math.sin(t * 4));
+				if (hud) {
+					hud.ano.textContent = TR('ano ' + numero(an, an < 10 ? 1 : 0), 'year ' + numero(an, an < 10 ? 1 : 0));
+					hud.estacao.textContent = TR(an < 4.2 ? 'a luz vai na frente' : an < 21 ? 'a luz chegou! a vela ainda vai' : 'a vela chegou! a Voyager… nem saiu', an < 4.2 ? 'light goes first' : an < 21 ? 'light arrived! the sail is still going' : 'the sail arrived! Voyager… barely left');
 				}
 			};
 		}
