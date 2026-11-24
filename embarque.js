@@ -1265,10 +1265,18 @@
 						for (var wx = x0 + 6; wx < x1 - 12; wx += 18) {
 							/* o que tem em cada janela acesa: abajur entre cortinas, gente vendo TV no sofá, estante de
 							   livros, planta, gato no parapeito, alguém no computador, aquário, cozinha e persiana */
-							var r = ruido(wx, wy), acesa = r > 0.3, tipo = Math.floor(ruido(wx, wy + 1) * 9);
+							/* o tipo vem de uma ordem embaralhada por prédio: andando uma janela para o lado soma 1 e
+							   um andar para baixo soma 4, então duas vizinhas (até na diagonal) nunca repetem */
+							var col = Math.round((wx - x0 - 6) / 18), lin = Math.round((wy - topo - 6) / 14), ORDEM = x0 < 200 ? [0, 5, 2, 7, 4, 1, 6, 3, 8] : [6, 1, 8, 3, 0, 5, 2, 7, 4];
+							var r = ruido(wx, wy), acesa = (col + lin * 2) % 5 !== 1 && r > 0.18, tipo = ORDEM[(col + lin * 4 + (x0 < 200 ? 0 : 2)) % 9];
 							var luz = (tipo === 1 || tipo === 5) ? '#4a5a9a' : r > 0.8 ? '#ffd890' : r > 0.65 ? '#c8e8ff' : '#ffb8d8';
 							ret(wx - 1, wy - 1, 12, 11, '#0e0c16');
-							ret(wx, wy, 10, 9, acesa ? function (a, b) { return rampa([luz, luz, '#2a2030'], (b - wy) / 14, a, b); } : function (a, b) { var d = (a - wx) + (b - wy); return d === 6 || d === 7 ? '#2a3458' : d === 11 ? '#1e2644' : rampa(['#141a30', '#0e1226', '#0a0c1c'], (b - wy) / 9, a, b); });
+							var apag = (col * 2 + lin) % 3, refl = 3 + (col * 3 + lin * 5) % 9;
+							ret(wx, wy, 10, 9, acesa ? function (a, b) { return rampa([luz, luz, '#2a2030'], (b - wy) / 14, a, b); } : function (a, b) {
+								if (apag === 1) return (a - wx) % 3 === 0 ? '#2a1a2a' : '#3a2234'; /* a cortina fechada */
+								if (apag === 2) return (b - wy) % 2 ? '#1a1c2c' : '#24263a'; /* a persiana escura */
+								var d = (a - wx) + (b - wy); return d === refl || d === refl + 1 ? '#2a3458' : rampa(['#141a30', '#0e1226', '#0a0c1c'], (b - wy) / 9, a, b); /* o vidro com o reflexo */
+							});
 							ret(wx + 4, wy, 1, 9, acesa ? '#3a2a30' : '#1a1e34'); /* a divisória do vidro */
 							if (acesa) {
 								LUZES_J.push([wx + 5, wy + 5, luz]);
@@ -1303,7 +1311,7 @@
 							}
 							ret(wx - 1, wy + 9, 12, 1, '#4a4258'); // o peitoril
 							/* um vasinho com planta no peitoril, de vez em quando */
-							if (ruido(wx, wy + 7) > 0.62) { var vx3 = wx + 1 + Math.floor(ruido(wx, wy + 8) * 7); ret(vx3, wy + 7, 3, 2, '#b0603a'); px(vx3, wy + 6, '#4aa85a'); px(vx3 + 2, wy + 6, '#3a8a4a'); px(vx3 + 1, wy + 5, '#5ab86a'); }
+							if (ruido(wx, wy + 7) > 0.8 && tipo !== 3) { var vx3 = wx + 1 + Math.floor(ruido(wx, wy + 8) * 7); ret(vx3, wy + 7, 3, 2, '#b0603a'); px(vx3, wy + 6, '#4aa85a'); px(vx3 + 2, wy + 6, '#3a8a4a'); px(vx3 + 1, wy + 5, '#5ab86a'); }
 							/* o varal entre duas janelas, com roupa pendurada (só onde não tem ar-condicionado) */
 							if (ruido(wx, wy + 5) <= 0.7 && ruido(wx, wy + 11) > 0.55 && wx + 17 < x1) {
 								for (var vr = wx + 10; vr <= wx + 17; vr++) px(vr, wy + 1 + (vr === wx + 13 || vr === wx + 14 ? 1 : 0), '#6a6280');
@@ -1609,11 +1617,24 @@
 			// os carros voadores passando em três alturas, com farol e lanterna
 			for (var n = 0; n < 5; n++) {
 				var per = 7 + n * 2.3, u = ((t + n * 3.1) % per) / per, ida = n % 2 ? -1 : 1;
-				var vx = ida > 0 ? -OX - 30 + u * (W + 60) : NUCLEO + OX + 30 - u * (W + 60), vy = [24, 48, 74, 36, 92][n], esc = n > 2 ? 1 : 2;
-				if (vy < 90 && vx > 8 && vx < 124) continue; /* (atrás da torre do telão da gueixa) */
+				var vx = ida > 0 ? -OX - 30 + u * (W + 60) : NUCLEO + OX + 30 - u * (W + 60), vy = [11, 48, 74, 36, 92][n], esc = n > 2 ? 1 : 2;
+				if (vy > 14 && vy < 68 && vx > 8 && vx < 124) continue; /* (na altura do rosto e do penteado da gueixa, passam por trás da torre; na do quimono, passam na frente) */
 				for (var r2 = 1; r2 < 12; r2++) P(c, vx - ida * r2 * 2, vy, r2 < 4 ? 'rgba(255,255,255,0.6)' : 'rgba(255,90,140,0.3)');
 				R(c, vx - 4 * esc, vy - 1, 8 * esc, 2 * esc, '#2a2a3e'); R(c, vx - 2 * esc, vy - 2, 4 * esc, 1, '#5a5e7a');
 				R(c, vx + ida * 4 * esc, vy, 1, 1, '#ffffff'); R(c, vx - ida * 4 * esc, vy, 1, 1, '#ff3a3a');
+			}
+			// no primeiro plano da apresentação, dois carros passam com hora marcada pelo telão da gueixa:
+			// um por cima do penteado, da esquerda para a direita, e outro na altura do quimono, voltando
+			if (this.cine && !this.mostrou) {
+				var tcg = (performance.now() - this.cine) / 1000;
+				[[1.2, 5.2, 9, 1], [3.4, 7.4, 70, -1]].forEach(function (cg) {
+					if (tcg < cg[0] || tcg > cg[1]) return;
+					var ug = (tcg - cg[0]) / (cg[1] - cg[0]), idg = cg[3], gx2 = idg > 0 ? -OX - 30 + ug * (190 + OX) : 160 - ug * (190 + OX), gy2 = cg[2];
+					for (var rg = 1; rg < 14; rg++) P(c, gx2 - idg * rg * 2, gy2, rg < 4 ? 'rgba(255,255,255,0.6)' : 'rgba(255,90,140,0.3)');
+					R(c, gx2 - 8, gy2 - 1, 16, 4, '#2a2a3e'); R(c, gx2 - 4, gy2 - 2, 8, 1, '#5a5e7a'); R(c, gx2 - 3, gy2 - 1, 6, 1, '#6a8ac8');
+					R(c, gx2 + idg * 8, gy2, 1, 1, '#ffffff'); R(c, gx2 - idg * 8, gy2 + 1, 1, 1, '#ff3a3a');
+					c.globalAlpha = 0.35; R(c, gx2 - 6, gy2 + 3, 12, 1, idg > 0 ? '#3ae0ff' : '#ff3ab8'); c.globalAlpha = 1; /* o brilho dos propulsores embaixo */
+				});
 			}
 			// o spinner da polícia (Blade Runner): de vez em quando ele desce devagar pela rua, da direita
 			// para a esquerda, com o giroflex piscando azul e vermelho e o holofote varrendo o chão
