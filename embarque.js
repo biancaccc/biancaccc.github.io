@@ -131,6 +131,44 @@
 			mistura(cx + i, cy + j, h, (1 - d) * (1 - d) * forca);
 		}
 	}
+	// luz somada (acende o que está embaixo, sem cobrir): um ponto e uma mancha oval suave
+	function somar(x, y, r, g, b, a) {
+		x = Math.round(x + DX); y = Math.round(y); if (x < 0 || y < 0 || x >= BW || y >= BH || a <= 0) return;
+		var k = y * BW + x, o = buf[k];
+		buf[k] = (255 << 24 | Math.min(255, ((o >> 16) & 255) + b * a) << 16 | Math.min(255, ((o >> 8) & 255) + g * a) << 8 | Math.min(255, (o & 255) + r * a)) >>> 0;
+	}
+	function luzOval(cx, cy, rx, ry, r, g, b, forca) {
+		for (var j = Math.floor(-ry); j <= ry; j++) for (var i = Math.floor(-rx); i <= rx; i++) {
+			var d = (i * i) / (rx * rx) + (j * j) / (ry * ry); if (d >= 1) continue;
+			somar(cx + i, cy + j, r, g, b, (1 - d) * (1 - d) * forca);
+		}
+	}
+	// o brilho em volta de tudo que é aceso (neons, janelas, telões): separa o que é claro, borra
+	// (três passadas de caixa, quase uma gaussiana) e soma de volta por cima
+	function bloom(p, lim, raio, forca) {
+		var w = p.w, h = p.h, n = w * h, c = [new Float32Array(n), new Float32Array(n), new Float32Array(n)], tmp = new Float32Array(Math.max(w, h));
+		for (var i = 0; i < n; i++) {
+			var o = p.d[i], r = o & 255, g = (o >> 8) & 255, b = (o >> 16) & 255, m = Math.max(r, g, b);
+			if (m <= lim) continue;
+			/* (o que é colorido brilha mais que o branco: assim neon acende e as paredes claras não estouram) */
+			var sat = (m - Math.min(r, g, b)) / m, k = (m - lim) / (255 - lim); k *= k * (0.08 + 0.92 * sat);
+			c[0][i] = r * k; c[1][i] = g * k; c[2][i] = b * k;
+		}
+		function caixa(a, ini, passo, cont) {
+			var s = 0, q = raio * 2 + 1;
+			for (var j = 0; j < cont; j++) tmp[j] = a[ini + j * passo];
+			for (j = -raio; j <= raio; j++) s += tmp[Math.max(0, Math.min(cont - 1, j))];
+			for (j = 0; j < cont; j++) {
+				a[ini + j * passo] = s / q;
+				s += tmp[Math.min(cont - 1, j + raio + 1)] - tmp[Math.max(0, j - raio)];
+			}
+		}
+		c.forEach(function (a) { for (var vez = 0; vez < 3; vez++) { for (var y = 0; y < h; y++) caixa(a, y * w, 1, w); for (var x = 0; x < w; x++) caixa(a, x, w, h); } });
+		for (i = 0; i < n; i++) {
+			var o2 = p.d[i]; if (!(o2 >>> 24)) continue;
+			p.d[i] = (255 << 24 | Math.min(255, ((o2 >> 16) & 255) + c[2][i] * forca) << 16 | Math.min(255, ((o2 >> 8) & 255) + c[1][i] * forca) << 8 | Math.min(255, (o2 & 255) + c[0][i] * forca)) >>> 0;
+		}
+	}
 	// contorno escuro em volta de um sprite (como em Papers, Please): todo pixel vazio encostado num cheio
 	function contornar(p, cor) {
 		var d = p.d, w = p.w, h = p.h, c = rgb(cor), o = new Uint32Array(d);
@@ -1157,15 +1195,26 @@
 					var n = nuvem(x + 300, y * 1.8, 50);
 					px(x, y, rampa(['#04030c', '#080820', '#0e0c2e', '#1a1040', '#2e1450', '#4a1a5a'], y / 200 + (n - 0.5) * 0.25, x, y));
 				}
+				/* as nuvens baixas, iluminadas por baixo pela cidade, e o domo de luz subindo do horizonte */
+				for (var y = 0; y < 200; y++) for (var x = X0; x < X1; x++) {
+					var nv = nuvem(x * 0.8 + 900, y * 2.6, 64), dens = Math.max(0, nv - 0.48) * 2.6, baixo = y / 200;
+					if (dens > 0) somar(x, y, 70 + 90 * baixo, 30 + 20 * baixo, 90 - 20 * baixo, dens * (0.12 + 0.3 * baixo * baixo));
+					if (dens > 0.25 && nuvem(x * 0.8 + 903, y * 2.6 - 3, 64) < nv - 0.02) somar(x, y, 255, 150, 210, 0.05 * baixo);
+					var domo = Math.pow(Math.max(0, (y - 70) / 130), 2.2);
+					somar(x, y, 90, 30, 80, domo * 0.45);
+				}
 				// as torres lá do fundo: silhuetas altas com janelinhas, faixas de neon e luzes de topo
 				function torres(cam, baseY, altMin, altMax, larMin, larMax, nevoa) {
 					for (var bx = X0 - 10; bx < X1; ) {
 						var bw = larMin + Math.floor(ruido(bx, cam * 7) * (larMax - larMin)), bh = altMin + Math.floor(ruido(bx, cam * 7 + 1) * (altMax - altMin)), topo = baseY - bh;
-						var corT = cam === 0 ? ['#141634', '#10122c', '#0c0e24'] : ['#0e1028', '#0a0b1e', '#070816'];
+						var corT = cam === 2 ? ['#2a1a48', '#24163e', '#1e1234'] : cam === 0 ? ['#141634', '#10122c', '#0c0e24'] : ['#0e1028', '#0a0b1e', '#070816'];
 						ret(bx, topo, bw - 1, bh, function (x2, y2) { return rampa(corT, (x2 - bx) / bw * 0.7 + 0.1, x2, y2); });
 						if (ruido(bx, cam + 20) > 0.6) { ret(bx + bw / 2 - 1, topo - 10, 1, 10, corT[1]); px(bx + bw / 2 - 1, topo - 11, '#ff3a5a'); }
 						// janelinhas em grade (umas acesas, em branco, ciano ou âmbar)
-						for (var wy = topo + 3; wy < baseY - 2; wy += 3) for (var wx = bx + 2; wx < bx + bw - 2; wx += 2) { var r = ruido(wx * 3 + cam, wy); if (r > 0.86) px(wx, wy, r > 0.97 ? '#ffffff' : r > 0.92 ? '#7fe3ff' : '#ffb860'); }
+						for (var wy = topo + 3; wy < baseY - 2; wy += 3) for (var wx = bx + 2; wx < bx + bw - 2; wx += 2) { var r = ruido(wx * 3 + cam, wy); if (r > (cam === 2 ? 0.93 : 0.86)) px(wx, wy, cam === 2 ? '#8a6aa8' : r > 0.97 ? '#ffffff' : r > 0.92 ? '#7fe3ff' : '#ffb860'); }
+						/* andares inteiros acesos (escritórios trabalhando de noite) e a quina iluminada pela cidade */
+						if (cam < 2) for (var fa = topo + 6; fa < baseY - 8; fa += 9) if (ruido(bx + fa, cam + 50) > 0.9) for (var fx3 = bx + 2; fx3 < bx + bw - 2; fx3++) mistura(fx3, fa, ruido(bx, fa) > 0.5 ? '#9ad8ff' : '#ffd8a0', 0.55);
+						for (var qy = topo; qy < baseY; qy++) mistura(bx + bw - 2, qy, cam === 2 ? '#4a3a6a' : '#3a3a6a', 0.5);
 						// faixas de neon subindo pela quina
 						var neon = ruido(bx, cam + 30);
 						if (neon > 0.55) { var cn = neon > 0.8 ? '#ff3ab8' : neon > 0.68 ? '#3ae0ff' : '#b05aff'; ret(bx, topo + 2, 1, bh - 2, cn); for (var g = topo; g < baseY; g += 2) mistura(bx + 1, g, cn, 0.3); }
@@ -1181,6 +1230,7 @@
 					// a neblina na base das torres
 					for (var y3 = baseY - 50; y3 < baseY; y3++) for (var x3 = X0; x3 < X1; x3++) mistura(x3, y3, nevoa, (y3 - baseY + 50) / 50 * 0.35);
 				}
+				torres(2, 174, 90, 165, 8, 18, '#6a3a7a');
 				torres(0, 180, 60, 150, 10, 26, '#5a2a6a');
 				torres(1, 186, 70, 175, 18, 40, '#3a2a6a');
 				// a torre do telão gigante da gueixa, à esquerda (como os anúncios de Blade Runner)
@@ -1211,6 +1261,7 @@
 							ret(wx - 1, wy - 1, 12, 11, '#0e0c16');
 							ret(wx, wy, 10, 9, acesa ? function (a, b) { return rampa([luz, luz, '#2a2030'], (b - wy) / 14, a, b); } : '#0a0a18');
 							if (acesa) {
+								LUZES_J.push([wx + 5, wy + 5, luz]);
 								if (tipo === 0) { /* o abajur aceso entre as cortinas */
 									ret(wx, wy, 2, 9, '#8a3a4a'); ret(wx + 8, wy, 2, 9, '#8a3a4a'); px(wx + 1, wy + 2, '#6a2a3a'); px(wx + 8, wy + 5, '#6a2a3a');
 									ret(wx + 4, wy + 3, 3, 2, '#fff0b0'); px(wx + 3, wy + 4, '#ffe08a'); px(wx + 7, wy + 4, '#ffe08a'); ret(wx + 5, wy + 5, 1, 2, '#3a2a20'); ret(wx + 3, wy + 7, 5, 2, '#5a3a24');
@@ -1244,12 +1295,23 @@
 							if (ruido(wx, wy + 5) > 0.7) { ret(wx + 11, wy + 3, 6, 5, '#5a5e6a'); ret(wx + 12, wy + 4, 4, 1, '#8a8e98'); ret(wx + 12, wy + 5, 4, 1, '#3a3e48'); px(wx + 14, wy + 9, '#6a9ac8'); } // o ar-condicionado pingando
 						}
 					}
+					// os escorridos de chuva: faixas mais escuras descendo da mureta
+					for (var ex = x0 + 1; ex < x1 - 1; ex++) {
+						var esc = ruido(ex, 777);
+						if (esc > 0.78) for (var ey = topo; ey < HORIZ - 62; ey++) mistura(ex, ey, '#06040c', 0.14 * (1 - (ey - topo) / (HORIZ - topo)) * (esc - 0.7) * 4);
+					}
 					// os canos descendo pela parede e uns rabiscos de grafite perto da calçada
 					ret(x0 + 3, topo, 2, HORIZ - topo - 62, '#3a3448'); ret(x0 + 3, topo, 1, HORIZ - topo - 62, '#5a5268');
 					for (var gf = 0; gf < 3; gf++) { var gx = x0 + 10 + gf * 30; if (gx > x1 - 20) break; for (var gp = 0; gp < 14; gp++) px(gx + gp, HORIZ - 72 + Math.round(Math.sin(gp * 0.9 + gf) * 3), ['#ff3ab8', '#3ae0ff', '#ffd36a'][gf]); }
 				}
+				var LUZES_J = [];
 				predio(X0, 128, 86, ['#2a2236', '#221c2e', '#1a1624', '#14101c']);
 				predio(352, X1, 96, ['#1e2232', '#181c2a', '#121522', '#0e101a']);
+				/* a luz das janelas acesas espalhando na parede em volta (mais para baixo, como luz de abajur) */
+				LUZES_J.forEach(function (lj) {
+					var n2 = parseInt(lj[2].slice(1), 16);
+					luzOval(lj[0], lj[1] + 3, 13, 10, (n2 >> 16) & 255, (n2 >> 8) & 255, n2 & 255, 0.16);
+				});
 				// o prédio da agência no meio: fachada azul-marinho subindo, com o telão vertical dela
 				ret(150, 26, 180, HORIZ - 26, function (x2, y2) { return rampa(['#26388a', '#1c2a6e', '#16225a', '#101a4a'], (x2 - 150) / 180 * 0.5 + (y2 - 26) / 186 * 0.4 + (ruido(x2 >> 3, y2 >> 3) - 0.5) * 0.06, x2, y2); });
 				for (var sx = 172; sx < 330; sx += 22) { ret(sx, 26, 1, 120, '#0e1640'); ret(sx + 1, 26, 1, 120, '#2c3c8e'); }
@@ -1342,8 +1404,19 @@
 				for (var lv = 0; lv < 9; lv++) { var lx = 22 + lv * 12, lyv = 151 + Math.round(Math.sin(lv * 0.7) * 1); ret(lx, lyv, 4, 5, lv % 2 ? '#ffd36a' : '#ff6a4a'); px(lx + 1, lyv + 1, '#ffffff'); }
 				// a farmácia, à direita: a cruz verde de neon, a vitrine e as máquinas de venda brilhando
 				ret(352, 150, 120, 62, '#0c1a14'); ret(352, 150, 120, 3, '#2ad88a');
-				ret(358, 158, 60, 50, function (x2, y2) { return rampa(['#d8fff0', '#a8f0d0', '#6ad0a8'], (y2 - 158) / 50, x2, y2); });
-				for (var pr = 0; pr < 3; pr++) { ret(362, 168 + pr * 12, 52, 2, '#3a8a6a'); for (var it = 0; it < 6; it++) ret(364 + it * 8, 162 + pr * 12, 5, 6, ['#ff6a8a', '#ffffff', '#6ac8ff', '#ffd36a'][(it + pr) % 4]); }
+				ret(358, 158, 60, 50, function (x2, y2) { return rampa(['#a8e8d0', '#78c8a8', '#4a9a80', '#2e6a5a'], (y2 - 158) / 50, x2, y2); });
+				for (var pr = 0; pr < 3; pr++) {
+					ret(362, 168 + pr * 12, 52, 2, '#3a8a6a'); ret(362, 168 + pr * 12, 52, 1, '#7ad8aa');
+					for (var it = 0; it < 7; it++) {
+						var ix = 364 + it * 7, iy = 168 + pr * 12, ti = Math.floor(ruido(it, pr + 5) * 4), ci = ['#e83a5a', '#f4f4ff', '#2a8ae8', '#f0b020', '#8a4ae8'][(it + pr * 2) % 5];
+						if (ti === 0) { ret(ix + 1, iy - 6, 3, 6, ci); ret(ix + 2, iy - 8, 1, 2, '#e8ecf4'); px(ix + 1, iy - 5, '#ffffff'); ret(ix + 1, iy - 3, 3, 1, '#2a5a4a'); } /* o frasco com rótulo */
+						else if (ti === 1) { ret(ix, iy - 7, 5, 7, ci); ret(ix, iy - 7, 5, 1, '#ffffff'); ret(ix + 1, iy - 4, 3, 2, '#ffffff'); px(ix + 2, iy - 4, '#ff3a5a'); } /* a caixinha com a cruz */
+						else if (ti === 2) { ret(ix, iy - 4, 5, 4, ci); ret(ix, iy - 5, 5, 1, '#e8ecf4'); px(ix + 1, iy - 3, '#ffffff'); } /* o pote */
+						else { ret(ix + 1, iy - 6, 2, 6, ci); ret(ix + 3, iy - 5, 2, 5, '#ffffff'); px(ix + 1, iy - 6, '#ffffff'); } /* duas latinhas */
+					}
+				}
+				/* o reflexo da rua no vidro: duas faixas claras na diagonal */
+				for (var rv = 0; rv < 50; rv++) for (var rk = 0; rk < 3; rk++) { mistura(362 + rv * 0.9 + rk, 206 - rv, '#ffffff', 0.07); mistura(392 + rv * 0.6 + rk, 206 - rv * 0.9, '#ffffff', 0.04); }
 				ret(380, 128, 26, 26, '#0a0814'); ret(389, 131, 8, 20, '#2aff8a'); ret(383, 137, 20, 8, '#2aff8a'); brilho(393, 141, 22, '#2aff8a', 0.3);
 				// (com um painel holográfico verde translúcido atrás, para dar para ler)
 				ret(373, 112, 41, 11, function (x2, y2) { mistura(x2, y2, y2 % 2 ? '#04241a' : '#06301f', 0.82); return null; });
@@ -1362,26 +1435,42 @@
 				ret(X0, HORIZ, W, 10, function (x2, y2) { return (x2 % 16 === 0) ? '#1a1828' : rampa(['#3a3650', '#2e2a44', '#24223a'], (y2 - HORIZ) / 10 + (ruido(x2 >> 1, y2) - 0.5) * 0.2, x2, y2); });
 				ret(X0, HORIZ + 10, W, 2, '#5a5878'); ret(X0, HORIZ + 12, W, 1, '#14121e');
 				ret(X0, HORIZ + 13, W, H - HORIZ - 13, function (x2, y2) { return rampa(['#1a1828', '#14121e', '#0e0c16'], (y2 - HORIZ) / 58 * 0.6 + (ruido(x2 >> 2, y2 >> 1) - 0.5) * 0.15, x2, y2); });
-				// o reflexo de tudo no asfalto molhado (o espelho da fachada, tremido e mais escuro)
+				// o reflexo de tudo no asfalto molhado: o espelho da fachada, borrado de leve, tremendo em
+				// ondinhas e sumindo com a distância (nas poças, bem mais nítido e claro)
+				var POCAS = [[110, 252, 18], [300, 262, 26], [460, 244, 14], [190, 230, 12], [30, 240, 16], [250, 250, 10]];
+				var copia = buf.slice();
 				for (var ry = HORIZ + 13; ry < H; ry++) {
-					var dist = ry - (HORIZ + 13), origem = HORIZ - 2 - Math.round(dist * 1.6), onda = Math.round(Math.sin(ry * 1.3) * 1.5);
+					var dist = ry - (HORIZ + 13), origem = HORIZ - 2 - Math.round(dist * 1.6);
 					if (origem < 0) continue;
 					for (var rx = X0; rx < X1; rx++) {
-						var k = (origem * BW) + Math.max(0, Math.min(BW - 1, rx + DX + onda)), v = buf[k];
-						if (!v || ruido(rx >> 1, ry) < 0.25) continue;
-						var hex = '#' + ('00000' + (((v & 255) << 16) | (v & 0xff00) | ((v >> 16) & 255)).toString(16)).slice(-6);
-						mistura(rx, ry, hex, 0.42 * (1 - dist / 70));
+						var poca = 0;
+						for (var pq = 0; pq < POCAS.length; pq++) { var q0 = POCAS[pq], dpq = Math.pow((rx - q0[0]) / (q0[2] + 6), 2) + Math.pow((ry - q0[1]) / 4, 2); if (dpq < 1) poca = Math.max(poca, 1 - dpq); }
+						var onda = Math.sin(ry * 0.9 + rx * 0.04) * 1.3 * (1 - poca * 0.7) + Math.sin(ry * 2.3 + rx * 0.11) * 0.5;
+						var sx = rx + DX + Math.round(onda), rr = 0, gg = 0, bb = 0, nn = 0;
+						for (var kk = -1; kk <= 1; kk++) { var vv = copia[origem * BW + Math.max(0, Math.min(BW - 1, sx + kk))]; if (!vv) continue; rr += vv & 255; gg += (vv >> 8) & 255; bb += (vv >> 16) & 255; nn++; }
+						if (!nn) continue;
+						var alfa = (0.38 + poca * 0.4) * Math.pow(1 - dist / 72, 1.2) * (0.8 + 0.2 * ruidoSuave(rx * 0.2, ry * 0.7));
+						var kd = ry * BW + rx + DX, o = buf[kd];
+						buf[kd] = (255 << 24 | Math.round(((o >> 16) & 255) * (1 - alfa) + bb / nn * alfa) << 16 | Math.round(((o >> 8) & 255) * (1 - alfa) + gg / nn * alfa) << 8 | Math.round((o & 255) * (1 - alfa) + rr / nn * alfa)) >>> 0;
 					}
 				}
-				// os reflexos coloridos compridos dos neons no asfalto (vermelho do lámen, dourado da agência, verde da farmácia...)
-				[[72, '#ff4a3a', 30], [26, '#ff5a3a', 8], [118, '#ff5a3a', 8], [240, '#e8c46a', 60], [393, '#2aff8a', 20], [434, '#3ae0ff', 8], [454, '#ff3ab8', 8], [66, '#ff3ab8', 30]].forEach(function (q) {
-					for (var ry2 = HORIZ + 14; ry2 < H; ry2++) for (var dx2 = -q[2] / 2; dx2 < q[2] / 2; dx2++) {
-						var forca = (1 - (ry2 - HORIZ) / 60) * (1 - Math.abs(dx2) / (q[2] / 2)) * 0.35;
-						if (ruido(q[0] + dx2, ry2 >> 1) > 0.3 && (ry2 % 3)) mistura(q[0] + dx2 + Math.round(Math.sin(ry2 * 0.9) * 1.5), ry2, q[1], forca);
+				// os reflexos compridos dos neons no asfalto: riscos verticais macios, tremendo (vermelho do
+				// lámen, dourado da agência, verde da farmácia, ciano dos postes...)
+				[[72, '#ff4a3a', 30], [26, '#ff5a3a', 8], [118, '#ff5a3a', 8], [240, '#e8c46a', 60], [393, '#2aff8a', 20], [434, '#3ae0ff', 8], [454, '#ff3ab8', 8], [66, '#ff3ab8', 30], [138, '#3ae0ff', 6], [342, '#3ae0ff', 6]].forEach(function (q) {
+					var n3 = parseInt(q[1].slice(1), 16), cr = (n3 >> 16) & 255, cg = (n3 >> 8) & 255, cb = n3 & 255;
+					for (var ry2 = HORIZ + 13; ry2 < H; ry2++) {
+						var d2 = (ry2 - HORIZ - 13) / 60, larg = q[2] / 2 * (1 + d2 * 0.4), meio = q[0] + Math.sin(ry2 * 0.7) * 1.5 + Math.sin(ry2 * 0.23);
+						for (var dx2 = -larg; dx2 <= larg; dx2++) somar(meio + dx2, ry2, cr, cg, cb, Math.exp(-Math.pow(dx2 / larg, 2) * 2.5) * Math.max(0, 1 - d2) * (0.6 + 0.4 * Math.sin(ry2 * 1.7 + dx2 * 0.3)) * 0.32);
 					}
 				});
+				// a calçada molhada também espelha um pouco a fachada (de pertinho)
+				for (var cy2 = HORIZ; cy2 < HORIZ + 10; cy2++) for (var cx2 = X0; cx2 < X1; cx2++) {
+					var vo = copia[(HORIZ - 1 - (cy2 - HORIZ) * 2) * BW + cx2 + DX]; if (!vo) continue;
+					var af = 0.22 * (1 - (cy2 - HORIZ) / 10), kc = cy2 * BW + cx2 + DX, oc = buf[kc];
+					buf[kc] = (255 << 24 | Math.round(((oc >> 16) & 255) * (1 - af) + ((vo >> 16) & 255) * af) << 16 | Math.round(((oc >> 8) & 255) * (1 - af) + ((vo >> 8) & 255) * af) << 8 | Math.round((oc & 255) * (1 - af) + (vo & 255) * af)) >>> 0;
+				}
 				// poças mais claras, uma seta pintada e marcas de pneu
-				[[110, 252, 18], [300, 262, 26], [460, 244, 14], [190, 230, 12]].forEach(function (q) { elip(q[0], q[1], q[2], 2, function (x2, y2) { mistura(x2, y2, '#8a90c8', 0.22); return null; }); });
+				POCAS.forEach(function (q) { elip(q[0], q[1] - 3, q[2], 1, function (x2, y2, u) { mistura(x2, y2, '#c8d0ff', 0.18 * (1 - u * u)); return null; }); }); /* a beirada clara de cada poça */
 				poli([[352, 258], [372, 258], [372, 255], [380, 260], [372, 265], [372, 262], [352, 262]], function (x2, y2) { mistura(x2, y2, '#d8d8e8', 0.22); return null; });
 				// os postes de luz da calçada (cabeça ciano) e um hidrante
 				[[140, '#3ae0ff'], [344, '#3ae0ff']].forEach(function (q) {
@@ -1395,7 +1484,21 @@
 				for (var fx = 150; fx < 340; fx += 16) ret(fx, 238, 9, 30, function (x2, y2) { mistura(x2, y2, '#d8d8e8', 0.28); return null; });
 				elip(420, 250, 12, 3, '#0a0a12'); for (var gr = -10; gr <= 10; gr += 3) ret(420 + gr, 248, 1, 4, '#2a2a3a');
 				letras('BIANCA CARDADOR', 360, 262, 1, '#5a5440'); // (a assinatura da autora, pintada no asfalto)
+				/* o cone de luz de cada poste, abrindo até a calçada */
+				[140, 344].forEach(function (lx2) {
+					for (var cy3 = 152; cy3 < 222; cy3++) {
+						var ab = 3 + (cy3 - 152) * 0.32, fc = 0.16 * (1 - (cy3 - 152) / 80);
+						for (var cx3 = -ab; cx3 <= ab; cx3++) somar(lx2 - 2 + cx3, cy3, 120, 220, 255, fc * (1 - Math.pow(cx3 / ab, 2)));
+					}
+					luzOval(lx2 - 2, 216, 26, 5, 120, 220, 255, 0.3);
+				});
+				/* as poças de luz das lojas na calçada: o laranja do lámen, o dourado da agência e o verde da farmácia */
+				luzOval(70, 214, 60, 8, 255, 130, 60, 0.35); luzOval(240, 214, 50, 8, 255, 220, 150, 0.4); luzOval(400, 214, 56, 8, 60, 255, 150, 0.32);
+				/* a luz das lanternas e dos neons batendo nas paredes em volta */
+				luzOval(26, 146, 22, 22, 255, 80, 50, 0.22); luzOval(118, 146, 22, 22, 255, 80, 50, 0.22); luzOval(393, 141, 34, 30, 40, 255, 120, 0.16);
+				luzOval(240, 129, 96, 30, 255, 200, 110, 0.1);
 			});
+			bloom(p, 150, 2, 0.5); bloom(p, 110, 8, 0.38); /* o brilho em volta de tudo que é aceso */
 			var k = paraCanvas(p), g = k.getContext('2d');
 			if (simbImg) { g.imageSmoothingEnabled = false; g.drawImage(simbImg, OX + 156, 113, 32, 32); } // o símbolo do lado do nome, no tamanho certo (nítido)
 			return k;
