@@ -3443,6 +3443,53 @@
 		}
 	};
 
+	// ---------- A paisagem em volta do porto (no hangar e na decolagem) ----------
+	// o entardecer no deserto: o Sol baixo com brilho, nuvens finas acesas por baixo e três camadas de
+	// serra, cada uma com as faces viradas para o Sol iluminadas e as outras na sombra, em cores chapadas:
+	// a do fundo lilás e enevoada, a do meio laranja e a da frente com os paredões em forma de mesa e as
+	// faixas da rocha. "base" é a linha do chão na tela; "H0", a altura da serra mais alta.
+	var SERRA_COR = [
+		{ luz: '#d89aa0', meio: '#b47e96', sombra: '#8a6690', topo: '#f0c0b0' },
+		{ luz: '#e8945e', meio: '#b8644e', sombra: '#6e3a52', topo: '#ffd09a' },
+		{ luz: '#f0a464', meio: '#c4703e', sombra: '#783832', topo: '#ffe0a8', faixa: '#a85a36', faixaSombra: '#5a2a2a' }
+	];
+	function serraAltura(x, i) {
+		if (i === 0) return 0.62 + 0.26 * ruidoSuave(x / 46 + 3, 1.5) + 0.12 * ruidoSuave(x / 13 + 1, 4.2);
+		if (i === 1) { var n = ruidoSuave(x / 30 + 11, 7) * 0.7 + ruidoSuave(x / 9 + 5, 2) * 0.3; return 0.22 + Math.pow(n, 1.5) * 0.62; }
+		var m = ruidoSuave(x / 34 + 20, 9), mesa = Math.max(0, Math.min(1, (m - 0.5) * 9)); /* as mesas: sobem de repente e ficam planas em cima */
+		return 0.1 + m * 0.12 + mesa * 0.2 + (ruidoSuave(x / 4, 3) - 0.5) * 0.02;
+	}
+	function paisagemPorto(x, y, base, H0) {
+		var h = base - y;
+		for (var i = 2; i >= 0; i--) {
+			var topo = serraAltura(x, i) * H0;
+			if (h >= topo) continue;
+			var C = SERRA_COR[i], incl = (serraAltura(x + 1, i) - serraAltura(x - 1, i)) * H0;
+			/* as ranhuras de erosão descendo a encosta deixam a luz em listras */
+			var ranhura = ruidoSuave(x / (i === 0 ? 5 : 3.2) + i * 7, h / 9) - 0.5;
+			var lado = incl + ranhura * (i === 0 ? 0.15 : 0.8);
+			if (topo - h < 1 && incl > -0.2) return C.topo;
+			var cor = lado > 0.25 ? C.luz : lado < -0.25 ? C.sombra : C.meio;
+			if (i === 2 && Math.floor((h + Math.sin(x * 0.09) * 1.5) / 3) % 3 === 0) cor = cor === C.sombra ? C.faixaSombra : C.faixa; /* as faixas da rocha */
+			if (i === 2 && h < topo * 0.25 && ruido(x, Math.floor(y)) > 0.7) cor = C.sombra; /* o pé do paredão, com pedras soltas */
+			return cor;
+		}
+		return null;
+	}
+	// o céu do entardecer em cima da serra (stops do degradê: do alto para o horizonte), o Sol e as nuvens
+	function ceuEntardecer(x, y, base, alto, sol) {
+		var cores = ['#03041a', '#0c0e34', '#1e1a50', '#3e2a6a', '#7a3a78', '#c05a6a', '#f08a5a', '#ffc080', '#ffe0a8'];
+		var t = Math.max(0, Math.min(1, 1 - (base - y) / alto));
+		if (sol) {
+			var ds = Math.hypot(x - sol[0], (y - sol[1]) * 1.15);
+			if (ds < sol[2]) return ds < sol[2] - 1.5 ? '#fff6dc' : '#ffe6a8';
+			if (ds < sol[2] * 3.2) t = Math.min(1, t + (1 - (ds - sol[2]) / (sol[2] * 2.2)) * 0.22); /* o brilho em volta */
+		}
+		var nv = ruidoSuave(x / 44 + 2, y / 2.6), faixaN = 1 - Math.abs(t - 0.76) / 0.08;
+		if (faixaN > 0 && nv > 0.77 - faixaN * 0.06) return ruidoSuave(x / 44 + 2, (y + 1) / 2.6) < nv - 0.02 ? '#ffb48a' : '#c46a7a'; /* as nuvens finas, acesas por baixo */
+		return rampa(cores, Math.pow(t, 1.25), x, y);
+	}
+
 	// 8. O HANGAR, visto do alto em diagonal (a mesma inclinação da câmera para o chão e para a nave):
 	// a baia redonda afundada no pátio de concreto, o muro curvo por dentro, a faixa zebrada, a torre,
 	// os paredões de rocha; a PX-01 estacionada, apoiada no trem de pouso, com a sombra no chão,
@@ -3487,11 +3534,8 @@
 							var ang = Math.atan2((y - B.cy) / B.ry, (x - B.cx) / B.rx), alt = (y - (B.cy + Math.sin(ang) * B.ry)) / B.fundo;
 							c = (Math.round(ang * 40) % 5 === 0) ? '#1e2028' : rampa(['#5e6270', '#4a4e5a', '#3a3e4a', '#2c2f38'], alt * 0.7 + 0.15 + Math.cos(ang) * 0.15, x, y);
 						}
-					} else if (y < 9 + Math.sin((x + OX) * 0.05) * 4 + ruido((x + OX) >> 4, 9) * 5) { // um pedaço de céu entardecendo lá em cima
-						c = rampa(['#f0a868', '#e8c890', '#b8c8e0', '#8aa8d8'], 1 - y / 14, x, y);
-					} else if (y < 30 + Math.sin((x + OX) * 0.03) * 8 + ruido((x + OX) >> 3, 2) * 10) { // os paredões de rocha no fundo
-						var cam = Math.floor((y + Math.sin(x * 0.05) * 5) / 6);
-						c = rampa(['#5a4434', '#7a5c44', '#9a7656', '#b8946c', '#d4b088'], 0.2 + ruido(x >> 2, cam) * 0.5 + (cam % 3) * 0.1, x, y);
+					} else if (y < 34) { // lá no fundo, além do pátio: a serra e o céu do entardecer (a mesma paisagem da decolagem)
+						c = paisagemPorto((x + OX) * 2.2, y, 34, 30) || ceuEntardecer((x + OX) * 2.2, y, 34, 44, [330 * 2.2, 10, 4]);
 					} else { // o pátio de concreto em volta, mais claro, com marcas de pneu e juntas
 						var gx = (x + OX) / 34, gy = y / 22;
 						c = (gx - Math.floor(gx) < 0.04 || gy - Math.floor(gy) < 0.06) ? '#a29e94' : rampa(['#d8d2c4', '#cac4b6', '#bab4a6', '#aaa498'], 0.25 + ruido(Math.floor(gx), Math.floor(gy)) * 0.2 + (ruido(x, y) - 0.5) * 0.15 + y / H * 0.2, x, y);
@@ -3873,13 +3917,13 @@
 			cena10.fora = paraCanvas(pintar(new Pintura(W, H * 2, OX), function () {
 				for (var y = 0; y < H * 2; y++) for (var x = -OX; x < NUCLEO + OX; x++) {
 					var c, q = (x - 240) / 240;
-					var rocha = 300 + Math.sin((x + OX) * 0.04) * 6 + ruido((x + OX) >> 3, 7) * 9, muro = 334 + q * q * 10, chao = 362 + q * q * 14;
-					if (y < rocha) {
-						c = rampa(['#03041a', '#080c2e', '#141a4c', '#2e2a68', '#6a3a78', '#c0605e', '#f0a868'], Math.pow(y / rocha, 1.7), x, y);
-						if (y < 250 && ruido(x + 917, y + 331) > 0.991 + y / 250 * 0.008) c = ruido(x, y) > 0.6 ? '#ffffff' : '#bfe0ff';
-					} else if (y < muro) {
-						var cam = Math.floor((y + Math.sin(x * 0.07) * 4) / 5);
-						c = rampa(['#4a3a30', '#6a5040', '#8a6a50', '#aa8664', '#c8a07a'], 0.2 + ruido(x >> 2, cam) * 0.5 + (cam % 3) * 0.1 - (y - rocha) / 34 * 0.25, x, y);
+					var muro = 334 + q * q * 10, chao = 362 + q * q * 14;
+					if (y < muro) { /* a serra no entardecer e o céu indo até o espaço (com as estrelas lá em cima) */
+						c = paisagemPorto(x + OX, y, 336, 58);
+						if (!c) {
+							c = ceuEntardecer(x + OX, y, 336, 336, [318 + OX, 274, 11]);
+							if (y < 250 && ruido(x + 917, y + 331) > 0.991 + y / 250 * 0.008) c = ruido(x, y) > 0.6 ? '#ffffff' : '#bfe0ff';
+						}
 					} else if (y < chao) {
 						c = (Math.floor((x + OX) / 9) % 4 === 0) ? '#1e2028' : rampa(['#6a6e7a', '#5e6270', '#4a4e5a', '#3a3e4a', '#2c2f38'], (y - muro) / (chao - muro) * 0.8 + 0.1, x, y);
 					} else { // o chão da baia em perspectiva, com as juntas fugindo para o fundo
